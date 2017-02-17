@@ -114,11 +114,11 @@ class TauTauAnalysis : public SCycleBase {
                                const UZH::MissingEt& met, const UZH::MissingEt& puppimet );//, const UZH::MissingEt& mvamet=NULL);
     
     // check pass of triggers / MET filters
-    virtual TString passTrigger();
+    virtual TString passTrigger( int runNumber, int lumiSection );
     virtual bool passMETFilters();
     
     // obtain event weights for MC
-    virtual void getEventWeight( int runNumber, int lumiSection );
+    virtual void getEventWeight();
     
     // GenFilter to select Z to tautau events
     virtual void genFilterZtautau();

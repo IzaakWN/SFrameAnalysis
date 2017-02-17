@@ -634,13 +634,13 @@ void TauTauAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
     fillCutflow("cutflow_" + ch, "histogram_" + ch, kBeforeCuts, 1);
     b_channel[ch] = 0;
   }
-//   if (m_isSignal){
-//     checks();
-//     visiblePTCheck();
-//     for (auto ch: channels_){
-//       cutflowCheck(ch);
-//     }
-//   }
+  // if (m_isSignal){
+  // checks();
+  // visiblePTCheck();
+  // for (auto ch: channels_){
+  //   cutflowCheck(ch);
+  // }
+  // }
   
   
   // Cut 1: check for data if run/lumiblock in JSON
@@ -849,33 +849,33 @@ void TauTauAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
     fillCutflow("cutflow_mutau", "histogram_mutau", kLepTau, 1);
     sort(mutau_pair.begin(), mutau_pair.end());
     
-//     UZH::MissingEt MvaMet;
-//     for ( int i = 0; i < (Met.Nmva()); ++i ) {
-//       UZH::MissingEt myMvaMet( &m_mvamissingEt, i );
-//       
-//       bool flag_lep = false;
-//       bool flag_tau = false;
-//       
-//       for(int ipf=0; ipf < (int) myMvaMet.recoil_pt().size(); ipf++){
-//         Float_t recoil_pt = myMvaMet.recoil_pt().at(ipf);
-//         Float_t recoil_eta = myMvaMet.recoil_eta().at(ipf);
-//         Float_t recoil_phi = myMvaMet.recoil_phi().at(ipf);
-//         Int_t recoil_pdgId = abs(myMvaMet.recoil_pdgId().at(ipf));
-//         
-//         if(recoil_pt == goodMuons[mutau_pair[0].ilepton].pt() && 
-//            recoil_eta == goodMuons[mutau_pair[0].ilepton].eta() && 
-//            recoil_phi == goodMuons[mutau_pair[0].ilepton].phi() &&
-//            recoil_pdgId == 13) flag_lep = true;
-//         
-//         if(recoil_pt == goodTaus[mutau_pair[0].itau].pt() && 
-//            recoil_eta == goodTaus[mutau_pair[0].itau].eta() && 
-//            recoil_phi == goodTaus[mutau_pair[0].itau].phi() && 
-//            recoil_pdgId == 15) flag_tau = true;
-//       }
-//       
-//       if(flag_lep==true && flag_tau==true) MvaMet = myMvaMet;
-//       
-//     }
+    // UZH::MissingEt MvaMet;
+    // for ( int i = 0; i < (Met.Nmva()); ++i ) {
+    //   UZH::MissingEt myMvaMet( &m_mvamissingEt, i );
+    //   
+    //   bool flag_lep = false;
+    //   bool flag_tau = false;
+    //   
+    //   for(int ipf=0; ipf < (int) myMvaMet.recoil_pt().size(); ipf++){
+    //     Float_t recoil_pt = myMvaMet.recoil_pt().at(ipf);
+    //     Float_t recoil_eta = myMvaMet.recoil_eta().at(ipf);
+    //     Float_t recoil_phi = myMvaMet.recoil_phi().at(ipf);
+    //     Int_t recoil_pdgId = abs(myMvaMet.recoil_pdgId().at(ipf));
+    //     
+    //     if(recoil_pt == goodMuons[mutau_pair[0].ilepton].pt() && 
+    //        recoil_eta == goodMuons[mutau_pair[0].ilepton].eta() && 
+    //        recoil_phi == goodMuons[mutau_pair[0].ilepton].phi() &&
+    //        recoil_pdgId == 13) flag_lep = true;
+    //     
+    //     if(recoil_pt == goodTaus[mutau_pair[0].itau].pt() && 
+    //        recoil_eta == goodTaus[mutau_pair[0].itau].eta() && 
+    //        recoil_phi == goodTaus[mutau_pair[0].itau].phi() && 
+    //        recoil_pdgId == 15) flag_tau = true;
+    //   }
+    //   
+    //   if(flag_lep==true && flag_tau==true) MvaMet = myMvaMet;
+    //   
+    // }
     
     // For Jets
     std::vector<UZH::Jet> goodJetsAK4;
@@ -912,33 +912,33 @@ void TauTauAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
     fillCutflow("cutflow_eletau", "histogram_eletau", kLepTau, 1);
     sort(eletau_pair.begin(), eletau_pair.end());
     
-//     UZH::MissingEt MvaMet;
-//     for ( int i = 0; i < (Met.Nmva()); ++i ) {
-//       UZH::MissingEt myMvaMet( &m_mvamissingEt, i );
-//       
-//       bool flag_lep = false;
-//       bool flag_tau = false;
-//       
-//       for(int ipf=0; ipf < (int) myMvaMet.recoil_pt().size(); ipf++){
-//         Float_t recoil_pt = myMvaMet.recoil_pt().at(ipf);
-//         Float_t recoil_eta = myMvaMet.recoil_eta().at(ipf);
-//         Float_t recoil_phi = myMvaMet.recoil_phi().at(ipf);
-//         Int_t recoil_pdgId = abs(myMvaMet.recoil_pdgId().at(ipf));
-//         
-//         if(recoil_pt == goodElectrons[eletau_pair[0].ilepton].pt() && 
-//            recoil_eta == goodElectrons[eletau_pair[0].ilepton].eta() && 
-//            recoil_phi == goodElectrons[eletau_pair[0].ilepton].phi() && 
-//            recoil_pdgId == 11) flag_lep = true;
-//         
-//         if(recoil_pt == goodTaus[eletau_pair[0].itau].pt() && 
-//            recoil_eta == goodTaus[eletau_pair[0].itau].eta() && 
-//            recoil_phi == goodTaus[eletau_pair[0].itau].phi() && 
-//            recoil_pdgId == 15) flag_tau = true;
-//       }
-//       
-//       if(flag_lep==true && flag_tau==true) MvaMet = myMvaMet;
-//     
-//     }
+    // UZH::MissingEt MvaMet;
+    // for ( int i = 0; i < (Met.Nmva()); ++i ) {
+    //   UZH::MissingEt myMvaMet( &m_mvamissingEt, i );
+    //   
+    //   bool flag_lep = false;
+    //   bool flag_tau = false;
+    //   
+    //   for(int ipf=0; ipf < (int) myMvaMet.recoil_pt().size(); ipf++){
+    //     Float_t recoil_pt = myMvaMet.recoil_pt().at(ipf);
+    //     Float_t recoil_eta = myMvaMet.recoil_eta().at(ipf);
+    //     Float_t recoil_phi = myMvaMet.recoil_phi().at(ipf);
+    //     Int_t recoil_pdgId = abs(myMvaMet.recoil_pdgId().at(ipf));
+    //     
+    //     if(recoil_pt == goodElectrons[eletau_pair[0].ilepton].pt() && 
+    //        recoil_eta == goodElectrons[eletau_pair[0].ilepton].eta() && 
+    //        recoil_phi == goodElectrons[eletau_pair[0].ilepton].phi() && 
+    //        recoil_pdgId == 11) flag_lep = true;
+    //     
+    //     if(recoil_pt == goodTaus[eletau_pair[0].itau].pt() && 
+    //        recoil_eta == goodTaus[eletau_pair[0].itau].eta() && 
+    //        recoil_phi == goodTaus[eletau_pair[0].itau].phi() && 
+    //        recoil_pdgId == 15) flag_tau = true;
+    //   }
+    //   
+    //   if(flag_lep==true && flag_tau==true) MvaMet = myMvaMet;
+    // 
+    // }
     
     
     // For Jets

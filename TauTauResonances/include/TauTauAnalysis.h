@@ -91,34 +91,34 @@ class TauTauAnalysis : public SCycleBase {
       "LepTau",                 // C6
       "BeforeCutsWeighted",     // C7
     };
-  
-  
+    
+    
     // default constructor and destructor
     TauTauAnalysis();  // default constructor
     ~TauTauAnalysis(); // default destructor
-
+    
     // SFrame
     virtual void BeginCycle() throw( SError );                        // called beginning of the cycle
     virtual void EndCycle()   throw( SError );                        // called at the end of the cycle
     virtual void BeginInputData( const SInputData& ) throw( SError ); // called at the beginning of a new input data
     virtual void EndInputData  ( const SInputData& ) throw( SError ); // called after finishing to process an input data
     virtual void BeginInputFile( const SInputData& ) throw( SError ); // called after opening each new input file
-    virtual void ExecuteEvent( const SInputData&, Double_t ) throw( SError ); // called for every event
-    virtual bool isGoodEvent   (int runNumber, int lumiSection);      // check good lumi section
+    virtual void ExecuteEvent  ( const SInputData&, Double_t    ) throw( SError ); // called for every event
+    virtual bool isGoodEvent   ( int runNumber, int lumiSection );    // check good lumi section
     
     
     /// Function to book tree branches
     //virtual void FillBranches(const std::string& channel,  const std::vector<UZH::Jet>& Jet, const UZH::Tau& tau, const  TLorentzVector& lepton, const UZH::MissingEt& met );
-    virtual void FillBranches(const std::string& channel, const std::vector<UZH::Jet>& Jet,
-                              const UZH::Tau& tau, const int taugen, const UZH::Muon& muon, const UZH::Electron& electron,
-                              const UZH::MissingEt& met, const UZH::MissingEt& puppimet);//, const UZH::MissingEt& mvamet=NULL);
+    virtual void FillBranches( const std::string& channel, const std::vector<UZH::Jet>& Jet,
+                               const UZH::Tau& tau, const int taugen, const UZH::Muon& muon, const UZH::Electron& electron,
+                               const UZH::MissingEt& met, const UZH::MissingEt& puppimet );//, const UZH::MissingEt& mvamet=NULL);
     
     // check pass of triggers / MET filters
     virtual TString passTrigger();
     virtual bool passMETFilters();
     
     // obtain event weights for MC
-    virtual void getEventWeight();
+    virtual void getEventWeight( int runNumber, int lumiSection );
     
     // GenFilter to select Z to tautau events
     virtual void genFilterZtautau();
@@ -132,25 +132,25 @@ class TauTauAnalysis : public SCycleBase {
     // help function
     virtual Float_t deltaPhi(Float_t p1, Float_t p2);
     virtual Float_t deltaR(Float_t p1, Float_t p2);
-    virtual void shiftLeptonAndMET( const float shift, TLorentzVector& lep_shifted, TLorentzVector& met_shifted, bool shiftEnergy = false);
+    virtual void shiftLeptonAndMET( const float shift, TLorentzVector& lep_shifted, TLorentzVector& met_shifted, bool shiftEnergy = false );
     
     // IDs
-    virtual bool isNonTrigElectronID(const UZH::Electron& electron);
-    virtual bool LooseJetID(const UZH::Jet& jet);
+    virtual bool isNonTrigElectronID( const UZH::Electron& electron );
+    virtual bool LooseJetID( const UZH::Jet& jet );
     
     // extra scaling factors
-    virtual float genMatchSF(const std::string& channel, const int genmatch_2, const float tau_eta = 0.);
+    virtual float genMatchSF( const std::string& channel, const int genmatch_2, const float tau_eta = 0. );
     virtual bool  getBTagWeight_promote_demote( const UZH::Jet& jet );
     
     // checks
     virtual void checks();
-    virtual void cutflowCheck(const std::string& channel);
+    virtual void cutflowCheck( const std::string& channel );
     virtual void visiblePTCheck();
     
     /// fill cut flow
     //virtual void fillCutflow( const std::string histName, const std::string dirName, const Int_t id, const Double_t weight = 1.);
-    virtual void fillCutflow(TString histName, TString dirName, const Int_t id, const Double_t weight = 1.);
-    virtual void printCutFlow(const std::string& ch, const std::string& name, const TString hname, const TString dirname, std::vector<std::string> cutName);
+    virtual void fillCutflow( TString histName, TString dirName, const Int_t id, const Double_t weight = 1. );
+    virtual void printCutFlow( const std::string& ch, const std::string& name, const TString hname, const TString dirname, std::vector<std::string> cutName );
     
     
     
@@ -398,6 +398,7 @@ class TauTauAnalysis : public SCycleBase {
     std::map<std::string,Int_t>    b_extraelec_veto;
     std::map<std::string,Int_t>    b_extramuon_veto;
     std::map<std::string,Int_t>    b_lepton_vetos;
+    std::map<std::string,Int_t>    b_iso_cuts;
     
     std::map<std::string,Double_t> b_jpt_1;
     std::map<std::string,Double_t> b_jeta_1;

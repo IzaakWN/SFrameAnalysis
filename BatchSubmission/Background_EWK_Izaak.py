@@ -1,4 +1,4 @@
-path2xml="$SFRAME_DIR/../BatchSubmission/xmls_Summer2016"
+path2xml="$SFRAME_DIR/../BatchSubmission/xmls_Moriond"
 path2tmp="$SFRAME_DIR/../AnalysisTemp"
 jobName="EWK"
 outDir="/scratch/$USER/SFrameAnalysis/AnalysisOutput/"+jobName #"$SFRAME_DIR/../AnalysisOutput/"+jobName
@@ -9,10 +9,10 @@ nProcesses=1
 nFiles=4
 hCPU="03:30:00"
 hVMEM="5000M"
-postFix="_Summer2016"
+postFix="_Moriond"
 dataSets = [ ]
                             
-if "Summer2016" in postFix: dataSets = [
+if "Moriond" in postFix: dataSets = [
         
        [ "EWKWMinus2Jets_WToLNu_M-50",
         [   "EWKWMinus2Jets_WToLNu_M-50_13TeV-madgraph-pythia8_V1_ext_0000.xml",

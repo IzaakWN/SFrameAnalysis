@@ -1,4 +1,4 @@
-path2xml="$SFRAME_DIR/../BatchSubmission/xmls_Summer2016"
+path2xml="$SFRAME_DIR/../BatchSubmission/xmls_Moriond"
 path2tmp="$SFRAME_DIR/../AnalysisTemp"
 jobName="WZ"
 outDir="/scratch/$USER/SFrameAnalysis/AnalysisOutput/"+jobName #"$SFRAME_DIR/../AnalysisOutput/"+jobName
@@ -9,7 +9,7 @@ nProcesses=1
 nFiles=8
 hCPU="03:30:00"
 hVMEM="5000M"
-postFix="_Summer2016" #"_ICHEP" #"_Summer2016"
+postFix="_Moriond" #"_ICHEP" #"_Moriond"
 dataSets = [             
        [ "WZ_TuneCUETP8M1",
         [   "WZ_TuneCUETP8M1_13TeV-pythia8_HLT1_0000_0.xml",
@@ -22,7 +22,7 @@ dataSets = [
             "WZ_TuneCUETP8M1_13TeV-pythia8_HLT1_0000_7.xml", ]],    
             ]
                 
-if "Summer2016" in postFix: dataSets = [
+if "Moriond" in postFix: dataSets = [
               
        [ "WZTo3LNu_TuneCUETP8M1_13TeV_nlo",
         [   "WZTo3LNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_V2_0000_0.xml",

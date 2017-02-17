@@ -9,7 +9,7 @@ TESFILES="Signal_Izaak.py \
           Background_DY_NLO_Izaak.py \
           Background_TT_Izaak.py"
 LTFFILES="Background_DY_Izaak.py \
-          Background_DY_NLO_Izaak.py"
+          Background_DY_NLO_Izaak.py" # Background_DY_10to50_Izaak.py
 EESFILES=`ls *_Izaak.py | grep -v TES | grep -v LTF | grep -v EES | grep -v SUSY | grep -v EWK | grep -v Data`
 FILEND="_Izaak.py"
 
@@ -32,15 +32,15 @@ DOWN=(       "TES0p97"    "EES0p99"    "LTF0p97" )
 for ((i=0;i<${#DO_VAR[@]};++i)); do
     
     DO_LINE="\[\"${DO_VAR[i]}\",\"false\"\]"
-    DO_LINE_TRUE=`echo grep $DO_LINE | sed "s/false/true/"`
+    DO_LINE_TRUE=`echo $DO_LINE | sed "s/false/true/"`
     
     SHIFT_LINE="\[\"${SHIFT_VAR[i]}\",\"0.00\"\]"
     SHIFT_LINE_UP=`echo $SHIFT_LINE | sed "s/0.00/${SHIFT[i]}/"`
     SHIFT_LINE_DOWN=`echo $SHIFT_LINE | sed "s/0.00/-${SHIFT[i]}/"`
     
     LABEL_LINE="postFix=\""
-    LABEL_LINE_UP="$LABEL_LINE=\"_${UP[i]}"
-    LABEL_LINE_DOWN="$LABEL_LINE=\"_${DOWN[i]}"
+    LABEL_LINE_UP="${LABEL_LINE}_${UP[i]}"
+    LABEL_LINE_DOWN="${LABEL_LINE}_${DOWN[i]}"
     
     echo ">>> "
     echo ">>> replacing \"${SHIFT_LINE}\" with: "

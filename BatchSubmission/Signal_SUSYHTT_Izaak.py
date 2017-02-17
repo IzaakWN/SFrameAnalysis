@@ -1,4 +1,4 @@
-path2xml="$SFRAME_DIR/../BatchSubmission/xmls_Summer2016"
+path2xml="$SFRAME_DIR/../BatchSubmission/xmls_Moriond"
 path2tmp="$SFRAME_DIR/../AnalysisTemp"
 jobName="HTT"
 outDir="/scratch/$USER/SFrameAnalysis/AnalysisOutput/"+jobName #"$SFRAME_DIR/../AnalysisOutput/"+jobName
@@ -9,7 +9,7 @@ nProcesses=1
 nFiles=2
 hCPU="03:30:00"
 hVMEM="5000M"
-postFix="_Summer2016"
+postFix="_Moriond"
 dataSets = [
     ["SUSYGluGluToHToTauTau_M-160_TuneCUETP8M1_13TeV",
      [  "SUSYGluGluToHToTauTau_M-160_TuneCUETP8M1_13TeV-pythia8.xml", ]],

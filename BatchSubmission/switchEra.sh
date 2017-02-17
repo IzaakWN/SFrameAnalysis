@@ -1,6 +1,6 @@
 #! /bin/bash
 # check with
-#    grep -e "postFix=\"_Summer2016\"" *_Izaak.py
+#    grep -e "postFix=\"_Moriond\"" *_Izaak.py
 #    grep -e "postFix=\"_ICHEP\"" *_Izaak.py
 
 echo
@@ -10,9 +10,9 @@ cd $BASEDIR
 FILES=`ls Signal_*_Izaak.py Background_*_Izaak.py Data_*_Izaak.py | grep -v "_TES" | grep -v "_EES" | grep -v "_LTF"`
 LABEL="postFix=\""
 LABEL1="postFix=\"_ICHEP\""
-LABEL2="postFix=\"_Summer2016\""
+LABEL2="postFix=\"_Moriond\""
 PATH1="xmls_Izaak"
-PATH2="xmls_Summer2016"
+PATH2="xmls_Moriond"
 
 FILES0=( ) # no match
 FILES1=( ) # match to LABEL1

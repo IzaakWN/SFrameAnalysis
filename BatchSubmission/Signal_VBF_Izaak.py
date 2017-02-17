@@ -1,4 +1,4 @@
-path2xml="$SFRAME_DIR/../BatchSubmission/xmls_Summer2016"
+path2xml="$SFRAME_DIR/../BatchSubmission/xmls_Moriond"
 path2tmp="$SFRAME_DIR/../AnalysisTemp"
 jobName="VBF"
 outDir="/scratch/$USER/SFrameAnalysis/AnalysisOutput/"+jobName #"$SFRAME_DIR/../AnalysisOutput/"+jobName
@@ -9,7 +9,7 @@ nProcesses=1
 nFiles=2
 hCPU="03:30:00"
 hVMEM="5000M"
-postFix="_Summer2016" #"_ICHEP" #"_Summer2016"
+postFix="_Moriond" #"_ICHEP" #"_Moriond"
 dataSets = [
             
         ["VBFHToTauTau_M125_13TeV_powheg_pythia8",
@@ -22,7 +22,7 @@ dataSets = [
             
             ]
 
-if "Summer2016" in postFix: dataSets = [
+if "Moriond" in postFix: dataSets = [
         ["VBFHToTauTau_M125_13TeV_powheg_pythia8",
          [  "VBFHToTauTau_M125_13TeV_powheg_pythia8_V2_0000_0.xml",
             "VBFHToTauTau_M125_13TeV_powheg_pythia8_V2_0000_1.xml",

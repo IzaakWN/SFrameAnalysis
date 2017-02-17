@@ -9,7 +9,7 @@ nProcesses=1
 nFiles=3
 hCPU="03:00:00"
 hVMEM="5000M"
-postFix="_ICHEP" #"_ICHEP" #"_Summer2016"
+postFix="_ICHEP" #"_ICHEP" #"_Moriond"
 dataSets = [
     ["LowMass_30GeV_DiTauResonance",
      [  "LowMass_30GeV_DiTauResonance_RunIISpring16MiniAODv2_asymptotic_miniAODv2.xml"
@@ -17,7 +17,7 @@ dataSets = [
         ]],                
             ]
                 
-if "Summer2016" in postFix: dataSets = [
+if "Moriond" in postFix: dataSets = [
     ["LowMass_30GeV_DiTauResonance",
      [  "LowMass_30GeV_DiTauResonance_RunIISpring16MiniAODv2_asymptotic_miniAODv2_short.xml", ]],
             ]

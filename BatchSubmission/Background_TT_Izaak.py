@@ -1,4 +1,4 @@
-path2xml="$SFRAME_DIR/../BatchSubmission/xmls_Summer2016"
+path2xml="$SFRAME_DIR/../BatchSubmission/xmls_Moriond"
 path2tmp="$SFRAME_DIR/../AnalysisTemp"
 jobName="TT"
 outDir="/scratch/$USER/SFrameAnalysis/AnalysisOutput/"+jobName #"$SFRAME_DIR/../AnalysisOutput/"+jobName
@@ -9,7 +9,7 @@ nProcesses=1
 nFiles=3
 hCPU="04:00:00"
 hVMEM="5000M"
-postFix="_Summer2016" #"_ICHEP" #"_Summer2016"
+postFix="_Moriond" #"_ICHEP" #"_Moriond"
 dataSets = [
        ["TT_TuneCUETP8M1",
         [   "TT_TuneCUETP8M1_13TeV-powheg-pythia8_reHLT_ext_0000_0.xml",
@@ -19,7 +19,7 @@ dataSets = [
             "TT_TuneCUETP8M1_13TeV-powheg-pythia8_reHLT_ext_0002.xml",   ]],
             ]
                 
-if "Summer2016" in postFix: dataSets = [
+if "Moriond" in postFix: dataSets = [
        ["TT_TuneCUETP8M1",
         [   "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_V1_0000_0.xml",
             "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_V1_0000_1.xml",

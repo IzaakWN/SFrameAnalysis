@@ -1,4 +1,4 @@
-path2xml="$SFRAME_DIR/../BatchSubmission/xmls_Summer2016"
+path2xml="$SFRAME_DIR/../BatchSubmission/xmls_Moriond"
 path2tmp="$SFRAME_DIR/../AnalysisTemp"
 jobName="SingleMuon"
 outDir="/scratch/$USER/SFrameAnalysis/AnalysisOutput/"+jobName #"$SFRAME_DIR/../AnalysisOutput/"+jobName
@@ -9,7 +9,7 @@ nProcesses=1
 nFiles=4
 hCPU="04:00:00"
 hVMEM="5000M"
-postFix="_Summer2016" #"_ICHEP"
+postFix="_Moriond" #"_ICHEP"
 dataSets = [
                ["SingleMuon_1_Run2016",
                 [   "SingleMuon_Run2016B-PromptReco-v2_24p47fb_v2_0000_0.xml",

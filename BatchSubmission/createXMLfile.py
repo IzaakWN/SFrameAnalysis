@@ -16,7 +16,7 @@
 #  
 #  Tier 2 PNFS:
 #    PNFS="gsiftp://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_Moriond17/"
-#    uberftp -ls $PNFS/DY1J*/*/* | awk '{print $7} > > dirs_T2_DY1J.txt'
+#    uberftp -ls $PNFS/DY1J*/*/* | awk '{print $7}' > dirs_T2_DY1J.txt
 #    uberftp -ls $PNFS/*/*/* | awk '{print $7}' > dirs_T2.txt
 #    ./createXMLfile.py dirs_T2.txt -o xmls_Moriond_T2 -s PSI-T2
 #
@@ -166,8 +166,8 @@ def getFiles(samplepath):
       if line.find(".root") <= 0: continue
       subdirs_dict.setdefault(os.path.dirname(line),[]).append(os.path.basename(line.strip()))
     for subdir,files in subdirs_dict.items():
-      if verbose: print "subdir=%s, files=%s" % (samplepath,files)
-      yield (samplepath,files)
+      if verbose: print "subdir=%s, files=%s" % (subdir,files)
+      yield (subdir,files)
   else:
     for subdir,dirs,files in os.walk(samplepath):
       if verbose: print "subdir=%s, files=%s" % (subdir,files)

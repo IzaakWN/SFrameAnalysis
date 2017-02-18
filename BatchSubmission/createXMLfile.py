@@ -93,7 +93,7 @@ def main():
       sampleName_file+="_"+sampleName
       print "Sample: %s in location: %s producing file with list %s" %(sampleName,sample,sampleName_file )
       fileList=[]
-      if not os.path.isdir(sample) and "T2" not in site:
+      if not isDir(sample):
         print sample,"is not a directory."
       else:
         prefix = ""
@@ -149,11 +149,11 @@ def main():
                 print line.strip("\n")
           outerr=processMC.stderr.read()
           print outerr
-
+        
 
 
 def getFiles(samplepath):
-  '''Generator to loop over files in some dir.'''
+  '''Generator to loop over files in some directory.'''
   if "T2" in site:
     lock=thread.allocate_lock()
     lock.acquire()
@@ -172,7 +172,25 @@ def getFiles(samplepath):
     for subdir,dirs,files in os.walk(samplepath):
       if verbose: print "subdir=%s, files=%s" % (subdir,files)
       yield (subdir,files)
+  
 
+
+def isDir(samplepath):
+  '''Help function check the existence of a directory.'''
+  if "T2" in site:
+    lock=thread.allocate_lock()
+    lock.acquire()
+    commandLS="uberftp -ls gsiftp://storage01.lcg.cscs.ch/%s"%(samplepath)
+    if verbose: print commandLS
+    processLS=subprocess.Popen(commandLS, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+    lock.release()
+    output=processLS.stderr.read()
+    if verbose: print "isDir: stdout: %s"%processLS.stdout.read()
+    if verbose: print "isDir: stderr: %s"%output
+    return "No match for" not in output
+  else:
+    return os.path.isdir(sample)
+  
 
 
 if __name__ == "__main__":

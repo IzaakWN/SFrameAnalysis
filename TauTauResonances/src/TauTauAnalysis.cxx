@@ -102,9 +102,9 @@ TauTauAnalysis::TauTauAnalysis() : SCycleBase()
 
 
 TauTauAnalysis::~TauTauAnalysis() {
-  
+  m_logger << INFO << " " << SLogger::endmsg;
   m_logger << INFO << "Tschoe!" << SLogger::endmsg;
-  
+  std::cout << " " << std::endl;
 }
 
 
@@ -112,8 +112,8 @@ TauTauAnalysis::~TauTauAnalysis() {
 
 
 void TauTauAnalysis::BeginCycle() throw( SError ) {
-  
-  m_logger << INFO << "BeginCycle ... " << SLogger::endmsg;
+  m_logger << INFO << " " << SLogger::endmsg;
+  m_logger << INFO << "BeginCycle" << SLogger::endmsg;
   
   mu_tau    = 0;
   ele_tau   = 0;
@@ -133,29 +133,40 @@ void TauTauAnalysis::BeginCycle() throw( SError ) {
     AddConfigObject( &m_grl );
   }
   
-  m_triggerNames_mutau.clear();
-  m_triggerNames_eletau.clear();
+  //m_triggerNames_mutau.clear();
+  //m_triggerNames_eletau.clear();
+  m_triggerNamesToRun_mutau.clear();
+  m_triggerNamesToRun_etau.clear();
   
-  
-  // TRIGGERS
-  // https://twiki.cern.ch/twiki/bin/viewauth/CMS/HiggsToTauTauWorking2016
-  // https://twiki.cern.ch/twiki/bin/viewauth/CMS/SMTauTau2016
-  // https://hypernews.cern.ch/HyperNews/CMS/get/AUX/2017/02/10/17:01:24-67933-2016triggerGrandTable.pdf
+  // MARK: Triggers
   // https://indico.cern.ch/event/598433/#day-2017-02-15
+  // https://indico.cern.ch/event/598433/contributions/2475199/attachments/1413150/2162337/Davignon_TauTriggerRecommendations_HTTMeeting_15_02_17_v2.pdf slide 11
+  // https://hypernews.cern.ch/HyperNews/CMS/get/AUX/2017/02/10/17:01:24-67933-2016triggerGrandTable.pdf
+  
+  // 2016 JSON run 271036 to 284044
+  int firstRun = 271000;
+  int lastRun  = 285000; 
   
   // muon triggers
-  m_triggerNames_mutau.push_back("HLT_IsoMu22_v");          // not pre-scaled  run < 276864
-  m_triggerNames_mutau.push_back("HLT_IsoTkMu22_v");        // not pre-scaled  run < 276864
-  // m_triggerNames_mutau.push_back("HLT_IsoMu20_v");          // not pre-scaled  run > 274889
-  // m_triggerNames_mutau.push_back("HLT_IsoTkMu20_v");        // not pre-scaled  run > 274889
-  // m_triggerNames_mutau.push_back("HLT_IsoMu24_v");          // not pre-scaled  entire run
-  // m_triggerNames_mutau.push_back("HLT_IsoTkMu24_v");        // not pre-scaled  entire run
+  m_triggerNamesToRun_mutau["HLT_IsoMu22_v"]           = {firstRun,276863};  // not pre-scaled  run < 276864
+  m_triggerNamesToRun_mutau["HLT_IsoTkMu22_v"]         = {firstRun,276863};  // not pre-scaled  run < 276864
+  m_triggerNamesToRun_mutau["HLT_IsoMu22_eta2p1_v2"]   = {274890,lastRun};   // not pre-scaled  run > 274889
+  m_triggerNamesToRun_mutau["HLT_IsoTkMu22_eta2p1_v2"] = {274890,lastRun};   // not pre-scaled  run > 274889
+  m_triggerNamesToRun_mutau["HLT_IsoMu24_v"]           = {firstRun,lastRun}; // not pre-scaled  entire run
+  m_triggerNamesToRun_mutau["HLT_IsoTkMu24_v"]         = {firstRun,lastRun}; // not pre-scaled  entire run
+  m_triggerNamesToRun_mutau["HLT_IsoMu19_eta2p1_LooseIsoPFTau20_SingleL1_v"] = {firstRun,lastRun}; // not pre-scaled  entire run
+  // m_triggerNames_mutau.push_back("HLT_IsoMu22_v");           // not pre-scaled  run < 276864
+  // m_triggerNames_mutau.push_back("HLT_IsoTkMu22_v");         // not pre-scaled  run < 276864
+  // m_triggerNames_mutau.push_back("HLT_IsoMu22_eta2p1_v2");   // not pre-scaled  run > 274889
+  // m_triggerNames_mutau.push_back("HLT_IsoTkMu22_eta2p1_v2"); // not pre-scaled  run > 274889
+  // m_triggerNames_mutau.push_back("HLT_IsoMu24_v");           // not pre-scaled  entire run
+  // m_triggerNames_mutau.push_back("HLT_IsoTkMu24_v");         // not pre-scaled  entire run
+  // m_triggerNames_mutau.push_back("HLT_IsoMu20_v");
+  // m_triggerNames_mutau.push_back("HLT_IsoTkMu20_v");
   // m_triggerNames_mutau.push_back("HLT_IsoMu18_v");
   // m_triggerNames_mutau.push_back("HLT_IsoMu22_v3");
-  // m_triggerNames_mutau.push_back("HLT_IsoMu22_eta2p1_v2");
   // m_triggerNames_mutau.push_back("HLT_IsoMu27_v4");
   // m_triggerNames_mutau.push_back("HLT_IsoTkMu18_v3");
-  // m_triggerNames_mutau.push_back("HLT_IsoTkMu22_eta2p1_v2");
   // m_triggerNames_mutau.push_back("HLT_IsoTkMu22_v3");
   // m_triggerNames_mutau.push_back("HLT_IsoTkMu27_v4");
   // m_triggerNames_mutau.push_back("HLT_IsoMu17_eta2p1_LooseIsoPFTau20_SingleL1_v5");  // pre-scaled
@@ -164,15 +175,19 @@ void TauTauAnalysis::BeginCycle() throw( SError ) {
   // m_triggerNames_mutau.push_back("HLT_IsoMu19_eta2p1_LooseIsoPFTau20_v2");           // not pre-scaled  entire run
   // m_triggerNames_mutau.push_back("HLT_IsoMu21_eta2p1_LooseIsoPFTau20_SingleL1_v2");  // not pre-scaled  entire run
   
-  
   // electron triggers
-  m_triggerNames_eletau.push_back("HLT_Ele25_eta2p1_WPTight_Gsf_v");                    // not pre-scaled  entire run
+  m_triggerNamesToRun_etau["HLT_Ele25_eta2p1_WPTight_Gsf_v"]                 = {firstRun,lastRun}; // not pre-scaled    entire run
+  m_triggerNamesToRun_etau["HLT_Ele45_WPLoose_Gsf_L1JetTauSeeded"]           = {275392,278270};    // not pre-scaled  275391 < run <= 278270
+  m_triggerNamesToRun_etau["HLT_Ele24_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_SingleL1_v"] = {firstRun,276214}; // not pre-scaled    run < 276215
+  m_triggerNamesToRun_etau["HLT_Ele24_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_v"] = {276215,278269};    // not pre-scaled  276215 <= run < 278270
+  m_triggerNamesToRun_etau["HLT_Ele24_eta2p1_WPLoose_Gsf_LooseIsoPFTau30_v"] = {278271,lastRun};   // not pre-scaled            run > 278270
+  // m_triggerNames_eletau.push_back("HLT_Ele25_eta2p1_WPTight_Gsf_v");                            // not pre-scaled  entire run
   // m_triggerNames_eletau.push_back("HLT_Ele23_WPLoose_Gsf_v4");
   // m_triggerNames_eletau.push_back("HLT_Ele24_eta2p1_WPLoose_Gsf_v2");
   // m_triggerNames_eletau.push_back("HLT_Ele25_WPTight_Gsf_v2");
   // m_triggerNames_eletau.push_back("HLT_Ele25_eta2p1_WPLoose_Gsf_v2");
   // m_triggerNames_eletau.push_back("HLT_Ele25_eta2p1_WPTight_Gsf_v2");
-  // m_triggerNames_eletau.push_back("HLT_Ele27_WPLoose_Gsf_v2");
+  // m_triggerNames_eletau.push_back("HLT_Ele27_WPLoose_Gsf_v2");                                  // not pre-scaled        run <= 280385
   // m_triggerNames_eletau.push_back("HLT_Ele27_WPTight_Gsf_v2");
   // m_triggerNames_eletau.push_back("HLT_Ele27_eta2p1_WPLoose_Gsf_v3");
   // m_triggerNames_eletau.push_back("HLT_Ele27_eta2p1_WPTight_Gsf_v3");
@@ -184,6 +199,27 @@ void TauTauAnalysis::BeginCycle() throw( SError ) {
   // m_triggerNames_eletau.push_back("HLT_Ele27_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_SingleL1_v2");
   // m_triggerNames_eletau.push_back("HLT_Ele32_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_SingleL1_v2");
   
+  
+  // muon-electron triggers
+  // m_triggerNamesToRun_emu["HLT_IsoMu22_v"]              = m_triggerNamesToRun_mutau["HLT_IsoMu22_v"]
+  // m_triggerNamesToRun_emu["HLT_IsoMu22_v"]              = m_triggerNamesToRun_mutau["HLT_IsoMu22_v"]
+  // m_triggerNamesToRun_emu["HLT_IsoTkMu22_v"]            = m_triggerNamesToRun_mutau["HLT_IsoTkMu22_v"]
+  // m_triggerNamesToRun_emu["HLT_IsoMu22_eta2p1_v2"]      = m_triggerNamesToRun_mutau["HLT_IsoMu22_eta2p1_v2"]
+  // m_triggerNamesToRun_emu["HLT_IsoTkMu22_eta2p1_v2"]    = m_triggerNamesToRun_mutau["HLT_IsoTkMu22_eta2p1_v2"]
+  // m_triggerNamesToRun_emu["HLT_IsoMu24_v"]              = m_triggerNamesToRun_mutau["HLT_IsoMu24_v"]
+  // m_triggerNamesToRun_emu["HLT_IsoTkMu24_v"]            = m_triggerNamesToRun_mutau["HLT_IsoTkMu24_v"]
+  // m_triggerNamesToRun_emu["HLT_Ele25_eta2p1_WPTight_Gsf_v"]         = m_triggerNamesToRun_etau["HLT_Ele25_eta2p1_WPTight_Gsf_v"]
+  // m_triggerNamesToRun_emu["HLT_Ele45_WPLoose_Gsf_L1JetTauSeeded"]   = m_triggerNamesToRun_etau["HLT_Ele45_WPLoose_Gsf_L1JetTauSeeded"]
+  
+  m_logger << INFO << "\nmutau triggers: " << SLogger::endmsg;
+  for (auto const& trigger: m_triggerNamesToRun_mutau){
+    m_logger << INFO << "  " << trigger.second.start << " - " << trigger.second.end << "  " << trigger.first << SLogger::endmsg;
+  }
+  m_logger << INFO << "\netau triggers: " << SLogger::endmsg;
+  for (auto const& trigger: m_triggerNamesToRun_etau){
+    m_logger << INFO << "  " << trigger.second.start << " - " << trigger.second.end << "  " << trigger.first << SLogger::endmsg;
+  }
+  m_logger << INFO << " " << SLogger::endmsg;
   
   return;
 
@@ -225,8 +261,11 @@ struct ltau_pair
 
 
 void TauTauAnalysis::EndCycle() throw( SError ) {
-   std::cout << "events in mu_tau " <<mu_tau <<std::endl;
-   std::cout << "events in ele_tau " <<ele_tau <<std::endl;
+   m_logger << INFO << " " << SLogger::endmsg;
+   m_logger << INFO << "EndInputData" << SLogger::endmsg;
+   m_logger << INFO << "events in mu_tau: "  << mu_tau << SLogger::endmsg;
+   m_logger << INFO << "events in ele_tau: " << ele_tau << SLogger::endmsg;
+   m_logger << INFO << " " << SLogger::endmsg;
    return;
 }
 
@@ -235,7 +274,9 @@ void TauTauAnalysis::EndCycle() throw( SError ) {
 
 
 void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
-  std::cout << "BeginInputData" << std::endl;
+  //std::cout << "BeginInputData" << std::endl;
+  m_logger << INFO << " " << SLogger::endmsg;
+  m_logger << INFO << "BeginInputData" << SLogger::endmsg;
 
   m_logger << INFO << "RecoTreeName:        " <<            m_recoTreeName << SLogger::endmsg;
   m_logger << INFO << "JetAK4Name:          " <<            m_jetAK4Name << SLogger::endmsg;
@@ -454,7 +495,7 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
     TString hname = "cutflow_" + ch;
     TString dirname = "histogram_" + ch;
     TString tch = ch;
-    std::cout << hname << " " << dirname << std::endl;
+    //std::cout << hname << " " << dirname << std::endl;
     Book( TH1F(hname, hname, 20, 0.5, 20.5 ), dirname);
     Book( TH1F("lepton_"+tch, "lepton_"+tch, 20, 0.5, 20.5 ), dirname);
     Book( TH1F("tauh1_"+tch,  "tauh1_"+tch,  20, 0.5, 20.5 ), dirname);
@@ -529,15 +570,17 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
 
 
 void TauTauAnalysis::EndInputData( const SInputData& ) throw( SError ) {
-  std::cout << "EndInputData" << std::endl;
-
+  //std::cout << "EndInputData" << std::endl;
+  m_logger << INFO << " " << SLogger::endmsg;
+  m_logger << INFO << "EndInputData" << SLogger::endmsg;
+  m_logger << INFO << " " << SLogger::endmsg;
+  
   std::vector<std::string> kCutNameLep{ "start", "match", "ID",        "iso", "pt" };
   //std::vector<std::string> kCutNameTau{ "start", "match", "DecayMode", "iso", "pt" };
   std::vector<std::string> kCutNameTau{ "start", "at least one reco tau", "2.3 eta and 18 pt reco cut", "tau ID", "2.3 eta and 18 pt gen cut", "match", "DecayMode", "iso", "pt" };
   std::vector<std::string> kCutNameJet{ "start", "one eta<2.3 jet && hadronic" };
   
   for(auto ch: channels_) {
-    m_logger << INFO << " " << SLogger::endmsg;
     m_logger << INFO << "cut flow for " << ch << SLogger::endmsg;
     m_logger << INFO << Form( "Cut\t%25.25s\tEvents\tRelEff\tAbsEff", "Name" ) << SLogger::endmsg;
   
@@ -560,7 +603,8 @@ void TauTauAnalysis::EndInputData( const SInputData& ) throw( SError ) {
 //       printCutFlow(ch,"jet","jet_"+ch,dirname,kCutNameJet);
 //     }
 
-    std::cout << std::endl;
+    m_logger << INFO << " " << SLogger::endmsg;
+
   }
 
    return;
@@ -588,8 +632,9 @@ void TauTauAnalysis::printCutFlow(const std::string& ch, const std::string& name
 
 void TauTauAnalysis::BeginInputFile( const SInputData& ) throw( SError ) {
 //   std::cout << "BeginInputFile" << std::endl;
-
+  m_logger << INFO << " " << SLogger::endmsg;
   m_logger << INFO << "Connecting input variables" << SLogger::endmsg;
+  
   if (m_isData) {
     m_jetAK4.ConnectVariables(      m_recoTreeName.c_str(), Ntuple::JetBasic|Ntuple::JetAnalysis, (m_jetAK4Name + "_").c_str() );
     m_eventInfo.ConnectVariables(   m_recoTreeName.c_str(), Ntuple::EventInfoTrigger|Ntuple::EventInfoMETFilters, "" );
@@ -660,7 +705,7 @@ void TauTauAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
   // Cut 2: pass trigger
   //std::cout << ">>> ExecuteEvent - Cut 2" << std::endl;
   TString trigger_result = "both";
-  if(m_isData) trigger_result = passTrigger(m_eventInfo.runNumber, m_eventInfo.lumiBlock);
+  if(m_isData) trigger_result = passTrigger(m_eventInfo.runNumber);
   //trigger_result = passTrigger();
   if(trigger_result != "none") m_logger << VERBOSE << "Trigger pass" << SLogger::endmsg;
   //  else throw SError( SError::SkipEvent );
@@ -995,35 +1040,55 @@ bool TauTauAnalysis::isGoodEvent(int runNumber, int lumiSection) {
 
 
 
-TString TauTauAnalysis::passTrigger(int runNumber, int lumiSection) {
+TString TauTauAnalysis::passTrigger(int runNumber) {
 //   std::cout << "TauTauAnalysis" << std::endl;
   
   bool flag_mu_trigger = false;
   bool flag_ele_trigger = false;
+  //bool flag_emu_trigger = false;
 
   for (std::map<std::string,bool>::iterator it = (m_eventInfo.trigDecision)->begin(); it != (m_eventInfo.trigDecision)->end(); ++it){
-    for (unsigned int t = 0; t < m_triggerNames_mutau.size(); ++t ){
-      if ((it->first).find(m_triggerNames_mutau[t]) != std::string::npos) {
-        if (it->second == true) {
+    
+    // mutau
+    for (auto const& trigger: m_triggerNamesToRun_mutau){
+      if ((it->first).find(trigger.first) != std::string::npos){
+        if (it->second == true and trigger.second.start <= runNumber and runNumber <= trigger.second.end){
           m_logger << VERBOSE << "Trigger pass: " << (it->first) << SLogger::endmsg;
-          flag_mu_trigger = true;
-          //return true;
-        }
-      }
-    }
-  }
-
-  for (std::map<std::string,bool>::iterator it = (m_eventInfo.trigDecision)->begin(); it != (m_eventInfo.trigDecision)->end(); ++it){
-    for (unsigned int t = 0; t < m_triggerNames_eletau.size(); ++t ){
-      if ((it->first).find(m_triggerNames_eletau[t]) != std::string::npos) {
-        if (it->second == true) {
+          flag_mu_trigger = true; break;
+    }}}
+        
+    // etau
+    for (auto const& trigger: m_triggerNamesToRun_etau){
+      if ((it->first).find(trigger.first) != std::string::npos){
+        if (it->second == true and trigger.second.start <= runNumber and runNumber <= trigger.second.end){
           m_logger << VERBOSE << "Trigger pass: " << (it->first) << SLogger::endmsg;
-	      flag_ele_trigger = true;
-	      //return true;
-        }
-      }
-    }
+          flag_ele_trigger = true; break;
+    }}}
+    
+    // emu
+    // for (auto const& trigger: m_triggerNamesToRun_emu){
+    //   if ((it->first).find(trigger.first) != std::string::npos){
+    //     if (it->second == true and trigger.second.start <= runNumber and runNumber <= trigger.second.end){
+    //       m_logger << VERBOSE << "Trigger pass: " << (it->first) << SLogger::endmsg;
+    //       flag_emu_trigger = true;
+    // }}}
+    
   }
+  
+//   for (std::map<std::string,bool>::iterator it = (m_eventInfo.trigDecision)->begin(); it != (m_eventInfo.trigDecision)->end(); ++it){
+//     for (unsigned int t = 0; t < m_triggerNames_mutau.size(); ++t ){
+//       if ((it->first).find(m_triggerNames_mutau[t]) != std::string::npos) {
+//         if (it->second == true) {
+//           m_logger << VERBOSE << "Trigger pass: " << (it->first) << SLogger::endmsg;
+//           flag_mu_trigger = true; break;
+//     }}}
+//     for (unsigned int t = 0; t < m_triggerNames_eletau.size(); ++t ){
+//       if ((it->first).find(m_triggerNames_eletau[t]) != std::string::npos) {
+//         if (it->second == true) {
+//           m_logger << VERBOSE << "Trigger pass: " << (it->first) << SLogger::endmsg;
+// 	         flag_ele_trigger = true; break;
+//     }}}
+//   }
 
   if(flag_mu_trigger == true  && flag_ele_trigger == true ) return "both";
   if(flag_mu_trigger == true  && flag_ele_trigger == false) return "mu";

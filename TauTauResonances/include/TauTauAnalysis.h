@@ -103,8 +103,8 @@ class TauTauAnalysis : public SCycleBase {
     virtual void BeginInputData( const SInputData& ) throw( SError ); // called at the beginning of a new input data
     virtual void EndInputData  ( const SInputData& ) throw( SError ); // called after finishing to process an input data
     virtual void BeginInputFile( const SInputData& ) throw( SError ); // called after opening each new input file
-    virtual void ExecuteEvent  ( const SInputData&, Double_t    ) throw( SError ); // called for every event
-    virtual bool isGoodEvent   ( int runNumber, int lumiSection );    // check good lumi section
+    virtual void ExecuteEvent(   const SInputData&, Double_t    ) throw( SError ); // called for every event
+    virtual bool isGoodEvent(    int runNumber, int lumiSection );    // check good lumi section
     
     
     /// Function to book tree branches
@@ -114,7 +114,7 @@ class TauTauAnalysis : public SCycleBase {
                                const UZH::MissingEt& met, const UZH::MissingEt& puppimet );//, const UZH::MissingEt& mvamet=NULL);
     
     // check pass of triggers / MET filters
-    virtual TString passTrigger( int runNumber, int lumiSection );
+    virtual TString passTrigger( int runNumber );
     virtual bool passMETFilters();
     
     // obtain event weights for MC
@@ -127,11 +127,11 @@ class TauTauAnalysis : public SCycleBase {
     virtual void setGenBosonTLVs();
     
     // match reco objects to taus
-    virtual int genMatch(Float_t lep_eta, Float_t lep_phi);
+    virtual int genMatch( Float_t lep_eta, Float_t lep_phi );
     
     // help function
-    virtual Float_t deltaPhi(Float_t p1, Float_t p2);
-    virtual Float_t deltaR(Float_t p1, Float_t p2);
+    virtual Float_t deltaPhi( Float_t p1, Float_t p2 );
+    virtual Float_t deltaR(   Float_t p1, Float_t p2 );
     virtual void shiftLeptonAndMET( const float shift, TLorentzVector& lep_shifted, TLorentzVector& met_shifted, bool shiftEnergy = false );
     
     // IDs
@@ -272,8 +272,13 @@ class TauTauAnalysis : public SCycleBase {
     //std::string m_IDSF_eleName;
 
     // other variables needed
-    std::vector<std::string> m_triggerNames_mutau;
-    std::vector<std::string> m_triggerNames_eletau;
+    //std::vector<std::string> m_triggerNames_mutau;
+    //std::vector<std::string> m_triggerNames_eletau;
+    struct UnPreScaledRun{ int start; int end;};
+    //UnPreScaledRun initializeUnPreScaledRun( int start, int end ){ UnPreScaledRun run = { start, end }; return run; }
+    std::map<std::string,UnPreScaledRun> m_triggerNamesToRun_mutau;
+    std::map<std::string,UnPreScaledRun> m_triggerNamesToRun_etau;
+    std::map<std::string,UnPreScaledRun> m_triggerNamesToRun_emu;
     
     int mu_tau;
     int ele_tau;

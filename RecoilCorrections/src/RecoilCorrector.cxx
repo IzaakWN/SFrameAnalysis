@@ -10,7 +10,7 @@
 RecoilCorrectorTool::RecoilCorrectorTool(SCycleBase* parent, const char* name ) : SToolBase( parent ), m_name( name )
 {
   SetLogName( name );
-  DeclareProperty(  m_name+"PFMETFile",     m_PFMETFile     = std::string (std::getenv("SFRAME_DIR")) + "/../RecoilCorrections/data/TypeIPFMET_2016BCD.root" );
+  DeclareProperty(  m_name+"PFMETFile",     m_PFMETFile     = std::string (std::getenv("SFRAME_DIR")) + "/../RecoilCorrections/data/TypeI-PFMet_Run2016BtoH.root" );
   DeclareProperty(  m_name+"MVAMETFile",    m_MVAMETFile    = std::string (std::getenv("SFRAME_DIR")) + "/../RecoilCorrections/data/MvaMET_2016BCD.root" );
   DeclareProperty(  m_name+"ZPTFile",       m_ZPTFile       = std::string (std::getenv("SFRAME_DIR")) + "/../RecoilCorrections/data/Zpt_weights.root" );
 }

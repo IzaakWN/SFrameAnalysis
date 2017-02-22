@@ -23,7 +23,7 @@ if [ -d $DIR ]; then
     echo ">>> in $DIR:"
     echo ">>> " 
 else
-    echo ">>> directory does not exist: $DIR"
+    echo ">>> ERROR! Directory does not exist: $DIR"
     echo
     exit 1
 fi
@@ -32,7 +32,7 @@ fi
 for f in `ls ${DIR}/${SAMPLE}*.xml | awk -F '/' '{print $NF}'`; do
   EVENTS=`grep "${DIR}/$f" -e 'Total number of events processed: ' | grep -Po '[0-9]*'`
   if [[ ! $EVENTS ]]; then
-    echo ">>> Warning! no number of events saved in $f!"
+    echo ">>> Warning! No number of events saved in $f!"
   else
     echo ">>> $EVENTS events in $f"
     N=$(($N+$EVENTS))

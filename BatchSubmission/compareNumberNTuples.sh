@@ -7,37 +7,37 @@ BASEDIR="/shome/$USER/analysis/SFrameAnalysis_Moriond/BatchSubmission"
 XMLDIR="xmls_Moriond_T2"
 
 SAMPLES=(
-    TT_TuneCUE
-    WJetsToLNu_TuneCUETP8M1_13TeV-madgraph
+#     TT_TuneCUE
+#     WJetsToLNu_TuneCUETP8M1_13TeV-madgraph
     W1JetsToLNu_TuneCUETP8M1_13TeV-madgraph
-    W2JetsToLNu_TuneCUETP8M1_13TeV-madgraph
-    W3JetsToLNu_TuneCUETP8M1_13TeV-madgraph
-    W4JetsToLNu_TuneCUETP8M1_13TeV-madgraph
-    DYJetsToLL_M-10to50_TuneCUETP8M1
-    DY1JetsToLL_M-10to50_TuneCUETP8M1
-    DY2JetsToLL_M-10to50_TuneCUETP8M1
-    DY3JetsToLL_M-10to50_TuneCUETP8M1
-    DYJetsToLL_M-50_TuneCUETP8M1
-    DY1JetsToLL_M-50_TuneCUETP8M1
-    DY2JetsToLL_M-50_TuneCUETP8M1
-    DY3JetsToLL_M-50_TuneCUETP8M1
-    WWTo1L1Nu2Q_13TeV_amcatnlo
-    WZTo2L2Q_13TeV_amcatnlo
-    WZTo3LNu_TuneCUETP8M1_13TeV-amcatnlo
-    WZ_TuneCUETP8M1_13TeV-pythia8
-    ZZTo2Q2Nu_13TeV_amcatnlo
-    ZZTo4L_13TeV_powheg
-    ZZTo4Q_13TeV_amcatnlo
-    ZZTo4L_13TeV-amcatnlo
-    ZZ_TuneCUETP8M1_13TeV-pythia8
-    VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8
-    ST_s-channel_4f_leptonDecays
-    ST_t-channel_antitop_4f
-    ST_t-channel_top_4f_inclusive
-    ST_tW_antitop_5f_NoFullyHadronicDecays_13TeV
-    ST_tW_antitop_5f_inclusiveDecays_13TeV
-    ST_tW_top_5f_NoFullyHadronicDecays_13TeV
-    ST_tW_top_5f_inclusiveDecays_13TeV
+#     W2JetsToLNu_TuneCUETP8M1_13TeV-madgraph
+#     W3JetsToLNu_TuneCUETP8M1_13TeV-madgraph
+#     W4JetsToLNu_TuneCUETP8M1_13TeV-madgraph
+#     DYJetsToLL_M-10to50_TuneCUETP8M1
+#     DY1JetsToLL_M-10to50_TuneCUETP8M1
+#     DY2JetsToLL_M-10to50_TuneCUETP8M1
+#     DY3JetsToLL_M-10to50_TuneCUETP8M1
+#     DYJetsToLL_M-50_TuneCUETP8M1
+#     DY1JetsToLL_M-50_TuneCUETP8M1
+#     DY2JetsToLL_M-50_TuneCUETP8M1
+#     DY3JetsToLL_M-50_TuneCUETP8M1
+#     WWTo1L1Nu2Q_13TeV_amcatnlo
+#     WZTo2L2Q_13TeV_amcatnlo
+#     WZTo3LNu_TuneCUETP8M1_13TeV-amcatnlo
+#     WZ_TuneCUETP8M1_13TeV-pythia8
+#     ZZTo2Q2Nu_13TeV_amcatnlo
+#     ZZTo4L_13TeV_powheg
+#     ZZTo4Q_13TeV_amcatnlo
+#     ZZTo4L_13TeV-amcatnlo
+#     ZZ_TuneCUETP8M1_13TeV-pythia8
+#     VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8
+#     ST_s-channel_4f_leptonDecays
+#     ST_t-channel_antitop_4f
+#     ST_t-channel_top_4f_inclusive
+#     ST_tW_antitop_5f_NoFullyHadronicDecays_13TeV
+#     ST_tW_antitop_5f_inclusiveDecays_13TeV
+#     ST_tW_top_5f_NoFullyHadronicDecays_13TeV
+#     ST_tW_top_5f_inclusiveDecays_13TeV
         
 #     DYJetsToLL_M-50_HT
 #     DYJetsToLL_M-5to50_HT
@@ -153,14 +153,21 @@ for sample in ${SAMPLES[@]}; do
     if ls $XMLDIR | grep -q $sample; then
         echo ">>> sample found in ${XMLDIR}:"
         nFiles=`cat $XMLDIR/${sample}*.xml | grep .root | wc -l`
-        nDuplicates=`sort $XMLDIR/${sample}*.xml | grep -o "${sample}.*/flatTuple_.*.root" | uniq -cd | wc -l`
+        nDuplicates=`cat $XMLDIR/${sample}*.xml | grep -o "${sample}.*/flatTuple_.*.root" | uniq -cd | wc -l`
         nXMLFiles=`ls $XMLDIR/${sample}*.xml | wc -l`
         
         # COUNT number of events
         NTOT=0
-        for f in `ls ${XMLDIR}/${SAMPLE}*.xml | awk -F '/' '{print $NF}'`; do
+        NEVENTS=0
+        for f in `ls ${XMLDIR}/${sample}*.xml | awk -F '/' '{print $NF}'`; do
           NEVENTS=`grep "${XMLDIR}/$f" -e 'Total number of events processed: ' | grep -Po '[0-9]*'`
-          NTOT=$(($N+$NEVENTS))
+          NTOT=$(($NTOT+$NEVENTS))
+          if [[ ! $EVENTS ]]; then
+            echo ">>> Warning! No number of events saved in $f!"
+          # else
+          #   echo ">>> $EVENTS events in $f"
+          #   N=$(($N+$EVENTS))
+          fi
         done
         
         printf ">>>   \e[1m%4s \e[0mfiles in %2s xmls files (%s events)" "$nFiles" "$nXMLFiles" "$NTOT"
@@ -177,3 +184,4 @@ done
 echo ">>> "
 echo ">>> done"
 echo
+exit 0

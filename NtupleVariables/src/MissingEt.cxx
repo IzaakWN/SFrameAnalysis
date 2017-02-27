@@ -34,7 +34,6 @@ if(  ((ana->detailLevel & Ntuple::MissingEtAnalysis) == Ntuple::MissingEtAnalysi
     if (ana->m_connectsucceeded[4]) m_corrPx = &((*ana->corrPx)[idx]); else m_corrPx = 0; 
     if (ana->m_connectsucceeded[5]) m_corrPy = &((*ana->corrPy)[idx]); else m_corrPy = 0; 
     if (ana->m_connectsucceeded[6]) m_significance = &((*ana->significance)[idx]); else m_significance = 0; 
-    if (ana->m_connectsucceeded[7]) m_Nmva = &((*ana->Nmva)[idx]); else m_Nmva = 0; 
 } // end of detail level Analysis
 
 if(  ((ana->detailLevel & Ntuple::MissingEtBasic) == Ntuple::MissingEtBasic)  ) {
@@ -43,16 +42,16 @@ if(  ((ana->detailLevel & Ntuple::MissingEtBasic) == Ntuple::MissingEtBasic)  ) 
 } // end of detail level Basic
 
 if(  ((ana->detailLevel & Ntuple::MissingEtCovAnalysis) == Ntuple::MissingEtCovAnalysis)  ) {
-     if (ana->m_connectsucceeded[8]) m_cov00 = &((*ana->cov00)[idx]); else m_cov00 = 0; 
-    if (ana->m_connectsucceeded[9]) m_cov10 = &((*ana->cov10)[idx]); else m_cov10 = 0; 
-    if (ana->m_connectsucceeded[10]) m_cov11 = &((*ana->cov11)[idx]); else m_cov11 = 0; 
+     if (ana->m_connectsucceeded[7]) m_cov00 = &((*ana->cov00)[idx]); else m_cov00 = 0; 
+    if (ana->m_connectsucceeded[8]) m_cov10 = &((*ana->cov10)[idx]); else m_cov10 = 0; 
+    if (ana->m_connectsucceeded[9]) m_cov11 = &((*ana->cov11)[idx]); else m_cov11 = 0; 
 } // end of detail level CovAnalysis
 
 if(  ((ana->detailLevel & Ntuple::MissingEtMVAAnalysis) == Ntuple::MissingEtMVAAnalysis)  ) {
-     if (ana->m_connectsucceeded[11]) m_recoil_pt = &((*ana->recoil_pt)[idx]); else m_recoil_pt = 0; 
-    if (ana->m_connectsucceeded[12]) m_recoil_eta = &((*ana->recoil_eta)[idx]); else m_recoil_eta = 0; 
-    if (ana->m_connectsucceeded[13]) m_recoil_phi = &((*ana->recoil_phi)[idx]); else m_recoil_phi = 0; 
-    if (ana->m_connectsucceeded[14]) m_recoil_pdgId = &((*ana->recoil_pdgId)[idx]); else m_recoil_pdgId = 0; 
+     if (ana->m_connectsucceeded[10]) m_recoil_pt = &((*ana->recoil_pt)[idx]); else m_recoil_pt = 0; 
+    if (ana->m_connectsucceeded[11]) m_recoil_eta = &((*ana->recoil_eta)[idx]); else m_recoil_eta = 0; 
+    if (ana->m_connectsucceeded[12]) m_recoil_phi = &((*ana->recoil_phi)[idx]); else m_recoil_phi = 0; 
+    if (ana->m_connectsucceeded[13]) m_recoil_pdgId = &((*ana->recoil_pdgId)[idx]); else m_recoil_pdgId = 0; 
 }
 
 
@@ -81,7 +80,6 @@ if(  ((rhs.getLvl() & Ntuple::MissingEtAnalysis) == Ntuple::MissingEtAnalysis)  
   out << " corrPx " << rhs.corrPx();
   out << " corrPy " << rhs.corrPy();
   out << " significance " << rhs.significance();
-  out << " Nmva " << rhs.Nmva();
 ;
 } // end of detail level Analysis
 

@@ -51,6 +51,11 @@ namespace Ntuple {
     m_names["lumiBlock"] = "EVENT_lumiBlock";
     m_names["bunchCrossing"] = "bX";
     m_names["trigDecision"] = "HLT_isFired";
+    m_names["trigObject_pt"] = "triggerObject_pt";
+    m_names["trigObject_eta"] = "triggerObject_eta";
+    m_names["trigObject_phi"] = "triggerObject_phi";
+    m_names["trigObject_lastname"] = "triggerObject_lastname";
+    m_names["trigObject_filterLabels"] = "triggerObject_filterLabels";
     m_names["averageIntPerXing"] = "nPuVtx";
     m_names["actualIntPerXing"] = "nPuVtxTrue";
     //    m_names["nPuVtx"] = "nPuVtx";
@@ -262,6 +267,7 @@ namespace Ntuple {
     m_names["isLooseMuon"] = "isLooseMuon";
     m_names["isTightMuon"] = "isTightMuon";
     m_names["isMediumMuon"] = "isMediumMuon";
+    m_names["isMediumMuonGH"] = "isMediumMuonGH";
     m_names["isTrackerMuon"] = "isTrackerMuon";
     m_names["isPFMuon"] = "isPFMuon";
     m_names["isGlobalMuon"] = "isGlobalMuon";

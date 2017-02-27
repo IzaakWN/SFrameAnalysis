@@ -73,6 +73,12 @@ namespace Ntuple {
 
     // EventInfoTrigger
     std::map<std::string,bool>* trigDecision;
+    std::vector< floatingnumber >* trigObject_pt;
+    std::vector< floatingnumber >* trigObject_eta;
+    std::vector< floatingnumber >* trigObject_phi;
+    std::vector< std::string >* trigObject_lastname;
+    std::map< std::string, std::vector<std::string> >* trigObject_filterLabels;
+
 
     // EventInfoTruth
     Float_t genEventWeight;

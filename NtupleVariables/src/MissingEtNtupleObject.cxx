@@ -44,7 +44,6 @@ if(  ((detail_level & Ntuple::MissingEtAnalysis) == Ntuple::MissingEtAnalysis)  
     setConnectSucceeded(4, ConnectVariable( treeName, prefix + m_objectNames.getName("corrPx"), corrPx)); 
     setConnectSucceeded(5, ConnectVariable( treeName, prefix + m_objectNames.getName("corrPy"), corrPy)); 
     setConnectSucceeded(6, ConnectVariable( treeName, prefix + m_objectNames.getName("significance"), significance)); 
-    setConnectSucceeded(7, ConnectVariable( treeName, prefix + m_objectNames.getName("Nmva"), Nmva)); 
 } // end of detail level Analysis
 
 if(  ((detail_level & Ntuple::MissingEtBasic) == Ntuple::MissingEtBasic)  ) {
@@ -53,16 +52,16 @@ if(  ((detail_level & Ntuple::MissingEtBasic) == Ntuple::MissingEtBasic)  ) {
 } // end of detail level Basic
 
 if(  ((detail_level & Ntuple::MissingEtCovAnalysis) == Ntuple::MissingEtCovAnalysis)  ) {
-     setConnectSucceeded(8, ConnectVariable( treeName, prefix + m_objectNames.getName("cov00"), cov00)); 
-    setConnectSucceeded(9, ConnectVariable( treeName, prefix + m_objectNames.getName("cov10"), cov10)); 
-    setConnectSucceeded(10, ConnectVariable( treeName, prefix + m_objectNames.getName("cov11"), cov11)); 
+     setConnectSucceeded(7, ConnectVariable( treeName, prefix + m_objectNames.getName("cov00"), cov00)); 
+    setConnectSucceeded(8, ConnectVariable( treeName, prefix + m_objectNames.getName("cov10"), cov10)); 
+    setConnectSucceeded(9, ConnectVariable( treeName, prefix + m_objectNames.getName("cov11"), cov11)); 
 } // end of detail level CovAnalysis
 
 if(  ((detail_level & Ntuple::MissingEtMVAAnalysis) == Ntuple::MissingEtMVAAnalysis)  ) {
-     setConnectSucceeded(11, ConnectVariable( treeName, prefix + m_objectNames.getName("recoil_pt"), recoil_pt)); 
-    setConnectSucceeded(12, ConnectVariable( treeName, prefix + m_objectNames.getName("recoil_eta"), recoil_eta)); 
-    setConnectSucceeded(13, ConnectVariable( treeName, prefix + m_objectNames.getName("recoil_phi"), recoil_phi)); 
-    setConnectSucceeded(14, ConnectVariable( treeName, prefix + m_objectNames.getName("recoil_pdgId"), recoil_pdgId)); 
+     setConnectSucceeded(10, ConnectVariable( treeName, prefix + m_objectNames.getName("recoil_pt"), recoil_pt)); 
+    setConnectSucceeded(11, ConnectVariable( treeName, prefix + m_objectNames.getName("recoil_eta"), recoil_eta)); 
+    setConnectSucceeded(12, ConnectVariable( treeName, prefix + m_objectNames.getName("recoil_phi"), recoil_phi)); 
+    setConnectSucceeded(13, ConnectVariable( treeName, prefix + m_objectNames.getName("recoil_pdgId"), recoil_pdgId)); 
 }
 
 

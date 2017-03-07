@@ -28,10 +28,10 @@ class ScaleFactorTool : public SToolBase {
     void BeginInputData( const SInputData& id ) throw( SError );
     
     // MUON
-    double get_Efficiency_MuTauTrig_MC(double pt, double eta, int dm, std::string triggerFlags="mt");
-    double get_Efficiency_MuTauTrig_Data(double pt, double eta, int dm, std::string triggerFlags="mt");
-    double get_ScaleFactor_MuTauTrig(double pt, double eta, int dm, std::string triggerFlags="mt");
-    double get_ScaleFactor_MuIdIso(double pt, double eta);
+    double get_Efficiency_MuTauTrig_MC(   double pt, double eta, int dm, std::string triggerFlags="mt" );
+    double get_Efficiency_MuTauTrig_Data( double pt, double eta, int dm, std::string triggerFlags="mt" );
+    double get_ScaleFactor_MuTauTrig(     double pt, double eta, int dm, std::string triggerFlags="mt" );
+    double get_ScaleFactor_MuIdIso(       double pt, double eta );
     std::string m_File_Mu22Trig;
     std::string m_File_Mu24Trig;
     std::string m_File_MuTauTrig_MuLeg;
@@ -39,14 +39,23 @@ class ScaleFactorTool : public SToolBase {
     std::string m_File_MuIdIso;
     
     // ELECTRON
-    double get_Efficiency_EleTauTrig_MC(double pt, double eta, int dm, std::string triggerFlags="mt");
-    double get_Efficiency_EleTauTrig_Data(double pt, double eta, int dm, std::string triggerFlags="mt");
-    double get_ScaleFactor_EleTauTrig(double pt, double eta, int dm, std::string triggerFlags="et");
-    double get_ScaleFactor_EleIdIso(double pt, double eta);
+    double get_Efficiency_EleTauTrig_MC(   double pt, double eta, int dm, std::string triggerFlags="et" );
+    double get_Efficiency_EleTauTrig_Data( double pt, double eta, int dm, std::string triggerFlags="et" );
+    double get_ScaleFactor_EleTauTrig(     double pt, double eta, int dm, std::string triggerFlags="et" );
+    double get_ScaleFactor_EleIdIso(       double pt, double eta );
     std::string m_File_EleTrig;
     std::string m_File_EleTauTrig_EleLeg;
     std::string m_File_EleTauTrig_TauLeg;
     std::string m_File_EleIdIso;
+    
+    // EMU
+    double get_Efficiency_EleMuTrig_MC(   double pt, double eta, int dm, std::string triggerFlags="em" );
+    double get_Efficiency_EleMuTrig_Data( double pt, double eta, int dm, std::string triggerFlags="em" );
+    double get_ScaleFactor_EleMuTrig(     double pt, double eta, int dm, std::string triggerFlags="em" );
+    std::string m_File_EleMuTrig_Ele12Leg;
+    std::string m_File_EleMuTrig_Ele23Leg;
+    std::string m_File_EleMuTrig_Mu8Leg;
+    std::string m_File_EleMuTrig_Mu23Leg;
     
     bool verbose = true;
     
@@ -63,6 +72,10 @@ class ScaleFactorTool : public SToolBase {
     ScaleFactor* m_ScaleFactor_EleTrig;
     ScaleFactor* m_ScaleFactor_EleTauTrig_EleLeg;
     ScaleFactorTau* m_ScaleFactor_EleTauTrig_TauLeg;
+    ScaleFactor* m_ScaleFactor_EleMuTrig_Ele12Leg;
+    ScaleFactor* m_ScaleFactor_EleMuTrig_Ele23Leg;
+    ScaleFactor* m_ScaleFactor_EleMuTrig_Mu8Leg;
+    ScaleFactor* m_ScaleFactor_EleMuTrig_Mu23Leg;
     ScaleFactor* m_ScaleFactor_EleIdIso;
     
     

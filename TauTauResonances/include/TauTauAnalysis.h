@@ -77,7 +77,8 @@ class TauTauAnalysis : public SCycleBase {
       kMetFilters,            // C3
       kLepton,                // C4
       kLepTau,                // C6
-      kBeforeCutsWeighted,    // C7
+      kTriggerMatched,        // C7
+      kBeforeCutsWeighted,    // C8
       kNumCuts                // last!
     } SelectionCuts;
   
@@ -89,7 +90,97 @@ class TauTauAnalysis : public SCycleBase {
       "MetFilters",             // C3
       "Lepton",                 // C4
       "LepTau",                 // C6
-      "BeforeCutsWeighted",     // C7
+      "TriggerMatched",         // C7
+      "BeforeCutsWeighted",     // C8
+    };
+    
+
+    struct ltau_pair{
+      Int_t ilepton;
+      Float_t lep_iso;
+      Float_t lep_pt;
+      Int_t itau;
+      Float_t tau_iso;
+      Float_t tau_pt;
+      Float_t dR;
+      // comparators
+      bool operator<(const ltau_pair& another) const {
+      //if (dR > 0.3 && another.dR > 0.3 && dR != another.dR)
+      //  return dR < another.dR;           // take pair with lowest dR, if dR > 0.3
+        if (lep_iso != another.lep_iso)
+          return lep_iso < another.lep_iso; // take pair with best (lowest) leption iso
+        if (lep_pt != another.lep_pt)
+          return lep_pt > another.lep_pt;   // take pair with highest lepton pt
+        if (tau_iso != another.tau_iso)
+          return tau_iso > another.tau_iso; // take pair with best (highest) tau iso
+        if (tau_pt != another.tau_pt)
+          return tau_pt > another.tau_pt;   // take pair with highest tau pt
+        return ilepton < another.ilepton;
+      }
+    };
+    
+    
+    //
+    // TRIGGERS
+    //
+    
+    struct Trigger{ // classes behaviour: cpp.sh/5723a
+      std::string name; int start; int end;
+      Trigger(std::string _name, int _start, int _end) : name(_name), start(_start), end(_end) { } ;
+      virtual bool matchesTriggerObject(Ntuple::EventInfoNtupleObject eventInfo, const Float_t pt1, const Float_t eta1, const Float_t phi1, const Float_t pt2, const Float_t eta2, const Float_t phi2) const { return true; }
+    };
+    
+    struct LeptonTrigger : Trigger {
+      double pt;
+      std::vector<std::string> filterNames;
+      LeptonTrigger(std::string _name, int _start, int _end, double _pt, std::vector<std::string> _names):
+        Trigger(_name,_start,_end), pt(_pt), filterNames(_names) { }
+//       virtual bool matchesTriggerObject(Ntuple::EventInfoNtupleObject eventInfo, const Float_t pt1, const Float_t eta1, const Float_t phi1, const Float_t pt2, const Float_t eta2, const Float_t phi2) const {
+//         for(unsigned int i=0; i<eventInfo.trigObject_eta->size(); i++){
+//           std::string triggerName = eventInfo.trigObject_lastname->at(i);
+//           Float_t trig_eta = eventInfo.trigObject_eta->at(i);
+//           Float_t trig_phi = eventInfo.trigObject_phi->at(i);
+//           Float_t dR = deltaR(eta1 - trig_eta, deltaPhi(phi1,trig_phi));
+//           if(dR < 0.5) continue;
+//           for(auto const& filterName: filterNames){
+//             for(std::map<std::string, std::vector<std::string>>::iterator it = (eventInfo.trigObject_filterLabels)->begin(); it != (eventInfo.trigObject_filterLabels)->end(); ++it){
+//               if(it->first != triggerName) continue;
+//               for(unsigned int j=0; j<it->second.size(); j++){
+//                 //std::cout << ">>> filter " << j << ": " << it->second.at(j) << std::endl;
+//                 if(it->second.at(j)==filterName && pt1>pt) return true;
+//         }}}}
+//         return false;
+//       }
+    };
+    
+    struct CrossTrigger : Trigger {
+      double pt_leg1; double pt_leg2;
+      std::string filterName_leg1;
+      std::string filterName_leg2;
+      bool noleg2 = false;  
+      CrossTrigger(std::string _name, int _start, int _end, double pt1, double pt2,
+                   std::string names1, std::string names2 = "NOLEG1"):
+        Trigger(_name,_start,_end), pt_leg1(pt1), pt_leg2(pt2), filterName_leg1(names1), filterName_leg2(names2)
+        { noleg2 = (filterName_leg2.find("NOLEG1") != std::string::npos);}
+//       virtual bool matchesTrigObject(Ntuple::EventInfoNtupleObject eventInfo, const Float_t pt1, const Float_t eta1, const Float_t phi1, const Float_t pt2, const Float_t eta2, const Float_t phi2) const {
+//         bool match_leg1 = false;
+//         bool match_leg2 = false;
+//         for(unsigned int i = 0; i < eventInfo.trigObject_eta->size(); i++){
+//           std::string triggerName = eventInfo.trigObject_lastname->at(i);
+//           Float_t trig_eta = eventInfo.trigObject_eta->at(i);
+//           Float_t trig_phi = eventInfo.trigObject_phi->at(i);
+//           Float_t dR1 = deltaR(eta1 - trig_eta, deltaPhi(phi1,trig_phi));
+//           Float_t dR2 = 0.0;
+//           if(noleg2) dR2 = deltaR(eta2 - trig_eta, deltaPhi(phi2,trig_phi));
+//           for(std::map<std::string, std::vector<std::string>>::iterator it = (eventInfo.trigObject_filterLabels)->begin(); it != (eventInfo.trigObject_filterLabels)->end(); ++it){
+//             if(it->first != triggerName) continue;
+//             for(unsigned int j=0; j < it->second.size(); j++){
+//               //std::cout << ">>> filter " << j << ": " << it->second.at(j) << std::endl;
+//               if(           it->second.at(j)==filterName_leg1 and dR1<0.5 and pt1>pt_leg1) match_leg1 = true;
+//               if(noleg2 and it->second.at(j)==filterName_leg2 and dR2<0.5 and pt2>pt_leg2) match_leg2 = true;
+//         }}}
+//         return match_leg1 and (match_leg2 or noleg2);
+//       }
     };
     
     
@@ -114,7 +205,8 @@ class TauTauAnalysis : public SCycleBase {
                                const UZH::MissingEt& met, const UZH::MissingEt& puppimet );//, const UZH::MissingEt& mvamet=NULL);
     
     // check pass of triggers / MET filters
-    virtual TString passTrigger( int runNumber );
+    virtual TString passTrigger( int runNumber = -1 );
+    virtual bool triggerMatches(const std::vector<Trigger> firedTriggers, const Float_t pt1, const Float_t eta1, const Float_t phi1, const Float_t pt2, const Float_t eta2, const Float_t phi2);
     virtual bool passMETFilters();
     
     // obtain event weights for MC
@@ -125,13 +217,14 @@ class TauTauAnalysis : public SCycleBase {
     
     // set tlv of generator boson for recoil corrections
     virtual void setGenBosonTLVs();
+    virtual double getGenBosonPt();
     
     // match reco objects to taus
     virtual int genMatch( Float_t lep_eta, Float_t lep_phi );
     
     // help function
-    virtual Float_t deltaPhi( Float_t p1, Float_t p2 );
-    virtual Float_t deltaR(   Float_t p1, Float_t p2 );
+    static Float_t deltaPhi( Float_t p1, Float_t p2 );
+    static Float_t deltaR(   Float_t p1, Float_t p2 );
     virtual void shiftLeptonAndMET( const float shift, TLorentzVector& lep_shifted, TLorentzVector& met_shifted, bool shiftEnergy = false );
     
     // IDs
@@ -203,22 +296,22 @@ class TauTauAnalysis : public SCycleBase {
     std::string m_tauName;            ///< name of tau collection in tree with reconstructed objects
     std::string m_missingEtName;      ///< name of missing E_T collection in tree with reconstructed objects
     std::string m_genParticleName;    ///< name of gen particle collection in tree with reconstructed objects
-  
+    
     // XML flags for TauTauAnalysis
-    bool      m_isData;
-    bool      m_isSignal;
-    bool      m_applyMETFilters;
-    bool      m_doSVFit;
-    bool      m_doRecoilCorr;
-    bool      m_doZpt;
-    bool      m_doTTpt;
-    bool      m_doTES;
-    double    m_TESshift;
-    bool      m_doEES;
-    double    m_EESshift;
-    double    m_EESshiftEndCap;
-    bool      m_doLTF;
-    double    m_LTFshift;
+    bool    m_isData;
+    bool    m_isSignal;
+    bool    m_applyMETFilters;
+    bool    m_doSVFit;
+    bool    m_doRecoilCorr;
+    bool    m_doZpt;
+    bool    m_doTTpt;
+    bool    m_doTES;
+    double  m_TESshift;
+    bool    m_doEES;
+    double  m_EESshift;
+    double  m_EESshiftEndCap;
+    bool    m_doLTF;
+    double  m_LTFshift;
 
     ///
     /// CUTS
@@ -260,28 +353,19 @@ class TauTauAnalysis : public SCycleBase {
     // MET
     double    m_metCut;
     
-    
-    ///
-    /// FILE NAME
-    ///
-    
-    std::string m_jsonName;
-    //std::string m_TrigSF_muonName;
-    //std::string m_IDSF_muonName;
-    //std::string m_IsoSF_muonName;
-    //std::string m_IDSF_eleName;
-
-    // other variables needed
-    //std::vector<std::string> m_triggerNames_mutau;
-    //std::vector<std::string> m_triggerNames_eletau;
-    struct UnPreScaledRun{ int start; int end;};
-    //UnPreScaledRun initializeUnPreScaledRun( int start, int end ){ UnPreScaledRun run = { start, end }; return run; }
-    std::map<std::string,UnPreScaledRun> m_triggerNamesToRun_mutau;
-    std::map<std::string,UnPreScaledRun> m_triggerNamesToRun_etau;
-    std::map<std::string,UnPreScaledRun> m_triggerNamesToRun_emu;
-    
     int mu_tau;
     int ele_tau;
+    std::string m_jsonName;
+    
+        
+    std::string m_trigger_Flags;
+    std::vector<Trigger> m_triggers_mutau;
+    std::vector<Trigger> m_triggers_etau;
+    std::vector<Trigger> m_triggers_emu;
+    std::vector<Trigger> m_firedTriggers_mutau;
+    std::vector<Trigger> m_firedTriggers_etau;
+    std::vector<Trigger> m_firedTriggers_emu;
+    
     
     
     ///
@@ -403,6 +487,7 @@ class TauTauAnalysis : public SCycleBase {
     std::map<std::string,Int_t>    b_extraelec_veto;
     std::map<std::string,Int_t>    b_extramuon_veto;
     std::map<std::string,Int_t>    b_lepton_vetos;
+    std::map<std::string,Int_t>    b_iso_cuts;
     
     std::map<std::string,Double_t> b_jpt_1;
     std::map<std::string,Double_t> b_jeta_1;
@@ -459,8 +544,8 @@ class TauTauAnalysis : public SCycleBase {
     std::map<std::string,Double_t> b_m_genboson;
     std::map<std::string,Double_t> b_pt_genboson;
     
-    //std::map<std::string,Double_t> b_pt_sv; 
-    //std::map<std::string,Double_t> b_eta_sv; 
+    //std::map<std::string,Double_t> b_pt_sv;
+    //std::map<std::string,Double_t> b_eta_sv;
     //std::map<std::string,Double_t> b_phi_sv;
     std::map<std::string,Double_t> b_pzetamiss;
     std::map<std::string,Double_t> b_pzetavis;
@@ -471,7 +556,7 @@ class TauTauAnalysis : public SCycleBase {
     std::map<std::string,Double_t> b_vbf_jdphi;
     std::map<std::string,Int_t>    b_vbf_ncentral;
     std::map<std::string,Int_t>    b_vbf_ncentral20;
-
+    
     // Macro adding the functions for dictionary generation
     ClassDef( TauTauAnalysis, 0 );
   

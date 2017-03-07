@@ -18,14 +18,15 @@ class ScaleFactor {
 	private: 
 	std::map<std::string, TGraphAsymmErrors *> eff_data;
 	std::map<std::string, TGraphAsymmErrors *> eff_mc;
-
+    
 	TH1D * etaBinsH;
-
+    std::string m_inputRootFile;
+    
 	void  SetAxisBins(TGraphAsymmErrors*);
 	bool  check_SameBinning(TGraphAsymmErrors*, TGraphAsymmErrors*);
 	std::string FindEtaLabel(double, std::string);
     int FindPtBin( std::map<std::string, TGraphAsymmErrors *>, std::string, double);
-
+    
 	public:
 		ScaleFactor(){};
 		ScaleFactor(TString);

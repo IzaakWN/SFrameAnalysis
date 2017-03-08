@@ -26,9 +26,9 @@ BTaggingScaleTool::BTaggingScaleTool( SCycleBase* parent,
   // if needed, probably best to append WP names a la Loose74X
   // see also use in BeginInputData
   wpCuts.clear();
-  wpCuts["Loose"] = 0.460;
-  wpCuts["Medium"] = 0.800;
-  wpCuts["Tight"] = 0.935;
+  wpCuts["Loose"]  = 0.5426;
+  wpCuts["Medium"] = 0.8484;
+  wpCuts["Tight"]  = 0.9535;
   // wpCuts_veto.clear();
   // wpCuts_veto["Loose"] = 0.460;
   // wpCuts_veto["Medium"] = 0.800;
@@ -48,8 +48,8 @@ BTaggingScaleTool::BTaggingScaleTool( SCycleBase* parent,
   DeclareProperty( m_name + "_WorkingPoint", m_workingPoint = "Loose" );
   DeclareProperty( m_name + "_WorkingPoint_veto", m_workingPoint_veto = "Medium" );
 
-  DeclareProperty( m_name + "_CsvFile", m_csvFile = sframe_dir + "/../BTaggingTools/csv/subjet_CSVv2_ichep.csv" );//subjet_CSVv2_ichep.csv
-  DeclareProperty( m_name + "_CsvFile_veto", m_csvFile_veto = sframe_dir + "/../BTaggingTools/csv/CSVv2_ichep.csv" );
+  DeclareProperty( m_name + "_CsvFile", m_csvFile = sframe_dir + "/../BTaggingTools/csv/subjet_CSVv2_Moriond17_B_H.csv" ); // subjet_CSVv2_ichep.csv
+  DeclareProperty( m_name + "_CsvFile_veto", m_csvFile_veto = sframe_dir + "/../BTaggingTools/csv/CSVv2_Moriond17_B_H.csv" );
 
   DeclareProperty( m_name + "_MeasurementType_udsg", m_measurementType_udsg = "incl" );//"incl" 
   DeclareProperty( m_name + "_MeasurementType_bc", m_measurementType_bc = "lt" );//"lt"
@@ -59,8 +59,8 @@ BTaggingScaleTool::BTaggingScaleTool( SCycleBase* parent,
 
 
   DeclareProperty( m_name + "_EffHistDirectory", m_effHistDirectory = "bTagEff" );
-  DeclareProperty( m_name + "_EffFile", m_effFile = sframe_dir + "/../BTaggingTools/efficiencies/bTagEffs_15p9_v3.root" );
-  DeclareProperty( m_name + "_EffFile_veto", m_effFile_veto = sframe_dir + "/../BTaggingTools/efficiencies/bTagEffs_15p9_v3.root" ); // Camilla
+  DeclareProperty( m_name + "_EffFile", m_effFile = sframe_dir + "/../BTaggingTools/efficiencies/bTagEffs_36p8_vMediumAk4_LooseAk8_lepVeto.root" ); // bTagEffs_15p9_v3.root
+  DeclareProperty( m_name + "_EffFile_veto", m_effFile_veto = sframe_dir + "/../BTaggingTools/efficiencies/bTagEffs_36p8_vMediumAk4_LooseAk8_lepVeto.root" ); // Camilla // bTagEffs_15p9_v3.root
   //DeclareProperty( m_name + "_EffFile_veto", m_effFile_veto = sframe_dir + "/../BTaggingTools/efficiencies/bTagEffs_ichep2016.root" );
 
 }

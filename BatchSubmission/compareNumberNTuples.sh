@@ -4,40 +4,59 @@
 echo
 echo ">>> comparing stored root files to the listed ones in xml files"
 BASEDIR="/shome/$USER/analysis/SFrameAnalysis_Moriond/BatchSubmission"
-XMLDIR="xmls_Moriond_T2"
+XMLDIR="xmls_postMoriond_T2"
+SITES_T3=(
+#     /pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Spring16/Ntuple_80_08022017 # data
+#     /pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Summer16/Ntuple_80_20170203
+#     /pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Summer16/Ntuple_80_20170206 
+#     /pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Summer16/Ntuple_80_20170207 
+    /pnfs/psi.ch/cms/trivcat/store/user/ineuteli/Ntuple_80_20170303/
+)
+SITES_T2=(
+#     gsiftp://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_Moriond17
+#     gsiftp://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_Moriond17_v2
+#     gsiftp://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond
+#     gsiftp://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/cgalloni/Ntuple_Moriond17
+#     gsiftp://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/zucchett/Ntuple_Moriond17
+)
+
 
 SAMPLES=(
-#     TT_TuneCUE
-#     WJetsToLNu_TuneCUETP8M1_13TeV-madgraph
+    
+#     SingleMuon
+#     SingleElectron
+    
+    TT_TuneCUE
+    WJetsToLNu_TuneCUETP8M1_13TeV-madgraph
     W1JetsToLNu_TuneCUETP8M1_13TeV-madgraph
-#     W2JetsToLNu_TuneCUETP8M1_13TeV-madgraph
-#     W3JetsToLNu_TuneCUETP8M1_13TeV-madgraph
-#     W4JetsToLNu_TuneCUETP8M1_13TeV-madgraph
-#     DYJetsToLL_M-10to50_TuneCUETP8M1
-#     DY1JetsToLL_M-10to50_TuneCUETP8M1
-#     DY2JetsToLL_M-10to50_TuneCUETP8M1
-#     DY3JetsToLL_M-10to50_TuneCUETP8M1
-#     DYJetsToLL_M-50_TuneCUETP8M1
-#     DY1JetsToLL_M-50_TuneCUETP8M1
-#     DY2JetsToLL_M-50_TuneCUETP8M1
-#     DY3JetsToLL_M-50_TuneCUETP8M1
-#     WWTo1L1Nu2Q_13TeV_amcatnlo
-#     WZTo2L2Q_13TeV_amcatnlo
-#     WZTo3LNu_TuneCUETP8M1_13TeV-amcatnlo
-#     WZ_TuneCUETP8M1_13TeV-pythia8
-#     ZZTo2Q2Nu_13TeV_amcatnlo
-#     ZZTo4L_13TeV_powheg
-#     ZZTo4Q_13TeV_amcatnlo
-#     ZZTo4L_13TeV-amcatnlo
-#     ZZ_TuneCUETP8M1_13TeV-pythia8
-#     VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8
-#     ST_s-channel_4f_leptonDecays
-#     ST_t-channel_antitop_4f
-#     ST_t-channel_top_4f_inclusive
-#     ST_tW_antitop_5f_NoFullyHadronicDecays_13TeV
-#     ST_tW_antitop_5f_inclusiveDecays_13TeV
-#     ST_tW_top_5f_NoFullyHadronicDecays_13TeV
-#     ST_tW_top_5f_inclusiveDecays_13TeV
+    W2JetsToLNu_TuneCUETP8M1_13TeV-madgraph
+    W3JetsToLNu_TuneCUETP8M1_13TeV-madgraph
+    W4JetsToLNu_TuneCUETP8M1_13TeV-madgraph
+    DYJetsToLL_M-10to50_TuneCUETP8M1
+    DY1JetsToLL_M-10to50_TuneCUETP8M1
+    DY2JetsToLL_M-10to50_TuneCUETP8M1
+    DY3JetsToLL_M-10to50_TuneCUETP8M1
+    DYJetsToLL_M-50_TuneCUETP8M1
+    DY1JetsToLL_M-50_TuneCUETP8M1
+    DY2JetsToLL_M-50_TuneCUETP8M1
+    DY3JetsToLL_M-50_TuneCUETP8M1
+    WWTo1L1Nu2Q_13TeV_amcatnlo
+    WZTo2L2Q_13TeV_amcatnlo
+    WZTo3LNu_TuneCUETP8M1_13TeV-amcatnlo
+    WZ_TuneCUETP8M1_13TeV-pythia8
+    ZZTo2Q2Nu_13TeV_amcatnlo
+    ZZTo4L_13TeV_powheg
+    ZZTo4Q_13TeV_amcatnlo
+    ZZTo4L_13TeV-amcatnlo
+    ZZ_TuneCUETP8M1_13TeV-pythia8
+    VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8
+    ST_s-channel_4f_leptonDecays
+    ST_t-channel_antitop_4f
+    ST_t-channel_top_4f_inclusive
+    ST_tW_antitop_5f_NoFullyHadronicDecays_13TeV
+    ST_tW_antitop_5f_inclusiveDecays_13TeV
+    ST_tW_top_5f_NoFullyHadronicDecays_13TeV
+    ST_tW_top_5f_inclusiveDecays_13TeV
         
 #     DYJetsToLL_M-50_HT
 #     DYJetsToLL_M-5to50_HT
@@ -80,19 +99,24 @@ SAMPLES=(
 #     BulkGravTohhTohtatahbb_narrow_M
 )
 
-SITES_T3=(
-#     /pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Spring16/Ntuple_80_08022017
-#     /pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Summer16/Ntuple_80_20170203
-#     /pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Summer16/Ntuple_80_20170206 
-#     /pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Summer16/Ntuple_80_20170207
-)
 
-SITES_T2=(
-    gsiftp://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_Moriond17
-    gsiftp://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_Moriond17_v2
-    gsiftp://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/cgalloni/Ntuple_Moriond17
-    gsiftp://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/zucchett/Ntuple_Moriond17
-)
+
+# USER OPTIONS
+# TODO: http://stackoverflow.com/a/39754944/5499028
+# TODO: verbose mode: print dirs, xml files, duplicate lines
+# TODO: option to add own pnfs site
+SAMPLES_USER=( )
+SITES_USER=( )
+while getopts b:x:s: option; do
+    case "${option}"
+    in
+        b) BASEDIR=${OPTARG};;
+        x) XMLDIR=${OPTARG};;
+        s) SAMPLES_USER+=(${OPTARG});;
+    esac
+done
+[[ $SAMPLES_USER ]] && SAMPLES=$SAMPLES_USER
+
 
 
 # LOOP over samples
@@ -162,11 +186,11 @@ for sample in ${SAMPLES[@]}; do
         for f in `ls ${XMLDIR}/${sample}*.xml | awk -F '/' '{print $NF}'`; do
           NEVENTS=`grep "${XMLDIR}/$f" -e 'Total number of events processed: ' | grep -Po '[0-9]*'`
           NTOT=$(($NTOT+$NEVENTS))
-          if [[ ! $EVENTS ]]; then
+          if [[ ! $NEVENTS ]]; then
             echo ">>> Warning! No number of events saved in $f!"
           # else
-          #   echo ">>> $EVENTS events in $f"
-          #   N=$(($N+$EVENTS))
+          #   echo ">>> $NEVENTS events in $f"
+          #   N=$(($N+$NEVENTS))
           fi
         done
         

@@ -22,7 +22,7 @@
 #
 #  Print out xml file names formatted for copy-pasting into job options files:
 #    cd xmls_Moriond/
-#    ls *.xml | xargs -I@ echo \”@\”,
+#    ls *.xml | xargs -I@ echo \"@\",
 #
 
 
@@ -58,6 +58,7 @@ parser.add_option("-o", "--outDir", action="store",
 (options, args) = parser.parse_args()
 if len(args) != 1: parser.error("Please provide at file list name")
 
+print
 sampleListName = args[0]
 site=options.site
 verbose=options.verbose
@@ -73,7 +74,9 @@ dCacheInstances={}
 #Xrootd and dcap prefixes
 dCacheInstances["PSI"]=["root://t3dcachedb.psi.ch:1094/", "dcap://t3se01.psi.ch:22125/"]
 dCacheInstances["PSI-T2"]=["root://storage01.lcg.cscs.ch/",  "root://storage01.lcg.cscs.ch/"] # PSI Tier 2
-
+if site not in dCacheInstances:
+    print "ERROR! Site %s not registered as a dCacheInstances"
+    sys.exit(1)
 
 
 def main():
@@ -120,7 +123,7 @@ def main():
         if (nFiles > 1):
           maxFiles = int(math.ceil(len(fileList)/float(nFiles)))
           print "splitting file into %d subfiles of max. %d input files each" %(nFiles, maxFiles)
-        else :
+        else:
           maxFiles = int(maxFiles_original)
         if (len(fileList) == 0):
           print "No files found."
@@ -157,11 +160,12 @@ def getFiles(samplepath):
   if "T2" in site:
     lock=thread.allocate_lock()
     lock.acquire()
-    commandLS="uberftp -ls -r gsiftp://storage01.lcg.cscs.ch/%s | awk '{print $8}'"%(samplepath)
+    commandLS="uberftp -ls -r gsiftp://storage01.lcg.cscs.ch/%s | awk '{print $8}'"%(samplepath) # | sort -V
     if verbose: print commandLS
     processLS=subprocess.Popen(commandLS, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     lock.release()
     subdirs_dict={}
+    #output=processLS.stdout #(stdout,stderr) = processLS.communicate()
     for line in processLS.stdout:
       if line.find(".root") <= 0: continue
       subdirs_dict.setdefault(os.path.dirname(line),[]).append(os.path.basename(line.strip()))
@@ -181,15 +185,15 @@ def isDir(samplepath):
     lock=thread.allocate_lock()
     lock.acquire()
     commandLS="uberftp -ls gsiftp://storage01.lcg.cscs.ch/%s"%(samplepath)
-    if verbose: print commandLS
+    if verbose: print "\n",commandLS
     processLS=subprocess.Popen(commandLS, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     lock.release()
-    output=processLS.stderr.read()
-    if verbose: print "isDir: stdout: %s"%processLS.stdout.read()
-    if verbose: print "isDir: stderr: %s"%output
-    return "No match for" not in output
+    (stdout,stderr) = processLS.communicate() #output=processLS.stderr.read()
+    if verbose: print "isDir: stdout: %s"%stdout
+    if verbose: print "isDir: stderr: %s"%stderr
+    return "No match for" not in stderr
   else:
-    return os.path.isdir(sample)
+    return os.path.isdir(samplepath)
   
 
 

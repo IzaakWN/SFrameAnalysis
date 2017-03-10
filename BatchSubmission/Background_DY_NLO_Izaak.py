@@ -9,7 +9,7 @@ nProcesses=1
 nFiles=3
 hCPU="03:30:00"
 hVMEM="5000M"
-postFix="_Moriond" #"_ICHEP" #"_Moriond"
+postFix="_Moriond"
 dataSets = [
         
        [ "DYJetsToLL_M-10to50_nlo",

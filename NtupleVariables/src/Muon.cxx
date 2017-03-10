@@ -40,15 +40,15 @@ if(  ((ana->detailLevel & Ntuple::MuonBasic) == Ntuple::MuonBasic)  ) {
 } // end of detail level Basic
 
 if(  ((ana->detailLevel & Ntuple::MuonBoostedIsolation) == Ntuple::MuonBoostedIsolation)  ) {
-     if (ana->m_connectsucceeded[30]) m_pfRhoCorrRelIso03Boost = &((*ana->pfRhoCorrRelIso03Boost)[idx]); else m_pfRhoCorrRelIso03Boost = 0; 
-    if (ana->m_connectsucceeded[31]) m_pfRhoCorrRelIso04Boost = &((*ana->pfRhoCorrRelIso04Boost)[idx]); else m_pfRhoCorrRelIso04Boost = 0; 
-    if (ana->m_connectsucceeded[32]) m_pfDeltaCorrRelIsoBoost = &((*ana->pfDeltaCorrRelIsoBoost)[idx]); else m_pfDeltaCorrRelIsoBoost = 0; 
-    if (ana->m_connectsucceeded[33]) m_pfRelIsoBoost = &((*ana->pfRelIsoBoost)[idx]); else m_pfRelIsoBoost = 0; 
-    if (ana->m_connectsucceeded[34]) m_photonIsoBoost = &((*ana->photonIsoBoost)[idx]); else m_photonIsoBoost = 0; 
-    if (ana->m_connectsucceeded[35]) m_neutralHadIsoBoost = &((*ana->neutralHadIsoBoost)[idx]); else m_neutralHadIsoBoost = 0; 
-    if (ana->m_connectsucceeded[36]) m_chargedHadIsoBoost = &((*ana->chargedHadIsoBoost)[idx]); else m_chargedHadIsoBoost = 0; 
-    if (ana->m_connectsucceeded[37]) m_SemileptonicPFIso = &((*ana->SemileptonicPFIso)[idx]); else m_SemileptonicPFIso = 0; 
-    if (ana->m_connectsucceeded[38]) m_SemileptonicCorrPFIso = &((*ana->SemileptonicCorrPFIso)[idx]); else m_SemileptonicCorrPFIso = 0; 
+     if (ana->m_connectsucceeded[31]) m_pfRhoCorrRelIso03Boost = &((*ana->pfRhoCorrRelIso03Boost)[idx]); else m_pfRhoCorrRelIso03Boost = 0; 
+    if (ana->m_connectsucceeded[32]) m_pfRhoCorrRelIso04Boost = &((*ana->pfRhoCorrRelIso04Boost)[idx]); else m_pfRhoCorrRelIso04Boost = 0; 
+    if (ana->m_connectsucceeded[33]) m_pfDeltaCorrRelIsoBoost = &((*ana->pfDeltaCorrRelIsoBoost)[idx]); else m_pfDeltaCorrRelIsoBoost = 0; 
+    if (ana->m_connectsucceeded[34]) m_pfRelIsoBoost = &((*ana->pfRelIsoBoost)[idx]); else m_pfRelIsoBoost = 0; 
+    if (ana->m_connectsucceeded[35]) m_photonIsoBoost = &((*ana->photonIsoBoost)[idx]); else m_photonIsoBoost = 0; 
+    if (ana->m_connectsucceeded[36]) m_neutralHadIsoBoost = &((*ana->neutralHadIsoBoost)[idx]); else m_neutralHadIsoBoost = 0; 
+    if (ana->m_connectsucceeded[37]) m_chargedHadIsoBoost = &((*ana->chargedHadIsoBoost)[idx]); else m_chargedHadIsoBoost = 0; 
+    if (ana->m_connectsucceeded[38]) m_SemileptonicPFIso = &((*ana->SemileptonicPFIso)[idx]); else m_SemileptonicPFIso = 0; 
+    if (ana->m_connectsucceeded[39]) m_SemileptonicCorrPFIso = &((*ana->SemileptonicCorrPFIso)[idx]); else m_SemileptonicCorrPFIso = 0; 
 } // end of detail level BoostedIsolation
 
 if(  ((ana->detailLevel & Ntuple::MuonID) == Ntuple::MuonID)  ) {
@@ -56,35 +56,36 @@ if(  ((ana->detailLevel & Ntuple::MuonID) == Ntuple::MuonID)  ) {
     if (ana->m_connectsucceeded[4]) m_isLooseMuon = &((*ana->isLooseMuon)[idx]); else m_isLooseMuon = 0; 
     if (ana->m_connectsucceeded[5]) m_isTightMuon = &((*ana->isTightMuon)[idx]); else m_isTightMuon = 0; 
     if (ana->m_connectsucceeded[6]) m_isMediumMuon = &((*ana->isMediumMuon)[idx]); else m_isMediumMuon = 0; 
-    if (ana->m_connectsucceeded[7]) m_isPFMuon = &((*ana->isPFMuon)[idx]); else m_isPFMuon = 0; 
-    if (ana->m_connectsucceeded[8]) m_isGlobalMuon = &((*ana->isGlobalMuon)[idx]); else m_isGlobalMuon = 0; 
-    if (ana->m_connectsucceeded[9]) m_isTrackerMuon = &((*ana->isTrackerMuon)[idx]); else m_isTrackerMuon = 0; 
-    if (ana->m_connectsucceeded[10]) m_isSoftMuon = &((*ana->isSoftMuon)[idx]); else m_isSoftMuon = 0; 
+    if (ana->m_connectsucceeded[7]) m_isMediumMuonGH = &((*ana->isMediumMuonGH)[idx]); else m_isMediumMuonGH = 0; 
+    if (ana->m_connectsucceeded[8]) m_isPFMuon = &((*ana->isPFMuon)[idx]); else m_isPFMuon = 0; 
+    if (ana->m_connectsucceeded[9]) m_isGlobalMuon = &((*ana->isGlobalMuon)[idx]); else m_isGlobalMuon = 0; 
+    if (ana->m_connectsucceeded[10]) m_isTrackerMuon = &((*ana->isTrackerMuon)[idx]); else m_isTrackerMuon = 0; 
+    if (ana->m_connectsucceeded[11]) m_isSoftMuon = &((*ana->isSoftMuon)[idx]); else m_isSoftMuon = 0; 
 } // end of detail level ID
 
 if(  ((ana->detailLevel & Ntuple::MuonIsolation) == Ntuple::MuonIsolation)  ) {
-     if (ana->m_connectsucceeded[11]) m_pfRhoCorrRelIso03 = &((*ana->pfRhoCorrRelIso03)[idx]); else m_pfRhoCorrRelIso03 = 0; 
-    if (ana->m_connectsucceeded[12]) m_pfRhoCorrRelIso04 = &((*ana->pfRhoCorrRelIso04)[idx]); else m_pfRhoCorrRelIso04 = 0; 
-    if (ana->m_connectsucceeded[13]) m_pfDeltaCorrRelIso = &((*ana->pfDeltaCorrRelIso)[idx]); else m_pfDeltaCorrRelIso = 0; 
-    if (ana->m_connectsucceeded[14]) m_pfRelIso = &((*ana->pfRelIso)[idx]); else m_pfRelIso = 0; 
-    if (ana->m_connectsucceeded[15]) m_photonIso = &((*ana->photonIso)[idx]); else m_photonIso = 0; 
-    if (ana->m_connectsucceeded[16]) m_neutralHadIso = &((*ana->neutralHadIso)[idx]); else m_neutralHadIso = 0; 
-    if (ana->m_connectsucceeded[17]) m_chargedHadIso = &((*ana->chargedHadIso)[idx]); else m_chargedHadIso = 0; 
-    if (ana->m_connectsucceeded[18]) m_trackIso = &((*ana->trackIso)[idx]); else m_trackIso = 0; 
+     if (ana->m_connectsucceeded[12]) m_pfRhoCorrRelIso03 = &((*ana->pfRhoCorrRelIso03)[idx]); else m_pfRhoCorrRelIso03 = 0; 
+    if (ana->m_connectsucceeded[13]) m_pfRhoCorrRelIso04 = &((*ana->pfRhoCorrRelIso04)[idx]); else m_pfRhoCorrRelIso04 = 0; 
+    if (ana->m_connectsucceeded[14]) m_pfDeltaCorrRelIso = &((*ana->pfDeltaCorrRelIso)[idx]); else m_pfDeltaCorrRelIso = 0; 
+    if (ana->m_connectsucceeded[15]) m_pfRelIso = &((*ana->pfRelIso)[idx]); else m_pfRelIso = 0; 
+    if (ana->m_connectsucceeded[16]) m_photonIso = &((*ana->photonIso)[idx]); else m_photonIso = 0; 
+    if (ana->m_connectsucceeded[17]) m_neutralHadIso = &((*ana->neutralHadIso)[idx]); else m_neutralHadIso = 0; 
+    if (ana->m_connectsucceeded[18]) m_chargedHadIso = &((*ana->chargedHadIso)[idx]); else m_chargedHadIso = 0; 
+    if (ana->m_connectsucceeded[19]) m_trackIso = &((*ana->trackIso)[idx]); else m_trackIso = 0; 
 } // end of detail level Isolation
 
 if(  ((ana->detailLevel & Ntuple::MuonTrack) == Ntuple::MuonTrack)  ) {
-     if (ana->m_connectsucceeded[19]) m_d0 = &((*ana->d0)[idx]); else m_d0 = 0; 
-    if (ana->m_connectsucceeded[20]) m_dz = &((*ana->dz)[idx]); else m_dz = 0; 
-    if (ana->m_connectsucceeded[21]) m_d0_allvertices = &((*ana->d0_allvertices)[idx]); else m_d0_allvertices = 0; 
-    if (ana->m_connectsucceeded[22]) m_dz_allvertices = &((*ana->dz_allvertices)[idx]); else m_dz_allvertices = 0; 
-    if (ana->m_connectsucceeded[23]) m_bestTrack_pt = &((*ana->bestTrack_pt)[idx]); else m_bestTrack_pt = 0; 
-    if (ana->m_connectsucceeded[24]) m_bestTrack_ptErr = &((*ana->bestTrack_ptErr)[idx]); else m_bestTrack_ptErr = 0; 
-    if (ana->m_connectsucceeded[25]) m_trackerHits = &((*ana->trackerHits)[idx]); else m_trackerHits = 0; 
-    if (ana->m_connectsucceeded[26]) m_matchedStations = &((*ana->matchedStations)[idx]); else m_matchedStations = 0; 
-    if (ana->m_connectsucceeded[27]) m_pixelHits = &((*ana->pixelHits)[idx]); else m_pixelHits = 0; 
-    if (ana->m_connectsucceeded[28]) m_globalHits = &((*ana->globalHits)[idx]); else m_globalHits = 0; 
-    if (ana->m_connectsucceeded[29]) m_normChi2 = &((*ana->normChi2)[idx]); else m_normChi2 = 0; 
+     if (ana->m_connectsucceeded[20]) m_d0 = &((*ana->d0)[idx]); else m_d0 = 0; 
+    if (ana->m_connectsucceeded[21]) m_dz = &((*ana->dz)[idx]); else m_dz = 0; 
+    if (ana->m_connectsucceeded[22]) m_d0_allvertices = &((*ana->d0_allvertices)[idx]); else m_d0_allvertices = 0; 
+    if (ana->m_connectsucceeded[23]) m_dz_allvertices = &((*ana->dz_allvertices)[idx]); else m_dz_allvertices = 0; 
+    if (ana->m_connectsucceeded[24]) m_bestTrack_pt = &((*ana->bestTrack_pt)[idx]); else m_bestTrack_pt = 0; 
+    if (ana->m_connectsucceeded[25]) m_bestTrack_ptErr = &((*ana->bestTrack_ptErr)[idx]); else m_bestTrack_ptErr = 0; 
+    if (ana->m_connectsucceeded[26]) m_trackerHits = &((*ana->trackerHits)[idx]); else m_trackerHits = 0; 
+    if (ana->m_connectsucceeded[27]) m_matchedStations = &((*ana->matchedStations)[idx]); else m_matchedStations = 0; 
+    if (ana->m_connectsucceeded[28]) m_pixelHits = &((*ana->pixelHits)[idx]); else m_pixelHits = 0; 
+    if (ana->m_connectsucceeded[29]) m_globalHits = &((*ana->globalHits)[idx]); else m_globalHits = 0; 
+    if (ana->m_connectsucceeded[30]) m_normChi2 = &((*ana->normChi2)[idx]); else m_normChi2 = 0; 
 }
 
 
@@ -139,6 +140,7 @@ if(  ((rhs.getLvl() & Ntuple::MuonID) == Ntuple::MuonID)  ) {
   out << " isLooseMuon " << rhs.isLooseMuon();
   out << " isTightMuon " << rhs.isTightMuon();
   out << " isMediumMuon " << rhs.isMediumMuon();
+  out << " isMediumMuonGH " << rhs.isMediumMuonGH();
   out << " isPFMuon " << rhs.isPFMuon();
   out << " isGlobalMuon " << rhs.isGlobalMuon();
   out << " isTrackerMuon " << rhs.isTrackerMuon();

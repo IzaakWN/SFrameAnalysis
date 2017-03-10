@@ -473,6 +473,7 @@ TLorentzVector RecoilCorrectorTool::CorrectMVAMETByMeanResolution(  float MetPx,
 
 float RecoilCorrectorTool::ZptWeight( float genVM, float genVPt ){
     // https://twiki.cern.ch/twiki/bin/view/CMS/MSSMAHTauTauEarlyRun2#Z_reweighting
+    // /afs/cern.ch/user/r/rlane/public/HIG16006/Zweights/zpt_weights.root
     return m_ZPTHist->GetBinContent(m_ZPTHist->GetXaxis()->FindBin(genVM),m_ZPTHist->GetYaxis()->FindBin(genVPt));
 }
 

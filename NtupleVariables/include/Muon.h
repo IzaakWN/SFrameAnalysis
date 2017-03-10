@@ -68,6 +68,7 @@ namespace UZH {
     int* m_isLooseMuon;
     int* m_isTightMuon;
     int* m_isMediumMuon;
+    int* m_isMediumMuonGH;
     int* m_isPFMuon;
     int* m_isGlobalMuon;
     int* m_isTrackerMuon;
@@ -114,6 +115,7 @@ namespace UZH {
     int isLooseMuon() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MuonNtupleObject::kisLooseMuon)) std::cout<<"isLooseMuon not connected!"<<std::endl;*/ return *(m_isLooseMuon); } 
     int isTightMuon() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MuonNtupleObject::kisTightMuon)) std::cout<<"isTightMuon not connected!"<<std::endl;*/ return *(m_isTightMuon); } 
     int isMediumMuon() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MuonNtupleObject::kisMediumMuon)) std::cout<<"isMediumMuon not connected!"<<std::endl;*/ return *(m_isMediumMuon); } 
+    int isMediumMuonGH() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MuonNtupleObject::kisMediumMuonGH)) std::cout<<"isMediumMuonGH not connected!"<<std::endl;*/ return *(m_isMediumMuonGH); } 
     int isPFMuon() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MuonNtupleObject::kisPFMuon)) std::cout<<"isPFMuon not connected!"<<std::endl;*/ return *(m_isPFMuon); } 
     int isGlobalMuon() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MuonNtupleObject::kisGlobalMuon)) std::cout<<"isGlobalMuon not connected!"<<std::endl;*/ return *(m_isGlobalMuon); } 
     int isTrackerMuon() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MuonNtupleObject::kisTrackerMuon)) std::cout<<"isTrackerMuon not connected!"<<std::endl;*/ return *(m_isTrackerMuon); } 
@@ -153,6 +155,7 @@ namespace UZH {
     void isLooseMuon( const int& val){ *(m_isLooseMuon)=val; } 
     void isTightMuon( const int& val){ *(m_isTightMuon)=val; } 
     void isMediumMuon( const int& val){ *(m_isMediumMuon)=val; } 
+    void isMediumMuonGH( const int& val){ *(m_isMediumMuonGH)=val; } 
     void isPFMuon( const int& val){ *(m_isPFMuon)=val; } 
     void isGlobalMuon( const int& val){ *(m_isGlobalMuon)=val; } 
     void isTrackerMuon( const int& val){ *(m_isTrackerMuon)=val; } 

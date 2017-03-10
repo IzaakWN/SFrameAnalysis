@@ -1,4 +1,4 @@
-# python -u submitSFrame.py -j Signal_Izaak.py --nosandbox --useEnv
+#! /bin/bash
 python -u submitSFrame.py -j Background_TT_Izaak.py --nosandbox --useEnv | tee nohup/nohup_TT.log
 python -u submitSFrame.py -j Background_ST_Izaak.py --nosandbox --useEnv | tee nohup/nohup_ST.log
 python -u submitSFrame.py -j Background_DY_Izaak.py --nosandbox --useEnv | tee nohup/nohup_DY.log

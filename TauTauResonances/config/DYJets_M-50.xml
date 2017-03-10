@@ -40,11 +40,11 @@
 
       <InputTree Name="ntuplizer/tree" />
       <OutputTree Name="tree_mutau" />
-      <OutputTree Name="tree_eletau" />
+      <OutputTree Name="tree_etau" />
     </InputData>
   <UserConfig>
     <Item Name="RecoTreeName"               Value="tree"/>
-    <Item Name="OutputTreeName_eletau"      Value="tree_eletau"/>
+    <Item Name="OutputTreeName_eletau"      Value="tree_etau"/>
     <Item Name="OutputTreeName_mutau"       Value="tree_mutau"/>
     <Item Name="doSVFit"                    Value="False"/>
     <Item Name="IsSignal"                   Value="False"/>

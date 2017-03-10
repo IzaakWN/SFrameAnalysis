@@ -18,10 +18,12 @@ dataSets=[
   ]
 
 userItems = [
-   ["IsData","false"],
-   ["IsSignal","true"],
-   ["doSVFit","true"],
-  ]
+               ["IsData","false"],
+               ["IsSignal","true"],
+               ["doSVFit","true"],
+               ["doEES","false"],
+               ["EESshift","0.00"],
+            ]
 
 jobOptionsFile2=open("AnalysisOptions.py", 'r')
 command2=""
@@ -31,6 +33,3 @@ for i in [o for o in jobOptionsFile2.readlines()]:
 jobOptionsFile2.close()
 exec command2
 userItems += AddUserItems
-
-inputTrees=["ntuplizer/tree"]
-outputTrees=["tree"]

@@ -99,8 +99,8 @@ fi
 cd $WORKDIR
 
 echo ">>>\
-python $BASEDIR/plot.py -c $CATEGORY >> myout.txt 2>> myerr.txt"
-python $BASEDIR/plot.py -c $CATEGORY >> myout.txt 2>> myerr.txt
+python $BASEDIR/plot.py -s $CATEGORY >> myout.txt 2>> myerr.txt"
+python $BASEDIR/plot.py -s $CATEGORY >> myout.txt 2>> myerr.txt
 echo ">>> ls"
 ls
 

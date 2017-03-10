@@ -7,6 +7,13 @@
 #include "../interface/SVfitStandaloneMarkovChainIntegrator.h"
 #include "../interface/svFitStandaloneAuxFunctions.h"
 
+//#include "../NtupleVariables/include/ElectronNtupleObject.h"
+#include "../NtupleVariables/include/Electron.h"
+//#include "../NtupleVariables/include/MuonNtupleObject.h"
+#include "../NtupleVariables/include/Muon.h"
+//#include "../NtupleVariables/include/TauNtupleObject.h"
+#include "../NtupleVariables/include/Tau.h"
+
 #include "TROOT.h"
 #include "TFile.h"
 #include "TLorentzVector.h"
@@ -34,6 +41,9 @@ class SVFitTool : public SToolBase {
     ~SVFitTool();
     void BeginInputData( const SInputData& id ) throw( SError );
     
+    void addMeasuredLeptonTau( const UZH::Electron& electron, const UZH::Tau& tau);
+    void addMeasuredLeptonTau( const UZH::Muon& muon,         const UZH::Tau& tau);
+    void addMeasuredLeptonTau( const UZH::Electron& electron, const UZH::Muon& muon);
     void addMeasuredLeptonTau( const std::string& channel, const TLorentzVector lep, const TLorentzVector tau, int tauDecayMode = -1 );
     //void addMeasuredElectronTau( const TLorentzVector ele,   const TLorentzVector tau );
     //void addMeasuredMuonTau(     const TLorentzVector mu,    const TLorentzVector tau );

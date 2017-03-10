@@ -327,7 +327,7 @@ double ScaleFactorTool::get_Efficiency_EleMuTrig_MC(double pt1, double eta1, dou
     if( triggerFlags.find("e23m8") != std::string::npos )
       return m_ScaleFactor_EleMuTrig_Ele23Leg->get_EfficiencyMC(pt1,eta1) * m_ScaleFactor_EleMuTrig_Mu23Leg->get_EfficiencyMC(pt2,eta2);
     else
-      return std::max(0.01, (m_ScaleFactor_EleMuTrig_Ele12Leg->get_EfficiencyData(pt1,eta1) - m_ScaleFactor_EleMuTrig_Ele23Leg->get_EfficiencyMC(pt1,eta1))
+      return std::max(0.01, (m_ScaleFactor_EleMuTrig_Ele12Leg->get_EfficiencyMC(pt1,eta1) - m_ScaleFactor_EleMuTrig_Ele23Leg->get_EfficiencyMC(pt1,eta1))
                            * m_ScaleFactor_EleMuTrig_Ele12Leg->get_EfficiencyMC(pt1,eta1) * m_ScaleFactor_EleMuTrig_Mu23Leg->get_EfficiencyMC(pt2,eta2));
   }else{
     if( triggerFlags.find("e23m8") != std::string::npos )
@@ -383,7 +383,19 @@ double ScaleFactorTool::get_Efficiency_EleMuTrig_Data(double pt1, double eta1, d
 
 
 double ScaleFactorTool::get_ScaleFactor_EleMuTrig(double pt1, double eta1, double pt2, double eta2, std::string triggerFlags){
-  return std::min(10.0, get_Efficiency_EleMuTrig_Data(pt1,eta1,pt2,eta2,triggerFlags)/get_Efficiency_EleMuTrig_MC(pt1,eta1,pt2,eta2,triggerFlags));
+  // https://indico.cern.ch/event/605295/contributions/2454799/attachments/1402337/2141040/leptonSF_260117.pdf
+  // B : 5.8/fb (5788.348/pb)
+  // C: 2.6/fb (2573.399/pb)
+  // D: 4.2/fb (4248.384/pb)
+  // E: 4.0/fb (4009.132/pb)
+  // F: 3.1/fb (3101.618/pb)
+  // G: 7.5/fb (7540.488/pb)
+  // H: 8.6/fb (8605.690/pb)
+  // 7540.488/pb+8605.690/pb=16,146.178/pb = 16.1/fb
+  // 5788.348/pb+2573.399/pb+4248.384/pb+4009.132/pb+3101.618/pb=19,720.881/pb = 19.7/fb
+  // (19.7+16.1*0.953)/35.9 = 0.9761
+  // (16,146.178+19,720.881*0.953)/35,867.059 = 0.9742
+  return 0.9742*std::min(10.0, get_Efficiency_EleMuTrig_Data(pt1,eta1,pt2,eta2,triggerFlags)/get_Efficiency_EleMuTrig_MC(pt1,eta1,pt2,eta2,triggerFlags));
 }
 
 
@@ -407,8 +419,8 @@ double ScaleFactorTool::get_Efficiency_EleMuTrig_OR_Data(double pt1, double eta1
 
 
 double ScaleFactorTool::get_ScaleFactor_EleMuTrig_OR(double pt1, double eta1, double pt2, double eta2){
-  return std::min(10.0, get_Efficiency_EleMuTrig_OR_Data(pt1,eta1,pt2,eta2)
-                         / std::max(0.01, get_Efficiency_EleMuTrig_OR_MC(pt1,eta1,pt2,eta2)));
+  return 0.9742*std::min(10.0, get_Efficiency_EleMuTrig_OR_Data(pt1,eta1,pt2,eta2)
+                             / std::max(0.01, get_Efficiency_EleMuTrig_OR_MC(pt1,eta1,pt2,eta2)));
 }
 
 

@@ -13,10 +13,12 @@ ID	int*	isHighPtMuon
 ID	int*	isLooseMuon
 ID	int*	isTightMuon
 ID	int*	isMediumMuon
+ID      int*    isMediumMuonGH
 ID	int*	isPFMuon
 ID	int*	isGlobalMuon
 ID	int*	isTrackerMuon
 ID	int*	isSoftMuon
+
 
 Isolation	floatingnumber*	pfRhoCorrRelIso03
 Isolation	floatingnumber*	pfRhoCorrRelIso04

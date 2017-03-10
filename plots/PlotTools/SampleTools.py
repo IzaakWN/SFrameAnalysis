@@ -13,7 +13,7 @@ vetos       = "dilepton_veto == 0 && extraelec_veto == 0 && extramuon_veto == 0 
                        "againstElectronVLooseMVA6_2 == 1 && againstMuonTight3_2 == 1"
 baseline    = "%s && %s && q_1*q_2<0" % (isocuts, vetos)
 category1   = "ncbtag > 0 && ncjets == 1 && nfjets  > 0"
-category2   = "ncbtag > 0 && ncjets  > 1 && nfjets == 0 && dphi_ll_bj > 2 && met < 60"
+category2   = "ncbtag > 0 && ncjets == 2 && nfjets == 0 && dphi_ll_bj > 2 && met < 60"
 blindlimits = { }
 blindcuts   = { }
 
@@ -46,7 +46,7 @@ def makeSamples(**kwargs):
         (subdir, sampleName, name, sigma, weight) = sampledata
         filename        = SAMPLE_DIR + subdir + "TauTauAnalysis.%s%s.root" % (sampleName,mylabel)
         file            = TFile( filename )
-        N_tot           = file.Get("histogram_mutau/cutflow_mutau").GetBinContent(7)
+        N_tot           = file.Get("histogram_mutau/cutflow_mutau").GetBinContent(8)
         N_tot_unweighted = file.Get("histogram_mutau/cutflow_mutau").GetBinContent(1)
         scale           = lumi * sigma * 1000 / N_tot
         #if "DYJetsToLL_M-10to50_nlo" in sample: weightB = "%s*%s" % (weightB,"(NUP==1 ? 0 : 1)*(NUP==2 ? 0 : 1)")
@@ -61,7 +61,7 @@ def makeSamples(**kwargs):
         (subdir, sampleName, name, S_exp, weight) = sampledata
         filename        = SAMPLE_DIR + subdir + "TauTauAnalysis.%s%s.root" % (sampleName,mylabel)
         file            = TFile( filename )
-        N_tot           = file.Get("histogram_mutau/cutflow_mutau").GetBinContent(7)
+        N_tot           = file.Get("histogram_mutau/cutflow_mutau").GetBinContent(8)
         N_tot_unweighted = file.Get("histogram_mutau/cutflow_mutau").GetBinContent(1)
         sample = Sample( filename, name, sigma=0, N=N_tot, signal=True, cuts="channel>0", weight=weight, treeName=treeName )
         scale           = 1 #sample.normalizeSignal(S_exp) * signal_scale #N_exp / N_tot
@@ -74,7 +74,7 @@ def makeSamples(**kwargs):
         (subdir, sampleName, name) = s
         filename        = SAMPLE_DIR + subdir + "TauTauAnalysis.%s%s.root" % (sampleName,mylabel)
         file            = TFile( filename )
-        N_tot           = file.Get("histogram_mutau/cutflow_mutau").GetBinContent(7)
+        N_tot           = file.Get("histogram_mutau/cutflow_mutau").GetBinContent(8)
         N_tot_unweighted = file.Get("histogram_mutau/cutflow_mutau").GetBinContent(1)
         sample = Sample( filename, name, data=True, cuts ="channel>0", treeName=treeName, blind=blindcuts )
         samplesD[channel] = [sample]
@@ -82,22 +82,23 @@ def makeSamples(**kwargs):
     
     
     # BACKGROUND MERGE
-    mergeST  = False; mergeVV  = False
-    stitchWJ = False; stitchDY = False
+    mergeST  = False; mergeVV    = False
+    stitchWJ = False; stitchDY50 = False; stitchDY10to50 = False
     for sample in samplesB:
         if   sample.isPartOf("ST"): mergeST  = True and kwargs.get('mergeST', True)
         elif sample.isPartOf("WW"): mergeVV  = True and kwargs.get('mergeVV', True)
-        elif sample.isPartOf("DY"): stitchDY = True and kwargs.get('stitchDY',True)
+        elif sample.isPartOf("DY","M-50"):  stitchDY50     = True and kwargs.get('stitchDY50',True)
+        elif sample.isPartOf("DY","10-50"): stitchDY10to50 = True and kwargs.get('stitchDY10to50',True)
         elif sample.isPartOf("WJ"): stitchWJ = True and kwargs.get('stitchWJ',True)
-    if mergeST:  mergeSamples(samplesB,"ST",verbosity=verbosity)
-    if mergeVV:  mergeSamples(samplesB,["WW","WZ","ZZ"],name="diboson",verbosity=verbosity)
-    if stitchWJ: stitchSamples(samplesB,"WJ",name_incl="WJets",verbosity=verbosity)
-    #samplesB = mergeSamples(samplesB,"DY",label="M-10to50_nlo",name="Drell-Yan 10-50 NLO")
+    if mergeST:         mergeSamples(samplesB,"ST",verbosity=verbosity)
+    if mergeVV:         mergeSamples(samplesB,["WW","WZ","ZZ"],name="diboson",verbosity=verbosity)
+    if stitchWJ:        stitchSamples(samplesB,"WJ",name_incl="WJets",verbosity=verbosity)
+    if stitchDY10to50:  stitchSamples(samplesB,"DY",label="M-10to50",verbosity=verbosity) # ,name="Drell-Yan 10-50"
     labels_DY50 = kwargs.get('labels_DY50')
     if labels_DY50:
         for label_DY in labels_DY50:
-            stitchSamples(samplesB,"DY",labels=["M-50",label_DY],verbosity=verbosity)
-    elif stitchDY: stitchSamples(samplesB,"DY",label="M-50",verbosity=verbosity)
+                        stitchSamples(samplesB,"DY",labels=["M-50",label_DY],verbosity=verbosity)
+    elif stitchDY50:    stitchSamples(samplesB,"DY",label="M-50",verbosity=verbosity)
     print ">>> "
     
 
@@ -114,32 +115,47 @@ def renormalizeWJ(samples,**kwargs):
     #print ">>>\n>>> renormalizing WJ"
     var         = kwargs.get('var',"pfmt_1")
     QCD         = kwargs.get('QCD',True)
+    channel     = kwargs.get('channel',"mutau")
+    label       = kwargs.get('label',"baseline")
     cuts        = kwargs.get('cuts',baseline)
     reset       = kwargs.get('reset',True)
     shift_QCD   = kwargs.get('shift_QCD',0) # e.g. 0.30
     prepend     = kwargs.get('prepend',"")
     verbosity   = kwargs.get('verbosity',0)
-    #samples = kwargs.get('samples',[ ])   
-    plot = Plot( samples, var, 100, 80, 180, cuts=cuts, QCD=QCD, reset=True, shift_QCD=shift_QCD, verbosity=verbosity )
+    ratio_WJ_QCD_SS = True
+    #samples = kwargs.get('samples',[ ])
+    name        = "%s/%s%s/%s_%s_noWJrenormalizatton.png" % (PLOTS_DIR,channel,mylabel,var,label)
+    title       = "%s: %s" % (channel.replace("tau","#tau").replace("mu","#mu"),label)
+    plot = Plot( samples, var, 200, 80, 200, cuts=cuts, QCD=QCD, ratio_WJ_QCD_SS=ratio_WJ_QCD_SS, reset=True, shift_QCD=shift_QCD, verbosity=verbosity )
+    #plot.plot(stack=True, title=title, staterror=True, ratio=True)
     plot.renormalizeWJ(prepend=prepend, verbosity=verbosity)
     plot.close()
     
 
-def renormalizeTT(samples,category,**kwargs):
+def renormalizeTT(samples,**kwargs):
     """Helpfunction to renormalize TT."""
-    #print ">>>\n>>> renormalizing TT"
-    var     = kwargs.get('var',"pfmt_1")
-    QCD     = kwargs.get('QCD',True)
-    cuts    = kwargs.get('cuts',baseline)
-    reset   = kwargs.get('reset',True)
+    #print ">>>\n>>> renormalizing WJ"
+    var         = kwargs.get('var',"pfmt_1")
+    QCD         = kwargs.get('QCD',True)
+    channel     = kwargs.get('channel',"mutau")
+    label       = kwargs.get('label',"baseline")
+    cuts        = kwargs.get('cuts',baseline)
+    reset       = kwargs.get('reset',True)
+    shift_QCD   = kwargs.get('shift_QCD',0) # e.g. 0.30
+    prepend     = kwargs.get('prepend',"")
+    verbosity   = kwargs.get('verbosity',0)
+    ratio_TT_QCD_SS = True
     #samples = kwargs.get('samples',[ ])
     if "category 1" in category:   cuts = combine(cuts,category1TT)
     elif "category 2" in category: cuts = combine(cuts,category1TT)
     else: print warning("Could not normalize TT: no category 1 or 2 selections")
-    plot = Plot( samples, var, 100, 80, 180, cuts=cuts, QCD=QCD, reset=True )
-    plot.renormalizeTT()
+    name        = "%s/%s%s/%s_%s_noTTrenormalizatton.png" % (PLOTS_DIR,channel,mylabel,var,label)
+    title       = "%s: %s" % (channel.replace("tau","#tau").replace("mu","#mu"),label)
+    plot = Plot( samples, var, 200, 0, 200, cuts=cuts, QCD=QCD, ratio_TT_QCD_SS=ratio_TT_QCD_SS, reset=True, shift_QCD=shift_QCD, verbosity=verbosity )
+    #plot.plot(stack=True, title=title, staterror=True, ratio=True)
+    plot.renormalizeTT(prepend=prepend, verbosity=verbosity)
     plot.close()
-    
+        
 
 
 
@@ -159,7 +175,7 @@ def getSample(samples,*labels,**kwargs):
     if not matches:
         print warning("Could not find a sample with search terms %s..." % (', '.join(labels+(filename,))))
     elif unique:
-        if len(matches)>1: print warning("Found more than one match to %s! (%s)" % (labels,matches))
+        if len(matches)>1: print warning("Found more than one match to %s. Using first match only: %s" % (", ".join(labels),", ".join([s.label for s in matches])))
         return matches[0]
         
     return matches
@@ -237,13 +253,13 @@ def stitchSamples(sample_list,name0,**kwargs):
     # DY cross sections  5765.4 [  4954.0, 1012.5,  332.8, 101.8,  54.8 ]
     # WJ cross sections 61526.7 [ 50380.0, 9644.5, 3144.5, 954.8, 485.6 ]
     
-    sigmasLO =  { "DY": { "M-50": 4954.0, "M-10to50_nlo": 18610.0 }, "WJ": { "": 50380.0 } }
-    sigmasNLO = { "DY": { "M-50": 5765.4, "M-10to50_nlo": 18610.0 }, "WJ": { "": 61526.7 } }
+    sigmasLO =  { "DY": { "M-50": 4954.0, "M-10to50": 18610.0 }, "WJ": { "": 50380.0 } }
+    sigmasNLO = { "DY": { "M-50": 5765.4, "M-10to50": 18610.0 }, "WJ": { "": 61526.7 } }
     
     #name0       = "DY" #"WJ"
     label_incl  = kwargs.get('label_incl',"Jets")
     name_incl   = kwargs.get('name_incl',name0+label_incl)
-    labels      = kwargs.get('labels',[]) # extra search term
+    labels      = kwargs.get('labels',[ ]) # extra search term
     labels.append(kwargs.get('label',""))
     sigmaLO     = sigmasLO[name0][labels[0]]
     kfactor     = sigmasNLO[name0][labels[0]] / sigmaLO
@@ -346,14 +362,16 @@ class Samples(object):
         kwargs['scale'] = self.scale * kwargs.get('scale', 1.0) # pass scale down
         
         verbosity = kwargs.get('verbosity', 0)
-        printVerbose(">>> Samples - %s, %s: %s" % (name, var, self.filenameshort),verbosity)
-        printVerbose(">>>    scale: %.4f\n>>>" % (kwargs['scale']),verbosity)
+        printVerbose(">>>\n>>> Samples - %s, %s: %s" % (color(name,color="grey"), var, self.filenameshort),verbosity)
+        printVerbose(">>>    scale: %.4f" % (kwargs['scale']),verbosity)
         
         hist = TH1F(name, title, nBins, a, b)
         for sample in self.samples:
             if 'name' in kwargs: # prevent memory leaks
                 kwargs['name']  = makeHistName(sample.label,name.replace(self.label+'_',''))    
-            hist.Add( sample.hist(var, nBins, a, b, **kwargs) )
+            hist_new = sample.hist(var, nBins, a, b, **kwargs)
+            hist.Add( hist_new )
+            printVerbose(">>>    sample %s added with %.1f events" % (sample.label,hist_new.Integral()),verbosity,level=2)
         
         return hist
     
@@ -364,8 +382,8 @@ class Samples(object):
         kwargs['scale'] = self.scale * kwargs.get('scale', 1.0) # pass scale down
         
         verbosity = kwargs.get('verbosity', 0)
-        printVerbose(">>> Samples - %s, %s vs. %s: %s" % (name, var1, var2, self.filenameshort),verbosity)
-        printVerbose(">>>    scale: %.4f\n>>>"        % (kwargs['scale']),verbosity)
+        printVerbose(">>>\n>>> Samples - %s, %s vs. %s: %s" % (color(name,color="grey"), var1, var2, self.filenameshort),verbosity)
+        printVerbose(">>>    scale: %.4f"        % (kwargs['scale']),verbosity)
         
         hist2D = TH2F(name, title, nBins2, a2, b2, nBins1, a1, b1)
         for sample in self.samples:
@@ -384,12 +402,10 @@ class Samples(object):
     
     def isPartOf(self, *labels):
         """Check if labels are in label or filename."""
-        
         if not labels: return False
         yes = True
         for label in labels:
             yes = yes and (label in self.label or label in self.filenameshort)
-        
         return yes
 
 
@@ -437,6 +453,8 @@ class Sample(object):
         tree    = self.file.Get(self.treeName)
         name    = kwargs.get('name',  makeHistName(self.label, var))
         title   = kwargs.get('title', self.label)
+        shift   = kwargs.get('shift', 0)
+        smear   = kwargs.get('smear', 0)
         verbosity = kwargs.get('verbosity', 0)
         
         if self.isSignal and self.scale is not self.scaleBU and self.scaleBU:
@@ -446,19 +464,28 @@ class Sample(object):
         if var in self.blind: blindcuts = self.blind[var]
         weight = combineWeights(self.weight, kwargs.get('weight', ""))
         cuts   = combineCuts(self.cuts, kwargs.get('cuts', ""), blindcuts, weight=weight)
-        printVerbose(">>> Sample - %s, %s: %s" % (name, var, self.filenameshort),verbosity)
-        printVerbose(">>>    scale:  %.4f (%.4f)"    % (scale,self.scale),verbosity)
-        printVerbose(">>>    weight: %s"      % (weight),verbosity)
-        printVerbose(">>>    %s\n>>>" % (cuts),verbosity)
         
         hist = TH1F(name, title, nBins, a, b)
         out = tree.Draw("%s >> %s" % (var,name), cuts, "gOff")
+        
+        if shift or smear:
+            mean0 = hist.GetMean()
+            #smear = min(1,smear)
+            #smear = sqrt(smear*smear-1) #*sigma
+            #tree.SetAlias("rng","sin(2*pi*rndm)*sqrt(-2*log(rndm))")
+            var2 = "%s*%s + %s + %s*%s" % (var,smear,shift,(1-smear),mean0)
+            tree.Draw("%s >> %s" % (var2,name), cuts, "gOff")
         if out < 0: print error("Drawing histogram for %s sample failed!" % (title))
         
         if scale is not 1.0: hist.Scale(scale)
         if scale is     0.0: print warning("Scale of %s is 0!" % self.label)
         #print hist.GetEntries()
         #gDirectory.Delete(label)
+        
+        printVerbose(">>>\n>>> Sample - %s, %s: %s" % (color(name,color="grey"), var, self.filenameshort),verbosity)
+        printVerbose(">>>    scale:  %.4f (%.4f)" % (scale,self.scale),verbosity)
+        printVerbose(">>>    weight: %s" % (("\n>>>%s*("%(' '*18)).join(weight.rsplit('*(',max(0,weight.count("*(")-1)))),verbosity)
+        printVerbose(">>>    %s" % (cuts.replace("*(","\n>>>%s*("%(' '*18))),verbosity)
         return hist
         
         
@@ -477,10 +504,10 @@ class Sample(object):
         if var2 in self.blind: blindcuts += self.blind[var2]
         weight = combineWeights(self.weight, kwargs.get('weight', ""))
         cuts   = combineCuts(self.cuts, kwargs.get('cuts', ""), blindcuts, weight=weight)
-        printVerbose(">>> Sample - %s, %s vs. %s: %s" % (name, var1, var2, self.filenameshort),verbosity)
+        printVerbose(">>>>\n>>> Sample - %s, %s vs. %s: %s" % (color(name,color="grey"), var1, var2, self.filenameshort),verbosity)
         printVerbose(">>>    scale:  %.4f"    % (scale),verbosity)
         printVerbose(">>>    weight: %s"      % (weight),verbosity)
-        printVerbose(">>>    %s\n>>>" % (cuts),verbosity)
+        printVerbose(">>>    %s" % (cuts),verbosity)
         
         hist2D = TH2F(name, title, nBins2, a2, b2, nBins1, a1, b1)
         out = tree.Draw("%s:%s >> %s" % (var1,var2,name), cuts, "gOff")
@@ -529,7 +556,7 @@ class Sample(object):
                         ("%s && %s" % (baseline, category2)), ]
         cuts        = kwargs.get('cuts',cuts)
         weight      = kwargs.get('weight',"")
-        (aa,bb)     = kwargs.get('blindlimits',(0,40))
+        (aa,bb)     = kwargs.get('signalregion',(0,40))
         
         N  = 0; MC = 0
         scale = 1
@@ -544,10 +571,31 @@ class Sample(object):
         if N:
             scale = S_exp / N * self.scale
             printVerbose(">>> normalizeSignal: S_exp=%.4f, N=%.4f, MC=%.1f, old scale=%.4f, scale=%.4f" % (S_exp, N, MC, self.scale, scale), verbosity)
-            printVerbose(">>> normalizeSignal: blindlimits=(%.1f,%.1f)" % (aa,bb),verbosity)
+            printVerbose(">>> normalizeSignal: signalregion=(%.1f,%.1f)" % (aa,bb),verbosity)
         else: print warning("Could not find normalization for signal: no MC events in given signal region after cuts (%s)!" % cuts)
         self.setAllScales(scale)
         
+        return scale
+        
+    
+    def calculateLumiAcceptance(self,cuts,**kwargs):
+        """Calculates scale for a given expected signal yield, to divide
+           out the luminosity and acceptance. This method only returns the scale,
+           it does not rescale the signal."""
+        verbosity   = kwargs.get('verbosity',0)
+        weight      = kwargs.get('weight',"")
+        (a,b)       = kwargs.get('range',(0,500))
+        scale       = 1
+        N_tot       = self.N
+        name        = "m_sv_for_LumiAcceptance"
+        hist        = self.hist("m_sv",100,a,b,name=name,cuts=cuts,weight=weight)
+        (N,MC)      = (hist.GetSumOfWeights(),hist.GetEntries())
+        gDirectory.Delete(name)
+        if N_tot and N and lumi:
+            scale   = N_tot/(N*lumi)
+            printVerbose(">>> normalizeSignal: N_tot=%.4f, N=%.4f, MC=%.1f, lumi=%s, current scale=%.4f, scale=%.4f" % (N_tot, N, MC, lumi, self.scale, scale), verbosity)
+            printVerbose(">>> normalizeSignal: range=(%.1f,%.1f)" % (a,b),verbosity)
+        else: print warning("Could not find normalization for signal: N_tot=%s, N=%s, lumi=%s!" % (N_tot,N,lumi))
         return scale
 
 

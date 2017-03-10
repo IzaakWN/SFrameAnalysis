@@ -4,7 +4,6 @@ if [[ $1 == 1 ]]; then
     echo ">>> ST, DY, DY NLO"
     python -u submitSFrame.py -j Background_ST_Izaak.py --nosandbox --useEnv | tee nohup/nohup_ST.log
     python -u submitSFrame.py -j Background_DY_Izaak.py --nosandbox --useEnv | tee nohup/nohup_DY.log
-    python -u submitSFrame.py -j Background_DY_10to50_Izaak.py --nosandbox --useEnv | tee nohup/nohup_DY_10to50.log
     python -u submitSFrame.py -j Background_DY_NLO_Izaak.py     --nosandbox --useEnv | tee nohup/nohup_DY_NLO.log
     python -u submitSFrame.py -j Background_DY_TES1p03_Izaak.py --nosandbox --useEnv | tee nohup/nohup_DY_TES1p03.log
     python -u submitSFrame.py -j Background_DY_TES0p97_Izaak.py --nosandbox --useEnv | tee nohup/nohup_DY_TES0p97.log

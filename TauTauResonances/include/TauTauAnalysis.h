@@ -235,16 +235,16 @@ class TauTauAnalysis : public SCycleBase {
     virtual float genMatchSF( const std::string& channel, const int genmatch_2, const float tau_eta = 0. );
     virtual bool  getBTagWeight_promote_demote( const UZH::Jet& jet );
     
-    // checks
-    virtual void checks();
-    virtual void cutflowCheck( const std::string& channel );
-    virtual void visiblePTCheck();
-    
     /// fill cut flow
     //virtual void fillCutflow( const std::string histName, const std::string dirName, const Int_t id, const Double_t weight = 1.);
     virtual void fillCutflow( TString histName, TString dirName, const Int_t id, const Double_t weight = 1. );
     virtual void printCutFlow( const std::string& ch, const std::string& name, const TString hname, const TString dirname, std::vector<std::string> cutName );
     
+    
+    // checks
+    virtual void checks();
+    virtual void cutflowCheck( const std::string& channel );
+    virtual void visiblePTCheck();
     
     
   private:

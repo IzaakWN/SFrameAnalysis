@@ -6,18 +6,18 @@ echo ">>> comparing stored root files to the listed ones in xml files"
 BASEDIR="/shome/$USER/analysis/SFrameAnalysis_Moriond/BatchSubmission"
 XMLDIR="xmls_postMoriond_T2"
 SITES_T3=(
-#     /pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Spring16/Ntuple_80_08022017 # data
-#     /pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Summer16/Ntuple_80_20170203
-#     /pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Summer16/Ntuple_80_20170206 
-#     /pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Summer16/Ntuple_80_20170207 
+    /pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Spring16/Ntuple_80_08022017 # data
+    /pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Summer16/Ntuple_80_20170203
+    /pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Summer16/Ntuple_80_20170206 
+    /pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Summer16/Ntuple_80_20170207 
     /pnfs/psi.ch/cms/trivcat/store/user/ineuteli/Ntuple_80_20170303/
 )
 SITES_T2=(
-#     gsiftp://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_Moriond17
-#     gsiftp://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_Moriond17_v2
-#     gsiftp://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond
-#     gsiftp://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/cgalloni/Ntuple_Moriond17
-#     gsiftp://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/zucchett/Ntuple_Moriond17
+    /pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_Moriond17
+    /pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_Moriond17_v2
+    /pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond
+    /pnfs/lcg.cscs.ch/cms/trivcat/store/user/cgalloni/Ntuple_Moriond17
+    /pnfs/lcg.cscs.ch/cms/trivcat/store/user/zucchett/Ntuple_Moriond17
 )
 
 
@@ -107,15 +107,28 @@ SAMPLES=(
 # TODO: option to add own pnfs site
 SAMPLES_USER=( )
 SITES_USER=( )
-while getopts b:x:s: option; do
+while getopts b:x:s:t: option; do
     case "${option}"
     in
         b) BASEDIR=${OPTARG};;
         x) XMLDIR=${OPTARG};;
         s) SAMPLES_USER+=(${OPTARG});;
+        t) SITES_USER+=(${OPTARG});;
     esac
 done
-[[ $SAMPLES_USER ]] && SAMPLES=$SAMPLES_USER
+[[ $SAMPLES_USER ]] && SAMPLES=( ${SAMPLES_USER[@]} )
+
+SITES_T3_USER=( )
+SITES_T2_USER=( )
+for site in ${SITES_USER[@]}; do
+    if   echo $site | grep -q "psi.ch/cms/trivcat/store";      then SITES_T3_USER+=($site)
+    elif echo $site | grep -q "lcg.cscs.ch/cms/trivcat/store"; then SITES_T2_USER+=($site)
+    else echo "Warning! User site not recognized!"
+    fi
+done
+
+([[ $SITES_T2_USER ]] || [[ $SITES_T3_USER ]]) && SITES_T2=( ${SITES_T2_USER[@]} ) &&
+                                                  SITES_T3=( ${SITES_T3_USER[@]} )
 
 
 
@@ -155,6 +168,7 @@ for sample in ${SAMPLES[@]}; do
     
     # LOOP over PNFS sites on Tier 2
     for site in ${SITES_T2[@]}; do
+        echo $site | grep -q -v "gsiftp://storage01.lcg.cscs.ch/" && site="gsiftp://storage01.lcg.cscs.ch/$site"
         if uberftp -ls $site | awk '{print $9}' | grep -q ^$sample; then
             echo ">>> "
             echo ">>> sample found in ${site}:"

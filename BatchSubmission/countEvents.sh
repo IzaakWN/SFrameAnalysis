@@ -17,7 +17,7 @@ while getopts b:x:s: option; do
         s) SAMPLES_USER+=(${OPTARG});;
     esac
 done
-[[ $SAMPLES_USER ]] && SAMPLES=${SAMPLES_USER[@]}
+[[ $SAMPLES_USER ]] && SAMPLES=( ) && SAMPLES=${SAMPLES_USER[@]}
 
 # CHECK DIR
 DIR="${BASEDIR}/${XMLDIR}"

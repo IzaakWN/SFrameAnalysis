@@ -11,6 +11,7 @@ hCPU="04:00:00"
 hVMEM="5000M"
 postFix="_Moriond"
 dataSets = [
+
        ["TT_TuneCUETP8M1",
         [   "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_0000_0.xml",
             "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_0000_1.xml",
@@ -19,13 +20,7 @@ dataSets = [
             "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_additional_0000_1.xml",
             "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_additional_0000_2.xml",
             "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_additional_0001.xml", ]],
-#             "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_0000_0.xml",           # _Moriond_T2
-#             "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_0000_1.xml",
-#             "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_0000_2.xml",
-#             "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_ext_0000_0.xml",
-#             "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_ext_0000_1.xml",
-#             "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_ext_0000_2.xml",
-#             "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_ext_0001.xml",   ]],
+            
             ]
 
 userItems = [ 

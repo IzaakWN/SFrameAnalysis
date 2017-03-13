@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#! /usr/bin/env python
 # -*- coding: utf-8 -*-
 #***************************************************************************
 #* @Project: creating XML files for SFrame
@@ -9,13 +9,13 @@
 # Get text file with full paths of ntuples (18/02/2017):
 #  
 #  Tier 3 PNFS:
-#    PNFS="/pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Summer16/Ntuple_80_20170206/"
+#    PNFS="/pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Summer16/Ntuple_80_20170206"
 #    ls -d $PNFS/DYJ*/*/*/* > dirs_DYJ.txt
 #    ls -d $PNFS/*/*/*/* > dirs.txt
 #    ./createXMLfile.py dirs.txt -o xmls_Moriond
 #  
 #  Tier 2 PNFS:
-#    PNFS="gsiftp://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_Moriond17/"
+#    PNFS="gsiftp://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_Moriond17"
 #    uberftp -ls $PNFS/DY1J*/*/* | awk '{print $7}' > dirs_T2_DY1J.txt
 #    uberftp -ls $PNFS/*/*/* | awk '{print $7}' > dirs_T2.txt
 #    ./createXMLfile.py dirs_T2.txt -o xmls_Moriond_T2 -s PSI-T2

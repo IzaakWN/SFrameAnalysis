@@ -14,26 +14,23 @@ dataSets = [
         
        [ "ZZTo2L2Q_13TeV_nlo",
         [   "ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8_0000.xml", ]],
-#             "ZZTo2Q2Nu_13TeV_amcatnloFXFX_madspin_pythia8_0000_0.xml", # Moriond
-#             "ZZTo2Q2Nu_13TeV_amcatnloFXFX_madspin_pythia8_0000_1.xml", ]],
             
-#        [ "ZZTo2Q2Nu_13TeV_nlo",
-#         [   "ZZTo2Q2Nu_13TeV_amcatnloFXFX_madspin_pythia8_V2_0000_0.xml",
-#             "ZZTo2Q2Nu_13TeV_amcatnloFXFX_madspin_pythia8_V2_0000_1.xml", ]],
-            
-#        [ "ZZTo4Q_13TeV_nlo",
-#         [   "ZZTo4Q_13TeV_amcatnloFXFX_madspin_pythia8_0000_0.xml",
-#             "ZZTo4Q_13TeV_amcatnloFXFX_madspin_pythia8_0000_1.xml", ]],
+     # [ "ZZTo2Q2Nu_13TeV_nlo",
+     #  [   "ZZTo2Q2Nu_13TeV_amcatnloFXFX_madspin_pythia8_V2_0000_0.xml",
+     #      "ZZTo2Q2Nu_13TeV_amcatnloFXFX_madspin_pythia8_V2_0000_1.xml", ]],
+        
+     # [ "ZZTo4Q_13TeV_nlo",
+     #  [   "ZZTo4Q_13TeV_amcatnloFXFX_madspin_pythia8_0000_0.xml",
+     #      "ZZTo4Q_13TeV_amcatnloFXFX_madspin_pythia8_0000_1.xml", ]],
             
        [ "ZZTo4L_13TeV_nlo",
         [   "ZZTo4L_13TeV-amcatnloFXFX-pythia8_ext_0000.xml", ]],
             
-#        [ "ZZTo4L_13TeV_powheg_pythia8",
-#         [   "ZZTo4L_13TeV_powheg_pythia8_0000.xml", ]],
+     # [ "ZZTo4L_13TeV_powheg_pythia8",
+     #  [   "ZZTo4L_13TeV_powheg_pythia8_0000.xml", ]],
             
        [ "VVTo2L2Nu_13TeV_nlo",
         [   "VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8_0000.xml", ]],
-#             "VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8_ext_0000.xml", ]], # Moriond
         
             ]
             

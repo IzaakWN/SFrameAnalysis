@@ -37,8 +37,6 @@ compilePacks=[
 AddUserItems = [
     ["RecoTreeName","tree"], 
     ["doSVFit","true"],
-    ["OutputTreeName_mutau", "tree_mutau" ],
-    ["OutputTreeName_eletau","tree_etau"],
             ]
   
 inputTrees=["ntuplizer/tree"]

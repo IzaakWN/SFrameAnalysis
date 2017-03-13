@@ -11,10 +11,9 @@ hCPU="03:30:00"
 hVMEM="5000M"
 postFix="_Moriond"
 dataSets = [
-              
+
        [ "WZTo3LNu_TuneCUETP8M1_13TeV_nlo",
         [   "WZTo1L3Nu_13TeV_amcatnloFXFX_madspin_pythia8_0000.xml", ]],
-#             "WZTo3LNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_0000.xml", ]], # Moriond
                           
        [ "WZTo1L1Nu2Q_13TeV_nlo",
         [   "WZTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8_0000_0.xml",
@@ -22,10 +21,10 @@ dataSets = [
                           
        [ "WZTo2L2Q_13TeV_nlo",
         [   "WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8_0000_0.xml",
-            "WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8_0000_1.xml",]],
+            "WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8_0000_1.xml", ]],
         
-       #[ "WZTo1L3Nu_13TeV_nlo",
-       # [    ]],
+       [ "WZJToLLLNu_nlo",
+        [   "WZJToLLLNu_TuneCUETP8M1_13TeV-amcnlo-pythia8_0000.xml", ]],
         
             ]
 

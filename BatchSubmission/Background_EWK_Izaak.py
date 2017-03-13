@@ -15,23 +15,13 @@ dataSets = [ ]
 if "Moriond" in postFix: dataSets = [
         
        [ "EWKWMinus2Jets_WToLNu_M-50",
-        [   "EWKWMinus2Jets_WToLNu_M-50_13TeV-madgraph-pythia8_V1_ext_0000.xml",
-            "EWKWMinus2Jets_WToLNu_M-50_13TeV-madgraph-pythia8_V2_0000.xml", ]],
+        [   "EWKWMinus2Jets_WToLNu_M-50_13TeV-madgraph-pythia8_0000.xml", ]],
         
        [ "EWKWPlus2Jets_WToLNu_M-50",
-        [   "EWKWPlus2Jets_WToLNu_M-50_13TeV-madgraph-pythia8_V1_0000.xml",
-            "EWKWPlus2Jets_WToLNu_M-50_13TeV-madgraph-pythia8_V2_additional_0000_0.xml",
-            "EWKWPlus2Jets_WToLNu_M-50_13TeV-madgraph-pythia8_V2_additional_0000_1.xml",
-            "EWKWPlus2Jets_WToLNu_M-50_13TeV-madgraph-pythia8_V2_additional_0000_2.xml",
-            "EWKWPlus2Jets_WToLNu_M-50_13TeV-madgraph-pythia8_V2_additional_0001_0.xml",
-            "EWKWPlus2Jets_WToLNu_M-50_13TeV-madgraph-pythia8_V2_additional_0001_1.xml",
-            "EWKWPlus2Jets_WToLNu_M-50_13TeV-madgraph-pythia8_V2_additional_0001_2.xml",
-            "EWKWPlus2Jets_WToLNu_M-50_13TeV-madgraph-pythia8_V2_additional_0002.xml",
-            "EWKWPlus2Jets_WToLNu_M-50_13TeV-madgraph-pythia8_V2_ext_0000.xml", ]],
+        [   "EWKWPlus2Jets_WToLNu_M-50_13TeV-madgraph-pythia8_0000.xml", ]],
         
        [ "EWKZ2Jets_ZToLL_M-50",
-        [   #"EWKZ2Jets_ZToLL_M-50_13TeV-madgraph-pythia8_V1_0000.xml",
-            "EWKZ2Jets_ZToLL_M-50_13TeV-madgraph-pythia8_V1_ext_0000.xml", ]],
+        [   "EWKZ2Jets_ZToLL_M-50_13TeV-madgraph-pythia8_0000.xml", ]],
             ]
 
 userItems = [ 

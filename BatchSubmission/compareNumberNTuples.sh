@@ -2,8 +2,8 @@
 # TODO check for _additional, _ext flags !
 
 echo
-echo ">>> comparing stored root files to the listed ones in xml files"
-BASEDIR="/shome/$USER/analysis/SFrameAnalysis_Moriond/BatchSubmission"
+echo ">>> comparing stored root files to those listed in xml files"
+BASEDIR="." #"/shome/$USER/analysis/SFrameAnalysis_Moriond/BatchSubmission"
 XMLDIR="xmls_postMoriond_T2"
 SITES_T3=(
     /pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Spring16/Ntuple_80_08022017 # data
@@ -13,11 +13,11 @@ SITES_T3=(
     /pnfs/psi.ch/cms/trivcat/store/user/ineuteli/Ntuple_80_20170303/
 )
 SITES_T2=(
-    /pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_Moriond17
-    /pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_Moriond17_v2
-    /pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond
-    /pnfs/lcg.cscs.ch/cms/trivcat/store/user/cgalloni/Ntuple_Moriond17
-    /pnfs/lcg.cscs.ch/cms/trivcat/store/user/zucchett/Ntuple_Moriond17
+#     /pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_Moriond17
+#     /pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_Moriond17_v2
+#     /pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond
+#     /pnfs/lcg.cscs.ch/cms/trivcat/store/user/cgalloni/Ntuple_Moriond17
+#     /pnfs/lcg.cscs.ch/cms/trivcat/store/user/zucchett/Ntuple_Moriond17
 )
 
 
@@ -147,21 +147,23 @@ for sample in ${SAMPLES[@]}; do
     echo ">>>     ####${BAR}####"
     #echo ">>> "
     
+    # replace * by .* wildcard to use with grep:
+    sample_dotted=`echo $sample | sed 's/*/.*/'`
     
     # LOOP over PNFS sites on Tier 3
     for site in ${SITES_T3[@]}; do
-        if ls $site | grep -q ^$sample; then
+        if ls $site | grep -q ^$sample_dotted; then
             echo ">>> "
             echo ">>> sample found in ${site}:"
             nFiles=0
             nFilesTot=0
-            for fullsample in `ls ${site} | grep ${sample}`; do            
+            for fullsample in `ls ${site} | grep ${sample_dotted}`; do            
                 nFiles=`ls ${site}/${fullsample}/*/*/* | grep .root | wc -l`
                 nDirs=`ls ${site}/${fullsample}/*/* | wc -l`
                 nFilesTot=$(($nFilesTot+$nFiles))
-                printf ">>>   \e[1m%4s \e[0mfiles in %2s directories %s\n" "$nFiles" "$nDirs" "$fullsample"
+                printf ">>>  \e[1m%5s \e[0mfiles in %2s directories %s\n" "$nFiles" "$nDirs" "$fullsample"
             done
-            (( $nFilesTot > $nFiles )) && printf ">>>   \e[1m%4s \e[0mfiles in total\n" "$nFilesTot"
+            (( $nFilesTot > $nFiles )) && printf ">>>  \e[1m%5s \e[0mfiles in total\n" "$nFilesTot"
         fi
     done
     
@@ -169,29 +171,29 @@ for sample in ${SAMPLES[@]}; do
     # LOOP over PNFS sites on Tier 2
     for site in ${SITES_T2[@]}; do
         echo $site | grep -q -v "gsiftp://storage01.lcg.cscs.ch/" && site="gsiftp://storage01.lcg.cscs.ch/$site"
-        if uberftp -ls $site | awk '{print $9}' | grep -q ^$sample; then
+        if uberftp -ls $site | awk '{print $9}' | grep -q ^$sample_dotted; then
             echo ">>> "
             echo ">>> sample found in ${site}:"
             nFiles=0
             nFilesTot=0
-            for fullsample in `uberftp -ls ${site} | awk '{print $9}' | grep ${sample} | xargs echo`; do
+            for fullsample in `uberftp -ls ${site} | awk '{print $9}' | grep ${sample_dotted} | xargs echo`; do
                 fullsample=${fullsample:0:${#fullsample}-1} # some weird character at the end
                 nFiles=`uberftp -ls ${site}/${fullsample}/*/*/* | grep .root | wc -l`
                 nDirs=`uberftp -ls ${site}/${fullsample}/*/* | wc -l`
                 nFilesTot=$(($nFilesTot+$nFiles))
-                printf ">>>   \e[1m%4s \e[0mfiles in %2s directories of  %s\n" "$nFiles" "$nDirs" "$fullsample"
+                printf ">>>  \e[1m%5s \e[0mfiles in %2s directories of  %s\n" "$nFiles" "$nDirs" "$fullsample"
             done
-            (( $nFilesTot > $nFiles )) && printf ">>>   \e[1m%4s \e[0mfiles in total\n" "$nFilesTot"
+            (( $nFilesTot > $nFiles )) && printf ">>>  \e[1m%5s \e[0mfiles in total\n" "$nFilesTot"
         fi
     done
 
     
     # CHECK XML files
     echo ">>> "
-    if ls $XMLDIR | grep -q $sample; then
+    if ls $XMLDIR | grep -q $sample_dotted; then
         echo ">>> sample found in ${XMLDIR}:"
         nFiles=`cat $XMLDIR/${sample}*.xml | grep .root | wc -l`
-        nDuplicates=`cat $XMLDIR/${sample}*.xml | grep -o "${sample}.*/flatTuple_.*.root" | uniq -cd | wc -l`
+        nDuplicates=`cat $XMLDIR/${sample}*.xml | grep -o "${sample_dotted}.*/flatTuple_.*.root" | uniq -cd | wc -l`
         nXMLFiles=`ls $XMLDIR/${sample}*.xml | wc -l`
         
         # COUNT number of events
@@ -199,12 +201,12 @@ for sample in ${SAMPLES[@]}; do
         NEVENTS=0
         for f in `ls ${XMLDIR}/${sample}*.xml | awk -F '/' '{print $NF}'`; do
           NEVENTS=`grep "${XMLDIR}/$f" -e 'Total number of events processed: ' | grep -Po '[0-9]*'`
-          NTOT=$(($NTOT+$NEVENTS))
           if [[ ! $NEVENTS ]]; then
-            echo ">>> Warning! No number of events saved in $f!"
-          # else
+            echo ">>>   Warning! No number of events saved in $f!"
+          else
           #   echo ">>> $NEVENTS events in $f"
           #   N=$(($N+$NEVENTS))
+            NTOT=$(($NTOT+$NEVENTS))
           fi
         done
         

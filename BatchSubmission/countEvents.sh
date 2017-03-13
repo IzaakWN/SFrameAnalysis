@@ -2,7 +2,7 @@
 
 # DEFAULT VALUES
 echo
-BASEDIR="/shome/ineuteli/analysis/SFrameAnalysis_Moriond/BatchSubmission"
+BASEDIR="." #"/shome/ineuteli/analysis/SFrameAnalysis_Moriond/BatchSubmission"
 XMLDIR="xmls_Moriond_T2" #Summer2016_noJEC"
 SAMPLES=("DY2JetsToLL_M-10")  #DY2JetsToLL_M-10  #DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_HLT
 N=0
@@ -32,6 +32,7 @@ fi
 
 # LOOP over files
 for sample in ${SAMPLES[@]}; do
+    
     for f in `ls ${DIR}/${sample}*.xml | awk -F '/' '{print $NF}'`; do
     EVENTS=`grep "${DIR}/$f" -e 'Total number of events processed: ' | grep -Po '[0-9]*'`
     if [[ ! $EVENTS ]]; then

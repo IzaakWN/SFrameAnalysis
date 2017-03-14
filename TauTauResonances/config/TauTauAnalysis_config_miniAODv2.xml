@@ -41,8 +41,6 @@
     <UserConfig>
       <Item Name="RecoTreeName" Value="tree"/>
       <Item Name="doSVFit" Value="False"/>
-      <Item Name="OutputTreeName_eletau"    Value="tree_etau"/>
-      <Item Name="OutputTreeName_mutau"     Value="tree_mutau"/>
 <!--      <Item Name="JetPtCut" Value="200."/> -->
       <Item Name="IsSignal" Value="True"/>
     </UserConfig>

@@ -10,9 +10,10 @@ N=0
 # USER OPTIONS
 #http://stackoverflow.com/a/39754944/5499028
 SAMPLES_USER=( )
-while getopts b:x:s: option; do
+while getopts b:d:x:s: option; do
     case "${option}" in
         b) BASEDIR=${OPTARG};;
+        d) XMLDIR=${OPTARG};;
         x) XMLDIR=${OPTARG};;
         s) SAMPLES_USER+=(${OPTARG});;
     esac

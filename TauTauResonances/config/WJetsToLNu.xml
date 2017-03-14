@@ -38,8 +38,6 @@
     </InputData>
   <UserConfig>
     <Item Name="RecoTreeName"               Value="tree"/>
-    <Item Name="OutputTreeName_eletau"      Value="tree_etau"/>
-    <Item Name="OutputTreeName_mutau"       Value="tree_mutau"/>
     <Item Name="doSVFit"                    Value="True"/>
     <Item Name="IsSignal"                   Value="False"/>
     <Item Name="doRecoilCorr"               Value="True"/>

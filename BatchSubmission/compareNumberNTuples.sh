@@ -10,14 +10,16 @@ SITES_T3=(
     /pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Summer16/Ntuple_80_20170203
     /pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Summer16/Ntuple_80_20170206 
     /pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Summer16/Ntuple_80_20170207 
-    /pnfs/psi.ch/cms/trivcat/store/user/ineuteli/Ntuple_80_20170303/
+    /pnfs/psi.ch/cms/trivcat/store/user/ineuteli/Ntuple_80_20170303/               # SingleElectron
 )
 SITES_T2=(
-#     /pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_Moriond17
-#     /pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_Moriond17_v2
-#     /pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond
-#     /pnfs/lcg.cscs.ch/cms/trivcat/store/user/cgalloni/Ntuple_Moriond17
-#     /pnfs/lcg.cscs.ch/cms/trivcat/store/user/zucchett/Ntuple_Moriond17
+    #gsiftp://storage01.lcg.cscs.ch/
+    /pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_Moriond17
+    /pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_Moriond17_v2
+    /pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond
+    /pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond_v2
+    /pnfs/lcg.cscs.ch/cms/trivcat/store/user/cgalloni/Ntuple_Moriond17
+    /pnfs/lcg.cscs.ch/cms/trivcat/store/user/zucchett/Ntuple_Moriond17
 )
 
 
@@ -107,13 +109,18 @@ SAMPLES=(
 # TODO: option to add own pnfs site
 SAMPLES_USER=( )
 SITES_USER=( )
-while getopts b:x:s:t: option; do
+VERBOSITY=0
+while getopts b:d:x:s:p:t:u:v option; do
     case "${option}"
     in
         b) BASEDIR=${OPTARG};;
+        d) XMLDIR=${OPTARG};;
         x) XMLDIR=${OPTARG};;
         s) SAMPLES_USER+=(${OPTARG});;
+        p) SITES_USER+=(${OPTARG});;
         t) SITES_USER+=(${OPTARG});;
+        u) SITES_USER+=(${OPTARG});;
+        v) VERBOSITY=1;;
     esac
 done
 [[ $SAMPLES_USER ]] && SAMPLES=( ${SAMPLES_USER[@]} )
@@ -127,9 +134,10 @@ for site in ${SITES_USER[@]}; do
     fi
 done
 
+CHECK_SITE=0
 ([[ $SITES_T2_USER ]] || [[ $SITES_T3_USER ]]) && SITES_T2=( ${SITES_T2_USER[@]} ) &&
-                                                  SITES_T3=( ${SITES_T3_USER[@]} )
-
+                                                  SITES_T3=( ${SITES_T3_USER[@]} ) &&
+                                                  CHECK_SITE=1
 
 
 # LOOP over samples
@@ -164,6 +172,9 @@ for sample in ${SAMPLES[@]}; do
                 printf ">>>  \e[1m%5s \e[0mfiles in %2s directories %s\n" "$nFiles" "$nDirs" "$fullsample"
             done
             (( $nFilesTot > $nFiles )) && printf ">>>  \e[1m%5s \e[0mfiles in total\n" "$nFilesTot"
+        elif [[ $CHECK_SITE > 0 ]]; then
+            echo ">>> "
+            echo ">>> sample not found in ${site}"
         fi
     done
     
@@ -184,6 +195,9 @@ for sample in ${SAMPLES[@]}; do
                 printf ">>>  \e[1m%5s \e[0mfiles in %2s directories of  %s\n" "$nFiles" "$nDirs" "$fullsample"
             done
             (( $nFilesTot > $nFiles )) && printf ">>>  \e[1m%5s \e[0mfiles in total\n" "$nFilesTot"
+        elif [[ $CHECK_SITE > 0 ]]; then
+            echo ">>> "
+            echo ">>> sample not found in ${site}"
         fi
     done
 
@@ -204,8 +218,7 @@ for sample in ${SAMPLES[@]}; do
           if [[ ! $NEVENTS ]]; then
             echo ">>>   Warning! No number of events saved in $f!"
           else
-          #   echo ">>> $NEVENTS events in $f"
-          #   N=$(($N+$NEVENTS))
+            [[ $VERBOSITY > 0 ]] && echo ">>>   $NEVENTS events in $f"
             NTOT=$(($NTOT+$NEVENTS))
           fi
         done
@@ -213,7 +226,7 @@ for sample in ${SAMPLES[@]}; do
         printf ">>>   \e[1m%4s \e[0mfiles in %2s xmls files (%s events)" "$nFiles" "$nXMLFiles" "$NTOT"
         (( $nDuplicates > 0 )) && printf "  ->  %s duplicate root files !!! \n" "$nDuplicates" || printf "\n"
     else
-        echo ">>> not found in $XMLDIR"
+        echo ">>> sample not found in $XMLDIR"
     fi
     
     

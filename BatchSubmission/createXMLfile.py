@@ -122,7 +122,7 @@ def main():
         nFiles=int(math.ceil(len(fileList)/float(maxFiles_original)))
         if (nFiles > 1):
           maxFiles = int(math.ceil(len(fileList)/float(nFiles)))
-          print "splitting file into %d subfiles of max. %d input files each" %(nFiles, maxFiles)
+          print "Splitting file into %d subfiles of max. %d input files each" %(nFiles, maxFiles)
         else:
           maxFiles = int(maxFiles_original)
         if (len(fileList) == 0):
@@ -133,7 +133,10 @@ def main():
           else:
             outName = sampleName_file
           csvList = ""
-          for fileIndex in range(i*maxFiles,min((i+1)*maxFiles,len(fileList))):
+          firstFileIndex=i*maxFiles
+          lastFileIndex=min((i+1)*maxFiles,len(fileList))
+          nRootFiles=lastFileIndex-firstFileIndex
+          for fileIndex in range(firstFileIndex,lastFileIndex):
             csvList = csvList+fileList[fileIndex]+","
           csvList = csvList.strip(",")
           lock=thread.allocate_lock()
@@ -149,10 +152,14 @@ def main():
           else:
             for line in output.split("\n"):
               if "events processed" in line:
-                print line.strip("\n")
+                print "  File %s: %s" % (i+1,line.replace("\n",""))
           outerr=processMC.stderr.read()
-          print outerr
-        
+          if outerr: print outerr
+          nWrittenRootFiles=output.count(".root")
+          if nWrittenRootFiles != nRootFiles:
+            print ">>> \033[1mWarning! File %s (%s.xml) contains fewer root files (%s) than expected (%s)!\033[0m" % (i+1,outName,nWrittenRootFiles,nRootFiles)
+            if verbose:
+              for i, file in enumerate(csvList.split(',')): print "%3s: %s" % (i,file)
 
 
 def getFiles(samplepath):
@@ -160,7 +167,7 @@ def getFiles(samplepath):
   if "T2" in site:
     lock=thread.allocate_lock()
     lock.acquire()
-    commandLS="uberftp -ls -r gsiftp://storage01.lcg.cscs.ch/%s | awk '{print $8}'"%(samplepath) # | sort -V
+    commandLS="uberftp -ls -r gsiftp://storage01.lcg.cscs.ch/%s | awk '{print $8}' | grep .root"%(samplepath) # | sort -V
     if verbose: print commandLS
     processLS=subprocess.Popen(commandLS, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     lock.release()
@@ -199,3 +206,4 @@ def isDir(samplepath):
 
 if __name__ == "__main__":
   main()
+  print

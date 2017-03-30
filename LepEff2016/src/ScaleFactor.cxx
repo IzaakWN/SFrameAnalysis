@@ -121,6 +121,11 @@ std::string ScaleFactor::FindEtaLabel(double Eta, std::string Which){
 	Eta = fabs(Eta);
 	int binNumber = etaBinsH->GetXaxis()->FindFixBin(Eta);
 	std::string EtaLabel = etaBinsH->GetXaxis()->GetBinLabel(binNumber);
+	while( EtaLabel == "" and binNumber > 0){
+	    binNumber--;
+        EtaLabel = etaBinsH->GetXaxis()->GetBinLabel(binNumber);
+        //std::cout << "Warning! ScaleFactor::FindEtaLabel: eta="<<Eta<<", using one bin lower: "<<binNumber<<" - \""<<EtaLabel<<"\"" << std::endl; //exit(1);
+    }
 	std::map<std::string, TGraphAsymmErrors*>::iterator it;
 	
     //std::cout << "ScaleFactor::FindEtaLabel: Eta=" << Eta << ", binNumber=" << binNumber << " - " << m_inputRootFile << std::endl;
@@ -132,16 +137,21 @@ std::string ScaleFactor::FindEtaLabel(double Eta, std::string Which){
     //   std::cout << "ScaleFactor::FindEtaLabel:   eff_mc - eta label \"" << label.first << "\"" << std::endl;
     // std::cout << "ScaleFactor::FindEtaLabel:   eff_mc.size() = " << eff_mc.size() << std::endl;
     
+    
 	if (Which == "data"){
       it =  eff_data.find(EtaLabel);
       if ( it == eff_data.end()) {
-        std::cout << "ERROR in ScaleFactor::FindEtaLabel: no object corresponding to eta label " << EtaLabel << " for data " << std::endl; exit(1);
+        if (EtaLabel == ""){
+              std::cout << "ERROR in ScaleFactor::FindEtaLabel: no eta label found for eta="<< Eta<<" (bin "<<binNumber<<") for data " << std::endl; exit(1); }
+        else{ std::cout << "ERROR in ScaleFactor::FindEtaLabel: no object found corresponding to eta label "<<EtaLabel<<" for data " << std::endl; exit(1); }
       }
 	}
 	else if (Which == "mc"){
       it = eff_mc.find(EtaLabel);
-      if (it == eff_mc.end()) { 
-        std::cout << "ERROR in ScaleFactor::FindEtaLabel: no object corresponding to eta label " << EtaLabel << " for MC " << std::endl; exit(1);
+      if (it == eff_mc.end()) {
+        if (EtaLabel == ""){
+              std::cout << "ERROR in ScaleFactor::FindEtaLabel: no eta label found for eta="<<Eta<<" (bin "<<binNumber<<") for MC " << std::endl; exit(1); }
+        else{ std::cout << "ERROR in ScaleFactor::FindEtaLabel: no object corresponding to eta label "<<EtaLabel<< " for MC " << std::endl; exit(1); }
       }
 	}
 	

@@ -1,5 +1,7 @@
 #! /bin/bash
 # TODO check for _additional, _ext flags !
+# ./compareNumberNTuples.sh -x xmls_postMoriond -t /pnfs/psi.ch/cms/trivcat/store/user/ytakahas/Ntuple_80_reminiAOD/ -t /pnfs/psi.ch/cms/trivcat/store/user/ineuteli/Ntuple_80_20170303/ -s SingleElectron -s SingleMuon
+#
 
 echo
 echo ">>> comparing stored root files to those listed in xml files"
@@ -9,7 +11,9 @@ SITES_T3=(
     /pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Spring16/Ntuple_80_08022017 # data
     /pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Summer16/Ntuple_80_20170203
     /pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Summer16/Ntuple_80_20170206 
-    /pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Summer16/Ntuple_80_20170207 
+    /pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Summer16/Ntuple_80_20170207
+    #/pnfs/psi.ch/cms/trivcat/store/user/ytakahas/Ntuple_80_reminiAOD/              # SingleMuon
+    /pnfs/psi.ch/cms/trivcat/store/user/ytakahas/Ntuple_80_reminiAOD_v2/           # SingleMuon
     /pnfs/psi.ch/cms/trivcat/store/user/ineuteli/Ntuple_80_20170303/               # SingleElectron
 )
 SITES_T2=(
@@ -18,6 +22,7 @@ SITES_T2=(
     /pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_Moriond17_v2
     /pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond
     /pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond_v2
+    /pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond_v3
     /pnfs/lcg.cscs.ch/cms/trivcat/store/user/cgalloni/Ntuple_Moriond17
     /pnfs/lcg.cscs.ch/cms/trivcat/store/user/zucchett/Ntuple_Moriond17
 )
@@ -223,7 +228,7 @@ for sample in ${SAMPLES[@]}; do
           fi
         done
         
-        printf ">>>   \e[1m%4s \e[0mfiles in %2s xmls files (%s events)" "$nFiles" "$nXMLFiles" "$NTOT"
+        printf ">>>  \e[1m%5s \e[0mfiles in %2s xmls files (%s events)" "$nFiles" "$nXMLFiles" "$NTOT"
         (( $nDuplicates > 0 )) && printf "  ->  %s duplicate root files !!! \n" "$nDuplicates" || printf "\n"
     else
         echo ">>> sample not found in $XMLDIR"

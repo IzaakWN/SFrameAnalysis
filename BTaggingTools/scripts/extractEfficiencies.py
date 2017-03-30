@@ -19,9 +19,11 @@ def main():
   parser.add_option("-p", "--prefix", dest="prefix", default="jet_", action="store",
                     help="prefix for histograms [default: %default]")
   parser.add_option("-w", "--workingpoint", dest="workingpoint", default="Loose", action="store",
-                    help="b-tagging working point [default: %default]")                
+                    help="b-tagging working point [default: %default]")
   parser.add_option("-r", "--replace", dest="replace", default=False, action="store_true",
                     help="replace/overwrite/recreate output ROOT file [default: %default]")
+  parser.add_option("-v", "--verbose", dest="verbose", default=False, action="store_true",
+                    help="make script verbose")
 
   
   (options, args) = parser.parse_args()
@@ -35,6 +37,7 @@ def main():
   prefix = options.prefix
   workingpoint = options.workingpoint
   replace = options.replace
+  verbose = options.verbose
 
   print "Using file list:", fileList
   print "output ROOT file:", outputFile
@@ -64,7 +67,7 @@ def main():
       
       baseHistName = "%s/%s%s" %(directory, prefix, flavour)
       baseHistNameNoDir = "%s%s" %(prefix, flavour)
-      print "Getting histograms for ",baseHistNameNoDir,"in file",file
+      if verbose: print "Getting histograms for ",baseHistNameNoDir,"in file",file
      
       if (i == 0):
         print "file.Get(%s%s)).Clone(%s%s%03d)"%(baseHistName, nominator,baseHistNameNoDir, nominator, i)
@@ -93,8 +96,9 @@ def main():
   if (replace):
     openOptions = "RECREATE"
   outFile = TFile.Open(outputFile, openOptions)
-  if (replace):
+  if (replace or not outFile.GetDirectory(directory)):
     outFile.mkdir(directory)
+    print ">>> made directory %s in %s" % (directory,outputFile) # if verbose:
   outFile.cd(directory)
   outDir = outFile.GetDirectory(directory)
   for flavour in flavourNames:

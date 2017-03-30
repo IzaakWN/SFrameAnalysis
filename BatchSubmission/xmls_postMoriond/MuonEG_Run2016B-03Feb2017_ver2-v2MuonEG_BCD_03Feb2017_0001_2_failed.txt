@@ -1,0 +1,1 @@
+dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/ytakahas/Ntuple_80_reminiAOD_v2/MuonEG/MuonEG_Run2016B-03Feb2017_ver2-v2MuonEG_BCD_03Feb2017/170317_051426/0001/flatTuple_1719.root

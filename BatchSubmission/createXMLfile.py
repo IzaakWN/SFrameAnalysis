@@ -5,25 +5,34 @@
 #* @author Clemens Lange    <clange@physik.uzh.ch>        - UZH
 #*
 #***************************************************************************
-#
+
 # Get text file with full paths of ntuples (18/02/2017):
-#  
-#  Tier 3 PNFS:
-#    PNFS="/pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Summer16/Ntuple_80_20170206"
-#    ls -d $PNFS/DYJ*/*/*/* > dirs_DYJ.txt
-#    ls -d $PNFS/*/*/*/* > dirs.txt
-#    ./createXMLfile.py dirs.txt -o xmls_Moriond
-#  
-#  Tier 2 PNFS:
-#    PNFS="gsiftp://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_Moriond17"
-#    uberftp -ls $PNFS/DY1J*/*/* | awk '{print $7}' > dirs_T2_DY1J.txt
-#    uberftp -ls $PNFS/*/*/* | awk '{print $7}' > dirs_T2.txt
-#    ./createXMLfile.py dirs_T2.txt -o xmls_Moriond_T2 -s PSI-T2
-#
-#  Print out xml file names formatted for copy-pasting into job options files:
-#    cd xmls_Moriond/
-#    ls *.xml | xargs -I@ echo \"@\",
-#
+example = """
+Examples:
+
+ Tier 3 PNFS:
+   PNFS="/pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Summer16/Ntuple_80_20170206"
+   ls -d $PNFS/DYJ*/*/*/* > dirs_DYJ.txt
+   ls -d $PNFS/*/*/*/* > dirs.txt
+   ./createXMLfile.py dirs.txt -o xmls_Moriond
+ 
+ Tier 2 PNFS:
+   PNFS="gsiftp://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_Moriond17"
+   uberftp -ls $PNFS/DY1J*/*/* | awk '{print $7}' > dirs_T2_DY1J.txt
+   uberftp -ls $PNFS/*/*/* | awk '{print $7}' > dirs_T2.txt
+   ./createXMLfile.py dirs_T2.txt -o xmls_Moriond_T2 -s PSI-T2
+
+ Split files
+   cat foo.txt | wc -l
+   split -l 200 foo.txt foo_split -d
+
+ Print out xml file names formatted for copy-pasting into job options files:
+   cd xmls_Moriond/
+   ls *.xml | xargs -I@ echo \\"@\\",
+"""
+
+# NOTE: if there are a lot of corrupt files, and the connection is slow, consider
+# replacing "return 255" by "continue" in  ../SFrame/python/SFrameHelpers.py
 
 
 import os
@@ -36,16 +45,19 @@ import math
 
 
 # parse the command line
-parser=optparse.OptionParser(usage="%prog sampleListFile")
-parser.add_option("-s", "--site", action="store",
-                dest="site", default="PSI",
-                help="grid site [default = %default]")
+parser=optparse.OptionParser(usage="%prog SAMPLELISTFILE") #epilog
+parser.add_option("-e", "--example", action="store_true",
+                dest="example", default=False,
+                help="Print example usage")
 parser.add_option("-v", "--verbose", action="store_true",
                 dest="verbose", default=False,
-                help="verbose output [default = %default]")
+                help="Verbose output [default = %default]")
+parser.add_option("-s", "--site", action="store",
+                dest="site", default="PSI",
+                help="Grid site [default = %default]")
 parser.add_option("-x", "--xrootd", action="store_true",
                 dest="useXrootd", default=False,
-                help="use Xrootd [default = %default]")
+                help="Use Xrootd [default = %default]")
 parser.add_option("-t", "--tree", action="store",
                 dest="treeName", default="ntuplizer/tree",
                 help="Tree to be scanned by SFrame for number of input events [default = %default]")
@@ -55,7 +67,14 @@ parser.add_option("-m", "--maxFiles", action="store",
 parser.add_option("-o", "--outDir", action="store",
                 dest="outDir", default="xmls_Summer2016",
                 help="Output directory for xml files [default = %default]")
+parser.add_option("-f", "--no-failed", action="store_false",
+                dest="writeFailed", default=True,
+                help="Do not write corrupt root files to a txt file")
 (options, args) = parser.parse_args()
+if options.example:
+  parser.print_help()
+  print example
+  exit(0)
 if len(args) != 1: parser.error("Please provide at file list name")
 
 print
@@ -66,26 +85,35 @@ useXrootd=options.useXrootd
 treeName=options.treeName
 maxFiles_original=int(options.maxFiles)
 outDir=options.outDir
-if verbose: print "Site:",site
-
-
+writeFailed=options.writeFailed
+if verbose:
+  print "Site:",site
 
 dCacheInstances={}
 #Xrootd and dcap prefixes
 dCacheInstances["PSI"]=["root://t3dcachedb.psi.ch:1094/", "dcap://t3se01.psi.ch:22125/"]
+dCacheInstances["PSI-T3"]=dCacheInstances["PSI"]
+dCacheInstances["T3"]=dCacheInstances["PSI"]
 dCacheInstances["PSI-T2"]=["root://storage01.lcg.cscs.ch/",  "root://storage01.lcg.cscs.ch/"] # PSI Tier 2
+dCacheInstances["T2"]=dCacheInstances["PSI-T2"]
 if site not in dCacheInstances:
     print "ERROR! Site %s not registered as a dCacheInstances"
     sys.exit(1)
 
 
 def main():
-  
-  if not os.path.exists(outDir):
-    print "Creating output directory", outDir
-    os.makedirs(outDir)
-  
+    
   with open(sampleListName) as sampleList:
+    
+    print "  Creating XML files in         %s," % (outDir)
+    print "  with root files on the        %s storage element," % ("PSI-T3" if "T2" not in site else site)
+    print "  in the directories listed in  %s.\n" % (sampleListName)
+    
+    if not os.path.exists(outDir):
+      print "Creating output directory", outDir
+      os.makedirs(outDir)
+  
+    # LOOP over all samples
     for sample in sampleList:
       if sample.startswith("#") or sample.isspace():
         continue
@@ -96,6 +124,8 @@ def main():
       sampleName_file+="_"+sampleName
       print "Sample: %s in location: %s producing file with list %s" %(sampleName,sample,sampleName_file )
       fileList=[]
+      
+      # CHECK directory existence
       if not isDir(sample):
         print sample,"is not a directory."
       else:
@@ -110,6 +140,8 @@ def main():
             prefix = dCacheInstances[site][1]
         if verbose:
           print "Using prefix:",prefix
+        
+        # GET root files
         for subdir, files in getFiles(sample):
           for file in files:
             if (file.find(".root") >= 0):
@@ -117,9 +149,10 @@ def main():
               if (verbose): print path
               if "failed" in path.lower() or "corrupt" in path.lower(): continue
               fileList.append(path)
-        
         print "Processing %d files"%len(fileList)
         nFiles=int(math.ceil(len(fileList)/float(maxFiles_original)))
+        
+        # SPLIT files list
         if (nFiles > 1):
           maxFiles = int(math.ceil(len(fileList)/float(nFiles)))
           print "Splitting file into %d subfiles of max. %d input files each" %(nFiles, maxFiles)
@@ -127,6 +160,8 @@ def main():
           maxFiles = int(maxFiles_original)
         if (len(fileList) == 0):
           print "No files found."
+        
+        # LOOP over XML files
         for i in range(nFiles):
           if (nFiles > 1):
             outName = "%s_%d" %(sampleName_file, i)
@@ -139,27 +174,65 @@ def main():
           for fileIndex in range(firstFileIndex,lastFileIndex):
             csvList = csvList+fileList[fileIndex]+","
           csvList = csvList.strip(",")
-          lock=thread.allocate_lock()
-          lock.acquire()
-          commandMC="sframe_input.py -r -d -o %s/%s.xml %s -t %s" %(outDir, outName, csvList, treeName)
-          if verbose:
-            print commandMC
-          processMC=subprocess.Popen(commandMC, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-          lock.release()
-          output=processMC.stdout.read()
-          if verbose:
-            print output
-          else:
+          
+          # MAKE XML file
+          failedRootFiles=[ ]
+          makeXMLFileFromStart=True
+          while makeXMLFileFromStart:
+            makeXMLFileFromStart=False
+            lock=thread.allocate_lock()
+            lock.acquire()
+            commandMC="sframe_input.py -r -d -o %s/%s.xml %s -t %s" %(outDir, outName, csvList, treeName)
+            if verbose: print commandMC
+            processMC=subprocess.Popen(commandMC, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+            lock.release()
+            output=processMC.stdout.read()
+            if verbose: print output
+            
+            # CHECK OUTPUT
+            nWrittenRootFiles=output.count(".root")
+            newFailedRootFiles=[ ]
             for line in output.split("\n"):
+              
+              # CHECK for failed files
+              if "error" in line.lower():
+                for rootfile in csvList.split(','):
+                  if rootfile in line:
+                    nWrittenRootFiles -= 1
+                    newFailedRootFiles.append(rootfile)
+                    csvList=csvList.replace(rootfile,'').replace(",,",',')
+                    makeXMLFileFromStart=True
+                    #print "  \033[1mWarning! File %s (%s.xml): ignoring corrupt file (%s) and retrying!\033[0m" % (i+1,outName,rootfile)
+                #else:
+                  #print "  \033[1m\033[91mERROR!%s!\033[0m" % line.replace(" *ERROR*","").replace("*ERROR*","")
+                  #if ".root" in line: nWrittenRootFiles-=line.count(".root")+1
+              
+              # FINAL SUCCES
               if "events processed" in line:
-                print "  File %s: %s" % (i+1,line.replace("\n",""))
-          outerr=processMC.stderr.read()
-          if outerr: print outerr
-          nWrittenRootFiles=output.count(".root")
-          if nWrittenRootFiles != nRootFiles:
-            print ">>> \033[1mWarning! File %s (%s.xml) contains fewer root files (%s) than expected (%s)!\033[0m" % (i+1,outName,nWrittenRootFiles,nRootFiles)
-            if verbose:
-              for i, file in enumerate(csvList.split(',')): print "%3s: %s" % (i,file)
+                makeXMLFileFromStart=False
+                print "  File %s: %s (%s files)" % (i+1,line.replace("\n",""),nWrittenRootFiles)
+            
+            # RETRY ?
+            if len(newFailedRootFiles):
+              failedRootFiles+=newFailedRootFiles
+              if makeXMLFileFromStart:
+                print "  \033[1mWarning! File %s: Ignoring %s corrupt file%s and retrying!\033[0m" % (i+1,len(newFailedRootFiles),plural(newFailedRootFiles))
+                continue
+              else:
+                print "  \033[1mWarning! File %s: Ignoring %s corrupt file%s!\033[0m" % (i+1,len(newFailedRootFiles),plural(newFailedRootFiles))
+            
+            outerr=processMC.stderr.read()
+            if outerr: print "sframe_input.py gave an error:\n%s" % (outerr)
+            if nWrittenRootFiles != nRootFiles and not makeXMLFileFromStart:
+              print "  \033[1mWarning! File %s contains fewer root files (%s) than expected (%s)! (%s.xml)\033[0m" % (i+1,nWrittenRootFiles,nRootFiles,outName)
+              if verbose:
+                for j, file in enumerate(csvList.split(',')): print "%3s: %s" % (j,file)
+            
+          # TODO: write failed files to a xml file in outdir
+          if len(failedRootFiles) and writeFailed: writeFailedRootFiles(failedRootFiles,i,outDir,outName)
+        
+  print "- "*10
+
 
 
 def getFiles(samplepath):
@@ -204,6 +277,32 @@ def isDir(samplepath):
   
 
 
+def writeFailedRootFiles(failedRootFiles,i,outDir,outName):
+  outDirFailed=outDir #.strip("/")+"_failed"
+  outNameFailed=outName+"_failed"
+  if not os.path.exists(outDirFailed):
+    print "Creating output directory", outDirFailed
+    os.makedirs(outDirFailed)
+  with open("%s/%s.txt"%(outDirFailed,outNameFailed),'w') as file:
+    for rootfile in failedRootFiles:
+      file.write("%s\n"%rootfile)
+  with open("%s/%s.xml"%(outDir,outName),'a') as file:
+    file.write("<!-- Warning! Ignored %s corrupted file%s, see %s.txt -->\n\n" % (len(failedRootFiles),plural(failedRootFiles),outNameFailed))
+  print "  \033[1mWarning! File %s: Written %s corrupt root file%s to %s.txt in %s\033[0m" % (i+1, len(failedRootFiles),plural(failedRootFiles),outNameFailed,outDirFailed)
+  
+
+
+def plural(list,y=False):
+  if len(list) > 1:
+      if y: return "ies"
+      else: return "s"
+  else:
+      if y: return "y"
+      else: return ""
+  
+
+
 if __name__ == "__main__":
   main()
   print
+

@@ -21,6 +21,7 @@ ScaleFactorTool::ScaleFactorTool(SCycleBase* parent, const char* name ):
   DeclareProperty( m_name+"_MuTauTrig_MuLeg",   m_File_MuTauTrig_MuLeg   = std::string(std::getenv("SFRAME_DIR")) + "/../LepEff2016/data/Muon/Run2016BtoH/Muon_Mu19leg_2016BtoH_eff.root"              );
   DeclareProperty( m_name+"_MuTauTrig_TauLeg",  m_File_MuTauTrig_TauLeg  = std::string(std::getenv("SFRAME_DIR")) + "/../LepEff2016/data/Muon/Run2016BtoH/Muon_Tau20LooseIsoPF.root"                   );
   DeclareProperty( m_name+"_MuIdIso",           m_File_MuIdIso           = std::string(std::getenv("SFRAME_DIR")) + "/../LepEff2016/data/Muon/Run2016BtoH/Muon_IdIso_IsoLt0p15_2016BtoH_eff.root"      );
+  
   DeclareProperty( m_name+"_EleTrig",           m_File_EleTrig           = std::string(std::getenv("SFRAME_DIR")) + "/../LepEff2016/data/Electron/Run2016BtoH/Electron_Ele25_eta2p1_WPTight_eff.root"  );
   DeclareProperty( m_name+"_EleTauTrig_EleLeg", m_File_EleTauTrig_EleLeg = std::string(std::getenv("SFRAME_DIR")) + "/../LepEff2016/data/Electron/Run2016BtoH/Electron_Ele24_eff.root"                 );
   DeclareProperty( m_name+"_EleTauTrig_TauLeg", m_File_EleTauTrig_TauLeg = std::string(std::getenv("SFRAME_DIR")) + "/../LepEff2016/data/Electron/Run2016BtoH/Electron_TauWPLooseIsoPF.root"           );
@@ -101,7 +102,7 @@ ScaleFactorTool::~ScaleFactorTool(){
 
 
 
-double ScaleFactorTool::get_Efficiency_MuTauTrig_MC(double pt1, double eta1, double pt2, double eta2, int dm, std::string triggerFlags){
+double ScaleFactorTool::get_Efficiency_MuTauTrig_MC(double pt1, double eta1, double pt2, double eta2, int dm, bool isRealTau, std::string triggerFlags){
   
   // assume:
   //  - eff(X) = eff(l*tau) = eff(l)*eff(tau)
@@ -120,24 +121,29 @@ double ScaleFactorTool::get_Efficiency_MuTauTrig_MC(double pt1, double eta1, dou
   //  Case 2: P = max[ 1.e-2, [eff(l)-eff(L)*eff(tau) ]
   //  Case 3: P = min[eff(L), eff(l)]*eff_tau
   //  SF = min(1.e+1, P_data / P_MC)
-
+  
   if( triggerFlags.find("mtx") != std::string::npos ){ // cross-trigger
     if( triggerFlags.find("mt24") != std::string::npos ){
-      return std::min(m_ScaleFactor_Mu24Trig->get_EfficiencyMC(pt1,eta1),m_ScaleFactor_MuTauTrig_MuLeg->get_EfficiencyMC(pt1,eta1))*m_ScaleFactor_MuTauTrig_TauLeg->get_EfficiencyMC(pt2,eta2,dm);
+      // Case 3: P = min[eff(L), eff(l)]*eff_tau
+      return std::min(m_ScaleFactor_Mu24Trig->get_EfficiencyMC(pt1,eta1),m_ScaleFactor_MuTauTrig_MuLeg->get_EfficiencyMC(pt1,eta1))*m_ScaleFactor_MuTauTrig_TauLeg->get_EfficiencyMC(pt2,eta2,dm,isRealTau);
     }else if( triggerFlags.find("mt22") != std::string::npos ){
-      return std::min(m_ScaleFactor_Mu22Trig->get_EfficiencyMC(pt1,eta1),m_ScaleFactor_MuTauTrig_MuLeg->get_EfficiencyMC(pt1,eta1))*m_ScaleFactor_MuTauTrig_TauLeg->get_EfficiencyMC(pt2,eta2,dm);
+      // Case 3: P = min[eff(L), eff(l)]*eff_tau
+      return std::min(m_ScaleFactor_Mu22Trig->get_EfficiencyMC(pt1,eta1),m_ScaleFactor_MuTauTrig_MuLeg->get_EfficiencyMC(pt1,eta1))*m_ScaleFactor_MuTauTrig_TauLeg->get_EfficiencyMC(pt2,eta2,dm,isRealTau);
     }else{
-      return std::max(0.01,(m_ScaleFactor_MuTauTrig_MuLeg->get_EfficiencyMC(pt1,eta1)-m_ScaleFactor_Mu22Trig->get_EfficiencyMC(pt1,eta1))*m_ScaleFactor_MuTauTrig_TauLeg->get_EfficiencyMC(pt2,eta2,dm));
+      // Case 2: P = max[ 1.e-2, [eff(l)-eff(L)*eff(tau) ]
+      return std::max(0.01,(m_ScaleFactor_MuTauTrig_MuLeg->get_EfficiencyMC(pt1,eta1)-m_ScaleFactor_Mu22Trig->get_EfficiencyMC(pt1,eta1))*m_ScaleFactor_MuTauTrig_TauLeg->get_EfficiencyMC(pt2,eta2,dm,isRealTau));
     }
-  }else{ // no cross-trigger  
+  }else{ // no cross-trigger
     if( triggerFlags.find("mt24") != std::string::npos ){
-      return std::max(0.01,( m_ScaleFactor_Mu24Trig->get_EfficiencyMC(pt1,eta1)
+      // Case 1: P = max[ 1.e-2, eff_L-eff(tau)*min[eff(L),eff(l)] ]
+      return std::max(0.01, m_ScaleFactor_Mu24Trig->get_EfficiencyMC(pt1,eta1)
                             -std::min(m_ScaleFactor_Mu24Trig->get_EfficiencyMC(pt1,eta1),m_ScaleFactor_MuTauTrig_MuLeg->get_EfficiencyMC(pt1,eta1))
-                            *m_ScaleFactor_MuTauTrig_TauLeg->get_EfficiencyMC(pt2,eta2,dm)));
+                            *m_ScaleFactor_MuTauTrig_TauLeg->get_EfficiencyMC(pt2,eta2,dm,isRealTau));
     }else if( triggerFlags.find("mt22") != std::string::npos ){
-      return std::max(0.01,( m_ScaleFactor_Mu22Trig->get_EfficiencyMC(pt1,eta1)
+      // Case 1: P = max[ 1.e-2, eff_L-eff(tau)*min[eff(L),eff(l)] ]
+      return std::max(0.01, m_ScaleFactor_Mu22Trig->get_EfficiencyMC(pt1,eta1)
                             -std::min(m_ScaleFactor_Mu22Trig->get_EfficiencyMC(pt1,eta1),m_ScaleFactor_MuTauTrig_MuLeg->get_EfficiencyMC(pt1,eta1))
-                            *m_ScaleFactor_MuTauTrig_TauLeg->get_EfficiencyMC(pt2,eta2,dm)));
+                            *m_ScaleFactor_MuTauTrig_TauLeg->get_EfficiencyMC(pt2,eta2,dm,isRealTau));
     }
   }
   
@@ -147,7 +153,7 @@ double ScaleFactorTool::get_Efficiency_MuTauTrig_MC(double pt1, double eta1, dou
 
 
 
-double ScaleFactorTool::get_Efficiency_MuTauTrig_Data(double pt1, double eta1, double pt2, double eta2, int dm, std::string triggerFlags){
+double ScaleFactorTool::get_Efficiency_MuTauTrig_Data(double pt1, double eta1, double pt2, double eta2, int dm, bool isRealTau, std::string triggerFlags){
   
   // assume:
   //  - eff(X) = eff(l*tau) = eff(l)*eff(tau)
@@ -166,24 +172,29 @@ double ScaleFactorTool::get_Efficiency_MuTauTrig_Data(double pt1, double eta1, d
   //  Case 2: P = max[ 1.e-2, [eff(l)-eff(L)*eff(tau) ]
   //  Case 3: P = min[eff(L), eff(l)]*eff_tau
   //  SF = min[1.e+1, P_data / P_MC]
-
+  
   if( triggerFlags.find("mtx") != std::string::npos ){ // cross-trigger
     if( triggerFlags.find("mt24") != std::string::npos ){
+      // Case 3: P = min[eff(L), eff(l)]*eff_tau
       return std::min(m_ScaleFactor_Mu24Trig->get_EfficiencyData(pt1,eta1),m_ScaleFactor_MuTauTrig_MuLeg->get_EfficiencyData(pt1,eta1))*m_ScaleFactor_MuTauTrig_TauLeg->get_EfficiencyData(pt2,eta2,dm);
     }else if( triggerFlags.find("mt22") != std::string::npos ){
+      // Case 3: P = min[eff(L), eff(l)]*eff_tau
       return std::min(m_ScaleFactor_Mu22Trig->get_EfficiencyData(pt1,eta1),m_ScaleFactor_MuTauTrig_MuLeg->get_EfficiencyData(pt1,eta1))*m_ScaleFactor_MuTauTrig_TauLeg->get_EfficiencyData(pt2,eta2,dm);
     }else{
+      // Case 2: P = max[ 1.e-2, [eff(l)-eff(L)*eff(tau) ]
       return std::max(0.01,(m_ScaleFactor_MuTauTrig_MuLeg->get_EfficiencyData(pt1,eta1)-m_ScaleFactor_Mu22Trig->get_EfficiencyData(pt1,eta1))*m_ScaleFactor_MuTauTrig_TauLeg->get_EfficiencyData(pt2,eta2,dm));
     }
   }else{ // no cross-trigger  
     if( triggerFlags.find("mt24") != std::string::npos ){
-      return std::max(0.01,( m_ScaleFactor_Mu24Trig->get_EfficiencyData(pt1,eta1)
+      // Case 1: P = max[ 1.e-2, eff_L-eff(tau)*min[eff(L),eff(l)] ]
+      return std::max(0.01, m_ScaleFactor_Mu24Trig->get_EfficiencyData(pt1,eta1)
                             -std::min(m_ScaleFactor_Mu24Trig->get_EfficiencyData(pt1,eta1),m_ScaleFactor_MuTauTrig_MuLeg->get_EfficiencyData(pt1,eta1))
-                            *m_ScaleFactor_MuTauTrig_TauLeg->get_EfficiencyData(pt2,eta2,dm)));
+                            *m_ScaleFactor_MuTauTrig_TauLeg->get_EfficiencyData(pt2,eta2,dm));
     }else if( triggerFlags.find("mt22") != std::string::npos ){
-      return std::max(0.01,( m_ScaleFactor_Mu22Trig->get_EfficiencyData(pt1,eta1)
+      // Case 1: P = max[ 1.e-2, eff_L-eff(tau)*min[eff(L),eff(l)] ]
+      return std::max(0.01, m_ScaleFactor_Mu22Trig->get_EfficiencyData(pt1,eta1)
                             -std::min(m_ScaleFactor_Mu22Trig->get_EfficiencyData(pt1,eta1),m_ScaleFactor_MuTauTrig_MuLeg->get_EfficiencyData(pt1,eta1))
-                            *m_ScaleFactor_MuTauTrig_TauLeg->get_EfficiencyData(pt2,eta2,dm)));
+                            *m_ScaleFactor_MuTauTrig_TauLeg->get_EfficiencyData(pt2,eta2,dm));
     }
   }
   
@@ -193,9 +204,16 @@ double ScaleFactorTool::get_Efficiency_MuTauTrig_Data(double pt1, double eta1, d
 
 
 
-double ScaleFactorTool::get_ScaleFactor_MuTauTrig(double pt1, double eta1, double pt2, double eta2, int dm, std::string triggerFlags){
+double ScaleFactorTool::get_ScaleFactor_MuTauTrig(double pt1, double eta1, double pt2, double eta2, int dm, int genmatch_2, std::string triggerFlags){
   // numerical protection: SF = min(1.e+1, P_data / P_MC)
-  return std::min(10.0, get_Efficiency_MuTauTrig_Data(pt1,eta1,pt2,eta2,dm,triggerFlags)/get_Efficiency_MuTauTrig_MC(pt1,eta1,pt2,eta2,dm,triggerFlags));
+  bool isRealTau = genmatch_2==5;
+  return std::min(10.0, get_Efficiency_MuTauTrig_Data(pt1,eta1,pt2,eta2,dm,isRealTau,triggerFlags)/get_Efficiency_MuTauTrig_MC(pt1,eta1,pt2,eta2,dm,isRealTau,triggerFlags));
+}
+
+
+
+double ScaleFactorTool::get_ScaleFactor_Mu22Trig(double pt1, double eta1){
+  return m_ScaleFactor_Mu22Trig->get_ScaleFactor(pt1,eta1);
 }
 
 
@@ -206,7 +224,7 @@ double ScaleFactorTool::get_ScaleFactor_MuIdIso(double pt, double eta){
 
 
 
-double ScaleFactorTool::get_Efficiency_EleTauTrig_MC(double pt1, double eta1, double pt2, double eta2, int dm, std::string triggerFlags){
+double ScaleFactorTool::get_Efficiency_EleTauTrig_MC(double pt1, double eta1, double pt2, double eta2, int dm, bool isRealTau, std::string triggerFlags){
   
   // assume:
   //  - eff(X) = eff(l*tau) = eff(l)*eff(tau)
@@ -228,15 +246,20 @@ double ScaleFactorTool::get_Efficiency_EleTauTrig_MC(double pt1, double eta1, do
 
   if( triggerFlags.find("etx") != std::string::npos ){ // cross-trigger
     if( triggerFlags.find("et25") != std::string::npos or triggerFlags.find("et45") != std::string::npos ){
-      return std::min(m_ScaleFactor_EleTrig->get_EfficiencyMC(pt1,eta1),m_ScaleFactor_EleTauTrig_EleLeg->get_EfficiencyMC(pt1,eta1))*m_ScaleFactor_EleTauTrig_TauLeg->get_EfficiencyMC(pt2,eta2,dm);
+      // Case 1: P = max[ 1.e-2, eff(L)-eff(tau)*min(eff(L),eff(l)) ]
+      return std::min(m_ScaleFactor_EleTrig->get_EfficiencyMC(pt1,eta1),m_ScaleFactor_EleTauTrig_EleLeg->get_EfficiencyMC(pt1,eta1))*m_ScaleFactor_EleTauTrig_TauLeg->get_EfficiencyMC(pt2,eta2,dm,isRealTau);
     }else{
-      return std::max(0.01,(m_ScaleFactor_EleTauTrig_EleLeg->get_EfficiencyMC(pt1,eta1)-m_ScaleFactor_EleTrig->get_EfficiencyMC(pt1,eta1))*m_ScaleFactor_EleTauTrig_TauLeg->get_EfficiencyMC(pt2,eta2,dm));
+      // Case 2: P = max[ 1.e-2, eff(l)-eff(L)*eff(tau) ]
+      return std::max(0.01,(m_ScaleFactor_EleTauTrig_EleLeg->get_EfficiencyMC(pt1,eta1)
+                            -m_ScaleFactor_EleTrig->get_EfficiencyMC(pt1,eta1))
+                            *m_ScaleFactor_EleTauTrig_TauLeg->get_EfficiencyMC(pt2,eta2,dm,isRealTau));
     }
-  }else{ // no cross-trigger  
+  }else{ // no cross-trigger
     if( triggerFlags.find("et25") != std::string::npos or triggerFlags.find("et45") != std::string::npos ){
-      return std::max(0.01,( m_ScaleFactor_EleTrig->get_EfficiencyMC(pt1,eta1)
+      // Case 3: P = min[eff(L), eff(l)]*eff(tau)
+      return std::max(0.01, m_ScaleFactor_EleTrig->get_EfficiencyMC(pt1,eta1)
                             -std::min(m_ScaleFactor_EleTrig->get_EfficiencyMC(pt1,eta1),m_ScaleFactor_EleTauTrig_EleLeg->get_EfficiencyMC(pt1,eta1))
-                            *m_ScaleFactor_EleTauTrig_TauLeg->get_EfficiencyMC(pt2,eta2,dm)));
+                            *m_ScaleFactor_EleTauTrig_TauLeg->get_EfficiencyMC(pt2,eta2,dm,isRealTau));
     }
   }
   
@@ -246,7 +269,7 @@ double ScaleFactorTool::get_Efficiency_EleTauTrig_MC(double pt1, double eta1, do
 
 
 
-double ScaleFactorTool::get_Efficiency_EleTauTrig_Data(double pt1, double eta1, double pt2, double eta2, int dm, std::string triggerFlags){
+double ScaleFactorTool::get_Efficiency_EleTauTrig_Data(double pt1, double eta1, double pt2, double eta2, int dm, bool isRealTau, std::string triggerFlags){
   
   // assume:
   //  - eff(X) = eff(l*tau) = eff(l)*eff(tau)
@@ -262,21 +285,26 @@ double ScaleFactorTool::get_Efficiency_EleTauTrig_Data(double pt1, double eta1, 
   //
   // numerical protection:
   //  Case 1: P = max[ 1.e-2, eff(L)-eff(tau)*min(eff(L),eff(l)) ]
-  //  Case 2: P = max[ 1.e-2, eff(l)-eff(L)*eff(tau) ]
+  //  Case 2: P = max[ 1.e-2, (eff(l)-eff(L))*eff(tau) ]
   //  Case 3: P = min[eff(L), eff(l)]*eff(tau)
   //  SF = min[1.e+1, P_data / P_MC]
-
+  
   if( triggerFlags.find("etx") != std::string::npos ){ // cross-trigger
     if( triggerFlags.find("et25") != std::string::npos or triggerFlags.find("et45") != std::string::npos ){
+      // Case 3: P = min[eff(L), eff(l)]*eff(tau)
       return std::min(m_ScaleFactor_EleTrig->get_EfficiencyData(pt1,eta1),m_ScaleFactor_EleTauTrig_EleLeg->get_EfficiencyData(pt1,eta1))*m_ScaleFactor_EleTauTrig_TauLeg->get_EfficiencyData(pt2,eta2,dm);
     }else{
-      return std::max(0.01,(m_ScaleFactor_EleTauTrig_EleLeg->get_EfficiencyData(pt1,eta1)-m_ScaleFactor_EleTrig->get_EfficiencyData(pt1,eta1))*m_ScaleFactor_EleTauTrig_TauLeg->get_EfficiencyData(pt2,eta2,dm));
+      // Case 2: P = max[ 1.e-2, (eff(l)-eff(L))*eff(tau) ]
+      return std::max(0.01,( m_ScaleFactor_EleTauTrig_EleLeg->get_EfficiencyData(pt1,eta1)
+                            -m_ScaleFactor_EleTrig->get_EfficiencyData(pt1,eta1))
+                            *m_ScaleFactor_EleTauTrig_TauLeg->get_EfficiencyData(pt2,eta2,dm));
     }
-  }else{ // no cross-trigger  
+  }else{ // no cross-trigger
     if( triggerFlags.find("et25") != std::string::npos or triggerFlags.find("et45") != std::string::npos ){
-      return std::max(0.01,( m_ScaleFactor_EleTrig->get_EfficiencyData(pt1,eta1)
+      // Case 1: P = max[ 1.e-2, eff(L)-eff(tau)*min(eff(L),eff(l)) ]
+      return std::max(0.01, m_ScaleFactor_EleTrig->get_EfficiencyData(pt1,eta1)
                             -std::min(m_ScaleFactor_EleTrig->get_EfficiencyData(pt1,eta1),m_ScaleFactor_EleTauTrig_EleLeg->get_EfficiencyData(pt1,eta1))
-                            *m_ScaleFactor_EleTauTrig_TauLeg->get_EfficiencyData(pt2,eta2,dm)));
+                            *m_ScaleFactor_EleTauTrig_TauLeg->get_EfficiencyData(pt2,eta2,dm));
     }
   }
   
@@ -286,10 +314,16 @@ double ScaleFactorTool::get_Efficiency_EleTauTrig_Data(double pt1, double eta1, 
 
 
 
-
-double ScaleFactorTool::get_ScaleFactor_EleTauTrig(double pt1, double eta1, double pt2, double eta2, int dm, std::string triggerFlags){
+double ScaleFactorTool::get_ScaleFactor_EleTauTrig(double pt1, double eta1, double pt2, double eta2, int dm, int genmatch_2, std::string triggerFlags){
   // numerical protection: SF = min(1.e+1, P_data / P_MC)
-  return std::min(10.0, get_Efficiency_EleTauTrig_Data(pt1,eta1,pt2,eta2,dm,triggerFlags)/get_Efficiency_EleTauTrig_MC(pt1,eta1,pt2,eta2,dm,triggerFlags));
+  bool isRealTau = genmatch_2==5;
+  return std::min(10.0, get_Efficiency_EleTauTrig_Data(pt1,eta1,pt2,eta2,dm,isRealTau,triggerFlags)/get_Efficiency_EleTauTrig_MC(pt1,eta1,pt2,eta2,dm,isRealTau,triggerFlags));
+}
+
+
+
+double ScaleFactorTool::get_ScaleFactor_EleTrig(double pt1, double eta1){
+  return m_ScaleFactor_EleTrig->get_ScaleFactor(pt1,eta1);
 }
 
 
@@ -342,7 +376,7 @@ double ScaleFactorTool::get_Efficiency_EleMuTrig_MC(double pt1, double eta1, dou
 
 
 double ScaleFactorTool::get_Efficiency_EleMuTrig_Data(double pt1, double eta1, double pt2, double eta2, std::string triggerFlags){
-
+  
   // assume:
   //  - eff(X1) = eff(Ele12Mu23) = eff(Ele12)*eff(Mu23)
   //  - eff(X2) = eff(Ele23Mu8)  = eff(Ele23)*eff(Mu8)

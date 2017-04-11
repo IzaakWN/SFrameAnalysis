@@ -10,12 +10,12 @@ ScaleFactorTau::ScaleFactorTau(TString inputRootFile) {
 
 void ScaleFactorTau::init_ScaleFactor(TString inputRootFile){
 	// TODO: pass isoLabel as variable
-
+    
 	TFile* fileIn = new TFile(inputRootFile, "read");
 	// if root file not found
 	if (fileIn->IsZombie() ) { std::cout << "ERROR in ScaleFactorTau::init_ScaleFactor(TString inputRootFile) from NTupleMaker/src/ScaleFactor.cc : ‎File " <<inputRootFile << " does not exist. Please check. " <<std::endl; exit(1); };
 	
-	std::string isoLabel = "LooseIso";
+	std::string isoLabel = "TightIso"; // iso_2 = byTightIsolationMVArun2v1DBoldDMwLT
 	//std::string graphName;
 	std::vector<std::string> etaLabels = {"endcap","barrel"};
     
@@ -27,7 +27,7 @@ void ScaleFactorTau::init_ScaleFactor(TString inputRootFile){
       getGraph(fileIn,eff_mc_fakeTau,  etaLabel,"mc_fake_"     +etaLabel+"_"+isoLabel);
       
     }
-        
+    
     // for(auto const& label: eff_data_realTau)
     //   std::cout << "ScaleFactorTau::init_ScaleFactor: eff_data_realTau - eta label \"" << label.first << "\"" << std::endl;
     // std::cout << "ScaleFactorTau::init_ScaleFactor: eff_data_realTau.size() = " << eff_data_realTau.size() << std::endl;
@@ -161,7 +161,7 @@ std::string ScaleFactorTau::FindEtaLabel(std::map<std::string, TGraphAsymmErrors
     // }
     
     it = eff_map.find(etaLabel); // look without dm
-    if(it == eff_map.end()){
+    if(it == eff_map.end()){     // otherwise look with dm
       switch(dm){
         case  0: etaLabel+="_dm0";  break;
         case  1: etaLabel+="_dm1";  break;

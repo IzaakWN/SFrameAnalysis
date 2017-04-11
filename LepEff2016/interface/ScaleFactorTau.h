@@ -24,7 +24,6 @@ class ScaleFactorTau {
 	std::map<std::string,TGraphAsymmErrors*> eff_mc_realTau;
     
 	//TH1D * etaBinsH;
-    
     TGraphAsymmErrors* makeGraph(TGraphAsymmErrors*);
 	void SetAxisBins(TGraphAsymmErrors*);
 	bool check_SameBinning(TGraphAsymmErrors*, TGraphAsymmErrors*);
@@ -39,10 +38,10 @@ class ScaleFactorTau {
 		void getGraph(TFile*, std::map<std::string,TGraphAsymmErrors*>&, std::string, std::string);
 		double get_EfficiencyData(double, double, int, bool isReal = true); //pt, eta
 		double get_EfficiencyMC(  double, double, int, bool isReal = true);
-		double get_ScaleFactor(   double, double, int, bool isReal = true); 
-// 		double get_EfficiencyDataError(double, double);
-// 		double get_EfficiencyMCError(double, double);
-// 		double get_ScaleFactorError(double, double);
+		double get_ScaleFactor(   double, double, int, bool isReal = true);
+        // double get_EfficiencyDataError(double, double);
+        // double get_EfficiencyMCError(double, double);
+        // double get_ScaleFactorError(double, double);
     
 };
 

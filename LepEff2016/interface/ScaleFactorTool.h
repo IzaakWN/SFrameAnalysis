@@ -28,10 +28,11 @@ class ScaleFactorTool : public SToolBase {
     void BeginInputData( const SInputData& id ) throw( SError );
     
     // MUON
-    double get_Efficiency_MuTauTrig_MC(   double pt1, double eta1, double pt2, double eta2, int dm, std::string triggerFlags="mt" );
-    double get_Efficiency_MuTauTrig_Data( double pt1, double eta1, double pt2, double eta2, int dm, std::string triggerFlags="mt" );
-    double get_ScaleFactor_MuTauTrig(     double pt1, double eta1, double pt2, double eta2, int dm, std::string triggerFlags="mt" );
-    double get_ScaleFactor_MuIdIso(       double pt, double eta );
+    double get_Efficiency_MuTauTrig_MC(   double pt1, double eta1, double pt2, double eta2, int dm, bool isRealTau,   std::string triggerFlags="mt" );
+    double get_Efficiency_MuTauTrig_Data( double pt1, double eta1, double pt2, double eta2, int dm, bool isRealTau,   std::string triggerFlags="mt" );
+    double get_ScaleFactor_MuTauTrig(     double pt1, double eta1, double pt2, double eta2, int dm, int genmatch_2=5, std::string triggerFlags="mt" );
+    double get_ScaleFactor_Mu22Trig(      double pt1, double eta1 );
+    double get_ScaleFactor_MuIdIso(       double pt,  double eta  );
     std::string m_File_Mu22Trig;
     std::string m_File_Mu24Trig;
     std::string m_File_MuTauTrig_MuLeg;
@@ -39,19 +40,20 @@ class ScaleFactorTool : public SToolBase {
     std::string m_File_MuIdIso;
     
     // ELECTRON
-    double get_Efficiency_EleTauTrig_MC(   double pt1, double eta1, double pt2, double eta2, int dm, std::string triggerFlags="et" );
-    double get_Efficiency_EleTauTrig_Data( double pt1, double eta1, double pt2, double eta2, int dm, std::string triggerFlags="et" );
-    double get_ScaleFactor_EleTauTrig(     double pt1, double eta1, double pt2, double eta2, int dm, std::string triggerFlags="et" );
-    double get_ScaleFactor_EleIdIso(       double pt, double eta );
+    double get_Efficiency_EleTauTrig_MC(   double pt1, double eta1, double pt2, double eta2, int dm, bool isRealTau,   std::string triggerFlags="et" );
+    double get_Efficiency_EleTauTrig_Data( double pt1, double eta1, double pt2, double eta2, int dm, bool isRealTau,   std::string triggerFlags="et" );
+    double get_ScaleFactor_EleTauTrig(     double pt1, double eta1, double pt2, double eta2, int dm, int genmatch_2=5, std::string triggerFlags="et" );
+    double get_ScaleFactor_EleTrig(        double pt1, double eta1 );
+    double get_ScaleFactor_EleIdIso(       double pt,  double eta  );
     std::string m_File_EleTrig;
     std::string m_File_EleTauTrig_EleLeg;
     std::string m_File_EleTauTrig_TauLeg;
     std::string m_File_EleIdIso;
     
     // EMU
-    double get_Efficiency_EleMuTrig_MC(   double pt1, double eta1, double pt2, double eta2, std::string triggerFlags="em" );
-    double get_Efficiency_EleMuTrig_Data( double pt1, double eta1, double pt2, double eta2, std::string triggerFlags="em" );
-    double get_ScaleFactor_EleMuTrig(     double pt1, double eta1, double pt2, double eta2, std::string triggerFlags="em" );
+    double get_Efficiency_EleMuTrig_MC(      double pt1, double eta1, double pt2, double eta2, std::string triggerFlags="em" );
+    double get_Efficiency_EleMuTrig_Data(    double pt1, double eta1, double pt2, double eta2, std::string triggerFlags="em" );
+    double get_ScaleFactor_EleMuTrig(        double pt1, double eta1, double pt2, double eta2, std::string triggerFlags="em" );
     double get_Efficiency_EleMuTrig_OR_MC(   double pt1, double eta1, double pt2, double eta2 );
     double get_Efficiency_EleMuTrig_OR_Data( double pt1, double eta1, double pt2, double eta2 );
     double get_ScaleFactor_EleMuTrig_OR(     double pt1, double eta1, double pt2, double eta2 );

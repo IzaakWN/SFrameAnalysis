@@ -15,7 +15,7 @@ void ScaleFactorTau::init_ScaleFactor(TString inputRootFile){
 	// if root file not found
 	if (fileIn->IsZombie() ) { std::cout << "ERROR in ScaleFactorTau::init_ScaleFactor(TString inputRootFile) from NTupleMaker/src/ScaleFactor.cc : ‎File " <<inputRootFile << " does not exist. Please check. " <<std::endl; exit(1); };
 	
-	std::string isoLabel = "TightIso"; // iso_2 = byTightIsolationMVArun2v1DBoldDMwLT
+	std::string isoLabel = "LooseIso"; // HLT_IsoMu19_eta2p1_LooseIsoPFTau20_SingleL1_v
 	//std::string graphName;
 	std::vector<std::string> etaLabels = {"endcap","barrel"};
     
@@ -149,7 +149,7 @@ bool ScaleFactorTau::check_SameBinning(TGraphAsymmErrors* graph1, TGraphAsymmErr
 
 
 
-std::string ScaleFactorTau::FindEtaLabel(std::map<std::string, TGraphAsymmErrors*> eff_map, double eta, int dm){
+std::string ScaleFactorTau::FindEtaLabel(std::map<std::string,TGraphAsymmErrors*> eff_map, double eta, int dm){
     
 	std::string etaLabel;
 	if(fabs(eta)<1.5) etaLabel = "barrel";
@@ -238,8 +238,8 @@ double ScaleFactorTau::get_EfficiencyMC(double pt, double eta, int dm, bool isRe
 
 double ScaleFactorTau::get_ScaleFactor(double pt, double eta, int dm, bool isReal){
 	
-	double efficiency_data = get_EfficiencyData(pt,eta,dm);
-	double efficiency_mc = get_EfficiencyMC(pt,eta,dm);
+	double efficiency_data = get_EfficiencyData(pt,eta,dm,isReal);
+	double efficiency_mc = get_EfficiencyMC(pt,eta,dm,isReal);
 	double SF;
     
 	if(efficiency_mc!=0){ SF = efficiency_data/efficiency_mc; }

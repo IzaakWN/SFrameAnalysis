@@ -26,11 +26,6 @@ ScaleFactorTool::ScaleFactorTool(SCycleBase* parent, const char* name ):
   DeclareProperty( m_name+"_EleTauTrig_EleLeg", m_File_EleTauTrig_EleLeg = std::string(std::getenv("SFRAME_DIR")) + "/../LepEff2016/data/Electron/Run2016BtoH/Electron_Ele24_eff.root"                 );
   DeclareProperty( m_name+"_EleTauTrig_TauLeg", m_File_EleTauTrig_TauLeg = std::string(std::getenv("SFRAME_DIR")) + "/../LepEff2016/data/Electron/Run2016BtoH/Electron_TauWPLooseIsoPF.root"           );
   DeclareProperty( m_name+"_EleIdIso",          m_File_EleIdIso          = std::string(std::getenv("SFRAME_DIR")) + "/../LepEff2016/data/Electron/Run2016BtoH/Electron_IdIso_IsoLt0p1_eff.root"        );
-
-  DeclareProperty( m_name+"_EleMuTrig_Ele12Leg", m_File_EleMuTrig_Ele12Leg = std::string(std::getenv("SFRAME_DIR")) + "/../LepEff2016/data/Electron/Run2016BtoH/Electron_Ele12leg_eff.root"            );
-  DeclareProperty( m_name+"_EleMuTrig_Ele23Leg", m_File_EleMuTrig_Ele23Leg = std::string(std::getenv("SFRAME_DIR")) + "/../LepEff2016/data/Electron/Run2016BtoH/Electron_Ele23leg_eff.root"            );
-  DeclareProperty( m_name+"_EleMuTrig_Mu8Leg",   m_File_EleMuTrig_Mu8Leg   = std::string(std::getenv("SFRAME_DIR")) + "/../LepEff2016/data/Muon/Run2016BtoH/Muon_Mu8leg_2016BtoH_eff.root"             );
-  DeclareProperty( m_name+"_EleMuTrig_Mu23Leg",  m_File_EleMuTrig_Mu23Leg  = std::string(std::getenv("SFRAME_DIR")) + "/../LepEff2016/data/Muon/Run2016BtoH/Muon_Mu23leg_2016BtoH_eff.root"            );
 }
 
 
@@ -47,10 +42,6 @@ void ScaleFactorTool::BeginInputData( const SInputData& ) throw( SError ) {
   m_logger << INFO << "Efficiency file EleTau Trig Ele Leg: "   << m_File_EleTauTrig_EleLeg << SLogger::endmsg;
   m_logger << INFO << "Efficiency file EleTau Trig Tau Leg: "   << m_File_EleTauTrig_TauLeg << SLogger::endmsg;
   m_logger << INFO << "Efficiency file Ele IdIso: "             << m_File_EleIdIso          << SLogger::endmsg;
-  m_logger << INFO << "Efficiency file EleMu Trig Ele12 Leg: "  << m_File_EleMuTrig_Ele12Leg << SLogger::endmsg;
-  m_logger << INFO << "Efficiency file EleMu Trig Ele23 Leg: "  << m_File_EleMuTrig_Ele23Leg << SLogger::endmsg;
-  m_logger << INFO << "Efficiency file EleMu Trig Mu8 Leg: "    << m_File_EleMuTrig_Mu8Leg   << SLogger::endmsg;
-  m_logger << INFO << "Efficiency file EleMu Trig Mu23 Leg: "   << m_File_EleMuTrig_Mu23Leg  << SLogger::endmsg;
   
   m_ScaleFactor_Mu22Trig          = new ScaleFactor( m_File_Mu22Trig );
   m_logger << INFO << "Scale factor Mu22 Trig initialised" << SLogger:: endmsg;
@@ -78,19 +69,7 @@ void ScaleFactorTool::BeginInputData( const SInputData& ) throw( SError ) {
   
   m_ScaleFactor_EleIdIso          = new ScaleFactor( m_File_EleIdIso );
   m_logger << INFO << "Scale factor Ele IdIso initialised" << SLogger:: endmsg;
-  
-  m_ScaleFactor_EleMuTrig_Ele12Leg = new ScaleFactor( m_File_EleMuTrig_Ele12Leg );
-  m_logger << INFO << "Scale factor EleMu Trig Ele 12 Leg initialised" << SLogger:: endmsg;
-  
-  m_ScaleFactor_EleMuTrig_Ele23Leg = new ScaleFactor( m_File_EleMuTrig_Ele23Leg );
-  m_logger << INFO << "Scale factor EleMu Trig Ele 23 Leg initialised" << SLogger:: endmsg;
-  
-  m_ScaleFactor_EleMuTrig_Mu8Leg   = new ScaleFactor( m_File_EleMuTrig_Mu8Leg );
-  m_logger << INFO << "Scale factor EleMu Trig Mu 8 Leg initialised" << SLogger:: endmsg;
-  
-  m_ScaleFactor_EleMuTrig_Mu23Leg  = new ScaleFactor( m_File_EleMuTrig_Mu23Leg );
-  m_logger << INFO << "Scale factor EleMu Trig Mu 23 Leg initialised" << SLogger:: endmsg;
-  
+    
   return;
 }
 
@@ -176,25 +155,25 @@ double ScaleFactorTool::get_Efficiency_MuTauTrig_Data(double pt1, double eta1, d
   if( triggerFlags.find("mtx") != std::string::npos ){ // cross-trigger
     if( triggerFlags.find("mt24") != std::string::npos ){
       // Case 3: P = min[eff(L), eff(l)]*eff_tau
-      return std::min(m_ScaleFactor_Mu24Trig->get_EfficiencyData(pt1,eta1),m_ScaleFactor_MuTauTrig_MuLeg->get_EfficiencyData(pt1,eta1))*m_ScaleFactor_MuTauTrig_TauLeg->get_EfficiencyData(pt2,eta2,dm);
+      return std::min(m_ScaleFactor_Mu24Trig->get_EfficiencyData(pt1,eta1),m_ScaleFactor_MuTauTrig_MuLeg->get_EfficiencyData(pt1,eta1))*m_ScaleFactor_MuTauTrig_TauLeg->get_EfficiencyData(pt2,eta2,dm,isRealTau);
     }else if( triggerFlags.find("mt22") != std::string::npos ){
       // Case 3: P = min[eff(L), eff(l)]*eff_tau
-      return std::min(m_ScaleFactor_Mu22Trig->get_EfficiencyData(pt1,eta1),m_ScaleFactor_MuTauTrig_MuLeg->get_EfficiencyData(pt1,eta1))*m_ScaleFactor_MuTauTrig_TauLeg->get_EfficiencyData(pt2,eta2,dm);
+      return std::min(m_ScaleFactor_Mu22Trig->get_EfficiencyData(pt1,eta1),m_ScaleFactor_MuTauTrig_MuLeg->get_EfficiencyData(pt1,eta1))*m_ScaleFactor_MuTauTrig_TauLeg->get_EfficiencyData(pt2,eta2,dm,isRealTau);
     }else{
       // Case 2: P = max[ 1.e-2, [eff(l)-eff(L)*eff(tau) ]
-      return std::max(0.01,(m_ScaleFactor_MuTauTrig_MuLeg->get_EfficiencyData(pt1,eta1)-m_ScaleFactor_Mu22Trig->get_EfficiencyData(pt1,eta1))*m_ScaleFactor_MuTauTrig_TauLeg->get_EfficiencyData(pt2,eta2,dm));
+      return std::max(0.01,(m_ScaleFactor_MuTauTrig_MuLeg->get_EfficiencyData(pt1,eta1)-m_ScaleFactor_Mu22Trig->get_EfficiencyData(pt1,eta1))*m_ScaleFactor_MuTauTrig_TauLeg->get_EfficiencyData(pt2,eta2,dm,isRealTau));
     }
   }else{ // no cross-trigger  
     if( triggerFlags.find("mt24") != std::string::npos ){
       // Case 1: P = max[ 1.e-2, eff_L-eff(tau)*min[eff(L),eff(l)] ]
       return std::max(0.01, m_ScaleFactor_Mu24Trig->get_EfficiencyData(pt1,eta1)
                             -std::min(m_ScaleFactor_Mu24Trig->get_EfficiencyData(pt1,eta1),m_ScaleFactor_MuTauTrig_MuLeg->get_EfficiencyData(pt1,eta1))
-                            *m_ScaleFactor_MuTauTrig_TauLeg->get_EfficiencyData(pt2,eta2,dm));
+                            *m_ScaleFactor_MuTauTrig_TauLeg->get_EfficiencyData(pt2,eta2,dm,isRealTau));
     }else if( triggerFlags.find("mt22") != std::string::npos ){
       // Case 1: P = max[ 1.e-2, eff_L-eff(tau)*min[eff(L),eff(l)] ]
       return std::max(0.01, m_ScaleFactor_Mu22Trig->get_EfficiencyData(pt1,eta1)
                             -std::min(m_ScaleFactor_Mu22Trig->get_EfficiencyData(pt1,eta1),m_ScaleFactor_MuTauTrig_MuLeg->get_EfficiencyData(pt1,eta1))
-                            *m_ScaleFactor_MuTauTrig_TauLeg->get_EfficiencyData(pt2,eta2,dm));
+                            *m_ScaleFactor_MuTauTrig_TauLeg->get_EfficiencyData(pt2,eta2,dm,isRealTau));
     }
   }
   
@@ -206,8 +185,27 @@ double ScaleFactorTool::get_Efficiency_MuTauTrig_Data(double pt1, double eta1, d
 
 double ScaleFactorTool::get_ScaleFactor_MuTauTrig(double pt1, double eta1, double pt2, double eta2, int dm, int genmatch_2, std::string triggerFlags){
   // numerical protection: SF = min(1.e+1, P_data / P_MC)
-  bool isRealTau = genmatch_2==5;
-  return std::min(10.0, get_Efficiency_MuTauTrig_Data(pt1,eta1,pt2,eta2,dm,isRealTau,triggerFlags)/get_Efficiency_MuTauTrig_MC(pt1,eta1,pt2,eta2,dm,isRealTau,triggerFlags));
+  //bool isRealTau = genmatch_2==5;
+  return std::min(10.0, get_Efficiency_MuTauTrig_Data(pt1,eta1,pt2,eta2,dm,genmatch_2==5,triggerFlags)/get_Efficiency_MuTauTrig_MC(pt1,eta1,pt2,eta2,dm,genmatch_2==5,triggerFlags));
+}
+
+
+
+double ScaleFactorTool::get_ScaleFactor_MuTauTrig_OR(double pt1, double eta1, double pt2, double eta2, int dm, int genmatch_2, std::string triggerFlags){
+  if( pt1>23 and triggerFlags.find("mt22")!=std::string::npos ){
+    return m_ScaleFactor_Mu22Trig->get_ScaleFactor(pt1,eta1);
+  }else{ //if(triggerFlags.find("mtx")!=std::string::npos){
+    // if(pt1<21){
+    //   double sf1 = m_ScaleFactor_MuTauTrig_MuLeg->get_ScaleFactor(pt1,eta1);
+    //   double sf2 = m_ScaleFactor_MuTauTrig_TauLeg->get_ScaleFactor(pt2,eta2,dm,genmatch_2==5);
+    //   std::cout << ">>> triggerFlags="<<triggerFlags<< std::endl;
+    //   std::cout << ">>> m_ScaleFactor_MuTauTrig_MuLeg->get_ScaleFactor("<<pt1<<","<<eta1<<")="<<sf1<<std::endl;
+    //   std::cout << ">>> m_ScaleFactor_MuTauTrig_TauLeg->get_ScaleFactor("<<pt2<<","<<eta2<<","<<dm<<","<<(genmatch_2==5)<<")="<<sf2<<std::endl;
+    //   std::cout << ">>> product="<<sf1*sf2<<std::endl;
+    // }
+    return  m_ScaleFactor_MuTauTrig_MuLeg->get_ScaleFactor(pt1,eta1)
+           *m_ScaleFactor_MuTauTrig_TauLeg->get_ScaleFactor(pt2,eta2,dm,genmatch_2==5);
+  }
 }
 
 
@@ -292,19 +290,19 @@ double ScaleFactorTool::get_Efficiency_EleTauTrig_Data(double pt1, double eta1, 
   if( triggerFlags.find("etx") != std::string::npos ){ // cross-trigger
     if( triggerFlags.find("et25") != std::string::npos or triggerFlags.find("et45") != std::string::npos ){
       // Case 3: P = min[eff(L), eff(l)]*eff(tau)
-      return std::min(m_ScaleFactor_EleTrig->get_EfficiencyData(pt1,eta1),m_ScaleFactor_EleTauTrig_EleLeg->get_EfficiencyData(pt1,eta1))*m_ScaleFactor_EleTauTrig_TauLeg->get_EfficiencyData(pt2,eta2,dm);
+      return std::min(m_ScaleFactor_EleTrig->get_EfficiencyData(pt1,eta1),m_ScaleFactor_EleTauTrig_EleLeg->get_EfficiencyData(pt1,eta1))*m_ScaleFactor_EleTauTrig_TauLeg->get_EfficiencyData(pt2,eta2,dm,isRealTau);
     }else{
       // Case 2: P = max[ 1.e-2, (eff(l)-eff(L))*eff(tau) ]
       return std::max(0.01,( m_ScaleFactor_EleTauTrig_EleLeg->get_EfficiencyData(pt1,eta1)
                             -m_ScaleFactor_EleTrig->get_EfficiencyData(pt1,eta1))
-                            *m_ScaleFactor_EleTauTrig_TauLeg->get_EfficiencyData(pt2,eta2,dm));
+                            *m_ScaleFactor_EleTauTrig_TauLeg->get_EfficiencyData(pt2,eta2,dm,isRealTau));
     }
   }else{ // no cross-trigger
     if( triggerFlags.find("et25") != std::string::npos or triggerFlags.find("et45") != std::string::npos ){
       // Case 1: P = max[ 1.e-2, eff(L)-eff(tau)*min(eff(L),eff(l)) ]
       return std::max(0.01, m_ScaleFactor_EleTrig->get_EfficiencyData(pt1,eta1)
                             -std::min(m_ScaleFactor_EleTrig->get_EfficiencyData(pt1,eta1),m_ScaleFactor_EleTauTrig_EleLeg->get_EfficiencyData(pt1,eta1))
-                            *m_ScaleFactor_EleTauTrig_TauLeg->get_EfficiencyData(pt2,eta2,dm));
+                            *m_ScaleFactor_EleTauTrig_TauLeg->get_EfficiencyData(pt2,eta2,dm,isRealTau));
     }
   }
   
@@ -316,8 +314,18 @@ double ScaleFactorTool::get_Efficiency_EleTauTrig_Data(double pt1, double eta1, 
 
 double ScaleFactorTool::get_ScaleFactor_EleTauTrig(double pt1, double eta1, double pt2, double eta2, int dm, int genmatch_2, std::string triggerFlags){
   // numerical protection: SF = min(1.e+1, P_data / P_MC)
-  bool isRealTau = genmatch_2==5;
-  return std::min(10.0, get_Efficiency_EleTauTrig_Data(pt1,eta1,pt2,eta2,dm,isRealTau,triggerFlags)/get_Efficiency_EleTauTrig_MC(pt1,eta1,pt2,eta2,dm,isRealTau,triggerFlags));
+  return std::min(10.0, get_Efficiency_EleTauTrig_Data(pt1,eta1,pt2,eta2,dm,genmatch_2==5,triggerFlags)/get_Efficiency_EleTauTrig_MC(pt1,eta1,pt2,eta2,dm,genmatch_2==5,triggerFlags));
+}
+
+
+
+double ScaleFactorTool::get_ScaleFactor_EleTauTrig_OR(double pt1, double eta1, double pt2, double eta2, int dm, int genmatch_2, std::string triggerFlags){
+  if( pt1>26 and (triggerFlags.find("et25")!=std::string::npos or triggerFlags.find("et45")!=std::string::npos) ){
+    return m_ScaleFactor_EleTrig->get_ScaleFactor(pt1,eta1);
+  }else{ //if(triggerFlags.find("etx")!=std::string::npos){
+    return  m_ScaleFactor_EleTauTrig_EleLeg->get_ScaleFactor(pt1,eta1)
+           *m_ScaleFactor_EleTauTrig_TauLeg->get_ScaleFactor(pt2,eta2,dm,genmatch_2==5);
+  }
 }
 
 
@@ -331,130 +339,3 @@ double ScaleFactorTool::get_ScaleFactor_EleTrig(double pt1, double eta1){
 double ScaleFactorTool::get_ScaleFactor_EleIdIso(double pt, double eta){
   return m_ScaleFactor_EleIdIso->get_ScaleFactor(pt,eta);
 }
-
-
-
-double ScaleFactorTool::get_Efficiency_EleMuTrig_MC(double pt1, double eta1, double pt2, double eta2, std::string triggerFlags){
-
-  // assume:
-  //  - eff(X1) = eff(Ele12Mu23) = eff(Ele12)*eff(Mu23)
-  //  - eff(X2) = eff(Ele23Mu8)  = eff(Ele23)*eff(Mu8)
-  //  - Ele23 fired  => Ele12 fired
-  //  - eff(Ele23) < eff(Ele12)
-  //  - Mu23 fired  => Mu8 fired
-  //  - eff(Mu23)  < eff(Mu8)
-  //
-  // https://twiki.cern.ch/twiki/bin/viewauth/CMS/HiggsToTauTauWorking2016#Muon_efficiencies
-  //
-  //  P( X1  OR  X2) = eff(Ele12)*eff(Mu23) + eff(Ele23)*eff(Mu8) - eff(Ele23)*eff(Mu23)
-  //  P( X1 AND  X2) = eff(Ele23)*eff(Mu23)
-  //  P( X1 AND !X2) = eff(Ele12)*eff(Mu23)*[eff(Ele8)-eff(Ele23)] 
-  //  P(!X1 AND  X2) = eff(Ele23)*eff(Mu8) *[eff(Mu12)-eff(Mu8)  ]
-  //
-  // numerical protection:
-  //  P( X1 AND  X2) = eff(Ele23)*eff(Mu23)
-  //  P( X1 AND !X2) = max[1.e-2, eff(Ele12)*eff(Mu23)*[eff(Ele8)-eff(Ele23)]]
-  //  P(!X1 AND  X2) = max[1.e-2, eff(Ele23)*eff(Mu8) *[eff(Mu12)-eff(Mu8)  ]]
-  //
-  
-  if( triggerFlags.find("e12m23") != std::string::npos ){
-    if( triggerFlags.find("e23m8") != std::string::npos )
-      return m_ScaleFactor_EleMuTrig_Ele23Leg->get_EfficiencyMC(pt1,eta1) * m_ScaleFactor_EleMuTrig_Mu23Leg->get_EfficiencyMC(pt2,eta2);
-    else
-      return std::max(0.01, (m_ScaleFactor_EleMuTrig_Ele12Leg->get_EfficiencyMC(pt1,eta1) - m_ScaleFactor_EleMuTrig_Ele23Leg->get_EfficiencyMC(pt1,eta1))
-                           * m_ScaleFactor_EleMuTrig_Ele12Leg->get_EfficiencyMC(pt1,eta1) * m_ScaleFactor_EleMuTrig_Mu23Leg->get_EfficiencyMC(pt2,eta2));
-  }else{
-    if( triggerFlags.find("e23m8") != std::string::npos )
-      return std::max(0.01, (m_ScaleFactor_EleMuTrig_Mu8Leg->get_EfficiencyMC(pt2,eta2)   - m_ScaleFactor_EleMuTrig_Mu23Leg->get_EfficiencyMC(pt2,eta2))
-                           * m_ScaleFactor_EleMuTrig_Ele23Leg->get_EfficiencyMC(pt1,eta1) * m_ScaleFactor_EleMuTrig_Mu8Leg->get_EfficiencyMC(pt2,eta2));
-  }
-  
-  std::cout << ">>> ScaleFactorTool::get_Efficiency_EleMuTrig_MC - no trigger fired? triggerFlags=" << triggerFlags << std::endl;
-  return 0.;
-}
-
-
-
-double ScaleFactorTool::get_Efficiency_EleMuTrig_Data(double pt1, double eta1, double pt2, double eta2, std::string triggerFlags){
-  
-  // assume:
-  //  - eff(X1) = eff(Ele12Mu23) = eff(Ele12)*eff(Mu23)
-  //  - eff(X2) = eff(Ele23Mu8)  = eff(Ele23)*eff(Mu8)
-  //  - Ele23 fired  => Ele12 fired
-  //  - eff(Ele23) < eff(Ele12)
-  //  - Mu23 fired  => Mu8 fired
-  //  - eff(Mu23)  < eff(Mu8)
-  //
-  // https://twiki.cern.ch/twiki/bin/viewauth/CMS/HiggsToTauTauWorking2016#Muon_efficiencies
-  //
-  // P( X1  OR  X2) = eff(Ele12)*eff(Mu23) + eff(Ele23)*eff(Mu8) - eff(Ele23)*eff(Mu23)
-  // P( X1 AND  X2) = eff(Ele23)*eff(Mu23)
-  // P( X1 AND !X2) = eff(Ele12)*eff(Mu23)*[eff(Ele8)-eff(Ele23)] 
-  // P(!X1 AND  X2) = eff(Ele23)*eff(Mu8) *[eff(Mu12)-eff(Mu8)  ]
-  //
-  // numerical protection:
-  //  P( X1 AND  X2) = eff(Ele23)*eff(Mu23)
-  //  P( X1 AND !X2) = max[1.e-2, eff(Ele12)*eff(Mu23)*[eff(Ele8)-eff(Ele23)]]
-  //  P(!X1 AND  X2) = max[1.e-2, eff(Ele23)*eff(Mu8) *[eff(Mu12)-eff(Mu8)  ]]
-  //
-  
-  if( triggerFlags.find("e12m23") != std::string::npos ){
-    if( triggerFlags.find("e23m8") != std::string::npos )
-      return m_ScaleFactor_EleMuTrig_Ele23Leg->get_EfficiencyData(pt1,eta1) * m_ScaleFactor_EleMuTrig_Mu23Leg->get_EfficiencyData(pt2,eta2);
-    else
-      return std::max(0.01, (m_ScaleFactor_EleMuTrig_Ele12Leg->get_EfficiencyData(pt1,eta1) - m_ScaleFactor_EleMuTrig_Ele23Leg->get_EfficiencyData(pt1,eta1))
-                           * m_ScaleFactor_EleMuTrig_Ele12Leg->get_EfficiencyData(pt1,eta1) * m_ScaleFactor_EleMuTrig_Mu23Leg->get_EfficiencyData(pt2,eta2));
-  }else{
-    if( triggerFlags.find("e23m8") != std::string::npos )
-      return std::max(0.01, (m_ScaleFactor_EleMuTrig_Mu8Leg->get_EfficiencyData(pt2,eta2)   - m_ScaleFactor_EleMuTrig_Mu23Leg->get_EfficiencyData(pt2,eta2))
-                           * m_ScaleFactor_EleMuTrig_Ele23Leg->get_EfficiencyData(pt1,eta1) * m_ScaleFactor_EleMuTrig_Mu8Leg->get_EfficiencyData(pt2,eta2));
-  }
-  
-  std::cout << ">>> ScaleFactorTool::get_Efficiency_EleMuTrig_Data - no trigger fired? triggerFlags=" << triggerFlags << std::endl;
-  return 0.;
-}
-
-
-
-double ScaleFactorTool::get_ScaleFactor_EleMuTrig(double pt1, double eta1, double pt2, double eta2, std::string triggerFlags){
-  // https://indico.cern.ch/event/605295/contributions/2454799/attachments/1402337/2141040/leptonSF_260117.pdf
-  // B : 5.8/fb (5788.348/pb)
-  // C: 2.6/fb (2573.399/pb)
-  // D: 4.2/fb (4248.384/pb)
-  // E: 4.0/fb (4009.132/pb)
-  // F: 3.1/fb (3101.618/pb)
-  // G: 7.5/fb (7540.488/pb)
-  // H: 8.6/fb (8605.690/pb)
-  // 7540.488/pb+8605.690/pb=16,146.178/pb = 16.1/fb
-  // 5788.348/pb+2573.399/pb+4248.384/pb+4009.132/pb+3101.618/pb=19,720.881/pb = 19.7/fb
-  // (19.7+16.1*0.953)/35.9 = 0.9761
-  // (16,146.178+19,720.881*0.953)/35,867.059 = 0.9742
-  return 0.9742*std::min(10.0, get_Efficiency_EleMuTrig_Data(pt1,eta1,pt2,eta2,triggerFlags)/get_Efficiency_EleMuTrig_MC(pt1,eta1,pt2,eta2,triggerFlags));
-}
-
-
-
-double ScaleFactorTool::get_Efficiency_EleMuTrig_OR_MC(double pt1, double eta1, double pt2, double eta2){
-  //  P( X1 OR X2) = eff(Ele12)*eff(Mu23) + eff(Ele23)*eff(Mu8) - eff(Ele23)*eff(Mu23)
-  return   m_ScaleFactor_EleMuTrig_Ele12Leg->get_EfficiencyMC(pt1,eta1) * m_ScaleFactor_EleMuTrig_Mu23Leg->get_EfficiencyMC(pt2,eta2)
-         + m_ScaleFactor_EleMuTrig_Ele23Leg->get_EfficiencyMC(pt1,eta1) * m_ScaleFactor_EleMuTrig_Mu8Leg->get_EfficiencyMC(pt2,eta2)
-         - m_ScaleFactor_EleMuTrig_Ele23Leg->get_EfficiencyMC(pt1,eta1) * m_ScaleFactor_EleMuTrig_Mu23Leg->get_EfficiencyMC(pt2,eta2);
-}
-
-
-
-double ScaleFactorTool::get_Efficiency_EleMuTrig_OR_Data(double pt1, double eta1, double pt2, double eta2){
-  //  P( X1 OR X2) = eff(Ele12)*eff(Mu23) + eff(Ele23)*eff(Mu8) - eff(Ele23)*eff(Mu23)
-  return   m_ScaleFactor_EleMuTrig_Ele12Leg->get_EfficiencyData(pt1,eta1) * m_ScaleFactor_EleMuTrig_Mu23Leg->get_EfficiencyData(pt2,eta2)
-         + m_ScaleFactor_EleMuTrig_Ele23Leg->get_EfficiencyData(pt1,eta1) * m_ScaleFactor_EleMuTrig_Mu8Leg->get_EfficiencyData(pt2,eta2)
-         - m_ScaleFactor_EleMuTrig_Ele23Leg->get_EfficiencyData(pt1,eta1) * m_ScaleFactor_EleMuTrig_Mu23Leg->get_EfficiencyData(pt2,eta2);
-}
-
-
-
-double ScaleFactorTool::get_ScaleFactor_EleMuTrig_OR(double pt1, double eta1, double pt2, double eta2){
-  return 0.9742*std::min(10.0, get_Efficiency_EleMuTrig_OR_Data(pt1,eta1,pt2,eta2)
-                             / std::max(0.01, get_Efficiency_EleMuTrig_OR_MC(pt1,eta1,pt2,eta2)));
-}
-
-

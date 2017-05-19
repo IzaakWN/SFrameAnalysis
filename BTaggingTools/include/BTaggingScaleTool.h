@@ -37,7 +37,7 @@ class BTaggingScaleTool : public SToolBase {
   
   /// functions for efficiencies
   void bookHistograms();
-  void fillEfficiencies( const UZH::JetVec& vJets );
+  void fillEfficiencies( const UZH::JetVec& vJets, std::string channel="" );
   void readEfficiencies();
   double getEfficiency( const double& pt, const double& eta, const int& flavour, const TString& jetCategory = "jet_ak4" );
   double getEfficiency( const UZH::Jet& jet, const TString& jetCategory = "jet_ak4" );

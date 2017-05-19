@@ -31,14 +31,14 @@ class ScaleFactorTau {
     int FindPtBin( std::map<std::string, TGraphAsymmErrors *>, std::string, double);
     
 	public:
-		ScaleFactorTau(){};
+		ScaleFactorTau(){ };
 		ScaleFactorTau(TString);
-		~ ScaleFactorTau(){};
+		~ ScaleFactorTau(){ };
 		void init_ScaleFactor(TString);
 		void getGraph(TFile*, std::map<std::string,TGraphAsymmErrors*>&, std::string, std::string);
-		double get_EfficiencyData(double, double, int, bool isReal = true); //pt, eta
-		double get_EfficiencyMC(  double, double, int, bool isReal = true);
-		double get_ScaleFactor(   double, double, int, bool isReal = true);
+		double get_EfficiencyData(double pt, double eta, int dm, bool isReal=true); //pt, eta
+		double get_EfficiencyMC(  double pt, double eta, int dm, bool isReal=true);
+		double get_ScaleFactor(   double pt, double eta, int dm, bool isReal=true);
         // double get_EfficiencyDataError(double, double);
         // double get_EfficiencyMCError(double, double);
         // double get_ScaleFactorError(double, double);

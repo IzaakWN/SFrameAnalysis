@@ -28,7 +28,7 @@ BTaggingScaleTool::BTaggingScaleTool( SCycleBase* parent, const char* name ) :
   DeclareProperty( m_name + "_MeasurementType_bc", m_measurementType_bc = "mujets" ); // for AK4 jets; for AK8 jets, use "lt"
   
   DeclareProperty( m_name + "_EffHistDirectory", m_effHistDirectory = "bTagEff" );
-  DeclareProperty( m_name + "_EffFile", m_effFile = sframe_dir + "/../BTaggingTools/efficiencies/bTagEffs_36p8_vMediumAk4_LooseAk8_lepVeto.root" ); // bTagEffs_15p9_v3.root
+  DeclareProperty( m_name + "_EffFile", m_effFile = sframe_dir + "/../BTaggingTools/efficiencies/bTagEffs_HTT_baseline.root" );
 
 }
 
@@ -322,28 +322,32 @@ void BTaggingScaleTool::bookHistograms() {
   const int nEtaBins = 4;
   float ptBins[nPtBins+1] = {10, 20, 30, 50, 70, 100, 140, 200, 300, 670, 1000, 1500};
   float etaBins[nEtaBins+1] = {-2.5, -1.5, 0, 1.5, 2.5};
+  std::string directories[3] = {m_effHistDirectory, m_effHistDirectory+"_mutau", m_effHistDirectory+"_etau"};
   
-  for (std::vector<TString>::const_iterator flav = m_flavours.begin(); flav != m_flavours.end(); ++flav) {
-    Book( TH2F("jet_ak4_" + *flav + "_" + m_workingPoint, "jet_ak4_" + *flav + "_" + m_workingPoint, nPtBins, ptBins, nEtaBins, etaBins ), m_effHistDirectory.c_str() );
-    Book( TH2F("jet_ak4_" + *flav + "_all", "jet_ak4_" + *flav + "_all", nPtBins, ptBins, nEtaBins, etaBins ), m_effHistDirectory.c_str() );
+  for(const std::string &directory: directories){
+    for(std::vector<TString>::const_iterator flav = m_flavours.begin(); flav != m_flavours.end(); ++flav){
+      Book( TH2F("jet_ak4_"+*flav+"_"+m_workingPoint, "jet_ak4_"+*flav+"_"+m_workingPoint, nPtBins, ptBins, nEtaBins, etaBins), directory.c_str() );
+      Book( TH2F("jet_ak4_"+*flav+"_all",             "jet_ak4_"+*flav+"_all",             nPtBins, ptBins, nEtaBins, etaBins), directory.c_str() );
+    }
   }
-
-  
 }
 
 
 
-void BTaggingScaleTool::fillEfficiencies( const UZH::JetVec& vJets ) {
+void BTaggingScaleTool::fillEfficiencies( const UZH::JetVec& vJets, std::string channel ) {
   
-  for (std::vector< UZH::Jet>::const_iterator itJet = vJets.begin(); itJet < vJets.end(); ++itJet) {
-    m_logger << DEBUG << "Looking at jet " << itJet - vJets.begin()
-	     << ", pT=" << (*itJet).pt() << ", eta=" << (*itJet).eta()
-	     << SLogger::endmsg;
+  std::string directory = m_effHistDirectory;
+  if(channel!="") directory=directory+"_"+channel;
+  
+  for(std::vector< UZH::Jet>::const_iterator itJet = vJets.begin(); itJet < vJets.end(); ++itJet){
+    // m_logger << DEBUG << "Looking at jet " << itJet - vJets.begin()
+    //      << ", pT=" << (*itJet).pt() << ", eta=" << (*itJet).eta()
+    //      << SLogger::endmsg;
     TString flavourString = flavourToString(itJet->hadronFlavour());
-    if (isTagged(*itJet)) {
-      Hist( "jet_ak4_" + flavourString + "_" + m_workingPoint, m_effHistDirectory.c_str() )->Fill( itJet->pt(), itJet->eta() );
+    if(isTagged(*itJet)){
+      Hist("jet_ak4_"+flavourString+"_"+m_workingPoint, directory.c_str())->Fill(itJet->pt(), itJet->eta());
     }
-    Hist( "jet_ak4_" + flavourString + "_all", m_effHistDirectory.c_str() )->Fill( itJet->pt(), itJet->eta() );
+    Hist(  "jet_ak4_"+flavourString+"_all",             directory.c_str())->Fill(itJet->pt(), itJet->eta());
   }
   
 }
@@ -356,9 +360,9 @@ void BTaggingScaleTool::readEfficiencies() {
   auto inFile = TFile::Open(m_effFile.c_str());
   
   for (std::vector<TString>::const_iterator flav = m_flavours.begin(); flav != m_flavours.end(); ++flav) {
-    auto hPass = (TH2F*) inFile->Get( m_effHistDirectory + "/" + "jet_ak4_" + *flav + "_" + m_workingPoint);
-    auto hAll = (TH2F*) inFile->Get( m_effHistDirectory + "/" + "jet_ak4_" + *flav + "_all");
-    TH2F hEff = *((TH2F*) hPass->Clone( m_effHistDirectory + "_jet_ak4_" + *flav + "_" + m_workingPoint ));
+    auto hPass =   (TH2F*) inFile->Get(  m_effHistDirectory + "/" + "jet_ak4_" + *flav + "_" + m_workingPoint);
+    auto hAll  =   (TH2F*) inFile->Get(  m_effHistDirectory + "/" + "jet_ak4_" + *flav + "_all");
+    TH2F hEff  = *((TH2F*) hPass->Clone( m_effHistDirectory + "_jet_ak4_" + *flav + "_" + m_workingPoint ));
     hEff.Divide(hAll);
     m_effMaps[( "jet_ak4_" + *flav + "_" + m_workingPoint).Data()] = hEff;
     m_logger << DEBUG << "effi TH2D binsx: " << hEff.GetNbinsX() << " binsy: " << hEff.GetNbinsY() << SLogger::endmsg;

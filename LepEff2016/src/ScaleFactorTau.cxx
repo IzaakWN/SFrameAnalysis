@@ -211,40 +211,41 @@ double ScaleFactorTau::get_EfficiencyData(double pt, double eta, int dm, bool is
 	if (eff<0.){std::cout << "WARNING in ScaleFactorTau::get_EfficiencyData: Negative efficiency in data. Set eff = 0." << std::endl; eff=0.;}
 
 	return eff;
-	
 }
 
 
 double ScaleFactorTau::get_EfficiencyMC(double pt, double eta, int dm, bool isReal) {
-
+	//std::cout << "ScaleFactorTau::get_EfficiencyMC: pt="<<pt<<", eta="<<eta<<", dm="<<dm<<", isReal="<<isReal << std::endl;
+    
 	double eff;
     std::map<std::string, TGraphAsymmErrors*> eff_map;
     if (isReal) eff_map = eff_mc_realTau;
     else        eff_map = eff_mc_fakeTau;
 	std::string label = FindEtaLabel(eff_map,eta,dm);
-
+    
 	int ptbin = FindPtBin(eff_map, label, pt); 
 	if (ptbin == -99){eff =1;} // if pt is underflow 
 	else eff = eff_map[label]->GetY()[ptbin-1];
-
+    
 	if (eff>1.){std::cout << "WARNING in ScaleFactorTau::get_EfficiencyMC: Efficiency in MC > 1. Set eff = 1."      << std::endl; eff=1.;} 		
 	if (eff<0.){std::cout << "WARNING in ScaleFactorTau::get_EfficiencyMC: Negative efficiency in MC. Set eff = 0." << std::endl; eff=0.;}
-
+    
 	return eff;
-
 }
 
 
 
 double ScaleFactorTau::get_ScaleFactor(double pt, double eta, int dm, bool isReal){
-	
+	//std::cout << "ScaleFactorTau::get_ScaleFactor: pt="<<pt<<", eta="<<eta<<", dm="<<dm<<", isReal="<<isReal << std::endl;
+    
 	double efficiency_data = get_EfficiencyData(pt,eta,dm,isReal);
-	double efficiency_mc = get_EfficiencyMC(pt,eta,dm,isReal);
+	double efficiency_mc   = get_EfficiencyMC(pt,eta,dm,isReal);
 	double SF;
     
 	if(efficiency_mc!=0){ SF = efficiency_data/efficiency_mc; }
 	else{
-	  SF=0.; std::cout << "WARNING in ScaleFactorTau::get_ScaleFactor: MC efficiency = 0. Scale Factor set to 0.";
+	  SF=0.;
+	  std::cout << "WARNING in ScaleFactorTau::get_ScaleFactor(pt="<<pt<<",eta="<<eta<<",dm="<<dm<<",isReal="<<isReal<<"): MC efficiency = 0. Scale Factor set to 0." << std::endl;
 	}
     
 	return SF;

@@ -117,7 +117,8 @@ bool ScaleFactor::check_SameBinning(TGraphAsymmErrors* graph1, TGraphAsymmErrors
 
 
 std::string ScaleFactor::FindEtaLabel(double Eta, std::string Which){
-
+    //std::cout << "ScaleFactor::FindEtaLabel" << std::endl;
+    
 	Eta = fabs(Eta);
 	int binNumber = etaBinsH->GetXaxis()->FindFixBin(Eta);
 	std::string EtaLabel = etaBinsH->GetXaxis()->GetBinLabel(binNumber);
@@ -178,36 +179,34 @@ int ScaleFactor::FindPtBin( std::map<std::string, TGraphAsymmErrors *> eff_map, 
 
 
 double ScaleFactor::get_EfficiencyData(double pt, double eta){
-
+    
     double eff;
 	std::string label = FindEtaLabel(eta,"data");
-
+    
 	int ptbin = FindPtBin(eff_data, label, pt); 
 	if(ptbin == -99){eff =1;} // if pt is underflow 
 	else eff = eff_data[label]->GetY()[ptbin-1];
-
+    
 	if(eff>1.){std::cout << "WARNING in ScaleFactor::get_EfficiencyData: Efficiency in data > 1. Set eff = 1."      << std::endl; eff=1.;} 
 	if(eff<0.){std::cout << "WARNING in ScaleFactor::get_EfficiencyData: Negative efficiency in data. Set eff = 0." << std::endl; eff=0.;}
-
+    
 	return eff;
-	
 }
 
 
 double ScaleFactor::get_EfficiencyMC(double pt, double eta) {
-
+    
 	double eff;		
 	std::string label = FindEtaLabel(eta,"mc");
-
+    
 	int ptbin = FindPtBin(eff_mc, label, pt); 
 	if(ptbin == -99){eff =1;} // if pt is underflow 
 	else eff = eff_mc[label]->GetY()[ptbin-1];
-
+    
 	if(eff>1.){std::cout << "WARNING in ScaleFactor::get_EfficiencyMC: Efficiency in MC > 1. Set eff = 1."      << std::endl; eff=1.;} 		
 	if(eff<0.){std::cout << "WARNING in ScaleFactor::get_EfficiencyMC: Negative efficiency in MC. Set eff = 0." << std::endl; eff=0.;}
-
+    
 	return eff;
-
 }
 
 
@@ -215,16 +214,15 @@ double ScaleFactor::get_EfficiencyMC(double pt, double eta) {
 double ScaleFactor::get_ScaleFactor(double pt, double eta){
 	
 	double efficiency_data = get_EfficiencyData(pt, eta);
-	double efficiency_mc = get_EfficiencyMC(pt, eta);
+	double efficiency_mc   = get_EfficiencyMC(pt, eta);
 	double SF;
-
+    
 	if(efficiency_mc != 0){ SF = efficiency_data/efficiency_mc; }
 	else {
 	  SF=0.; std::cout << "WARNING in ScaleFactor::get_ScaleFactor: MC efficiency = 0. Scale Factor set to 0. ";
 	}
-
-	return SF;	
-	
+    
+	return SF;
 }
 
 
@@ -237,7 +235,7 @@ double ScaleFactor::get_EfficiencyDataError(double pt, double eta){
 	if (ptbin == -99){eff_error =0.;} // if pt is underflow 
 	else eff_error= eff_data[label]->GetErrorYhigh(ptbin-1); 
         // errors are supposed to be symmetric, can use GetErrorYhigh or GetErrorYlow
-
+    
 	double effData = get_EfficiencyData(pt,eta);
 	if(eff_error > effData) eff_error = 0.5*effData;
 	return eff_error;
@@ -246,14 +244,14 @@ double ScaleFactor::get_EfficiencyDataError(double pt, double eta){
 	
 
 double ScaleFactor::get_EfficiencyMCError(double pt, double eta){
-
+    
 	double eff_error;
 	std::string label = FindEtaLabel(eta,"mc");
 	int ptbin = FindPtBin(eff_mc, label, pt); 
 	if (ptbin == -99){eff_error =0.;} // if pt is underflow 
 	else eff_error= eff_mc[label]->GetErrorYhigh(ptbin-1); 
 	// errors are supposed to be symmetric, can use GetErrorYhigh or GetErrorYlow
-
+    
 	double effMC = get_EfficiencyMC(pt,eta);
 	if (eff_error > effMC ) eff_error = 0.5*effMC;
 	return eff_error;
@@ -262,14 +260,14 @@ double ScaleFactor::get_EfficiencyMCError(double pt, double eta){
 
 
 double ScaleFactor::get_ScaleFactorError(double pt, double eta){
-
+    
 	double SF_error = 0.;
 	
 	double effData = get_EfficiencyData(pt, eta);
-	double effMC = get_EfficiencyMC(pt, eta);
+	double effMC   = get_EfficiencyMC(pt, eta);
 	double errData = get_EfficiencyDataError(pt, eta);
-	double errMC =  get_EfficiencyMCError(pt, eta);
-
+	double errMC   = get_EfficiencyMCError(pt, eta);
+    
 	if (errData == 0) {std::cout<<"WARNING in ScaleFactor::get_ScaleFactorError: uncertainty on data point = 0, can not calculate uncertainty on scale factor. Uncertainty set to 0." << std::endl;}
 	if (errMC == 0)   {std::cout<<"WARNING in ScaleFactor::get_ScaleFactorError: uncertainty on MC = 0, can not calculate uncerttainty on scale factor. Uncertainty set to 0." << std::endl;}
 	if (effData == 0) {std::cout<<"WARNING in ScaleFactor::get_ScaleFactorError: efficiency in data = 0, can not calculate uncertainty on scale factor. Uncertainty set to 0." << std::endl;}

@@ -3,9 +3,13 @@
 echo
 VERBOSITY=0
 VERBOSE_FLAG=""
-while getopts v option; do
+OUTPUTFILE=""
+DIRECTORY=""
+while getopts d:o:v option; do
   case "${option}"
   in
+    d) DIRECTORY="-d ${OPTARG}";;
+    o) OUTPUTFILE="-o ${OPTARG}";;
     v) VERBOSITY=1; VERBOSE_FLAG="-v";;
   esac
 done
@@ -16,7 +20,7 @@ LABEL="Moriond"
 ANALYSIS="TauTauAnalysis"
 FILE_DIR="/scratch/ineuteli/SFrameAnalysis/AnalysisOutput"
 FILES=(
-  #TT/${ANALYSIS}.TT_TuneCUETP8M1_${LABEL}.root
+  TT/${ANALYSIS}.TT_TuneCUETP8M1_${LABEL}.root
   DY/${ANALYSIS}.DYJetsToLL_M-10to50_TuneCUETP8M1_${LABEL}.root
   DY/${ANALYSIS}.DY1JetsToLL_M-10to50_TuneCUETP8M1_${LABEL}.root
   DY/${ANALYSIS}.DY2JetsToLL_M-10to50_TuneCUETP8M1_${LABEL}.root
@@ -47,7 +51,10 @@ FILES=(
 FILES=(${FILES[@]/#/${FILE_DIR}/}) # prepend FILE_DIR to files
 #echo ${FILES[@]}
 echo ">>> ls -lh"
-ls -lh ${FILES[@]} | while read c1 c2 c3 c4 c5; do echo $c5; done
+ls -lh ${FILES[@]} | \
+  while read c1 c2 c3 c4 c5 c6 c7 c8 c9; do
+    printf "%4s %3s %s %5s %s\n" $c7 $c6 $c8 $c5 $c9;
+  done 
 
 #for file in ${FILES[@]}; do
   #file="$FILE_DIR/$file"
@@ -57,6 +64,6 @@ ls -lh ${FILES[@]} | while read c1 c2 c3 c4 c5; do echo $c5; done
 
 echo 
 echo ">>> extractEfficiencies.py"
-python extractEfficiencies.py ${FILES[@]} $VERBOSE_FLAG -w $WP -p $PREFIX
+python extractEfficiencies.py ${FILES[@]} $VERBOSE_FLAG -w $WP -p $PREFIX $OUTPUTFILE $DIRECTORY -r
 echo
 

@@ -76,7 +76,6 @@ def main():
         flavNomHist = nomHist.Clone("%s%s_sum" %(baseHistNameNoDir, nominator))
         flavDenomHist = denomHist.Clone("%s%s_sum" %(baseHistNameNoDir, denominator))
       else:
-     
         nomHist = file.Get("%s%s" %(baseHistName, nominator)).Clone("%s%s%03d" %(baseHistNameNoDir, nominator, i))
         denomHist = file.Get("%s%s" %(baseHistName, denominator)).Clone("%s%s%03d" %(baseHistNameNoDir, denominator, i))
         flavNomHist.Add(nomHist)
@@ -98,7 +97,7 @@ def main():
   outFile = TFile.Open(outputFile, openOptions)
   if (replace or not outFile.GetDirectory(directory)):
     outFile.mkdir(directory)
-    print ">>> made directory %s in %s" % (directory,outputFile) # if verbose:
+    if verbose: print ">>> made directory %s in %s" % (directory,outputFile)
   outFile.cd(directory)
   outDir = outFile.GetDirectory(directory)
   for flavour in flavourNames:

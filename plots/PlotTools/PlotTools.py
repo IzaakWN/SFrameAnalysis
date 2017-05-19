@@ -2,8 +2,8 @@ from ROOT import * #TFile, TCanvas, TH1F, TH2F, THStack, TAxis, TGaxis, TGraph..
 import CMS_lumi, tdrstyle
 from math import sqrt, pow, log
 # from SampleTools import Samples, Sample
-from PrintTools  import color, warning, error, printSameLine, printVerbose, LoadingBar
-#from SampleTools import getSample # on the bottom to prevent loading errors
+from PrintTools import color, warning, error, printSameLine, printVerbose, LoadingBar
+#gROOT.Macro('PlotTools/functionmacro.C+')
 
 # CMS style
 lumi = 12.9 # set in plot.py
@@ -28,21 +28,21 @@ fillcolors = [ kRed-2, kAzure+5,
                kRed-7, kAzure-9, kOrange+382,  kGreen+3,  kViolet+5, kYellow-2 ]
                #kYellow-3
                
-varlist = { "jpt_1": "leading jet pt",              "jpt_2": "leading jet pt",
-            "bpt_1": "leading b jet pt",            "bpt_2": "sub-leading b jet pt",
+varlist = { "jpt_1": "leading jet pt",               "jpt_2":  "leading jet pt",
+            "bpt_1": "leading b jet pt",             "bpt_2":  "sub-leading b jet pt",
             "abs(jeta_1)": "leading jet abs(eta)",   "abs(jeta_2)": "sub-leading jet abs(eta)",
             "abs(beta_1)": "leading b jet abs(eta)", "abs(beta_2)": "sub-leading b jet abs(eta)",
-            "jeta_1": "leading jet eta",            "jeta_2": "sub-leading jet eta",
-            "beta_1": "leading b jet eta",          "beta_2": "sub-leading b jet eta",
-            "njets": "multiplicity of jets",
-            "ncjets": "multiplicity of central jets", "nfjets": "multiplicity of forward jets",
-            "nbtag": "multiplicity of b tagged jets", "ncbtag": "multiplicity of b tagged jets",
-            "beta_1": "leading b jet eta",          "beta_2": "sub-leading b jet eta",
-            "pt_tt": "pt_ltau",                     "R_pt_m_vis": "R = pt_ltau / m_vis",
-            "pt_tt_sv": "SVFit pt_ltau,sv",         "R_pt_m_sv":  "SVFit R_{sv} = pt_ltau / m_sv",
-            "m_sv": "SVFit m_sv",
-            "dR_ll": "#DeltaR_{ltau}",
-            "pfmt_1":"PF mt_l,MET", "met":"MET" }
+            "jeta_1": "leading jet eta",             "jeta_2": "sub-leading jet eta",
+            "beta_1": "leading b jet eta",           "beta_2": "sub-leading b jet eta",
+            "njets":  "multiplicity of jets",
+            "ncjets": "multiplicity of central jets",  "nfjets": "multiplicity of forward jets",
+            "nbtag":  "multiplicity of b tagged jets", "ncbtag": "multiplicity of b tagged jets",
+            "beta_1": "leading b jet eta",             "beta_2": "sub-leading b jet eta",
+            "pt_tt":  "pt_ltau",                       "R_pt_m_vis": "R = pt_ltau / m_vis",
+            "pt_tt_sv": "SVFit pt_ltau,sv",            "R_pt_m_sv":  "SVFit R_{sv} = pt_ltau / m_sv",
+            "m_sv":   "SVFit m_sv",
+            "dR_ll":  "#DeltaR_{ltau}",
+            "pfmt_1": "PF mt_l", "met":"MET" }
 
 
 
@@ -59,44 +59,44 @@ def makeLatex(title):
     strings = [ ]
     for string in title.split(' / '):
     
-        if "p_t" in string or "pt" in string or "Pt" in string:
-            if "pt_" in string and "Pt_" in string:
+        if "p_t" in string.lower() or "pt" in string.lower():
+            if "pt_" in string.lower():
                 string = string.replace("pt_","p_{T}^{").replace("Pt_","p_{T}^{") + "}"
             else:
                 string = string.replace("p_t","p_{T}").replace("pt","p_{T}").replace("Pt","p_{T}")
-    
-        if "m_" in string or "M_" in string:
+        
+        if "m_" in string.lower():
             string = string.replace("m_","m_{").replace("M_","M_{") + "}" # TODO: split at next space
-    
-        if "mt_" in string or "MT_" in string:
+        
+        if "mt_" in string.lower():
             string = string.replace("mt_","m_{T}^{").replace("M_","M_{T}^{") + "}" # TODO: split at next space
-    
-        if "tau" in string or "Tau" in string:
+        
+        if "tau" in string.lower():
             string = string.replace("tau","#tau").replace("Tau","#tau")
-    
-        if "phi" in string or "Phi" in string:
-            if "phi_" in string or "Phi_" in string:
+        
+        if "phi" in string.lower():
+            if "phi_" in string.lower():
                 string = string.replace("phi_","#phi_{").replace("Phi_","#phi_{") + "}"
             else:
                 string = string.replace("phi","#phi").replace("Phi","#phi")
-    
-        if "eta" in string or "Eta" in string:
-            if "eta_" in string or "Eta_" in string:
+        
+        if "eta" in string.lower():
+            if "eta_" in string.lower():
                 string = string.replace("eta_","#eta_{").replace("Eta_","#eta_{") + "}"
             else:
                 string = string.replace("eta","#eta").replace("Eta","#eta")
-    
+        
         if "abs(" in string and ")" in string:
             string = string.replace("abs(","|").replace(")","") + "|" # TODO: split at next space
-    
-        if "mu" in string or "Mu" in string:
-            if "muon" not in string and "Muon" not in string: 
+        
+        if  "mu" in string.lower():
+            if "muon" not in string.lower() and "multi" not in string.lower(): 
                 string = string.replace("mu","#mu").replace("Mu","#mu")
-    
-        if "ttbar" in string or "TTbar" in string:
+        
+        if "ttbar" in string.lower():
             string = string.replace("ttbar","t#bar{t}").replace("TTbar","t#bar{t}")
-    
-        if "npv" in string:
+        
+        if "npv" in string.lower():
             string = string.replace("npv","number of vertices")
         
         strings.append(string)
@@ -146,7 +146,7 @@ def combineCuts(*cuts,**kwargs):
     
     # TODO: take "or" into account with parentheses
     for cut in cuts:
-        if "||" in cuts: print ">>> be carefull with those \"or\" statements!"
+        if "||" in cuts: print warning("combineCuts: Be carefull with those \"or\" statements!")
         # [cut.strip() for i in cut.split('||')]
         
     if cuts:
@@ -237,18 +237,19 @@ class Ratio(object):
 
 class Plot(object):
     """Class to automatically make CMS plot."""
-
+    
     def __init__(self, samples, var, nBins, a, b, **kwargs):
         self.samples    = samples[:]
         self.var        = var
         self.nBins      = nBins
         self.a          = a
         self.b          = b
-        self.cuts       = kwargs.get('cuts', "")
+        self.cuts       = kwargs.get('cuts', "") # extra cuts
         self.weight     = kwargs.get('weight', "")
         self.shift_QCD  = kwargs.get('shift_QCD', 0)
         self.ratio_WJ_QCD_SS = kwargs.get('ratio_WJ_QCD_SS',0)
         self.ratio_TT_QCD_SS = kwargs.get('ratio_TT_QCD_SS',0)
+        self.channel    = kwargs.get('channel', "mutau")
         
         self.histsS     = [ ]
         self.histsB     = [ ]
@@ -282,7 +283,7 @@ class Plot(object):
                 self.histsD.append(sample.hist(var, nBins, a, b, cuts=self.cuts,                     verbosity=self.verbosity))
             if self.loadingbar: bar.count("%s done"%sample.label)
         if kwargs.get('QCD', False):
-            histQCD = self.QCD(ratio_WJ_QCD_SS=self.ratio_WJ_QCD_SS,ratio_TT_QCD_SS=self.ratio_TT_QCD_SS)
+            histQCD = self.QCD(ratio_WJ_QCD_SS=self.ratio_WJ_QCD_SS,ratio_TT_QCD_SS=self.ratio_TT_QCD_SS,verbosity=self.verbosity)
             if histQCD: self.histsB.append(histQCD)
         
         self.stack      = None
@@ -292,9 +293,9 @@ class Plot(object):
         self.pads       = [ ]
         self.frame      = None
         self.legend     = None
-        self.width  = 0.20; self.height = 0.08 + 0.05 * len(self.histsB)
-        self.x2     = 0.95; self.x1 = self.x2 - self.width
-        self.y2     = 0.90; self.y1 = self.y2 - self.height
+        self.width  = 0.11; self.height = 0.08 + 0.05 * len(self.histsB)
+        self.x2     = 0.89; self.x1 = self.x2 - self.width
+        self.y2     = 0.92; self.y1 = self.y2 - self.height
     
     @property
     def hists(self): return ( self.histsB + self.histsS + self.histsD )
@@ -329,7 +330,6 @@ class Plot(object):
         norm        = kwargs.get('norm',      False)
         option      = 'hist' #+ kwargs.get('option', '')
         if errorbars: option = 'E0 '+option
-        if not kwargs.get('data', True): self.histsD = [ ]
         
         # CANVAS
         self.makeCanvas(  square=kwargs.get('square', False),
@@ -348,8 +348,9 @@ class Plot(object):
             for hist in self.histsMC: hist.Draw(option+' same')
         
         # DATA
-        for hist in self.histsD:
-            hist.Draw('E same')
+        if kwargs.get('data', True):
+            for hist in self.histsD:
+                hist.Draw('E same')
         
         # NORM
         if norm: self.norm(self.hists)
@@ -406,10 +407,10 @@ class Plot(object):
         printSameLine("")
         if save:
             self.canvas.SaveAs(filename)
-            self.canvas.SaveAs(filename.replace(".png",".pdf"))
+            #self.canvas.SaveAs(filename.replace(".png",".pdf"))
             if self.canvas_sigma:
                 self.canvas_sigma.SaveAs(filename.replace(".png","_eff.png"))
-                self.canvas_sigma.SaveAs(filename.replace(".png","_eff.pdf"))
+                #self.canvas_sigma.SaveAs(filename.replace(".png","_eff.pdf"))
         if close: self.close()
 
 
@@ -417,7 +418,7 @@ class Plot(object):
     def close(self):
         """Close canvas and delete the histograms."""
         
-        if self.canvas:     self.canvas.Close()
+        if self.canvas:       self.canvas.Close()
         if self.canvas_sigma: self.canvas_sigma.Close()
         for hist in self.hists: gDirectory.Delete(hist.GetName())
 
@@ -432,6 +433,7 @@ class Plot(object):
         scaletopmargin = kwargs.get('scaletopmargin', 1)
         residue = kwargs.get('residue', False)
         ratio = kwargs.get('ratio', False)
+        CMS_lumi.lumi_13TeV = "%s fb^{-1}" % lumi
         
         W = 800; H  = 600
         if square:
@@ -506,7 +508,7 @@ class Plot(object):
         
         if position:
             if "LeftLeft" in position:      x1 = 0.15;      x2 =x1 + width
-            elif "Left" in position:        x1 = 0.20;      x2 = x1 + width
+            elif "Left" in position:        x1 = 0.18;      x2 = x1 + width
             elif "RightRight" in position:  x2 = 1 - 0.10;  x1 = x2 - width
             elif "Right" in position:       x2 = 1 - 0.15;  x1 = x2 - width
             elif "Center" in position:      x1 = 0.55 - width/2;  x2 = 0.55 + width/2
@@ -804,15 +806,23 @@ class Plot(object):
         """Substract stacked MC histograms from a data histogram,
            bin by bin if the difference is larger than zero."""
         
-        name    = kwargs.get('name', "diff_"+hist0.GetName())
-        title   = kwargs.get('title', "difference")
-        nBins   = hist0.GetNbinsX()
-        (a,b)   = (hist0.GetXaxis().GetXmin(), hist0.GetXaxis().GetXmax())
-        hist_diff = TH1F(name,title,nBins,a,b)
+        verbosity   = kwargs.get('verbosity', 0)
+        name        = kwargs.get('name', "diff_"+hist0.GetName())
+        title       = kwargs.get('title', "difference")
+        nBins       = hist0.GetNbinsX()
+        (a,b)       = (hist0.GetXaxis().GetXmin(), hist0.GetXaxis().GetXmax())
+        hist_diff   = TH1F(name,title,nBins,a,b)
+        stackhist   = stack.GetStack().Last()
+        printVerbose(">>>\n>>> substractStackFromHist: %s - %s"%(name,title),verbosity)
+        printVerbose(">>>   (BC = \"bin content\", BE = \"bin error\")",     verbosity)
+        printVerbose(">>>   %4s  %9s  %8s  %8s  %8s  %8s  %8s"%("bin","data BC","data BE","MC BC","MC BE","QCD BC","QCD BE"), verbosity)
         
         for i in range(1,nBins+1):
-            hist_diff.SetBinContent(i, max(0,hist0.GetBinContent(i)-stack.GetStack().Last().GetBinContent(i)));
-            #print ">>> i=%i, diff = %f" % (i, hist.GetBinContent(i)-stack.GetStack().Last().GetBinContent(i))  
+            hist_diff.SetBinContent(i, max(0,hist0.GetBinContent(i)-stackhist.GetBinContent(i)));
+            hist_diff.SetBinError(i,sqrt(hist0.GetBinError(i)**2+stackhist.GetBinError(i)**2))
+            printVerbose(">>>   %4s  %9.1f  %8.2f  %8.2f  %8.2f  %8.2f  %8.2f"%(i,hist0.GetBinContent(i),    hist0.GetBinError(i),
+                                                                      stackhist.GetBinContent(i),stackhist.GetBinError(i),
+                                                                      hist_diff.GetBinContent(i),hist_diff.GetBinError(i)),verbosity)
         
         return hist_diff
 
@@ -870,7 +880,7 @@ class Plot(object):
     def QCD(self,**kwargs):
         """Substract MC from data with same sign (SS) selection of a lepton - tau pair
            and return a histogram of the difference."""
-        #print ">>> estimating QCD for variable %s" % (self.var)
+        # TODO: check error propagation: e_QCD = sqrt(e_data^2+e_MC^2)
         
         cuts            = self.cuts
         weight          = self.weight
@@ -882,20 +892,24 @@ class Plot(object):
         ratio_WJ_QCD_SS = self.ratio_WJ_QCD_SS or kwargs.get('ratio_WJ_QCD_SS',False)
         ratio_TT_QCD_SS = self.ratio_TT_QCD_SS or kwargs.get('ratio_TT_QCD_SS',False)
         verbosity       = kwargs.get('verbosity',False)
+        printVerbose(">>>\n>>> estimating QCD for variable %s" % (self.var),verbosity,level=2)
         
         shift           = kwargs.get('shift',0.0) + self.shift_QCD
-        printVerbose(">>> QCD: shift = %s, self.shift_QCD = %s" % (shift,self.shift_QCD),verbosity,level=2)
-        scale           = 1.06*(1.0+shift) # scale up QCD 6% in OS region by default
-        if "q_1 * q_2 > 0" in cuts or "q_1*q_2>0" in cuts or "q_1*q_2 > 0" in cuts: scale = 1.0
+        scaleup         = 2.0 if "emu" in self.channel else 1.06
+        scaleup         = kwargs.get('scaleup',scaleup)
+        scale           = scaleup*(1.0+shift) # scale up QCD 6% in OS region by default
+        printVerbose(">>>   QCD: scaleup = %s shift = %s, self.shift_QCD = %s" % (scaleup,shift,self.shift_QCD),verbosity,level=2)
+        if "q_1*q_2>0" in cuts.replace(' ',''): scale = 1.0
         
-        if "q_1 * q_2 < 0" in cuts or "q_1*q_2<0" in cuts or "q_1*q_2 < 0" in cuts:
-            cuts = cuts.replace("q_1 * q_2 < 0","q_1 * q_2 > 0").replace("q_1*q_2 < 0","q_1 * q_2 > 0").replace("q_1*q_2<0","q_1 * q_2 > 0")        
+        if "q_1*q_2<0" in cuts.replace(' ',''):
+            cuts = cuts.replace("q_1 * q_2 < 0","q_1*q_2>0").replace("q_1*q_2 < 0","q_1*q_2>0").replace("q_1*q_2<0","q_1*q_2>0")        
         elif cuts:
-            cuts = "q_1 * q_2 > 0 && %s" % cuts
+            cuts = "q_1*q_2>0 && %s" % cuts
         else:
-            cuts = "q_1 * q_2 > 0"
+            cuts = "q_1*q_2>0"
             #print warning("Could not make QCD: no charge requirement")
             #return None
+        printVerbose(">>>   QCD: cuts = %s" % (cuts),verbosity,level=2)
         
         histsMC_SS = [ ]
         histsD_SS  = [ ]
@@ -906,16 +920,16 @@ class Plot(object):
             if self.loadingbar: bar.count(sample.label)
             name_SS = makeHistName(sample.label+"_SS", var)
             if sample.isBackground:
-                hist = sample.hist(var, nBins, a, b, cuts=cuts, weight=weight, name=name_SS)
+                hist = sample.hist(var, nBins, a, b, cuts=cuts, weight=weight, name=name_SS, verbosity=verbosity)
                 histsMC_SS.append(hist)
-                if ratio_WJ_QCD_SS and ("WJ" in hist.GetName() or "W-jets" in hist.GetName() or "W-Jets" in hist.GetName()):
-                    if histWJ: print warning("QCD: more than one W+jets sample in SS region, going with first instance!")
+                if ratio_WJ_QCD_SS and ("WJ" in hist.GetName() or "w-jets" in hist.GetName().lower()):
+                    if histWJ: print warning("QCD: more than one W+jets sample in SS region, going with first instance!", prepend="  ")
                     else: histWJ = hist
                 if ratio_TT_QCD_SS and ("TT" in hist.GetName() or "ttbar" in hist.GetName()):
-                    if histTT: print warning("QCD: more than one ttbar sample in SS region, going with first instance!")
+                    if histTT: print warning("QCD: more than one ttbar sample in SS region, going with first instance!", prepend="  ")
                     else: histTT = hist
             elif sample.isData:
-                histsD_SS.append(sample.hist(var, nBins, a, b, cuts=cuts, name=name_SS))
+                histsD_SS.append(sample.hist(var, nBins, a, b, cuts=cuts, name=name_SS, verbosity=verbosity))
             if self.loadingbar: bar.count("%s done"%sample.label)
         if not histsD_SS:
             print warning("No data to make DATA driven QCD!")
@@ -924,23 +938,24 @@ class Plot(object):
         stack_SS = THStack("stack_SS","stack_SS")
         for hist in histsMC_SS: stack_SS.Add(hist)
         histQCD = self.substractStackFromHist(stack_SS,histsD_SS[0],name=name,title="QCD")
+        QCD_SS = histQCD.Integral()
         histQCD.Scale(scale)
-        if not histQCD: print warning("Could not make QCD! QCD histogram is none!")
+        if not histQCD: print warning("Could not make QCD! QCD histogram is none!", prepend="  ")
         
         if ratio_WJ_QCD_SS and histWJ:
-            QCD_SS = histQCD.Integral()
             WJ_SS  = histWJ.Integral()
             if QCD_SS: ratio_WJ_QCD_SS = WJ_SS/QCD_SS
-            else: print warning("QCD: QCD integral is 0!")
-            printVerbose(">>> QCD: QCD = %.1f, WJ = %.1f, ratio_WJ_QCD_SS = %.3f" % (QCD_SS,WJ_SS,ratio_WJ_QCD_SS),verbosity,level=2)
+            else: print warning("QCD: QCD integral is 0!", prepend="  ")
+            printVerbose(">>>   QCD: QCD = %.1f, WJ = %.1f, ratio_WJ_QCD_SS = %.3f" % (QCD_SS,WJ_SS,ratio_WJ_QCD_SS),verbosity,level=2)
             self.ratio_WJ_QCD_SS = ratio_WJ_QCD_SS
+        else:
+            printVerbose(">>>   QCD: QCD = %.1f, scale=%.3f" % (QCD_SS,scale),verbosity,level=2)
         
         if ratio_TT_QCD_SS and histTT:
-            QCD_SS = histQCD.Integral()
             TT_SS  = histTT.Integral()
             if QCD_SS: ratio_TT_QCD_SS = TT_SS/QCD_SS
-            else: print warning("QCD: QCD integral is 0!")
-            printVerbose(">>> QCD: QCD = %.1f, TT = %.1f, ratio_TT_QCD_SS = %.3f" % (QCD_SS,TT_SS,ratio_TT_QCD_SS),verbosity,level=2)
+            else: print warning("QCD: QCD integral is 0!", prepend="  ")
+            printVerbose(">>>\n>>>\n>>>   QCD: QCD = %.1f, TT = %.1f, ratio_TT_QCD_SS = %.3f" % (QCD_SS,TT_SS,ratio_TT_QCD_SS),verbosity,level=2)
             self.ratio_TT_QCD_SS = ratio_TT_QCD_SS
         
         for hist in histsMC_SS + histsD_SS:
@@ -980,8 +995,8 @@ class Plot(object):
                 I_QCD = hist.Integral()
             printVerbose(">>>   adding to stack %s (%.1f events)" % (hist.GetName(),hist.Integral()),verbosity,level=2)
             stack.Add(hist)
-        if QCD: print "(QCD included)"
-        else:   print " "
+        if QCD and verbosity<2: print "(QCD included)"
+        elif not QCD: print " "
         self.stack = stack
         
         # CHECK MC and DATA
@@ -996,19 +1011,19 @@ class Plot(object):
             return
         
         # CHECK mt
-        for v in [ "mt", "mT", "m_T", "MT", "M_T" ]:
-            if v in var: break
+        for v in [ "mt", "m_t" ]:
+            if v in var.lower(): break
         else:
-            print warning("Could not renormalize WJ: Plot object has no transverse mass variable!", prepend="  ")
+            print warning("Could not renormalize WJ: variable %s is not a transverse mass variable!"%(var), prepend="  ")
             return
         
         # CHECK a, b (assume histogram range goes from 80 to >100 GeV)
         printVerbose(">>>   nBins=%s, (a,b)=(%s,%s)" % (nBins,a,b), verbosity)
         printVerbose(">>>   cuts=%s" % (cuts), verbosity)
         if a is not 80:
-            print warning("Renormalizing WJ with mt > %s GeV, instead of mt > 80 GeV!" % a, prepend="  ")
+            print warning("Renormalizing WJ with %s > %s GeV, instead of mt > 80 GeV!" % (var,a), prepend="  ")
         if b < 150:
-            print warning("Renormalizing WJ with mt < %s GeV < 150 GeV!" % b, prepend="  ")
+            print warning("Renormalizing WJ with %s < %s GeV < 150 GeV!" % (var,b), prepend="  ")
             return
         
         # GET WJ SAMPLE to set scale
@@ -1016,7 +1031,7 @@ class Plot(object):
         WJs = [ ]
         for sample in samples:
             printVerbose(">>>   %s" % sample.label,verbosity,level=2)
-            if "WJ" in sample.label or "W + jets" in sample.label or "W + Jets" in sample.label:
+            if "WJ" in sample.label or "w + jets" in sample.label.lower() or "w+jets" in sample.label.lower():
                 WJs.append(sample)
                 if "TES" in sample.label: print ">>>   note: %s" % (sample.label)
                 
@@ -1034,7 +1049,7 @@ class Plot(object):
         histWJ = None
         histsWJ = [ ]
         for hist in self.histsMC:
-            if "WJ" in hist.GetName() or "W-jets" in hist.GetName() or "W-Jets" in hist.GetName():
+            if "WJ" in hist.GetName() or "w-jets" in hist.GetName().lower():
                 histsWJ.append(hist)
                 
         # CHECK WJ HIST
@@ -1057,10 +1072,10 @@ class Plot(object):
         I_D  = self.histsD[0].Integral()
         I_WJ = histWJ.Integral()
         R = self.ratio_WJ_QCD_SS
-        print ">>>   data: %.1f, MC: %.1f, WJ: %.1f, QCD: %.1f, R: %.3f" % (I_D,I_MC,I_WJ,I_QCD,R)
         if I_MC < 10:
             print warning("Could not renormalize WJ: integral of MC is %s < 10!" % I_MC, prepend="  ")
             return
+        print ">>>   data: %.1f, MC: %.1f, WJ: %.1f, QCD: %.1f, R: %.3f, WJ prior purity: %.2f%%)" % (I_D,I_MC,I_WJ,I_QCD,R,I_WJ/I_MC)
         if I_D < 10:
             print warning("Could not renormalize WJ: integral of data is %s < 10!" % I_D, prepend="  ")
             return
@@ -1077,15 +1092,16 @@ class Plot(object):
             return
         WJ.scale = WJ.scaleBU * scale
         print ">>>   WJ renormalization scale = %.3f (new total scale = %.3f)" % (scale, WJ.scale)
+        return scale
 
 
 
     def renormalizeTT(self,**kwargs):
         """Renormalize TT by requireing that MC and data has the same number of events in some control region:
-              - category 1: nbtags >= 2
-              - category 2: met > 60, no dphi cut
+              - category 1: ...
+              - category 2: ...
            ..."""
-        printSameLine(">>>\n>>> %srenormalizing TT with ttbar control region for variable %s" % (kwargs.get('prepend',""),self.var))
+        #printSameLine(">>>\n>>> %srenormalizing TT with met in TT CR" % (kwargs.get('prepend',"")))
         
         samples     = self.samples
         cuts        = self.cuts
@@ -1095,8 +1111,6 @@ class Plot(object):
         verbosity   = kwargs.get('verbosity',0)
         
         # STACK
-        QCD         = False
-        I_QCD       = 0
         stack = THStack("stack","")
         printVerbose(" ",verbosity,level=2)
         for hist in self.histsMC:
@@ -1105,13 +1119,8 @@ class Plot(object):
                 continue
             if hist.Integral()<=0:
                 print warning("Ignored %s with an integral of %s <= 0 !" % (hist.GetName(),hist.Integral()), prepend="  ")
-            if "QCD" in hist.GetName():
-                QCD   = True
-                I_QCD = hist.Integral()
             printVerbose(">>>   adding to stack %s (%.1f events)" % (hist.GetName(),hist.Integral()),verbosity,level=2)
             stack.Add(hist)
-        if QCD: print "(QCD included)"
-        else:   print " "
         self.stack = stack
         
         # CHECK MC and DATA
@@ -1125,31 +1134,24 @@ class Plot(object):
             print warning("Could not renormalize TT: no data!", prepend="  ")
             return
         
-        # CHECK mt
-        for v in [ "mt", "mT", "m_T", "MT", "M_T" ]:
-            if v in var: break
-        else:
-            print warning("Could not renormalize TT: Plot object has no transverse mass variable!", prepend="  ")
-            return
-        
-        # CHECK a, b (assume histogram range goes from 80 to >100 GeV)
+        # CHECK a, b
         printVerbose(">>>   nBins=%s, (a,b)=(%s,%s)" % (nBins,a,b), verbosity)
         printVerbose(">>>   cuts=%s" % (cuts), verbosity)
-        if a is not 80:
-            print warning("Renormalizing TT with mt > %s GeV, instead of mt > 80 GeV!" % a, prepend="  ")
-        if b < 150:
-            print warning("Renormalizing TT with mt < %s GeV < 150 GeV!" % b, prepend="  ")
-            return
+        if a < 0:
+            print warning("Renormalizing TT with %s > %s GeV! Setting %s>0" % (var,a,var), prepend="  ")
+            a = 0
+        if b < 100:
+            print warning("Renormalizing TT with %s < %s GeV < 100 GeV!" % (var,b), prepend="  ")
         
         # GET TT SAMPLE to set scale
         TT = None
         TTs = [ ]
         for sample in samples:
             printVerbose(">>>   %s" % sample.label,verbosity,level=2)
-            if "TT" in sample.label or "ttbat" in sample.label:
+            if "TT" in sample.label or "ttbar" in sample.label.lower():
                 TTs.append(sample)
                 if "TES" in sample.label: print ">>>   note: %s" % (sample.label)
-                
+        
         # CHECK TT SAMPLE
         if   len(TTs) == 1:
             TT = TTs[0]
@@ -1159,14 +1161,14 @@ class Plot(object):
         else:
             print warning("Could not renormalize TT: no TT sample!", prepend="  ")
             return
-                
+        
         # GET TT HIST to calculate scale
         histTT = None
         histsTT = [ ]
         for hist in self.histsMC:
-            if "TT" in hist.GetName() or "W-jets" in hist.GetName() or "W-Jets" in hist.GetName():
+            if "TT" in hist.GetName() or "ttbar" in hist.GetName().lower():
                 histsTT.append(hist)
-                
+        
         # CHECK TT HIST
         if   len(histsTT) == 1:
             histTT = histsTT[0]
@@ -1177,29 +1179,23 @@ class Plot(object):
             print warning("Could not renormalize TT: no TT sample!", prepend="  ")
             return
         
-        # RESET SCALE
-        #if TT.scale and TT.scaleBU:
-        #    histTT.Scale(TT.scaleBU/TT.scale)
-        #TT.scale = TT.scaleBU
-        
         # INTEGRATE
         I_MC = self.stack.GetStack().Last().Integral()
         I_D  = self.histsD[0].Integral()
         I_TT = histTT.Integral()
-        R = self.ratio_TT_QCD_SS
-        print ">>>   data: %.1f, MC: %.1f, TT: %.1f, QCD: %.1f, R: %.3f" % (I_D,I_MC,I_TT,I_QCD,R)
-        if I_MC < 10:
-            print warning("Could not renormalize TT: integral of MC is %s < 10!" % I_MC, prepend="  ")
+        if I_MC < 5:
+            print warning("Could not renormalize TT: integral of MC is %s < 5!" % I_MC, prepend="  ")
             return
-        if I_D < 10:
-            print warning("Could not renormalize TT: integral of data is %s < 10!" % I_D, prepend="  ")
+        print ">>>   data: %.1f, MC: %.1f, TT: %.1f (%.1f%% TT prior purity)" % (I_D,I_MC,I_TT,I_TT/I_MC*100)
+        if I_D < 5:
+            print warning("Could not renormalize TT: integral of data is %s < 5!" % I_D, prepend="  ")
             return
-        if I_TT < 10:
-            print warning("Could not renormalize TT: integral of TT is %s < 10!" % I_TT, prepend="  ")
+        if I_TT < 5:
+            print warning("Could not renormalize TT: integral of TT is %s < 5!" % I_TT, prepend="  ")
             return
         
         # SET TT SCALE
-        scale = ( I_D - I_MC + I_TT - R*I_QCD ) / (I_TT - R*I_QCD)
+        scale = ( I_D - I_MC + I_TT ) / (I_TT)
         
         if scale < 0:
             print warning("Could not renormalize TT: scale = %.2f < 0!" % scale, prepend="  ")
@@ -1207,9 +1203,10 @@ class Plot(object):
             return
         TT.scale = TT.scaleBU * scale
         print ">>>   TT renormalization scale = %.3f (new total scale = %.3f)" % (scale, TT.scale)
+        return scale
         
-        
-        
+
+
     def significanceScan(self,*args,**kwargs):
         """Scan cut on a range of some variable, integrating the signal and background histograms,
            calculating the S/(1+sqrt(B)) and finally drawing a histogram with these values."""
@@ -1325,27 +1322,28 @@ class Plot(object):
     
     def checkSignal(self,blindlimits=(),S_exp=0):
         """Check signal bump, signal region, signal yield, ..."""
-        var = self.var
+        # TODO: use tree instead of histogram!
+        var     = self.var
+        signals = [s for s in self.samples if s.isSignal] 
         if len(blindlimits) is 2 and self.stack != None:
-            for signal in self.histsS:
+            for signal in signals:
                 (aa,bb) = blindlimits
-                mu      = signal.GetMean()
-                sd      = signal.GetStdDev()
-                N       = signal.GetEntries()
-                Sw      = signal.GetSumOfWeights()
-                S       = self.integrateHist(signal,aa,bb)
+                name    = "m_sv_signal_check"
+                shist   = signal.hist("m_sv",100,aa,bb,name=name,cuts=self.cuts,weight=self.weight,verbosity=self.verbosity)
+                mu      = shist.GetMean()
+                sd      = shist.GetStdDev()
+                N       = shist.GetEntries()
+                S       = shist.GetSumOfWeights()
                 B       = self.integrateStack(aa,bb)
                 scale   = -1
                 upscale = -1
                 norm    = 1
-                for sample in self.samples:
-                    if sample.isSignal and sample.scaleBU:
-                        scale = sample.scale
-                        upscale = sample.scale/sample.scaleBU
-                        if upscale:
-                            S = S*sample.scaleBU/sample.scale
-                            Sw = Sw*sample.scaleBU/sample.scale
-                print ">>> " + color("%.1f expected signal events (sum of weights) and %i MC events"     % (Sw,N), color="grey")
+                if signal.scaleBU:
+                    scale = signal.scale
+                    upscale = signal.scale/signal.scaleBU
+                    if upscale: S = S*signal.scaleBU/signal.scale
+                gDirectory.Delete(name)
+                print ">>> " + color("%.1f expected signal events (sum of weights) and %i MC events"     % (S,N), color="grey")
                 print ">>> " + color("  signal mean = %.2f, sigma = %.2f, nBins = %d"                    % (mu,sd,self.nBins), color="grey")
                 print ">>> " + color("  total scale = %.4f, upscale = %.1f"                              % (scale,upscale), color="grey")
                 print ">>> " + color("  thus 1-sigma signal region should be [ %4.1f, %4.1f ]"           % (max(0,mu-1*sd),mu+1*sd), color="grey")
@@ -1356,9 +1354,9 @@ class Plot(object):
                 print ">>> " + color("  %4.1f expected background events in signal region %s(%i,%i)"     % (B,var,aa,bb), color="grey")
                 if B:
                     sigma = S/(1+sqrt(B))
-                    print ">>> " + color("  %.2f expected significance in signal region %s(%i,%i)"          % (sigma,var,aa,bb), color="grey")
-                    print ">>> " + color("  &  %7.1f    &%5.1f  &  %5.2f   &  %6.1f &  %5.1f"        % (B,S,sigma,S*283,sigma*283), color="grey")
-        else: print warning("Could not check signal yield: \"len(blindlimits)==2\" = %s and \"plot.stack!=None\" = %s" % (len(blindlimits)==2,plot.stack!=None))
+                    print ">>> " + color("  %.2f expected significance in signal region %s(%i,%i)"       % (sigma,var,aa,bb), color="grey")
+                    print ">>> " + color("  &  %7.1f    &%6.2f &  %5.2f   &  %6.1f &  %5.1f"             % (B,S,sigma,S*283,sigma*283), color="grey")
+        else: print warning("Could not check signal yield: \"len(blindlimits)==2\" = %s and \"plot.stack!=None\" = %s" % (len(blindlimits)==2,self.stack!=None))
         
         
         
@@ -1418,7 +1416,8 @@ class Plot2D(object):
         #self.legend.SetFillStyle(0)
         #self.legend.Draw()
 
-        # CMS LUMI        
+        # CMS LUMI
+        CMS_lumi.lumi_13TeV = "%s fb^{-1}" % lumi
         CMS_lumi.cmsTextSize  = 0.65
         CMS_lumi.lumiTextSize = 0.60
         CMS_lumi.relPosX = 0.16

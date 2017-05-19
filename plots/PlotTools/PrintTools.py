@@ -21,11 +21,13 @@ def color(string,**kwargs):
     color_code = text_color_dict[kwargs.get('color',"red")] + background_color_dict[kwargs.get('background',"black")]
     return kwargs.get('prepend',"") + "\x1b[%sm%s\033[0m" % ( color_code, string )
 
-def warning(string,**kwargs):
-    return color("Warning! "+string, color="yellow", prepend=">>> "+kwargs.get('prepend',""))
+def warning(string,*trigger,**kwargs):
+    if len(trigger)==0 or trigger:
+        return color("Warning! "+string, color="yellow", prepend=">>> "+kwargs.get('prepend',""))
     
-def error(string,**kwargs):
-    return color("ERROR! "+string, color="red", prepend=">>> "+kwargs.get('prepend',""))
+def error(string,*trigger,**kwargs):
+    if len(trigger)==0 or trigger:
+        return color("ERROR! "+string, color="red", prepend=">>> "+kwargs.get('prepend',""))
     
 
 
@@ -96,6 +98,7 @@ class capturing(object):
 class LoadingBar(object):
     """Class to make a simple, custom loading bar."""
     # from math import log, import sys
+    # TODO: move cursor to end (to prevent breaks)
 
     def __init__(self, *args, **kwargs):
         '''Constructor for LoadingBar object.'''
@@ -168,5 +171,15 @@ class LoadingBar(object):
         if moveback: sys.stdout.write("\b"*(self.width+2-self.position+len(self.counter)+len(self.message_)))
     
 
+def makeThreshold(n,**kwargs):
+    """Help function to find a good stepsize for read out when looping over a large number N.
+       In a for loop with index i, you could do a print out like:
+         if i % threshold == 0: print "some progress message" """
+    max_digits = kwargs.get('max',6)
+    #                      floor(log(N/10.0,10))        stepsize = (number of digits in N) - 2
+    #              max(0.0,floor(log(N/10.0,10)))       make sure it is at least 0
+    #        min(6,max(0.0,floor(log(N/10.0,10))))      set maximum step size to 10^6 (otherwise one has to wait too long for an update)
+    # pow(10,min(6,max(0.0,floor(log(N/10.0,10)))))     make treshold a power of 10
+    return pow(10,min(max_digits,max(0.0,floor(log(n/10.0,10)))))
 
 

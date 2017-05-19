@@ -14,14 +14,11 @@ SITES_T3=(
     /pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Summer16/Ntuple_80_20170207
     #/pnfs/psi.ch/cms/trivcat/store/user/ytakahas/Ntuple_80_reminiAOD/              # SingleMuon
     /pnfs/psi.ch/cms/trivcat/store/user/ytakahas/Ntuple_80_reminiAOD_v2/           # SingleMuon
+    /pnfs/psi.ch/cms/trivcat/store/user/ytakahas/Ntuple_80_reminiAOD_v3/           # SingleMuon
     /pnfs/psi.ch/cms/trivcat/store/user/ineuteli/Ntuple_80_20170303/               # SingleElectron
 )
 SITES_T2=(
     #gsiftp://storage01.lcg.cscs.ch/
-    /pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_Moriond17
-    /pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_Moriond17_v2
-    /pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond
-    /pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond_v2
     /pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond_v3
     /pnfs/lcg.cscs.ch/cms/trivcat/store/user/cgalloni/Ntuple_Moriond17
     /pnfs/lcg.cscs.ch/cms/trivcat/store/user/zucchett/Ntuple_Moriond17
@@ -115,6 +112,8 @@ SAMPLES=(
 SAMPLES_USER=( )
 SITES_USER=( )
 VERBOSITY=0
+WARNING="\e[31m\e[1mWARNING!" # yellow/orange \e[93m
+E="\e[0m"
 while getopts b:d:x:s:p:t:u:v option; do
     case "${option}"
     in
@@ -135,7 +134,7 @@ SITES_T2_USER=( )
 for site in ${SITES_USER[@]}; do
     if   echo $site | grep -q "psi.ch/cms/trivcat/store";      then SITES_T3_USER+=($site)
     elif echo $site | grep -q "lcg.cscs.ch/cms/trivcat/store"; then SITES_T2_USER+=($site)
-    else echo "Warning! User site not recognized!"
+    else echo ">>> ${WARNING} User site not recognized! $A"
     fi
 done
 
@@ -221,7 +220,7 @@ for sample in ${SAMPLES[@]}; do
         for f in `ls ${XMLDIR}/${sample}*.xml | awk -F '/' '{print $NF}'`; do
           NEVENTS=`grep "${XMLDIR}/$f" -e 'Total number of events processed: ' | grep -Po '[0-9]*'`
           if [[ ! $NEVENTS ]]; then
-            echo ">>>   Warning! No number of events saved in $f!"
+            echo ">>>   ${WARNING} No number of events saved in $f!$E"
           else
             [[ $VERBOSITY > 0 ]] && echo ">>>   $NEVENTS events in $f"
             NTOT=$(($NTOT+$NEVENTS))

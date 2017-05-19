@@ -1,33 +1,27 @@
 #! /bin/bash
 
 echo
-BASEDIR="/shome/$USER/analysis/SFrameAnalysis/BatchSubmission"
+BASEDIR="." #"/shome/$USER/analysis/SFrameAnalysis/BatchSubmission"
 cd $BASEDIR
-TESFILES="Signal_Izaak.py \
-          Signal_HTT_Izaak.py \
-          Background_DY_Izaak.py \
-          Background_DY_NLO_Izaak.py \
-          Background_TT_Izaak.py"
-LTFFILES="Background_DY_Izaak.py \
-          Background_DY_NLO_Izaak.py" # Background_DY_10to50_Izaak.py
-EESFILES=`ls *_Izaak.py | grep -v TES | grep -v LTF | grep -v EES | grep -v SUSY | grep -v EWK | grep -v Data`
-FILEND="_Izaak.py"
-
-
-
-
-
+TESFILES="Signal_LowMass.py \
+          Background_DY.py \
+          Background_TT.py"
+LTFFILES="Background_DY.py"
+EESFILES=`ls Background_*.py Signal_*.py | grep -v TES | grep -v LTF | grep -v EES | grep -v SUSY | grep -v EWK | grep -v VBF | grep -v Data`
+FILEND=".py"
+WARNING="\e[31m\e[1mWARNING!"
+S="\e[0m"
 
 #################
 # TES, EES, LTF #
 #################
 
-DO_VAR=(      "doTES"      "doEES"      "doLTF"  )
-SHIFT=(        "0.03"       "0.01"       "0.03"  )
-SHIFT_VAR=(  "TESshift"  "EESshift"   "LTFshift" )
-FILES=(     "$TESFILES" "$EESFILES"  "$LTFFILES" )
-UP=(         "TES1p03"    "EES1p01"    "LTF1p03" )
-DOWN=(       "TES0p97"    "EES0p99"    "LTF0p97" )
+DO_VAR=(      "doTES"       "doLTF"      "doEES"  )
+SHIFT=(        "0.03"        "0.03"       "0.01"  )
+SHIFT_VAR=(  "TESshift"   "LTFshift"   "EESshift" )
+FILES=(     "$TESFILES"  "$LTFFILES"  "$EESFILES" )
+UP=(         "TES1p03"     "LTF1p03"    "EES1p01" )
+DOWN=(       "TES0p97"     "LTF0p97"    "EES0p99" )
 
 for ((i=0;i<${#DO_VAR[@]};++i)); do
     
@@ -69,14 +63,14 @@ for ((i=0;i<${#DO_VAR[@]};++i)); do
             if grep -q "${SHIFT_LINE}" $f; then
                 sed -i "s/${SHIFT_LINE}/${SHIFT_LINE_UP}/"   $FUP
                 sed -i "s/${SHIFT_LINE}/${SHIFT_LINE_DOWN}/" $FDOWN
-            else echo ">>> WARNING! Could not find \"${SHIFT_LINE}\" line"
+            else echo -e ">>> ${WARNING} Could not find \"${SHIFT_LINE}\" line${S}"
             fi
             if grep -q "${LABEL_LINE}" $f; then
                 sed -i "s/${LABEL_LINE}/${LABEL_LINE_UP}/"   $FUP
                 sed -i "s/${LABEL_LINE}/${LABEL_LINE_DOWN}/" $FDOWN          
-            else echo ">>> WARNING! Could not find \"${LABEL_LINE}\" line"
+            else echo -e ">>> ${WARNING} Could not find \"${LABEL_LINE}\" line${S}"
             fi
-        else echo ">>> WARNING! Could not find \"${DO_LINE}\" line"
+        else echo -e ">>> ${WARNING} Could not find \"${DO_LINE}\" line${S}"
         fi
     done
 done

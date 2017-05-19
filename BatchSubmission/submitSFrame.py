@@ -31,6 +31,10 @@ import subprocess
 import time
 import shutil
 import socket
+starttime = time.time()
+startdate = time.strftime("%a %d/%m/%Y %H:%M:%S",time.gmtime())
+
+
 
 class runCommand(Process):
   def __init__(self, baseName, subJob):
@@ -57,6 +61,7 @@ class runCommand(Process):
       logFile.close()
       time.sleep(1)
       print "job '%s %s' finished" %(self.baseName, self.subJob)
+
 
 
 class XmlTemplate(object):
@@ -109,6 +114,7 @@ class XmlTemplate(object):
     self.outFile.write(self.template)
     self.outFile.close()
   
+
 
 class BatchScript(object):
   """Class to create batch script"""
@@ -195,11 +201,14 @@ def getTempDirLog(job):
 def getCycleName(job):
   return getBasename(job)+getSubjobString(job)
 
+
+
 #runningJob = [ qid, cylceName=basename+subjobstring ]
 def getJobFromId(runningJob, listOfJobs):
   for l in listOfJobs:
     if runningJob[1]==getCycleName(l): return l
   return []
+
 
 
 # build in an automated resubmit for Eqw jobs at some point
@@ -236,6 +245,8 @@ def waitForBatchJobs(runningJobs, listOfJobs, userName, timeCheck):
       #  usageFile = getTempDirLog(job) + "/" + getCycleName(job) + ".tmp"  
       #  open(usageFile,'a').write(usageOutput)
 
+
+
 def checkRunningJobs(runningJobs, listOfJobs, timeCheck):
   time.sleep(float(timeCheck))
   for r in runningJobs:
@@ -244,6 +255,8 @@ def checkRunningJobs(runningJobs, listOfJobs, timeCheck):
         if r[1]==(l[2]+l[3]):
           l[4]=r[2]
       runningJobs.remove(r)
+
+
 
 def checkCompletion(dataSets, listOfJobs, outDir, cycleName, postFix,keepTemp):
   for d in dataSets:
@@ -284,31 +297,45 @@ def checkCompletion(dataSets, listOfJobs, outDir, cycleName, postFix,keepTemp):
         mergeCmd="hadd -f %s.root %s " %(mergeFileBaseName, mergeFiles)
       else:
         #mergeCmd="hadd -f %s.root %s && rm -rf %s" %(mergeFileBaseName, mergeFiles, mergeFiles)
-
         fileToMerge=fileBaseNameRoot.partition("pythia8")[0]+fileBaseNameRoot.partition("pythia8")[1]+'*'
         fileToMerge=fileToMerge.partition("Run2016")[0]+fileToMerge.partition("Run2016")[1]+'*'
         fileToMerge=fileToMerge.partition("madgraph")[0]+fileToMerge.partition("madgraph")[1]+'*'
         mergeCmd='hadd -f %s.root %s.root && rm -rf %s.root'  %(mergeFileBaseName,  fileToMerge,  fileToMerge)
         #mergeCmd_mt = 'hadd -f %s/%s_mutau.root %s/%s_mutau*.root && rm -rf %s/%s_mutau*.root'  %(outDir, d[0], fileBaseName, d[0], fileBaseName, d[0])
         #mergeCmd_et = 'hadd -f %s/%s_eletau.root %s/%s_eletau*.root && rm -rf %s/%s_eletau*.root'  %(outDir, d[0], fileBaseName, d[0], fileBaseName, d[0])
-        print "mergeCmd is %s " %mergeCmd
+        print "mergeCmd is\n%s \n" %mergeCmd
         #print "mergeCmd_private_mt is %s " %mergeCmd_mt
         #print "mergeCmd_private_et is %s " %mergeCmd_et
-
+        
+      # LS
       lock=thread.allocate_lock()
       lock.acquire()
-      #subProcess=subprocess.Popen("date; ls -lh %s" %(mergeFiles), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-      subProcess=subprocess.Popen("date; ls -lh %s*" %(fileToMerge), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
- 
+      lsCmd="date; ls -lh %s*" %(fileToMerge)
+      subProcess=subprocess.Popen(lsCmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
       #subProcess.wait()
       mergeDebug+="\n###### merging ######\n"
-      lsDebug=""
+      lsDebug=lsCmd+"\n"
       lsDebug+=subProcess.stdout.read()
       lsDebug+=subProcess.stderr.read()
-      mergeDebug+=lsDebug
-      mergeDebug+=lsDebug
-      mergeDebug+=mergeCmd+"\n"
       lock.release()
+      
+      # COUNT
+      lock=thread.allocate_lock()
+      lock.acquire()
+      WARNING="\\e[93m\\e[1m" # yellow/orange \e[93m
+      END="\\e[0m"
+      countCmd="echo -e \"%snumber of \\\"%s*.root\\\" files over number of jobs: `ls -lh %s*.root | wc -l`/%s%s\""%(WARNING,'/'.join((fileToMerge.split('/')[-2:])),fileToMerge,len(listOfJobs),END)
+      countCmd+="; echo -e \"%snumber of \\\"%s/*.root\\\" files over number of jobs: `ls -lh %s/*.root | wc -l`/%s%s\""%(WARNING,'/'.join((l[6].split('/')[-1:])),  l[6],       len(listOfJobs),END)
+      subProcess=subprocess.Popen(countCmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+      countDebug=subProcess.stdout.read()
+      countDebug+=subProcess.stderr.read()
+      lsDebug+="\n"+countCmd+"\n"+countDebug
+      mergeDebug+="\n"+lsDebug
+      mergeDebug+="\n"+mergeCmd
+      print countDebug
+      lock.release()
+      
+      # MERGE
       lock=thread.allocate_lock()
       lock.acquire()
       outFile=open(mergeFileBaseName+'.log', 'w')
@@ -327,9 +354,10 @@ def checkCompletion(dataSets, listOfJobs, outDir, cycleName, postFix,keepTemp):
         ##subProcess.wait()
         #mergeDebug += subProcess_et.stdout.read()
         #mergeDebug += subProcess_et.stderr.read()
-
       else:
         mergeDebug+="FATAL: Missing root files. No merging!"
+        
+      # WRITE
       outFile.write(mergeDebug)
       outFile.close()
       if subProcess.poll()==1:
@@ -338,10 +366,14 @@ def checkCompletion(dataSets, listOfJobs, outDir, cycleName, postFix,keepTemp):
       dataSets.remove(d)
       print "%s finished merging and copying" %(d[0])
 
+
+
 def getFileLumi(inputline):
   lumi_start=inputline.find("\"", inputline.find("Lumi="))+1
   lumi_end=inputline.find("\"", lumi_start)
   return float(inputline[lumi_start:lumi_end])
+
+
 
 def main():
   # parse the command line
@@ -426,6 +458,7 @@ def main():
   if not "jobConfig" in dir():
     jobConfig=path2sframe+'/user/config/JobConfig.dtd'
   print "%-30s : jobConfig='%s'" %("job config file", jobConfig)
+  print "%-30s : jobOptions='%s'" %("job option file", jobOptions)
 
   # check jobconfig file
   if not os.access(jobConfig, os.R_OK):
@@ -582,6 +615,13 @@ def main():
     print "FATAL: xml template missing"
     sys.exit()
 
+  # check path to xml files
+  if not "path2xml" in dir():
+    print "FATAL: path2xml missing"
+    sys.exit()
+  path2xml=os.path.expandvars(path2xml)
+  print "%-30s : path2xml=%s" %("path to xml files", path2xml)
+
   # check number of files per job
   if not "nFiles" in dir():
     nFiles=10
@@ -620,12 +660,6 @@ def main():
   if not "nProcesses" in dir():
     nProcesses="3"
   print "%-30s : nProcesses=%s" %("number of parallel processes", nProcesses)
-
-  # check path to xml files
-  if not "path2xml" in dir():
-    print "FATAL: path2xml missing"
-    sys.exit()
-  path2xml=os.path.expandvars(path2xml)
 
 
   # using sandbox
@@ -698,7 +732,7 @@ def main():
   
   # create genXmlTemplate steering file
   genXmlTemplate = XmlTemplate(xmlTemplate, jobConfig, jobName, outputLevel, loadLibs, loadPacks, cycleName, runMode, proofServer, proofWorkdir, postFix, inputTrees, outputTrees, userItems)
-
+  
   currentDir=os.getcwd()
   if fixTemp:
     if(path2tmplog):
@@ -713,15 +747,15 @@ def main():
       tempDirSh=path2tmpsh
     else:
       tempDirSh=path2tmp
-
+    
     os.system( "mkdir -p " + tempDirLog )
     os.system( "mkdir -p " + tempDirRoot )
     os.system( "mkdir -p " + tempDirSh )
   else:
-    tempDirLog=tempfile.mkdtemp(prefix="sframe_jobName_log_", dir=path2tmplog)
-    tempDirRoot=tempfile.mkdtemp(prefix="sframe_jobName_root_", dir=path2tmproot)
-    tempDirSh=tempfile.mkdtemp(prefix="sframe_jobName_sh_", dir=path2tmpsh)
-
+    tempDirLog=tempfile.mkdtemp(prefix="sframe_%s_log_"%jobName, dir=path2tmplog)
+    tempDirRoot=tempfile.mkdtemp(prefix="sframe_%s_root_"%jobName, dir=path2tmproot)
+    tempDirSh=tempfile.mkdtemp(prefix="sframe_%s_sh_"%jobName, dir=path2tmpsh)
+  
   if (useSandbox):
     analysisDir = (path2sframe.rstrip("/")).rstrip("SFrame")
     print "creating sandbox archive of %s and moving it to %s" %(analysisDir, tempDirSh)
@@ -952,17 +986,45 @@ def main():
   os.chdir(currentDir)
   if not keepTemp:
     print "\nremoved temporary directory with scripts and root file:"
-    print  "    %s" % (tempDirSh)
-    print  "    %s" % (tempDirRoot)
+    print  "  %s" % (tempDirSh)
+    print  "  %s" % (tempDirRoot)
     print "kept temporary directory with log files:"
-    print  "    %s" % (tempDirLog)
+    print  "  %s" % (tempDirLog)
     shutil.rmtree(tempDirSh)
     shutil.rmtree(tempDirRoot)
   
   if "postExec" in dir():
     print "Executing:\n%s \n\n" % postExec
     exec postExec
-  print "\nTschoe\n"
   
+  accountTime(jobOptions,jobName,nJobs)
+  
+  print "\nTschoe!\n"
+  
+
+
+def accountTime(jobOptions,jobName,nJobs):
+  makeDirectory("nohup")
+  minutes, seconds = divmod(time.time()-starttime,60)
+  hours, minutes   = divmod(minutes,60)
+  with open("nohup/submitSFrame.log","a") as file:
+    file.write("\n\n")
+    file.write("%s: %s\n" % (jobName, jobOptions.split('/')[-1]))
+    file.write("number of jobs: %s\n" % (nJobs))
+    file.write("start: %s\n" % (startdate))
+    file.write("done:  %s\n" % (time.strftime("%a %d/%m/%Y %H:%M:%S",time.gmtime())))
+    file.write("took:  %s hours, %s minutes and %.1f seconds" % (hours,minutes,seconds))
+  print "\nDone after %s hours, %s minutes and %.1f seconds." % (hours,minutes,seconds)
+  
+
+
+def makeDirectory(DIR):
+  """Make directory if it does not exist."""
+  if not os.path.exists(DIR):
+    os.makedirs(DIR)
+    #print ">>> made directory " + DIR
+
+
+
 if __name__ == "__main__":
   main()

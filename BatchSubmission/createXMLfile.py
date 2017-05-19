@@ -6,10 +6,13 @@
 #*
 #***************************************************************************
 
+# NOTE: if there are a lot of corrupt files, and the connection is slow, consider
+# replacing "return 255" by "continue" in  ../SFrame/python/SFrameHelpers.py
+
 # Get text file with full paths of ntuples (18/02/2017):
 example = """
 Examples:
-
+ 
  Tier 3 PNFS:
    PNFS="/pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Summer16/Ntuple_80_20170206"
    ls -d $PNFS/DYJ*/*/*/* > dirs_DYJ.txt
@@ -21,18 +24,15 @@ Examples:
    uberftp -ls $PNFS/DY1J*/*/* | awk '{print $7}' > dirs_T2_DY1J.txt
    uberftp -ls $PNFS/*/*/* | awk '{print $7}' > dirs_T2.txt
    ./createXMLfile.py dirs_T2.txt -o xmls_Moriond_T2 -s PSI-T2
-
+ 
  Split files
    cat foo.txt | wc -l
    split -l 200 foo.txt foo_split -d
-
+ 
  Print out xml file names formatted for copy-pasting into job options files:
    cd xmls_Moriond/
    ls *.xml | xargs -I@ echo \\"@\\",
 """
-
-# NOTE: if there are a lot of corrupt files, and the connection is slow, consider
-# replacing "return 255" by "continue" in  ../SFrame/python/SFrameHelpers.py
 
 
 import os
@@ -147,7 +147,7 @@ def main():
             if (file.find(".root") >= 0):
               path = prefix + os.path.join(sample, subdir, file)
               if (verbose): print path
-              if "failed" in path.lower() or "corrupt" in path.lower(): continue
+              if "fail" in path.lower() or "corrupt" in path.lower(): continue
               fileList.append(path)
         print "Processing %d files"%len(fileList)
         nFiles=int(math.ceil(len(fileList)/float(maxFiles_original)))
@@ -177,9 +177,9 @@ def main():
           
           # MAKE XML file
           failedRootFiles=[ ]
-          makeXMLFileFromStart=True
-          while makeXMLFileFromStart:
-            makeXMLFileFromStart=False
+          retryXMLFile=True
+          while retryXMLFile:
+            retryXMLFile=False
             lock=thread.allocate_lock()
             lock.acquire()
             commandMC="sframe_input.py -r -d -o %s/%s.xml %s -t %s" %(outDir, outName, csvList, treeName)
@@ -189,7 +189,7 @@ def main():
             output=processMC.stdout.read()
             if verbose: print output
             
-            # CHECK OUTPUT
+            # CHECK output
             nWrittenRootFiles=output.count(".root")
             newFailedRootFiles=[ ]
             for line in output.split("\n"):
@@ -198,37 +198,38 @@ def main():
               if "error" in line.lower():
                 for rootfile in csvList.split(','):
                   if rootfile in line:
-                    nWrittenRootFiles -= 1
+                    nWrittenRootFiles -= 2 # ".root" in processing and error message
                     newFailedRootFiles.append(rootfile)
-                    csvList=csvList.replace(rootfile,'').replace(",,",',')
-                    makeXMLFileFromStart=True
+                    csvList=csvList.replace(rootfile,'').replace(",,",',') # remove failed file from list
+                    retryXMLFile=True
                     #print "  \033[1mWarning! File %s (%s.xml): ignoring corrupt file (%s) and retrying!\033[0m" % (i+1,outName,rootfile)
                 #else:
                   #print "  \033[1m\033[91mERROR!%s!\033[0m" % line.replace(" *ERROR*","").replace("*ERROR*","")
                   #if ".root" in line: nWrittenRootFiles-=line.count(".root")+1
               
-              # FINAL SUCCES
+              # FINAL succes
               if "events processed" in line:
-                makeXMLFileFromStart=False
+                retryXMLFile=False
                 print "  File %s: %s (%s files)" % (i+1,line.replace("\n",""),nWrittenRootFiles)
             
             # RETRY ?
             if len(newFailedRootFiles):
               failedRootFiles+=newFailedRootFiles
-              if makeXMLFileFromStart:
+              if retryXMLFile:
                 print "  \033[1mWarning! File %s: Ignoring %s corrupt file%s and retrying!\033[0m" % (i+1,len(newFailedRootFiles),plural(newFailedRootFiles))
                 continue
               else:
                 print "  \033[1mWarning! File %s: Ignoring %s corrupt file%s!\033[0m" % (i+1,len(newFailedRootFiles),plural(newFailedRootFiles))
             
+            # NO RETRY
             outerr=processMC.stderr.read()
             if outerr: print "sframe_input.py gave an error:\n%s" % (outerr)
-            if nWrittenRootFiles != nRootFiles and not makeXMLFileFromStart:
+            if nWrittenRootFiles != nRootFiles:
               print "  \033[1mWarning! File %s contains fewer root files (%s) than expected (%s)! (%s.xml)\033[0m" % (i+1,nWrittenRootFiles,nRootFiles,outName)
               if verbose:
                 for j, file in enumerate(csvList.split(',')): print "%3s: %s" % (j,file)
             
-          # TODO: write failed files to a xml file in outdir
+          # LOG failed files
           if len(failedRootFiles) and writeFailed: writeFailedRootFiles(failedRootFiles,i,outDir,outName)
         
   print "- "*10

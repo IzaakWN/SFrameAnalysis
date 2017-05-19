@@ -8,9 +8,104 @@
 
 
 
+void TauTauAnalysis::makeHistogramsForChecks(){
+  //std::cout << "makeHistogramsForChecks" << std::endl;
+
+  // histograms - cutflow
+  for (auto ch: channels_){
+    TString dirname = "histogram_" + ch;
+    TString tch = ch;
+    
+    if(m_isData){
+      int  nperiods=7*2-1;
+      float periods[7*2] = { 272007-1, 275376+1,   275657-1, 276283+1,   276315-1, 276811+1,
+                             276831-1, 277420+1,   277772-1, 278808+1,   278820-1, 280385+1,   280919-1, 284044+1  };
+      Book( TH1F("runnumber", "runnumber", nperiods, periods ), dirname );
+    }
+    
+    // Book( TH1F("lepton_pt",         "lepton_pt",        100,   0, 120 ), dirname);
+    // Book( TH1F("lepton_eta",        "lepton_eta",       100,   0, 3.0 ), dirname);
+    // Book( TH1F("lepton_ID",         "lepton_ID",          2,   0, 2   ), dirname);
+    // Book( TH1F("lepton_N",          "lepton_N",          10,   0, 10  ), dirname);
+    // Book( TH1F("lepton_pt_pt23",    "lepton_pt_pt23",   100,   0, 120 ), dirname);
+    // Book( TH1F("lepton_eta_pt23",   "lepton_eta_pt23",  100,   0, 3.0 ), dirname);
+    // Book( TH1F("lepton_ID_pt23",    "lepton_ID_pt23",     2,   0, 2   ), dirname);
+    // Book( TH1F("lepton_N_pt23",     "lepton_N_pt23",     10,   0, 10  ), dirname);
+    // Book( TH1F("lepton_pt_2p4",     "lepton_pt_2p4",    100,   0, 120 ), dirname);
+    // Book( TH1F("lepton_eta_2p4",    "lepton_eta_2p4",   100,   0, 3.0 ), dirname);
+    // Book( TH1F("lepton_ID_2p4",     "lepton_ID_2p4",      2,   0, 2   ), dirname);
+    // Book( TH1F("lepton_N_2p4",      "lepton_N_2p4",      10,   0, 10  ), dirname);
+    // Book( TH1F("lepton_pt_vtx",     "lepton_pt_vtx",    100,   0, 120 ), dirname);
+    // Book( TH1F("lepton_eta_vtx",    "lepton_eta_vtx",   100,   0, 3.0 ), dirname);
+    // Book( TH1F("lepton_ID_vtx",     "lepton_ID_vtx",      2,   0, 2   ), dirname);
+    Book( TH1F("triggers",          "triggers",          10,   0, 10  ), dirname);
+    
+    // Book( TH1F("gen_match_1_pt23_eta2p4",  "gen_match_1_pt23_eta2p4", 8, 0, 8 ), dirname);
+    // Book( TH1F("gen_match_1_d0_dz",  "gen_match_1_d0_dz", 8, 0, 8 ), dirname);
+    // Book( TH1F("gen_match_1_baseline", "gen_match_1_baseline", 8, 0, 8 ), dirname);
+    // Book( TH1F("gen_match_2",  "gen_match_2", 8, 0, 8 ), dirname);
+    // Book( TH1F("gen_match_2_baseline", "gen_match_2_baseline", 8, 0, 8 ), dirname);
+  }
+  
+  // histograms - checks
+//   if(m_isSignal){
+//   
+//     // gen level distributions checks
+//     Book( TH1F("pt_gentaus",      "gen taus pt",      150, 0, 150 ), "checks");
+//     Book( TH1F("pt_gentau1",      "gen tau 1 pt",     150, 0, 150 ), "checks");
+//     Book( TH1F("pt_gentau2",      "gen tau 2 pt",     150, 0, 150 ), "checks");
+//     Book( TH1F("pt_genmuon",      "gen muon pt",      100, 0, 100 ), "checks");
+//     Book( TH1F("pt_tt_gen",       "gen pt_tt",        150, 0, 200 ), "checks");
+//     Book( TH1F("DeltaR_tautau",   "DeltaR_tautau",    150, 0,   5 ), "checks");
+//     Book( TH1F("DeltaR_taumu",    "DeltaR_taumu",     150, 0,   5 ), "checks");
+//     Book( TH1F("M_tautau",        "M_tautau",         200, 0,  60 ), "checks");
+//     
+//     // cutflow checks
+//     Book( TH1F("N_tauh_gen",      "N_tauh_gen",         5, 0,   5 ), "checks");
+//     Book( TH1F("N_tau_gen",       "N_tau_gen",          5, 0,   5 ), "checks");
+//     Book( TH1F("N_tauh_18_2p3_gen", "N_tauh_18_2p3_gen", 5, 0,  5 ), "checks");
+//     Book( TH1F("N_tau_reco",      "N_tau_reco",         5, 0,   5 ), "checks");
+//     Book( TH1F("N_tau_reco_18_2p3", "N_tau_reco_18_2p3", 5, 0,   5 ), "checks");
+//     Book( TH1F("tau_type",        "tau_type",           5, 0,   5 ), "checks");
+//     Book( TH1F("N_tau_std",       "N_tau_std",          5, 0,   5 ), "checks");
+//     Book( TH1F("N_tau_bst",       "N_tau_bst",          5, 0,   5 ), "checks");
+//     Book( TH1F("N_tau_18_2p3_std", "N_tau_18_2p3_std",  5, 0,   5 ), "checks");
+//     Book( TH1F("N_tau_18_2p3_1ctauh_std", "N_tau_18_2p3_1ctauh_std",  5, 0,   5 ), "checks");
+//     Book( TH1F("gen_match_tau_std", "gen_match_tau_std", 8, 0,  8 ), "checks");
+//     Book( TH1F("gen_match_tau_bst", "gen_match_tau_bst", 8, 0,  8 ), "checks");
+//     Book( TH1F("N_gen_match0p30_tau_std", "N_gen_match0p30_tau_std", 5, 0,  5 ), "checks");
+//     Book( TH1F("N_gen_match0p30_tau_bst", "N_gen_match0p30_tau_bst", 5, 0,  5 ), "checks");
+//     Book( TH1F("N_gen_match0p30_1bst_tau_std", "N_gen_match0p30_1bst_tau_std", 5, 0,  5 ), "checks");
+//     Book( TH1F("N_gen_match0p30_1bst_18_2p3_tau_std", "N_gen_match0p30_1bst_18_2p3_tau_std", 5, 0,  5 ), "checks");
+//     Book( TH1F("N_gen_match0p30_1ctauh_tau_std",  "N_gen_match0p30_1ctauh_tau_std", 5, 0,  5 ), "checks");
+//     Book( TH1F("N_gen_match0p30_0tauh_tau_std",   "N_gen_match0p30_0tauh_tau_std",  5, 0,  5 ), "checks");
+//     Book( TH1F("N_gen_match_tau_1cjet_bst",       "N_gen_match_tau_1cjet_bst",      5, 0,  5 ), "checks");
+//     Book( TH1F("N_gen_match0p30_18_2p3_tau_std",  "N_gen_match0p30_18_2p3_tau_std", 5, 0,  5 ), "checks");
+//     Book( TH1F("DeltaR_gen_reco_tau_std", "DeltaR_gen_reco_tau_std", 100, 0, 5 ), "checks");
+//     Book( TH1F("DeltaR_gen_reco_tau_bst", "DeltaR_gen_reco_tau_bst", 100, 0, 5 ), "checks");
+//     Book( TH1F("DeltaR_gen_reco_tau_min_1ctauh_std",  "DeltaR_gen_reco_tau_min_1ctauh_std", 100, 0, 5 ), "checks");
+//     Book( TH1F("DeltaR_gen_reco_tau_min_0tauh_std",   "DeltaR_gen_reco_tau_min_0tauh_std", 100, 0, 5 ), "checks");
+//     Book( TH1F("eta_tau_reco",    "eta_tau_reco",     100, -5, 5 ), "checks");
+//     Book( TH1F("pt_tau_reco",     "pt_tau_reco",      100, 0, 100 ), "checks");
+//     Book( TH1F("DeltaDeltaR",     "DeltaDeltaR",      100, -1,  5 ), "checks"); // abs(dR_TLV - dR_function)
+//     Book( TH1F("decayModeFinding", "decayModeFinding",   2,  0,  2 ), "checks");
+//     
+//     // boosted regime checks
+//     Book( TH1F("pt_tt_vis",         "pt_tt_vis",      100, 0, 200 ), "checks");
+//     Book( TH1F("pt_tt_vis_ltau",    "pt_tt_vis_ltau", 100, 0, 200 ), "checks");
+//     Book( TH2F("DeltaR_pt_tt_vis_ltau",     "DeltaR_pt_tt_vis_ltau",     100, 0, 200, 100, 0,   5 ), "checks");
+//     Book( TH2F("DeltaR_pt_tt_vis_ltau_std", "DeltaR_pt_tt_vis_ltau_std", 100, 0, 200, 100, 0,   5 ), "checks");
+//     Book( TH2F("DeltaR_pt_tt_vis_ltau_bst", "DeltaR_pt_tt_vis_ltau_bst", 100, 0, 200, 100, 0,   5 ), "checks");
+//     
+//   }
+}
 
 
-void TauTauAnalysis::checks() {
+
+
+
+
+void TauTauAnalysis::checks(){
   //std::cout << "checks" << std::endl;
 
   /// GEN TAUS

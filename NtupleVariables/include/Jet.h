@@ -80,6 +80,10 @@ namespace UZH {
     floatingnumber* m_cemf;
     floatingnumber* m_csv;
     int* m_charge;
+    floatingnumber* m_jer_sf;
+    floatingnumber* m_jer_sf_up;
+    floatingnumber* m_jer_sf_down;
+    floatingnumber* m_jer_sigma_pt;
     int* m_subjet_softdrop_N;
     std::vector<floatingnumber>* m_subjet_softdrop_pt;
     std::vector<floatingnumber>* m_subjet_softdrop_eta;
@@ -149,6 +153,10 @@ namespace UZH {
     floatingnumber cemf() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::kcemf)) std::cout<<"cemf not connected!"<<std::endl;*/ return *(m_cemf); } 
     floatingnumber csv() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::kcsv)) std::cout<<"csv not connected!"<<std::endl;*/ return *(m_csv); } 
     int charge() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::kcharge)) std::cout<<"charge not connected!"<<std::endl;*/ return *(m_charge); } 
+    floatingnumber jer_sf() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::kjer_sf)) std::cout<<"jer_sf not connected!"<<std::endl;*/ return *(m_jer_sf); } 
+    floatingnumber jer_sf_up() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::kjer_sf_up)) std::cout<<"jer_sf_up not connected!"<<std::endl;*/ return *(m_jer_sf_up); } 
+    floatingnumber jer_sf_down() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::kjer_sf_down)) std::cout<<"jer_sf_down not connected!"<<std::endl;*/ return *(m_jer_sf_down); } 
+    floatingnumber jer_sigma_pt() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::kjer_sigma_pt)) std::cout<<"jer_sigma_pt not connected!"<<std::endl;*/ return *(m_jer_sigma_pt); } 
     int subjet_softdrop_N() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::ksubjet_softdrop_N)) std::cout<<"subjet_softdrop_N not connected!"<<std::endl;*/ return *(m_subjet_softdrop_N); } 
     std::vector<floatingnumber> subjet_softdrop_pt() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::ksubjet_softdrop_pt)) std::cout<<"subjet_softdrop_pt not connected!"<<std::endl;*/ return *(m_subjet_softdrop_pt); } 
     std::vector<floatingnumber> subjet_softdrop_eta() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::ksubjet_softdrop_eta)) std::cout<<"subjet_softdrop_eta not connected!"<<std::endl;*/ return *(m_subjet_softdrop_eta); } 
@@ -205,6 +213,10 @@ namespace UZH {
     void cemf( const floatingnumber& val){ *(m_cemf)=val; } 
     void csv( const floatingnumber& val){ *(m_csv)=val; } 
     void charge( const int& val){ *(m_charge)=val; } 
+    void jer_sf( const floatingnumber& val){ *(m_jer_sf)=val; } 
+    void jer_sf_up( const floatingnumber& val){ *(m_jer_sf_up)=val; } 
+    void jer_sf_down( const floatingnumber& val){ *(m_jer_sf_down)=val; } 
+    void jer_sigma_pt( const floatingnumber& val){ *(m_jer_sigma_pt)=val; } 
     void subjet_softdrop_N( const int& val){ *(m_subjet_softdrop_N)=val; } 
     void subjet_softdrop_pt( const std::vector<floatingnumber>& val){ *(m_subjet_softdrop_pt)=val; } 
     void subjet_softdrop_eta( const std::vector<floatingnumber>& val){ *(m_subjet_softdrop_eta)=val; } 

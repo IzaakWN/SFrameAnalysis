@@ -78,6 +78,13 @@ if(  ((detail_level & Ntuple::JetBasic) == Ntuple::JetBasic)  ) {
     setConnectSucceeded(2, ConnectVariable( treeName, prefix + m_objectNames.getName("charge"), charge)); 
 } // end of detail level Basic
 
+if(  ((detail_level & Ntuple::JetJER) == Ntuple::JetJER)  ) {
+     setConnectSucceeded(56, ConnectVariable( treeName, prefix + m_objectNames.getName("jer_sf"), jer_sf)); 
+    setConnectSucceeded(57, ConnectVariable( treeName, prefix + m_objectNames.getName("jer_sf_up"), jer_sf_up)); 
+    setConnectSucceeded(58, ConnectVariable( treeName, prefix + m_objectNames.getName("jer_sf_down"), jer_sf_down)); 
+    setConnectSucceeded(59, ConnectVariable( treeName, prefix + m_objectNames.getName("jer_sigma_pt"), jer_sigma_pt)); 
+} // end of detail level JER
+
 if(  ((detail_level & Ntuple::JetSoftdropSubjets) == Ntuple::JetSoftdropSubjets)  ) {
      setConnectSucceeded(43, ConnectVariable( treeName, prefix + m_objectNames.getName("subjet_softdrop_N"), subjet_softdrop_N)); 
     setConnectSucceeded(44, ConnectVariable( treeName, prefix + m_objectNames.getName("subjet_softdrop_pt"), subjet_softdrop_pt)); 

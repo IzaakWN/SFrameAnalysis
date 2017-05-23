@@ -18,8 +18,14 @@ CovAnalysis	floatingnumber*	cov00
 CovAnalysis	floatingnumber*	cov10
 CovAnalysis	floatingnumber*	cov11
 
-MVAAnalysis	std::vector<floatingnumber>*	recoil_pt
-MVAAnalysis	std::vector<floatingnumber>*	recoil_eta
-MVAAnalysis	std::vector<floatingnumber>*	recoil_phi
-MVAAnalysis	std::vector<int>*	recoil_pdgId
+# MVAAnalysis	std::vector<floatingnumber>*	recoil_pt
+# MVAAnalysis	std::vector<floatingnumber>*	recoil_eta
+# MVAAnalysis	std::vector<floatingnumber>*	recoil_phi
+# MVAAnalysis	std::vector<int>*	            recoil_pdgId
 
+AnalysisSyst    floatingnumber* JetEnUp
+AnalysisSyst    floatingnumber* JetEnDown
+AnalysisSyst    floatingnumber* JetResUp
+AnalysisSyst    floatingnumber* JetResDown
+AnalysisSyst    floatingnumber* UnclusteredEnUp
+AnalysisSyst    floatingnumber* UnclusteredEnDown

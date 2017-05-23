@@ -69,6 +69,13 @@ if(  ((ana->detailLevel & Ntuple::JetBasic) == Ntuple::JetBasic)  ) {
     if (ana->m_connectsucceeded[2]) m_charge = &((*ana->charge)[idx]); else m_charge = 0; 
 } // end of detail level Basic
 
+if(  ((ana->detailLevel & Ntuple::JetJER) == Ntuple::JetJER)  ) {
+     if (ana->m_connectsucceeded[56]) m_jer_sf = &((*ana->jer_sf)[idx]); else m_jer_sf = 0; 
+    if (ana->m_connectsucceeded[57]) m_jer_sf_up = &((*ana->jer_sf_up)[idx]); else m_jer_sf_up = 0; 
+    if (ana->m_connectsucceeded[58]) m_jer_sf_down = &((*ana->jer_sf_down)[idx]); else m_jer_sf_down = 0; 
+    if (ana->m_connectsucceeded[59]) m_jer_sigma_pt = &((*ana->jer_sigma_pt)[idx]); else m_jer_sigma_pt = 0; 
+} // end of detail level JER
+
 if(  ((ana->detailLevel & Ntuple::JetSoftdropSubjets) == Ntuple::JetSoftdropSubjets)  ) {
      if (ana->m_connectsucceeded[43]) m_subjet_softdrop_N = &((*ana->subjet_softdrop_N)[idx]); else m_subjet_softdrop_N = 0; 
     if (ana->m_connectsucceeded[44]) m_subjet_softdrop_pt = &((*ana->subjet_softdrop_pt)[idx]); else m_subjet_softdrop_pt = 0; 
@@ -168,6 +175,14 @@ if(  ((rhs.getLvl() & Ntuple::JetBasic) == Ntuple::JetBasic)  ) {
   out << " charge " << rhs.charge();
 ;
 } // end of detail level Basic
+
+if(  ((rhs.getLvl() & Ntuple::JetJER) == Ntuple::JetJER)  ) {
+   out << " jer_sf " << rhs.jer_sf();
+  out << " jer_sf_up " << rhs.jer_sf_up();
+  out << " jer_sf_down " << rhs.jer_sf_down();
+  out << " jer_sigma_pt " << rhs.jer_sigma_pt();
+;
+} // end of detail level JER
 
 if(  ((rhs.getLvl() & Ntuple::JetSoftdropSubjets) == Ntuple::JetSoftdropSubjets)  ) {
    out << " subjet_softdrop_N " << rhs.subjet_softdrop_N();

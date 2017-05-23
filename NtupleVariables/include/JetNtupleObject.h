@@ -36,13 +36,14 @@ namespace Ntuple {
   */
   
   enum JetDetails {
-    JetSubstructure = 1,
-    JetSoftdropSubjets = 2,
-    JetSoftdropSubjetsTruth = 4,
-    JetAnalysis = 8,
-    JetTruth = 16,
-    JetBasic = 32,
-    JetAll = 63,
+    JetJER = 1,
+    JetSubstructure = 2,
+    JetSoftdropSubjets = 4,
+    JetSoftdropSubjetsTruth = 8,
+    JetAnalysis = 16,
+    JetTruth = 32,
+    JetBasic = 64,
+    JetAll = 127,
 
   };
   
@@ -100,6 +101,10 @@ namespace Ntuple {
      kcemf=25, 
      kcsv=1, 
      kcharge=2, 
+     kjer_sf=56, 
+     kjer_sf_up=57, 
+     kjer_sf_down=58, 
+     kjer_sigma_pt=59, 
      ksubjet_softdrop_N=43, 
      ksubjet_softdrop_pt=44, 
      ksubjet_softdrop_eta=45, 
@@ -170,6 +175,10 @@ namespace Ntuple {
     std::vector< floatingnumber >  *cemf;
     std::vector< floatingnumber >  *csv;
     std::vector< int >  *charge;
+    std::vector< floatingnumber >  *jer_sf;
+    std::vector< floatingnumber >  *jer_sf_up;
+    std::vector< floatingnumber >  *jer_sf_down;
+    std::vector< floatingnumber >  *jer_sigma_pt;
     std::vector< int >  *subjet_softdrop_N;
     std::vector< std::vector<floatingnumber> >  *subjet_softdrop_pt;
     std::vector< std::vector<floatingnumber> >  *subjet_softdrop_eta;

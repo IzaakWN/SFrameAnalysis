@@ -54,19 +54,22 @@ Truth	int*	genParton_pdgID
 Truth	int*	nbHadrons
 Truth	int*	ncHadrons
 
-
-
-SoftdropSubjets	int*	subjet_softdrop_N
+SoftdropSubjets	int*	                        subjet_softdrop_N
 SoftdropSubjets	std::vector<floatingnumber>*	subjet_softdrop_pt
 SoftdropSubjets	std::vector<floatingnumber>*	subjet_softdrop_eta
 SoftdropSubjets	std::vector<floatingnumber>*	subjet_softdrop_phi
 SoftdropSubjets	std::vector<floatingnumber>*	subjet_softdrop_e
 SoftdropSubjets	std::vector<floatingnumber>*	subjet_softdrop_m
 SoftdropSubjets	std::vector<floatingnumber>*	subjet_softdrop_csv
-SoftdropSubjets	std::vector<int>*	subjet_softdrop_charge
+SoftdropSubjets	std::vector<int>*	            subjet_softdrop_charge
 
 SoftdropSubjetsTruth	std::vector<int>*	subjet_softdrop_partonFlavour
 SoftdropSubjetsTruth	std::vector<int>*	subjet_softdrop_hadronFlavour
 SoftdropSubjetsTruth	std::vector<int>*	subjet_softdrop_genParton_pdgID
 SoftdropSubjetsTruth	std::vector<int>*	subjet_softdrop_nbHadrons
 SoftdropSubjetsTruth	std::vector<int>*	subjet_softdrop_ncHadrons
+
+JER     floatingnumber* jer_sf
+JER     floatingnumber* jer_sf_up
+JER     floatingnumber* jer_sf_down
+JER     floatingnumber* jer_sigma_pt

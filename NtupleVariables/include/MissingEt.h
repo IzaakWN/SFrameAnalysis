@@ -52,15 +52,17 @@ namespace UZH {
     floatingnumber* m_corrPx;
     floatingnumber* m_corrPy;
     floatingnumber* m_significance;
+    floatingnumber* m_JetEnUp;
+    floatingnumber* m_JetEnDown;
+    floatingnumber* m_JetResUp;
+    floatingnumber* m_JetResDown;
+    floatingnumber* m_UnclusteredEnUp;
+    floatingnumber* m_UnclusteredEnDown;
     floatingnumber* m_et;
     floatingnumber* m_phi;
     floatingnumber* m_cov00;
     floatingnumber* m_cov10;
     floatingnumber* m_cov11;
-    std::vector<floatingnumber>* m_recoil_pt;
-    std::vector<floatingnumber>* m_recoil_eta;
-    std::vector<floatingnumber>* m_recoil_phi;
-    std::vector<int>* m_recoil_pdgId;
 
 
 
@@ -73,29 +75,33 @@ namespace UZH {
     floatingnumber corrPx() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MissingEtNtupleObject::kcorrPx)) std::cout<<"corrPx not connected!"<<std::endl;*/ return *(m_corrPx); } 
     floatingnumber corrPy() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MissingEtNtupleObject::kcorrPy)) std::cout<<"corrPy not connected!"<<std::endl;*/ return *(m_corrPy); } 
     floatingnumber significance() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MissingEtNtupleObject::ksignificance)) std::cout<<"significance not connected!"<<std::endl;*/ return *(m_significance); } 
+    floatingnumber JetEnUp() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MissingEtNtupleObject::kJetEnUp)) std::cout<<"JetEnUp not connected!"<<std::endl;*/ return *(m_JetEnUp); } 
+    floatingnumber JetEnDown() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MissingEtNtupleObject::kJetEnDown)) std::cout<<"JetEnDown not connected!"<<std::endl;*/ return *(m_JetEnDown); } 
+    floatingnumber JetResUp() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MissingEtNtupleObject::kJetResUp)) std::cout<<"JetResUp not connected!"<<std::endl;*/ return *(m_JetResUp); } 
+    floatingnumber JetResDown() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MissingEtNtupleObject::kJetResDown)) std::cout<<"JetResDown not connected!"<<std::endl;*/ return *(m_JetResDown); } 
+    floatingnumber UnclusteredEnUp() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MissingEtNtupleObject::kUnclusteredEnUp)) std::cout<<"UnclusteredEnUp not connected!"<<std::endl;*/ return *(m_UnclusteredEnUp); } 
+    floatingnumber UnclusteredEnDown() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MissingEtNtupleObject::kUnclusteredEnDown)) std::cout<<"UnclusteredEnDown not connected!"<<std::endl;*/ return *(m_UnclusteredEnDown); } 
     floatingnumber et() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MissingEtNtupleObject::ket)) std::cout<<"et not connected!"<<std::endl;*/ return *(m_et); } 
     floatingnumber phi() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MissingEtNtupleObject::kphi)) std::cout<<"phi not connected!"<<std::endl;*/ return *(m_phi); } 
     floatingnumber cov00() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MissingEtNtupleObject::kcov00)) std::cout<<"cov00 not connected!"<<std::endl;*/ return *(m_cov00); } 
     floatingnumber cov10() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MissingEtNtupleObject::kcov10)) std::cout<<"cov10 not connected!"<<std::endl;*/ return *(m_cov10); } 
     floatingnumber cov11() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MissingEtNtupleObject::kcov11)) std::cout<<"cov11 not connected!"<<std::endl;*/ return *(m_cov11); } 
-    std::vector<floatingnumber> recoil_pt() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MissingEtNtupleObject::krecoil_pt)) std::cout<<"recoil_pt not connected!"<<std::endl;*/ return *(m_recoil_pt); } 
-    std::vector<floatingnumber> recoil_eta() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MissingEtNtupleObject::krecoil_eta)) std::cout<<"recoil_eta not connected!"<<std::endl;*/ return *(m_recoil_eta); } 
-    std::vector<floatingnumber> recoil_phi() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MissingEtNtupleObject::krecoil_phi)) std::cout<<"recoil_phi not connected!"<<std::endl;*/ return *(m_recoil_phi); } 
-    std::vector<int> recoil_pdgId() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MissingEtNtupleObject::krecoil_pdgId)) std::cout<<"recoil_pdgId not connected!"<<std::endl;*/ return *(m_recoil_pdgId); } 
     
     void sumEt( const floatingnumber& val){ *(m_sumEt)=val; } 
     void corrPx( const floatingnumber& val){ *(m_corrPx)=val; } 
     void corrPy( const floatingnumber& val){ *(m_corrPy)=val; } 
     void significance( const floatingnumber& val){ *(m_significance)=val; } 
+    void JetEnUp( const floatingnumber& val){ *(m_JetEnUp)=val; } 
+    void JetEnDown( const floatingnumber& val){ *(m_JetEnDown)=val; } 
+    void JetResUp( const floatingnumber& val){ *(m_JetResUp)=val; } 
+    void JetResDown( const floatingnumber& val){ *(m_JetResDown)=val; } 
+    void UnclusteredEnUp( const floatingnumber& val){ *(m_UnclusteredEnUp)=val; } 
+    void UnclusteredEnDown( const floatingnumber& val){ *(m_UnclusteredEnDown)=val; } 
     void et( const floatingnumber& val){ *(m_et)=val; } 
     void phi( const floatingnumber& val){ *(m_phi)=val; } 
     void cov00( const floatingnumber& val){ *(m_cov00)=val; } 
     void cov10( const floatingnumber& val){ *(m_cov10)=val; } 
     void cov11( const floatingnumber& val){ *(m_cov11)=val; } 
-    void recoil_pt( const std::vector<floatingnumber>& val){ *(m_recoil_pt)=val; } 
-    void recoil_eta( const std::vector<floatingnumber>& val){ *(m_recoil_eta)=val; } 
-    void recoil_phi( const std::vector<floatingnumber>& val){ *(m_recoil_phi)=val; } 
-    void recoil_pdgId( const std::vector<int>& val){ *(m_recoil_pdgId)=val; } 
     
 
   private:

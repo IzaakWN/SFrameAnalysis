@@ -36,6 +36,15 @@ if(  ((ana->detailLevel & Ntuple::MissingEtAnalysis) == Ntuple::MissingEtAnalysi
     if (ana->m_connectsucceeded[6]) m_significance = &((*ana->significance)[idx]); else m_significance = 0; 
 } // end of detail level Analysis
 
+if(  ((ana->detailLevel & Ntuple::MissingEtAnalysisSyst) == Ntuple::MissingEtAnalysisSyst)  ) {
+     if (ana->m_connectsucceeded[10]) m_JetEnUp = &((*ana->JetEnUp)[idx]); else m_JetEnUp = 0; 
+    if (ana->m_connectsucceeded[11]) m_JetEnDown = &((*ana->JetEnDown)[idx]); else m_JetEnDown = 0; 
+    if (ana->m_connectsucceeded[12]) m_JetResUp = &((*ana->JetResUp)[idx]); else m_JetResUp = 0; 
+    if (ana->m_connectsucceeded[13]) m_JetResDown = &((*ana->JetResDown)[idx]); else m_JetResDown = 0; 
+    if (ana->m_connectsucceeded[14]) m_UnclusteredEnUp = &((*ana->UnclusteredEnUp)[idx]); else m_UnclusteredEnUp = 0; 
+    if (ana->m_connectsucceeded[15]) m_UnclusteredEnDown = &((*ana->UnclusteredEnDown)[idx]); else m_UnclusteredEnDown = 0; 
+} // end of detail level AnalysisSyst
+
 if(  ((ana->detailLevel & Ntuple::MissingEtBasic) == Ntuple::MissingEtBasic)  ) {
      if (ana->m_connectsucceeded[1]) m_et = &((*ana->et)[idx]); else m_et = 0; 
     if (ana->m_connectsucceeded[2]) m_phi = &((*ana->phi)[idx]); else m_phi = 0; 
@@ -45,13 +54,6 @@ if(  ((ana->detailLevel & Ntuple::MissingEtCovAnalysis) == Ntuple::MissingEtCovA
      if (ana->m_connectsucceeded[7]) m_cov00 = &((*ana->cov00)[idx]); else m_cov00 = 0; 
     if (ana->m_connectsucceeded[8]) m_cov10 = &((*ana->cov10)[idx]); else m_cov10 = 0; 
     if (ana->m_connectsucceeded[9]) m_cov11 = &((*ana->cov11)[idx]); else m_cov11 = 0; 
-} // end of detail level CovAnalysis
-
-if(  ((ana->detailLevel & Ntuple::MissingEtMVAAnalysis) == Ntuple::MissingEtMVAAnalysis)  ) {
-     if (ana->m_connectsucceeded[10]) m_recoil_pt = &((*ana->recoil_pt)[idx]); else m_recoil_pt = 0; 
-    if (ana->m_connectsucceeded[11]) m_recoil_eta = &((*ana->recoil_eta)[idx]); else m_recoil_eta = 0; 
-    if (ana->m_connectsucceeded[12]) m_recoil_phi = &((*ana->recoil_phi)[idx]); else m_recoil_phi = 0; 
-    if (ana->m_connectsucceeded[13]) m_recoil_pdgId = &((*ana->recoil_pdgId)[idx]); else m_recoil_pdgId = 0; 
 }
 
 
@@ -83,6 +85,16 @@ if(  ((rhs.getLvl() & Ntuple::MissingEtAnalysis) == Ntuple::MissingEtAnalysis)  
 ;
 } // end of detail level Analysis
 
+if(  ((rhs.getLvl() & Ntuple::MissingEtAnalysisSyst) == Ntuple::MissingEtAnalysisSyst)  ) {
+   out << " JetEnUp " << rhs.JetEnUp();
+  out << " JetEnDown " << rhs.JetEnDown();
+  out << " JetResUp " << rhs.JetResUp();
+  out << " JetResDown " << rhs.JetResDown();
+  out << " UnclusteredEnUp " << rhs.UnclusteredEnUp();
+  out << " UnclusteredEnDown " << rhs.UnclusteredEnDown();
+;
+} // end of detail level AnalysisSyst
+
 if(  ((rhs.getLvl() & Ntuple::MissingEtBasic) == Ntuple::MissingEtBasic)  ) {
    out << " et " << rhs.et();
   out << " phi " << rhs.phi();
@@ -93,14 +105,6 @@ if(  ((rhs.getLvl() & Ntuple::MissingEtCovAnalysis) == Ntuple::MissingEtCovAnaly
    out << " cov00 " << rhs.cov00();
   out << " cov10 " << rhs.cov10();
   out << " cov11 " << rhs.cov11();
-;
-} // end of detail level CovAnalysis
-
-if(  ((rhs.getLvl() & Ntuple::MissingEtMVAAnalysis) == Ntuple::MissingEtMVAAnalysis)  ) {
-   try{  out << " recoil_pt " << rhs.recoil_pt().at(0);} catch(...){std::cout<<"except: no element"<<std::endl;};
-  try{  out << " recoil_eta " << rhs.recoil_eta().at(0);} catch(...){std::cout<<"except: no element"<<std::endl;};
-  try{  out << " recoil_phi " << rhs.recoil_phi().at(0);} catch(...){std::cout<<"except: no element"<<std::endl;};
-  try{  out << " recoil_pdgId " << rhs.recoil_pdgId().at(0);} catch(...){std::cout<<"except: no element"<<std::endl;};
 ;
 }
 

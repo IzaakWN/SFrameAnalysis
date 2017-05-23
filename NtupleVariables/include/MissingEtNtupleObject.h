@@ -37,9 +37,9 @@ namespace Ntuple {
   
   enum MissingEtDetails {
     MissingEtCovAnalysis = 1,
-    MissingEtMVAAnalysis = 2,
+    MissingEtBasic = 2,
     MissingEtAnalysis = 4,
-    MissingEtBasic = 8,
+    MissingEtAnalysisSyst = 8,
     MissingEtAll = 15,
 
   };
@@ -74,15 +74,17 @@ namespace Ntuple {
      kcorrPx=4, 
      kcorrPy=5, 
      ksignificance=6, 
+     kJetEnUp=10, 
+     kJetEnDown=11, 
+     kJetResUp=12, 
+     kJetResDown=13, 
+     kUnclusteredEnUp=14, 
+     kUnclusteredEnDown=15, 
      ket=1, 
      kphi=2, 
      kcov00=7, 
      kcov10=8, 
      kcov11=9, 
-     krecoil_pt=10, 
-     krecoil_eta=11, 
-     krecoil_phi=12, 
-     krecoil_pdgId=13, 
  
       kEnd 
     }; 
@@ -97,15 +99,17 @@ namespace Ntuple {
     std::vector< floatingnumber >  *corrPx;
     std::vector< floatingnumber >  *corrPy;
     std::vector< floatingnumber >  *significance;
+    std::vector< floatingnumber >  *JetEnUp;
+    std::vector< floatingnumber >  *JetEnDown;
+    std::vector< floatingnumber >  *JetResUp;
+    std::vector< floatingnumber >  *JetResDown;
+    std::vector< floatingnumber >  *UnclusteredEnUp;
+    std::vector< floatingnumber >  *UnclusteredEnDown;
     std::vector< floatingnumber >  *et;
     std::vector< floatingnumber >  *phi;
     std::vector< floatingnumber >  *cov00;
     std::vector< floatingnumber >  *cov10;
     std::vector< floatingnumber >  *cov11;
-    std::vector< std::vector<floatingnumber> >  *recoil_pt;
-    std::vector< std::vector<floatingnumber> >  *recoil_eta;
-    std::vector< std::vector<floatingnumber> >  *recoil_phi;
-    std::vector< std::vector<int> >  *recoil_pdgId;
 
 
     std::vector<int> m_connectsucceeded;

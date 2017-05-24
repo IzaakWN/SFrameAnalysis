@@ -42,6 +42,7 @@ namespace std {} using namespace std;
 #include "include/NtupleObjectNames.h"
 #include "include/Particle.h"
 #include "include/EventInfoNtupleObject.h"
+#include "include/GenJetak4.h"
 #include "include/GenParticleNtupleObject.h"
 #include "include/MissingEt.h"
 #include "include/TauNtupleObject.h"
@@ -53,6 +54,7 @@ namespace std {} using namespace std;
 #include "include/MuonNtupleObject.h"
 #include "include/Tau.h"
 #include "include/MissingEtNtupleObject.h"
+#include "include/GenJetak4NtupleObject.h"
 #include "include/Electron.h"
 #include "include/Muon.h"
 
@@ -443,6 +445,7 @@ namespace {
 "include/NtupleObjectNames.h",
 "include/Particle.h",
 "include/EventInfoNtupleObject.h",
+"include/GenJetak4.h",
 "include/GenParticleNtupleObject.h",
 "include/MissingEt.h",
 "include/TauNtupleObject.h",
@@ -454,6 +457,7 @@ namespace {
 "include/MuonNtupleObject.h",
 "include/Tau.h",
 "include/MissingEtNtupleObject.h",
+"include/GenJetak4NtupleObject.h",
 "include/Electron.h",
 "include/Muon.h",
 0
@@ -486,6 +490,7 @@ namespace std{template <typename _Tp> class __attribute__((annotate("$clingAutol
 #include "include/NtupleObjectNames.h"
 #include "include/Particle.h"
 #include "include/EventInfoNtupleObject.h"
+#include "include/GenJetak4.h"
 #include "include/GenParticleNtupleObject.h"
 #include "include/MissingEt.h"
 #include "include/TauNtupleObject.h"
@@ -497,6 +502,7 @@ namespace std{template <typename _Tp> class __attribute__((annotate("$clingAutol
 #include "include/MuonNtupleObject.h"
 #include "include/Tau.h"
 #include "include/MissingEtNtupleObject.h"
+#include "include/GenJetak4NtupleObject.h"
 #include "include/Electron.h"
 #include "include/Muon.h"
 

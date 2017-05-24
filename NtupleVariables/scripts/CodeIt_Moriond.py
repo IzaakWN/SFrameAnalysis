@@ -335,6 +335,8 @@ use_dl    = True
 # define additional substitutions here
 objects = {
   'Jet'           : {},
+  #'GenJet'        : {'NoBasics': ''},
+  'GenJetak4'     : {'NoBasics': ''},
   'Muon'          : {},
   'Electron'      : {},
   'Tau'           : {},

@@ -58,8 +58,8 @@ namespace Ntuple {
     m_names["trigObject_filterLabels"] = "triggerObject_filterLabels";
     m_names["averageIntPerXing"] = "nPuVtx";
     m_names["actualIntPerXing"] = "nPuVtxTrue";
-    //    m_names["nPuVtx"] = "nPuVtx";
-    //    m_names["nPuVtxTrue"] = "nPuVtxTrue";
+    //m_names["nPuVtx"] = "nPuVtx";
+    //m_names["nPuVtxTrue"] = "nPuVtxTrue";
     m_names["PV_N"] = "PV_N";
     m_names["genEventWeight"] = "genWeight";
     m_names["pdf_id"] = "PDF_id";
@@ -138,13 +138,19 @@ namespace Ntuple {
     m_names["nbHadrons"] = "nbHadrons";
     m_names["ncHadrons"] = "ncHadrons";
     m_names["genParton_pdgID"] = "genParton_pdgID";
-    
-    // ID
-    m_names["IDLoose"] = "IDLoose";
-    m_names["IDTight"] = "IDTight";
+
+    // systematics
     m_names["jec"] = "jec";
     m_names["jecUp"] = "jecUp";
     m_names["jecDown"] = "jecDown";
+    m_names["jer_sf"]= "jer_sf";
+    m_names["jer_sf_up"]= "jer_sf_up";
+    m_names["jer_sf_down"]= "jer_sf_down";
+    m_names["jer_sigma_pt"]= "jer_sigma_pt";
+
+    // ID
+    m_names["IDLoose"] = "IDLoose";
+    m_names["IDTight"] = "IDTight";
     m_names["muf"] = "muf";
     m_names["phf"] = "phf";
     m_names["emf"] = "emf";
@@ -165,20 +171,20 @@ namespace Ntuple {
     m_names["cemf"] = "cemf";
     
     // substructure
-    m_names["tau1"] = "tau1";
-    m_names["tau2"] = "tau2";
-    m_names["tau3"] = "tau3";
-    m_names["pruned_mass"] = "pruned_mass";
-    m_names["pruned_massCorr"] = "pruned_massCorr";
-    m_names["softdrop_mass"] = "softdrop_mass";
-    m_names["softdrop_massCorr"] = "softdrop_massCorr";
-    m_names["pruned_jec"] = "pruned_jec";
-    m_names["pruned_jecUp"] = "pruned_jecUp";
-    m_names["pruned_jecDown"] = "pruned_jecDown";
-    m_names["softdrop_jec"] = "softdrop_jec";
-    m_names["softdrop_jecUp"] = "softdrop_jecUp";
-    m_names["softdrop_jecDown"] = "softdrop_jecDown";
-    m_names["Hbbtag"] = "Hbbtag";
+    // m_names["tau1"] = "tau1";
+    // m_names["tau2"] = "tau2";
+    // m_names["tau3"] = "tau3";
+    // m_names["pruned_mass"] = "pruned_mass";
+    // m_names["pruned_massCorr"] = "pruned_massCorr";
+    // m_names["softdrop_mass"] = "softdrop_mass";
+    // m_names["softdrop_massCorr"] = "softdrop_massCorr";
+    // m_names["pruned_jec"] = "pruned_jec";
+    // m_names["pruned_jecUp"] = "pruned_jecUp";
+    // m_names["pruned_jecDown"] = "pruned_jecDown";
+    // m_names["softdrop_jec"] = "softdrop_jec";
+    // m_names["softdrop_jecUp"] = "softdrop_jecUp";
+    // m_names["softdrop_jecDown"] = "softdrop_jecDown";
+    // m_names["Hbbtag"] = "Hbbtag";
 
     // // pruned subjets
     // m_names["subjet_pruned_N"] = "subjet_pruned_N";
@@ -197,20 +203,27 @@ namespace Ntuple {
     // m_names["subjet_pruned_genParton_pdgID"] = "subjet_pruned_genParton_pdgID";
     
     // softdrop subjets
-    m_names["subjet_softdrop_N"] = "subjet_softdrop_N";
-    m_names["subjet_softdrop_e"] = "subjet_softdrop_e";
-    m_names["subjet_softdrop_pt"] = "subjet_softdrop_pt";
-    m_names["subjet_softdrop_m"] = "subjet_softdrop_mass";
-    m_names["subjet_softdrop_eta"] = "subjet_softdrop_eta";
-    m_names["subjet_softdrop_phi"] = "subjet_softdrop_phi";
-    m_names["subjet_softdrop_charge"] = "subjet_softdrop_charge";
-    m_names["subjet_softdrop_csv"] = "subjet_softdrop_csv";
+    // m_names["subjet_softdrop_N"] = "subjet_softdrop_N";
+    // m_names["subjet_softdrop_e"] = "subjet_softdrop_e";
+    // m_names["subjet_softdrop_pt"] = "subjet_softdrop_pt";
+    // m_names["subjet_softdrop_m"] = "subjet_softdrop_mass";
+    // m_names["subjet_softdrop_eta"] = "subjet_softdrop_eta";
+    // m_names["subjet_softdrop_phi"] = "subjet_softdrop_phi";
+    // m_names["subjet_softdrop_charge"] = "subjet_softdrop_charge";
+    // m_names["subjet_softdrop_csv"] = "subjet_softdrop_csv";
     // softdrop subjets flavour truth
-    m_names["subjet_softdrop_partonFlavour"] = "subjet_softdrop_partonFlavour";
-    m_names["subjet_softdrop_hadronFlavour"] = "subjet_softdrop_hadronFlavour";
-    m_names["subjet_softdrop_nbHadrons"] = "subjet_softdrop_nbHadrons";
-    m_names["subjet_softdrop_ncHadrons"] = "subjet_softdrop_ncHadrons";
-    m_names["subjet_softdrop_genParton_pdgID"] = "subjet_softdrop_genParton_pdgID";
+    // m_names["subjet_softdrop_partonFlavour"] = "subjet_softdrop_partonFlavour";
+    // m_names["subjet_softdrop_hadronFlavour"] = "subjet_softdrop_hadronFlavour";
+    // m_names["subjet_softdrop_nbHadrons"] = "subjet_softdrop_nbHadrons";
+    // m_names["subjet_softdrop_ncHadrons"] = "subjet_softdrop_ncHadrons";
+    // m_names["subjet_softdrop_genParton_pdgID"] = "subjet_softdrop_genParton_pdgID";
+
+    // gen jets
+    m_names["genJetAK4_softdropmass"] = "genJetAK4_softdropmass";
+    m_names["genJetAK4_pt"] = "genJetAK4_pt";
+    m_names["genJetAK4_phi"] = "genJetAK4_phi";
+    m_names["genJetAK4_eta"] = "genJetAK4_eta";
+    m_names["genJetAK4_e"] = "genJetAK4_e";
 
     // leptons
     m_names["trackIso"] = "trackIso";

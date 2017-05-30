@@ -1,7 +1,7 @@
 from ROOT import TFile, TTree, TH1F, TH2F, gDirectory, kAzure
 import PlotTools
 from PlotTools  import Plot, makeHistName, combineCuts, combineWeights
-from PrintTools import header, color, warning, error, printVerbose, printSameLine, LoadingBar
+from PrintTools import header, color, warning, error, printVerbose, printSameLine, LoadingBar, printBinError
 from math import sqrt, pow
 
 # set in plot.py
@@ -507,6 +507,7 @@ class Samples(object):
             hist.Add( hist_new )
             printVerbose(">>>    sample %s added with %.1f events (%d entries)" % (sample.label,hist_new.Integral(),hist_new.GetEntries()),verbosity,level=2)
         
+        if verbosity>2: printBinError(hist)
         return hist
     
     
@@ -619,6 +620,7 @@ class Sample(object):
         
         if scale is not 1.0: hist.Scale(scale)
         if scale is     0.0: print warning("Scale of %s is 0!" % self.label)
+        if verbosity>2: printBinError(hist)
         #print hist.GetEntries()
         #gDirectory.Delete(label)
         
@@ -741,16 +743,17 @@ class Sample(object):
         #cuts        = combineCuts("%s<%s && %s<%s"%(a,var,var,b), cuts)
         scale       = 1
         N_tot       = self.N
-        name        = "%s_for_LumiAcceptance"%var
+        name        = "%s_for_LA"%var
         hist        = self.hist(var,100,a,b,name=name,cuts=cuts,weight=weight)
         (N,MC)      = (hist.GetSumOfWeights(),hist.GetEntries())
         gDirectory.Delete(name)
         cuts        = combineCuts("%s<%s && %s<%s"%(a,var,var,b), cuts)
-        printVerbose(">>> calculateLumiAcceptance: cuts=%s" % (cuts), verbosity)
+        printVerbose(">>> calculateLA:", verbosity)
+        printVerbose(">>>   cuts=%s"%(cuts), verbosity)
         if N_tot and N and lumi:
             scale   = N_tot/(N*lumi*1000)
-            printVerbose(">>> calculateLumiAcceptance: N_tot=%.4f, N=%.4f, MC=%.1f, lumi=%s, current scale=%.4f, scale=%.4f" % (N_tot, N, MC, lumi, self.scale, scale), verbosity)
-            printVerbose(">>> calculateLumiAcceptance: signalregion=(%.1f,%.1f)" % (a,b),verbosity)
+            printVerbose(">>>   N_tot=%.4f, N=%.4f, MC=%.1f, lumi=%s, current scale=%.4f, scale=%.4f" % (N_tot, N, MC, lumi, self.scale, scale), verbosity)
+            printVerbose(">>>   signalregion=(%.1f,%.1f)" % (a,b),verbosity)
         else: print warning("Could not find normalization for signal: N_tot=%s, N=%s, lumi=%s!" % (N_tot,N,lumi))
         return scale
 

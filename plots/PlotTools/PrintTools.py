@@ -183,3 +183,15 @@ def makeThreshold(n,**kwargs):
     return pow(10,min(max_digits,max(0.0,floor(log(n/10.0,10)))))
 
 
+def printBinError(hist,**kwargs):
+    '''Help function to print bin errors'''
+    N       = hist.GetNbinsX()
+    mini    = max(kwargs.get('mini',1),0)
+    maxi    = min(kwargs.get('maxi',N),N+1)
+    #mina    = kwargs.get('min',hist.FindBin(mini))
+    #maxb    = kwargs.get('max',hist.FindBin(maxi))
+    print ">>>   %4s  %8s  %8s  %8s" % ("bin","content","error",hist.GetName())
+    for i in range(mini,maxi):
+        print ">>>   %4s  %8.4f  %8.4f" % (i,hist.GetBinContent(i),hist.GetBinError(i))
+
+

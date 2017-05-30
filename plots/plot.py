@@ -37,7 +37,7 @@ args = parser.parse_args()
 
 # LABELS & LUMI
 mylabel     = "_Moriond" # extra label for opening file, saving plots to dir
-plotlabel   = "_debugging" # extra label for image file #_noWJrenormalization
+plotlabel   = "" # extra label for image file #_noWJrenormalization
 lumi        = 35.9
 if "ICHEP" in mylabel: lumi = 12.9 #24.5
 
@@ -93,9 +93,9 @@ if not doQCD:       plotlabel+="_noQCD"
 if not normalizeWJ: plotlabel+="_noWJrenormalization"
 if not normalizeTT: plotlabel+="_noTTrenormalization"
 channels  = [
-                "mutau",
+#                 "mutau",
 #                 "etau",
-#                 "emu",
+                "emu",
              ]
 
 
@@ -129,7 +129,7 @@ category2J   = "ncbtag > 0 && ncjets == 2 && nfjets == 0"
 # category1TT  = "ncbtag > 1 && ncjets  > 0 && nfjets  > 0 && met>60"
 # category2TT  = "ncbtag > 0 && ncjets  > 1 && nfjets == 0 && met>60"
 category1TT0 = "ncbtag > 1 && ncjets == 2 && nfjets  > 0"
-category1TT1 = "ncbtag > 1 && ncjets > 1 && nfjets  > 0"
+category1TT1 = "ncbtag > 1 && ncjets  > 1 && nfjets  > 0"
 category1TT  = "ncbtag > 0 && ncjets == 1 && nfjets  > 0 && met>60 && pfmt_1>60"
 category2TT  = "ncbtag > 0 && ncjets == 2 && nfjets == 0 && dphi_ll_bj>2 && met>60 && pfmt_1>60"
 (metcut,mt1cut) = ("met<60","pfmt_1<60")
@@ -142,9 +142,10 @@ categories   = [
 #                 ("lepton vetos",        "%s" % (vetos)),
 #                 ("iso, lepton vetos",   "%s && %s" % (isocuts, vetos)),
 #                 ("baseline, same sign", "%s" % (baseline.replace("q_1*q_2<0","q_1*q_2>0"))),
-#                 ("baseline",            "%s" % (baseline)),
+                ("baseline",            "%s" % (baseline)),
+#                 ("baseline WJ CR",      "%s && %s" % (baseline,"pfmt_1>70")),
                 ("category 1",          "%s && %s" % (baseline, category1)),
-#                 ("category 2",          "%s && %s" % (baseline, category2)),
+                ("category 2",          "%s && %s" % (baseline, category2)),
 #                 ("category 1, relaxed iso", "%s && %s" % (baseline.replace(isocuts,"iso_1<=0.50 && iso_2==1"),category1)),
 #                 ("category 2, relaxed iso", "%s && %s" % (baseline.replace(isocuts,"iso_1<=0.50 && iso_2==1"),category2)),
 #                 ("category 1, relaxed iso medium", "%s && %s" % (baseline.replace(isocuts,"iso_1<=0.50 && iso_2_medium==1"),category1)),
@@ -163,8 +164,8 @@ categories   = [
 #                 ("category 1 SR met",   "%s && %s && %s && %s" % (baseline, category1, metcut, signalwindow)),
                 ##("category 1 SR mt1",   "%s && %s && %s && %s" % (baseline, category1, mt1cut, signalwindow)),
                 ##("category 2 SR mt1",   "%s && %s && %s && %s" % (baseline, category2, mt1cut, signalwindow)),
-#                 ("category 1.2",        "%s && %s && %s" % (baseline, category1, newcuts)),
-#                 ("category 2.2",        "%s && %s && %s" % (baseline, category2, newcuts)),
+                ("category 1.2",        "%s && %s && %s" % (baseline, category1, newcuts)),
+                ("category 2.2",        "%s && %s && %s" % (baseline, category2, newcuts)),
 #                 ("category 2.2 no dphi", "%s && %s && %s" % (baseline, category2J, newcuts)), # no dphi
               ]
 
@@ -174,10 +175,10 @@ variables = [
                 ##( "m_vis",         35, 0,  70 ),
                 ##( "m_sv",          35, 0,  70 ),
 #                 ( "m_vis",         35, 0, 140 ),
-                ( "m_sv",          35, 0, 140 ),
+#                 ( "m_sv",          35, 0, 140 ),
 #                 ( "pt_tt",         50, 0, 160 ),
 #                 ( "pt_tt_sv",      30, 0, 160 ),
-#                 ( "dR_ll",         35, 0,   6 ), 
+                ( "dR_ll",         30, 0,   6 ), 
 #                 ##( "R_pt_m_vis",    50, 0,   7 ),
 #                 ( "R_pt_m_sv",     50, 0,   5 ),
 #                 ##( "pfmt_1",        45, 0, 200 ),
@@ -396,11 +397,6 @@ def plotStacks(samples, channel, **kwargs):
                 s = 500
                 if "category" in label:   s *=  1
                 else:                     s *= 10
-                if   "pt_tt"  in var:     s *=  6
-#                 elif "R_pt_"  in var:     s *=  8
-#                 elif "dphi_"  in var:     s *=  0.5
-#                 if   "1.2"    in label:   s =  40
-#                 if   "2.2"    in label:   s =  45
                 if "etau" in channel:
                     if "m_sv" == var or "m_vis" == var:
                         if   "1.2"      in label: s = 20
@@ -414,13 +410,16 @@ def plotStacks(samples, channel, **kwargs):
                 if "emu" in channel:
                     if "m_sv" == var or "m_vis" == var:
                         if "category" in label: s = 200
+                    if "dR"    in var:   s *=  2.0
+                if "dR"    in var:   s *=  0.5
+                if "pt_tt" in var:   s *=  6.0
+                if "n"     in var:   s *=  5.0
                 if "SR"    in label: s *=  0.2
                 if "TT CR" in label: s *=  2.0
-                if "n"     in var:   s *=  5.0
                 
                 for sample in samples:
                     if sample.isSignal:
-                        sample.scale = sample.scaleBU * s
+                        sample.scale = sample.scaleBU * int(s)
                         #print warning("Signal (%s) enhanced by a factor of %.1f" % (sample.label,sample.scale/sample.scaleBU))
             
             
@@ -438,10 +437,10 @@ def plotStacks(samples, channel, **kwargs):
                     (a,b) = (0,200)
                     nBins = (b-a)/8
                     print ">>> %s: changed binning to (%i,%i,%i)" % (var,nBins,a,b)
-                if "dR_" in var:
-                    (a,b) = (0,6)
-                    nBins = 30
-                    print ">>> %s: changed binning to (%i,%i,%i)" % (var,nBins,a,b)
+            # if "dR_" in var:
+            #     (a,b) = (0,6)
+            #     nBins = 30
+            #     print ">>> %s: changed binning to (%i,%i,%i)" % (var,nBins,a,b)
             #elif "m_vis" == var: #or "m_sv" is var:
             #    if b is 140:
             #       a = 2
@@ -950,15 +949,13 @@ def writeDataCardHistograms(samples, channel, **kwargs):
                 name        = subsample+su_label
                 cuts1       = combineCuts(cuts,extracuts,"%s<%s && %s<%s"%(a,var,var,b))
                 
-                # MASS POINTS
-                shift = 0
-                smear = 0
-                
                 # SHIFT & SMEAR signal
-                if "XTT" in subsample and "-M" in subsample and "-M28" not in subsample:
-                    mass    = int(subsample[subsample.index("-M")+2:])
-                    shift   = mass-28
-                    smear   = mass/28.0
+                # shift = 0
+                # smear = 0
+                # if "XTT" in subsample and "-M" in subsample and "-M28" not in subsample:
+                #     mass    = int(subsample[subsample.index("-M")+2:])
+                #     shift   = mass-28
+                #     smear   = mass/28.0
                 
                 # MAKE HIST
                 hist        = None
@@ -980,13 +977,13 @@ def writeDataCardHistograms(samples, channel, **kwargs):
                         print warning("QCD histogram failed!")
                         continue
                 else:
-                    hist = sample.hist(var,nBins,a,b,name=name,cuts=cuts1,shift=shift,smear=smear)
+                    hist = sample.hist(var,nBins,a,b,name=name,cuts=cuts1) #,shift=shift,smear=smear)
                 hist.SetLineStyle(1)
                 hist.SetLineWidth(2)
                 
                 # SCALE
                 if "XTT-S283" in subsample: hist.Scale(283)
-#                 elif "XTT-S0" in subsample: hist.Scale(scale_LA) # model independent
+                #elif "XTT-S0" in subsample: hist.Scale(scale_LA) # model independent
                 
                 # WRITE HIST
                 hist.Write(hist.GetName(),TH1D.kOverwrite)

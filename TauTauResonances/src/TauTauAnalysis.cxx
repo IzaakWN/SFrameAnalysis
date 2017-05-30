@@ -3,7 +3,7 @@
 // Local include(s):
 #include "../include/TauTauAnalysis.h"
 // External include(s):
-#include "../GoodRunsLists/include/TGoodRunsListReader.h"
+//#include "../GoodRunsLists/include/TGoodRunsListReader.h"
 
 ClassImp( TauTauAnalysis );
 
@@ -13,6 +13,7 @@ ClassImp( TauTauAnalysis );
 
 TauTauAnalysis::TauTauAnalysis() : SCycleBase(),
     m_jetAK4( this ),
+    m_genJetAK4( this ),
     m_eventInfo( this ),
     m_electron( this ),
     m_muon( this ),
@@ -25,7 +26,9 @@ TauTauAnalysis::TauTauAnalysis() : SCycleBase(),
     m_BTaggingScaleTool( this ),
     m_ScaleFactorTool( this ),
     m_RecoilCorrector( this ),
-    m_SVFitTool( this ){
+    m_JetCorrectionTool( this ),
+    m_SVFitTool( this )
+{
 
   m_logger << INFO << "Hello!" << SLogger::endmsg;
   SetLogName( GetName() );
@@ -39,6 +42,7 @@ TauTauAnalysis::TauTauAnalysis() : SCycleBase(),
   //channels_.push_back("emu");
   
   DeclareProperty( "JetAK4Name",            m_jetAK4Name            = "jetAK4" );
+  DeclareProperty( "genJetAK4Name",         m_genJetAK4Name         = "genJetAK4" );
   DeclareProperty( "ElectronName",          m_electronName          = "el" );
   DeclareProperty( "MuonName",              m_muonName              = "mu" );
   DeclareProperty( "TauName",               m_tauName               = "tau" );
@@ -51,6 +55,7 @@ TauTauAnalysis::TauTauAnalysis() : SCycleBase(),
   DeclareProperty( "doRecoilCorr",          m_doRecoilCorr          = false );
   DeclareProperty( "doZpt",                 m_doZpt                 = false );
   DeclareProperty( "doTTpt",                m_doTTpt                = false );
+  DeclareProperty( "doJEC",                 m_doJEC                 = false );
   DeclareProperty( "doTES",                 m_doTES                 = false );
   DeclareProperty( "TESshift",              m_TESshift              = 0.0 );
   DeclareProperty( "doEES",                 m_doEES                 = false );
@@ -58,6 +63,7 @@ TauTauAnalysis::TauTauAnalysis() : SCycleBase(),
   DeclareProperty( "EESshiftEndCap",        m_EESshiftEndCap        = m_EESshift*2.5 );
   DeclareProperty( "doLTF",                 m_doLTF                 = false );
   DeclareProperty( "LTFshift",              m_LTFshift              = 0.0 );
+  DeclareProperty( "doTight",               m_doTight               = m_doEES or m_doTES or m_doLTF ); // fill branches with less events
   
   // for SUSY https://twiki.cern.ch/twiki/bin/viewauth/CMS/HiggsToTauTauWorking2016
   // for comparison https://twiki.cern.ch/twiki/bin/viewauth/CMS/MSSMAHTauTauSummer2016#Baseline
@@ -145,31 +151,8 @@ void TauTauAnalysis::BeginCycle() throw( SError ) {
   m_triggers_mutau.push_back(new LeptonTrigger("HLT_IsoTkMu22_v",       firstRun, 276863,22.0+1,IsoMu22));
   m_triggers_mutau.push_back(new LeptonTrigger("HLT_IsoMu22_eta2p1_v",    274890,lastRun,22.0+1,IsoMu22));
   m_triggers_mutau.push_back(new LeptonTrigger("HLT_IsoTkMu22_eta2p1_v",  274890,lastRun,22.0+1,IsoMu22));
-//   m_triggers_mutau.push_back(new LeptonTrigger("HLT_IsoMu24_v",         firstRun,lastRun,24.0+1,
-//                                                 {"hltL3crIsoL1sMu22L1f0L2f10QL3f24QL3trkIsoFiltered0p09"}));
-//   m_triggers_mutau.push_back(new LeptonTrigger("HLT_IsoTkMu24_v",       firstRun,lastRun,24.0+1,
-//                                                 {"hltL3crIsoL1sMu22L1f0L2f10QL3f24QL3trkIsoFiltered0p09"}));
   m_triggers_mutau.push_back(new CrossTrigger("HLT_IsoMu19_eta2p1_LooseIsoPFTau20_SingleL1_v",firstRun,lastRun,19.+1,0,
                                                 "hltL3crIsoL1sSingleMu18erIorSingleMu20erL1f0L2f10QL3f19QL3trkIsoFiltered0p09"));
-  // m_triggerNames_mutau.push_back("HLT_IsoMu22_v");           // not pre-scaled  run < 276864
-  // m_triggerNames_mutau.push_back("HLT_IsoTkMu22_v");         // not pre-scaled  run < 276864
-  // m_triggerNames_mutau.push_back("HLT_IsoMu22_eta2p1_v2");   // not pre-scaled  run > 274889
-  // m_triggerNames_mutau.push_back("HLT_IsoTkMu22_eta2p1_v2"); // not pre-scaled  run > 274889
-  // m_triggerNames_mutau.push_back("HLT_IsoMu24_v");           // not pre-scaled  entire run
-  // m_triggerNames_mutau.push_back("HLT_IsoTkMu24_v");         // not pre-scaled  entire run
-  // m_triggerNames_mutau.push_back("HLT_IsoMu20_v");
-  // m_triggerNames_mutau.push_back("HLT_IsoTkMu20_v");
-  // m_triggerNames_mutau.push_back("HLT_IsoMu18_v");
-  // m_triggerNames_mutau.push_back("HLT_IsoMu22_v3");
-  // m_triggerNames_mutau.push_back("HLT_IsoMu27_v4");
-  // m_triggerNames_mutau.push_back("HLT_IsoTkMu18_v3");
-  // m_triggerNames_mutau.push_back("HLT_IsoTkMu22_v3");
-  // m_triggerNames_mutau.push_back("HLT_IsoTkMu27_v4");
-  // m_triggerNames_mutau.push_back("HLT_IsoMu17_eta2p1_LooseIsoPFTau20_SingleL1_v5");  // pre-scaled
-  // m_triggerNames_mutau.push_back("HLT_IsoMu17_eta2p1_LooseIsoPFTau20_v5");           // pre-scaled
-  // m_triggerNames_mutau.push_back("HLT_IsoMu19_eta2p1_LooseIsoPFTau20_SingleL1_v2");  // not pre-scaled  entire run
-  // m_triggerNames_mutau.push_back("HLT_IsoMu19_eta2p1_LooseIsoPFTau20_v2");           // not pre-scaled  entire run
-  // m_triggerNames_mutau.push_back("HLT_IsoMu21_eta2p1_LooseIsoPFTau20_SingleL1_v2");  // not pre-scaled  entire run
   
   // electron triggers
   m_triggers_etau.push_back(new LeptonTrigger("HLT_Ele25_eta2p1_WPTight_Gsf_v",     firstRun,lastRun,25.+1,
@@ -182,23 +165,6 @@ void TauTauAnalysis::BeginCycle() throw( SError ) {
                                             "hltEle25erWPTightGsfTrackIsoFilter"));
   m_triggers_etau.push_back(new CrossTrigger("HLT_Ele24_eta2p1_WPLoose_Gsf_LooseIsoPFTau30_v", 278271,lastRun,24.+0,20.,
                                             "hltEle25erWPTightGsfTrackIsoFilter"));
-  // m_triggerNames_eletau.push_back("HLT_Ele25_eta2p1_WPTight_Gsf_v");   // not pre-scaled  entire run
-  // m_triggerNames_eletau.push_back("HLT_Ele23_WPLoose_Gsf_v4");
-  // m_triggerNames_eletau.push_back("HLT_Ele24_eta2p1_WPLoose_Gsf_v2");
-  // m_triggerNames_eletau.push_back("HLT_Ele25_WPTight_Gsf_v2");
-  // m_triggerNames_eletau.push_back("HLT_Ele25_eta2p1_WPLoose_Gsf_v2");
-  // m_triggerNames_eletau.push_back("HLT_Ele25_eta2p1_WPTight_Gsf_v2");
-  // m_triggerNames_eletau.push_back("HLT_Ele27_WPLoose_Gsf_v2");         // not pre-scaled  run <= 280385
-  // m_triggerNames_eletau.push_back("HLT_Ele27_WPTight_Gsf_v2");
-  // m_triggerNames_eletau.push_back("HLT_Ele27_eta2p1_WPLoose_Gsf_v3");
-  // m_triggerNames_eletau.push_back("HLT_Ele27_eta2p1_WPTight_Gsf_v3");
-  // m_triggerNames_eletau.push_back("HLT_Ele32_eta2p1_WPTight_Gsf_v3");
-  // m_triggerNames_eletau.push_back("HLT_Ele22_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_SingleL1_v3");
-  // m_triggerNames_eletau.push_back("HLT_Ele24_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_SingleL1_v2");  // pre-scaled            run < 276215
-  // m_triggerNames_eletau.push_back("HLT_Ele24_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_v2");           // pre-scaled  276215 <= run < 278270
-  // m_triggerNames_eletau.push_back("HLT_Ele24_eta2p1_WPLoose_Gsf_LooseIsoPFTau30_v");            // pre-scaled            run > 278270
-  // m_triggerNames_eletau.push_back("HLT_Ele27_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_SingleL1_v2");
-  // m_triggerNames_eletau.push_back("HLT_Ele32_eta2p1_WPLoose_Gsf_LooseIsoPFTau20_SingleL1_v2");
   
   
   m_logger << INFO << "\nmutau triggers: " << SLogger::endmsg;
@@ -233,7 +199,7 @@ void TauTauAnalysis::EndCycle() throw( SError ) {
 
 
 void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
-  //std::cout << "BeginInputData" << std::endl;
+  std::cout << "BeginInputData" << std::endl;
   m_logger << INFO << " " << SLogger::endmsg;
   m_logger << INFO << "BeginInputData" << SLogger::endmsg;
 
@@ -250,6 +216,7 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
   m_logger << INFO << "doRecoilCorr:        " <<            (m_doRecoilCorr ? "TRUE" : "FALSE") << SLogger::endmsg;
   m_logger << INFO << "doZpt:               " <<            (m_doZpt ?      "TRUE" : "FALSE") << SLogger::endmsg;
   m_logger << INFO << "doTTpt:              " <<            (m_doTTpt ?     "TRUE" : "FALSE") << SLogger::endmsg;
+  m_logger << INFO << "doJEC:               " <<            (m_doJEC ? "TRUE" : "FALSE") << SLogger::endmsg;
   m_logger << INFO << "doTES:               " <<            (m_doTES ? "TRUE" : "FALSE") << SLogger::endmsg;
   m_logger << INFO << "TESshift:            " <<            m_TESshift << SLogger::endmsg;
   m_logger << INFO << "doEES:               " <<            (m_doEES ? "TRUE" : "FALSE") << SLogger::endmsg;
@@ -292,161 +259,195 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
   
   // MARK Branches
   m_logger << INFO << "Declaring variables for branches" << SLogger::endmsg;
-  for(int ch = 0; ch < (int)channels_.size(); ch++){
+  for(int chi = 0; chi < (int)channels_.size(); chi++){
     
-    TString treeName = "tree_" + channels_[ch];
+    TString treeName = "tree_" + channels_[chi];
+    const char* ch = channels_[chi].c_str();
     
-    DeclareVariable( b_weight[channels_[ch]],         "weight",         treeName);
-    DeclareVariable( b_genweight[channels_[ch]],      "genweight",      treeName);
-    DeclareVariable( b_puweight[channels_[ch]],       "puweight",       treeName);
-    DeclareVariable( b_weightbtag[channels_[ch]],     "weightbtag",     treeName);
-    DeclareVariable( b_zptweight[channels_[ch]],      "zptweight",      treeName);
-    DeclareVariable( b_ttptweight[channels_[ch]],     "ttptweight",     treeName);
+    DeclareVariable( b_weight[ch],         "weight",         treeName);
+    DeclareVariable( b_genweight[ch],      "genweight",      treeName);
+    DeclareVariable( b_puweight[ch],       "puweight",       treeName);
+    DeclareVariable( b_weightbtag[ch],     "weightbtag",     treeName);
+    DeclareVariable( b_zptweight[ch],      "zptweight",      treeName);
+    DeclareVariable( b_ttptweight[ch],     "ttptweight",     treeName);
     
-    DeclareVariable( b_channel[channels_[ch]],        "channel",        treeName);
-    DeclareVariable( b_triggers[channels_[ch]],       "triggers",       treeName);
-    DeclareVariable( b_isData[channels_[ch]],         "isData",         treeName);
-    DeclareVariable( b_run[channels_[ch]],            "run",            treeName);
-    DeclareVariable( b_evt[channels_[ch]],            "evt",            treeName);
-    DeclareVariable( b_lum[channels_[ch]],            "lum",            treeName);
+    DeclareVariable( b_channel[ch],        "channel",        treeName);
+    DeclareVariable( b_triggers[ch],       "triggers",       treeName);
+    DeclareVariable( b_isData[ch],         "isData",         treeName);
+    DeclareVariable( b_run[ch],            "run",            treeName);
+    DeclareVariable( b_evt[ch],            "evt",            treeName);
+    DeclareVariable( b_lum[ch],            "lum",            treeName);
     
-    DeclareVariable( b_npv[channels_[ch]],            "npv",            treeName);
-    DeclareVariable( b_npu[channels_[ch]],            "npu",            treeName);
-    DeclareVariable( b_NUP[channels_[ch]],            "NUP",            treeName);
-    DeclareVariable( b_rho[channels_[ch]],            "rho",            treeName);
+    DeclareVariable( b_npv[ch],            "npv",            treeName);
+    DeclareVariable( b_npu[ch],            "npu",            treeName);
+    DeclareVariable( b_NUP[ch],            "NUP",            treeName);
+    DeclareVariable( b_rho[ch],            "rho",            treeName);
     
-    DeclareVariable( b_njets[channels_[ch]],          "njets",          treeName);
-    DeclareVariable( b_nfjets[channels_[ch]],         "nfjets",         treeName);
-    DeclareVariable( b_ncjets[channels_[ch]],         "ncjets",         treeName);
-    DeclareVariable( b_nbtag[channels_[ch]],          "nbtag",          treeName);
-    DeclareVariable( b_nfbtag[channels_[ch]],         "nfbtag",         treeName);
-    DeclareVariable( b_ncbtag[channels_[ch]],         "ncbtag",         treeName);
-    DeclareVariable( b_njets20[channels_[ch]],        "njets20",        treeName);
-    DeclareVariable( b_nfjets20[channels_[ch]],       "nfjets20",       treeName);
-    DeclareVariable( b_ncjets20[channels_[ch]],       "ncjets20",       treeName);
-    DeclareVariable( b_nbtag20[channels_[ch]],        "nbtag20",        treeName);
-    DeclareVariable( b_nfbtag20[channels_[ch]],       "nfbtag20",       treeName);
-    DeclareVariable( b_ncbtag20[channels_[ch]],       "ncbtag20",       treeName);
+    DeclareVariable( b_njets[ch],          "njets",          treeName);
+    DeclareVariable( b_nfjets[ch],         "nfjets",         treeName);
+    DeclareVariable( b_ncjets[ch],         "ncjets",         treeName);
+    DeclareVariable( b_nbtag[ch],          "nbtag",          treeName);
+    DeclareVariable( b_ncbtag[ch],         "ncbtag",         treeName);
+    DeclareVariable( b_njets20[ch],        "njets20",        treeName);
+    DeclareVariable( b_nfjets20[ch],       "nfjets20",       treeName);
+    DeclareVariable( b_ncjets20[ch],       "ncjets20",       treeName);
+    DeclareVariable( b_nbtag20[ch],        "nbtag20",        treeName);
+    DeclareVariable( b_ncbtag20[ch],       "ncbtag20",       treeName);
     
-    DeclareVariable( b_pt_1[channels_[ch]],           "pt_1",           treeName);
-    DeclareVariable( b_eta_1[channels_[ch]],          "eta_1",          treeName);
-    DeclareVariable( b_phi_1[channels_[ch]],          "phi_1",          treeName);
-    DeclareVariable( b_m_1[channels_[ch]],            "m_1",            treeName);
-    DeclareVariable( b_q_1[channels_[ch]],            "q_1",            treeName);
-    DeclareVariable( b_d0_1[channels_[ch]],           "d0_1",           treeName);
-    DeclareVariable( b_dz_1[channels_[ch]],           "dz_1",           treeName);
-    //DeclareVariable( b_mt_1[channels_[ch]],           "mt_1",           treeName);
-    DeclareVariable( b_pfmt_1[channels_[ch]],         "pfmt_1",         treeName);
-    DeclareVariable( b_puppimt_1[channels_[ch]],      "puppimt_1",      treeName);
-    DeclareVariable( b_iso_1[channels_[ch]],          "iso_1",          treeName);
-    DeclareVariable( b_id_e_mva_nt_loose_1[channels_[ch]], "id_e_mva_nt_loose_1", treeName);
-    DeclareVariable( b_gen_match_1[channels_[ch]],    "gen_match_1",    treeName);
-    DeclareVariable( b_trigweight_1[channels_[ch]],   "trigweight_1",   treeName);
-    DeclareVariable( b_trigweight_or_1[channels_[ch]], "trigweight_or_1",   treeName);
-    DeclareVariable( b_idisoweight_1[channels_[ch]],  "idisoweight_1",  treeName);
+    if (m_doJEC){
+      DeclareVariable( b_ncjets_jesUp[ch],          "ncjets_jesUp",         treeName);
+      DeclareVariable( b_ncjets_jesDown[ch],        "ncjets_jesDown",       treeName);
+      DeclareVariable( b_ncjets_jer[ch],            "ncjets_jer",           treeName);
+      DeclareVariable( b_ncjets_jerUp[ch],          "ncjets_jerUp",         treeName);
+      DeclareVariable( b_ncjets_jerDown[ch],        "ncjets_jerDown",       treeName);
+      DeclareVariable( b_ncbtag_jesUp[ch],          "ncbtag_jesUp",         treeName);
+      DeclareVariable( b_ncbtag_jesDown[ch],        "ncbtag_jesDown",       treeName);
+      DeclareVariable( b_ncbtag_jer[ch],            "ncbtag_jer",           treeName);
+      DeclareVariable( b_ncbtag_jerUp[ch],          "ncbtag_jerUp",         treeName);
+      DeclareVariable( b_ncbtag_jerDown[ch],        "ncbtag_jerDown",       treeName);
+      DeclareVariable( b_nfjets_jesUp[ch],          "nfjets_jesUp",         treeName);
+      DeclareVariable( b_nfjets_jesDown[ch],        "nfjets_jesDown",       treeName);
+      DeclareVariable( b_nfjets_jer[ch],            "nfjets_jer",           treeName);
+      DeclareVariable( b_nfjets_jerUp[ch],          "nfjets_jerUp",         treeName);
+      DeclareVariable( b_nfjets_jerDown[ch],        "nfjets_jerDown",       treeName);
+      DeclareVariable( b_met_jesUp[ch],             "met_jesUp",            treeName);
+      DeclareVariable( b_met_jesDown[ch],           "met_jesDown",          treeName);
+      DeclareVariable( b_met_jer[ch],               "met_jer",              treeName);
+      DeclareVariable( b_met_jerUp[ch],             "met_jerUp",            treeName);
+      DeclareVariable( b_met_jerDown[ch],           "met_jerDown",          treeName);
+      DeclareVariable( b_met_UncEnUp[ch],           "met_UncEnUp",          treeName);
+      DeclareVariable( b_met_UncEnDown[ch],         "met_UncEnDown",        treeName);
+      
+//       DeclareVariable( b_weightbtag_bcUp[ch],       "weightbtag_bcUp",      treeName);
+//       DeclareVariable( b_weightbtag_bcDown[ch],     "weightbtag_bcDown",    treeName);
+//       DeclareVariable( b_weightbtag_udsgUp[ch],     "weightbtag_udsgUp",    treeName);
+//       DeclareVariable( b_weightbtag_udsgDown[ch],   "weightbtag_udsgDown",  treeName);
+    }
+        
+    DeclareVariable( b_pt_1[ch],                "pt_1",                 treeName);
+    DeclareVariable( b_eta_1[ch],               "eta_1",                treeName);
+    DeclareVariable( b_phi_1[ch],               "phi_1",                treeName);
+    DeclareVariable( b_m_1[ch],                 "m_1",                  treeName);
+    DeclareVariable( b_q_1[ch],                 "q_1",                  treeName);
+    DeclareVariable( b_d0_1[ch],                "d0_1",                 treeName);
+    DeclareVariable( b_dz_1[ch],                "dz_1",                 treeName);
+    //DeclareVariable( b_mt_1[ch],                "mt_1",                 treeName);
+    DeclareVariable( b_pfmt_1[ch],              "pfmt_1",               treeName);
+    DeclareVariable( b_puppimt_1[ch],           "puppimt_1",            treeName);
+    DeclareVariable( b_iso_1[ch],               "iso_1",                treeName);
+    DeclareVariable( b_id_e_mva_nt_loose_1[ch], "id_e_mva_nt_loose_1",  treeName);
+    DeclareVariable( b_gen_match_1[ch],         "gen_match_1",          treeName);
+    DeclareVariable( b_trigweight_1[ch],        "trigweight_1",         treeName);
+    DeclareVariable( b_trigweight_or_1[ch],     "trigweight_or_1",      treeName);
+    DeclareVariable( b_idisoweight_1[ch],       "idisoweight_1",        treeName);
     
-    DeclareVariable( b_pt_2[channels_[ch]],           "pt_2",           treeName);
-    DeclareVariable( b_eta_2[channels_[ch]],          "eta_2",          treeName);
-    DeclareVariable( b_phi_2[channels_[ch]],          "phi_2",          treeName);
-    DeclareVariable( b_m_2[channels_[ch]],            "m_2",            treeName);
-    DeclareVariable( b_q_2[channels_[ch]],            "q_2",            treeName);
-    DeclareVariable( b_d0_2[channels_[ch]],           "d0_2",           treeName);
-    DeclareVariable( b_dz_2[channels_[ch]],           "dz_2",           treeName);
-    //DeclareVariable( b_mt_2[channels_[ch]],           "mt_2",           treeName);
-    DeclareVariable( b_pfmt_2[channels_[ch]],         "pfmt_2",         treeName);
-    DeclareVariable( b_puppimt_2[channels_[ch]],      "puppimt_2",      treeName);
-    DeclareVariable( b_iso_2[channels_[ch]],          "iso_2",          treeName);
-    DeclareVariable( b_iso_2_medium[channels_[ch]],   "iso_2_medium",   treeName);
-    DeclareVariable( b_gen_match_2[channels_[ch]],    "gen_match_2",    treeName);
-    DeclareVariable( b_trigweight_2[channels_[ch]],   "trigweight_2",   treeName);
-    DeclareVariable( b_idisoweight_2[channels_[ch]],  "idisoweight_2",  treeName);
-    DeclareVariable( b_pol_2[channels_[ch]],          "pol_2",          treeName);
+    DeclareVariable( b_pt_2[ch],           "pt_2",           treeName);
+    DeclareVariable( b_eta_2[ch],          "eta_2",          treeName);
+    DeclareVariable( b_phi_2[ch],          "phi_2",          treeName);
+    DeclareVariable( b_m_2[ch],            "m_2",            treeName);
+    DeclareVariable( b_q_2[ch],            "q_2",            treeName);
+    DeclareVariable( b_d0_2[ch],           "d0_2",           treeName);
+    DeclareVariable( b_dz_2[ch],           "dz_2",           treeName);
+    //DeclareVariable( b_mt_2[ch],           "mt_2",           treeName);
+    DeclareVariable( b_pfmt_2[ch],         "pfmt_2",         treeName);
+    DeclareVariable( b_puppimt_2[ch],      "puppimt_2",      treeName);
+    DeclareVariable( b_iso_2[ch],          "iso_2",          treeName);
+    DeclareVariable( b_iso_2_medium[ch],   "iso_2_medium",   treeName);
+    DeclareVariable( b_gen_match_2[ch],    "gen_match_2",    treeName);
+    DeclareVariable( b_trigweight_2[ch],   "trigweight_2",   treeName);
+    DeclareVariable( b_idisoweight_2[ch],  "idisoweight_2",  treeName);
+    DeclareVariable( b_pol_2[ch],          "pol_2",          treeName);
     
-    DeclareVariable( b_againstElectronVLooseMVA6_2[channels_[ch]],  "againstElectronVLooseMVA6_2",  treeName);
-    DeclareVariable( b_againstElectronLooseMVA6_2[channels_[ch]],   "againstElectronLooseMVA6_2",   treeName);
-    DeclareVariable( b_againstElectronMediumMVA6_2[channels_[ch]],  "againstElectronMediumMVA6_2",  treeName);
-    DeclareVariable( b_againstElectronTightMVA6_2[channels_[ch]],   "againstElectronTightMVA6_2",   treeName);
-    DeclareVariable( b_againstElectronVTightMVA6_2[channels_[ch]],  "againstElectronVTightMVA6_2",  treeName);
-    DeclareVariable( b_againstMuonLoose3_2[channels_[ch]],          "againstMuonLoose3_2",          treeName);
-    DeclareVariable( b_againstMuonTight3_2[channels_[ch]],          "againstMuonTight3_2",          treeName);
-    DeclareVariable( b_byCombinedIsolationDeltaBetaCorrRaw3Hits_2[channels_[ch]], "byCombinedIsolationDeltaBetaCorrRaw3Hits_2", treeName);
-    DeclareVariable( b_byIsolationMVA3newDMwLTraw_2[channels_[ch]], "byIsolationMVA3newDMwLTraw_2", treeName);
-    DeclareVariable( b_byIsolationMVA3oldDMwLTraw_2[channels_[ch]], "byIsolationMVA3oldDMwLTraw_2", treeName);
-    DeclareVariable( b_chargedIsoPtSum_2[channels_[ch]],            "chargedIsoPtSum_2",            treeName);
-    DeclareVariable( b_neutralIsoPtSum_2[channels_[ch]],            "neutralIsoPtSum_2",            treeName);
-    DeclareVariable( b_puCorrPtSum_2[channels_[ch]],                "puCorrPtSum_2",                treeName);
-    DeclareVariable( b_decayModeFindingOldDMs_2[channels_[ch]],     "decayModeFindingOldDMs_2",     treeName);
-    DeclareVariable( b_decayMode_2[channels_[ch]],                  "decayMode_2",                treeName);
+    DeclareVariable( b_againstElectronVLooseMVA6_2[ch],  "againstElectronVLooseMVA6_2",  treeName);
+    DeclareVariable( b_againstElectronLooseMVA6_2[ch],   "againstElectronLooseMVA6_2",   treeName);
+    DeclareVariable( b_againstElectronMediumMVA6_2[ch],  "againstElectronMediumMVA6_2",  treeName);
+    DeclareVariable( b_againstElectronTightMVA6_2[ch],   "againstElectronTightMVA6_2",   treeName);
+    DeclareVariable( b_againstElectronVTightMVA6_2[ch],  "againstElectronVTightMVA6_2",  treeName);
+    DeclareVariable( b_againstMuonLoose3_2[ch],          "againstMuonLoose3_2",          treeName);
+    DeclareVariable( b_againstMuonTight3_2[ch],          "againstMuonTight3_2",          treeName);
+    DeclareVariable( b_byCombinedIsolationDeltaBetaCorrRaw3Hits_2[ch], "byCombinedIsolationDeltaBetaCorrRaw3Hits_2", treeName);
+    DeclareVariable( b_byIsolationMVA3newDMwLTraw_2[ch], "byIsolationMVA3newDMwLTraw_2", treeName);
+    DeclareVariable( b_byIsolationMVA3oldDMwLTraw_2[ch], "byIsolationMVA3oldDMwLTraw_2", treeName);
+    DeclareVariable( b_chargedIsoPtSum_2[ch],            "chargedIsoPtSum_2",            treeName);
+    DeclareVariable( b_neutralIsoPtSum_2[ch],            "neutralIsoPtSum_2",            treeName);
+    DeclareVariable( b_puCorrPtSum_2[ch],                "puCorrPtSum_2",                treeName);
+    DeclareVariable( b_decayModeFindingOldDMs_2[ch],     "decayModeFindingOldDMs_2",     treeName);
+    DeclareVariable( b_decayMode_2[ch],                  "decayMode_2",                  treeName);
     
-    DeclareVariable( b_dilepton_veto[channels_[ch]],    "dilepton_veto",    treeName);
-    DeclareVariable( b_extraelec_veto[channels_[ch]],   "extraelec_veto",   treeName);
-    DeclareVariable( b_extramuon_veto[channels_[ch]],   "extramuon_veto",   treeName);
-    DeclareVariable( b_lepton_vetos[channels_[ch]],     "lepton_vetos",     treeName);
-    DeclareVariable( b_iso_cuts[channels_[ch]],         "iso_cuts",         treeName);
-    DeclareVariable( b_trigger_cuts[channels_[ch]],     "trigger_cuts",     treeName);
+    DeclareVariable( b_dilepton_veto[ch],   "dilepton_veto",    treeName);
+    DeclareVariable( b_extraelec_veto[ch],  "extraelec_veto",   treeName);
+    DeclareVariable( b_extramuon_veto[ch],  "extramuon_veto",   treeName);
+    DeclareVariable( b_lepton_vetos[ch],    "lepton_vetos",     treeName);
+    DeclareVariable( b_iso_cuts[ch],        "iso_cuts",         treeName);
+    DeclareVariable( b_trigger_cuts[ch],    "trigger_cuts",     treeName);
     
-    DeclareVariable( b_jpt_1[channels_[ch]],        "jpt_1",            treeName);
-    DeclareVariable( b_jeta_1[channels_[ch]],       "jeta_1",           treeName);
-    DeclareVariable( b_jphi_1[channels_[ch]],       "jphi_1",           treeName);
-    DeclareVariable( b_jpt_2[channels_[ch]],        "jpt_2",            treeName);
-    DeclareVariable( b_jeta_2[channels_[ch]],       "jeta_2",           treeName);
-    DeclareVariable( b_jphi_2[channels_[ch]],       "jphi_2",           treeName);
+    DeclareVariable( b_jpt_1[ch],           "jpt_1",            treeName);
+    DeclareVariable( b_jeta_1[ch],          "jeta_1",           treeName);
+    DeclareVariable( b_jphi_1[ch],          "jphi_1",           treeName);
+    DeclareVariable( b_jpt_2[ch],           "jpt_2",            treeName);
+    DeclareVariable( b_jeta_2[ch],          "jeta_2",           treeName);
+    DeclareVariable( b_jphi_2[ch],          "jphi_2",           treeName);
     
-    DeclareVariable( b_bpt_1[channels_[ch]],        "bpt_1",            treeName);
-    DeclareVariable( b_beta_1[channels_[ch]],       "beta_1",           treeName);
-    DeclareVariable( b_bphi_1[channels_[ch]],       "bphi_1",           treeName);
-    DeclareVariable( b_bcsv_1[channels_[ch]],       "bcsv_1",           treeName);
-    DeclareVariable( b_bpt_2[channels_[ch]],        "bpt_2",            treeName);
-    DeclareVariable( b_beta_2[channels_[ch]],       "beta_2",           treeName);
-    DeclareVariable( b_bphi_2[channels_[ch]],       "bphi_2",           treeName);
-    DeclareVariable( b_bcsv_2[channels_[ch]],       "bcsv_2",           treeName);
+    DeclareVariable( b_bpt_1[ch],           "bpt_1",            treeName);
+    DeclareVariable( b_beta_1[ch],          "beta_1",           treeName);
+    DeclareVariable( b_bphi_1[ch],          "bphi_1",           treeName);
+    DeclareVariable( b_bcsv_1[ch],          "bcsv_1",           treeName);
+    DeclareVariable( b_bpt_2[ch],           "bpt_2",            treeName);
+    DeclareVariable( b_beta_2[ch],          "beta_2",           treeName);
+    DeclareVariable( b_bphi_2[ch],          "bphi_2",           treeName);
+    DeclareVariable( b_bcsv_2[ch],          "bcsv_2",           treeName);
     
-    DeclareVariable( b_met[channels_[ch]],          "met",              treeName);
-    DeclareVariable( b_met_old[channels_[ch]],      "met_old",          treeName);
-    DeclareVariable( b_metphi[channels_[ch]],       "metphi",           treeName);
-    DeclareVariable( b_puppimet[channels_[ch]],     "puppimet",         treeName);
-    DeclareVariable( b_puppimetphi[channels_[ch]],  "puppimetphi",      treeName);
-    //DeclareVariable( b_mvamet[channels_[ch]],       "mvamet",           treeName);
-    //DeclareVariable( b_mvamet_old[channels_[ch]],   "mvamet_old",       treeName);
-    //DeclareVariable( b_mvametphi[channels_[ch]],    "mvametphi",        treeName);
+    DeclareVariable( b_met[ch],             "met",              treeName);
+    DeclareVariable( b_met_old[ch],         "met_old",          treeName);
+    DeclareVariable( b_metphi[ch],          "metphi",           treeName);
+    DeclareVariable( b_puppimet[ch],        "puppimet",         treeName);
+    DeclareVariable( b_puppimetphi[ch],     "puppimetphi",      treeName);
+    //DeclareVariable( b_mvamet[ch],          "mvamet",           treeName);
+    //DeclareVariable( b_mvamet_old[ch],      "mvamet_old",       treeName);
+    //DeclareVariable( b_mvametphi[ch],       "mvametphi",        treeName);
     
-    DeclareVariable( b_metcov00[channels_[ch]],     "metcov00",         treeName);
-    DeclareVariable( b_metcov01[channels_[ch]],     "metcov01",         treeName);
-    DeclareVariable( b_metcov10[channels_[ch]],     "metcov10",         treeName);
-    DeclareVariable( b_metcov11[channels_[ch]],     "metcov11",         treeName);
-    //DeclareVariable( b_mvacov00[channels_[ch]],     "mvacov00",         treeName);
-    //DeclareVariable( b_mvacov01[channels_[ch]],     "mvacov01",         treeName);
-    //DeclareVariable( b_mvacov10[channels_[ch]],     "mvacov10",         treeName);
-    //DeclareVariable( b_mvacov11[channels_[ch]],     "mvacov11",         treeName);
+    DeclareVariable( b_metcov00[ch],        "metcov00",         treeName);
+    DeclareVariable( b_metcov01[ch],        "metcov01",         treeName);
+    DeclareVariable( b_metcov10[ch],        "metcov10",         treeName);
+    DeclareVariable( b_metcov11[ch],        "metcov11",         treeName);
+    //DeclareVariable( b_mvacov00[ch],        "mvacov00",         treeName);
+    //DeclareVariable( b_mvacov01[ch],        "mvacov01",         treeName);
+    //DeclareVariable( b_mvacov10[ch],        "mvacov10",         treeName);
+    //DeclareVariable( b_mvacov11[ch],        "mvacov11",         treeName);
     
-    DeclareVariable( b_m_vis[channels_[ch]],        "m_vis",            treeName);
-    DeclareVariable( b_pt_tt[channels_[ch]],        "pt_tt",            treeName);
-    DeclareVariable( b_pt_tt_vis[channels_[ch]],    "pt_tt_vis",        treeName);
-    DeclareVariable( b_R_pt_m_vis[channels_[ch]],   "R_pt_m_vis",       treeName);
-    DeclareVariable( b_R_pt_m_vis2[channels_[ch]],  "R_pt_m_vis2",      treeName);
+    DeclareVariable( b_m_vis[ch],           "m_vis",            treeName);
+    DeclareVariable( b_pt_tt[ch],           "pt_tt",            treeName);
+    DeclareVariable( b_pt_tt_vis[ch],       "pt_tt_vis",        treeName);
+    DeclareVariable( b_R_pt_m_vis[ch],      "R_pt_m_vis",       treeName);
+    DeclareVariable( b_R_pt_m_vis2[ch],     "R_pt_m_vis2",      treeName);
     
-    DeclareVariable( b_m_sv[channels_[ch]],         "m_sv",             treeName);
-    //DeclareVariable( b_m_sv_pfmet[channels_[ch]],   "m_sv_pfmet",       treeName);
-    DeclareVariable( b_pt_tt_sv[channels_[ch]],     "pt_tt_sv",         treeName);
-    DeclareVariable( b_R_pt_m_sv[channels_[ch]],    "R_pt_m_sv",        treeName);
+    DeclareVariable( b_m_sv[ch],            "m_sv",             treeName);
+    //DeclareVariable( b_m_sv_pfmet[ch],      "m_sv_pfmet",       treeName);
+    DeclareVariable( b_pt_tt_sv[ch],        "pt_tt_sv",         treeName);
+    DeclareVariable( b_R_pt_m_sv[ch],       "R_pt_m_sv",        treeName);
     
-    DeclareVariable( b_dR_ll[channels_[ch]],        "dR_ll",            treeName);
-    DeclareVariable( b_dR_ll_gen[channels_[ch]],    "dR_ll_gen",        treeName);
-    DeclareVariable( b_dphi_ll_bj[channels_[ch]],   "dphi_ll_bj",       treeName);
-    DeclareVariable( b_mt_tot[channels_[ch]],       "mt_tot",           treeName);
-    DeclareVariable( b_ht[channels_[ch]],           "ht",               treeName);
+    DeclareVariable( b_dR_ll[ch],           "dR_ll",            treeName);
+    DeclareVariable( b_dphi_ll_bj[ch],      "dphi_ll_bj",       treeName);
+    DeclareVariable( b_mt_tot[ch],          "mt_tot",           treeName);
+    DeclareVariable( b_ht[ch],              "ht",               treeName);
     
-    DeclareVariable( b_m_genboson[channels_[ch]],   "m_genboson",       treeName);
-    DeclareVariable( b_pt_genboson[channels_[ch]],  "pt_genboson",      treeName);
+    if(m_doRecoilCorr || m_doZpt){
+      DeclareVariable( b_m_genboson[ch],    "m_genboson",       treeName);
+      DeclareVariable( b_pt_genboson[ch],   "pt_genboson",      treeName);
+    }    
+    if(m_doTTpt){
+      DeclareVariable( b_pt_top_1[ch],      "pt_top_1",         treeName);
+      DeclareVariable( b_pt_top_2[ch],      "pt_top_2",         treeName);
+    }    
     
-    DeclareVariable( b_pzetamiss[channels_[ch]],    "pzetamiss",        treeName);
-    DeclareVariable( b_pzetavis[channels_[ch]],     "pzetavis",         treeName);
-    DeclareVariable( b_pzeta_disc[channels_[ch]],   "pzeta_disc",       treeName);
-    DeclareVariable( b_vbf_mjj[channels_[ch]],      "vbf_mjj",          treeName);
-    DeclareVariable( b_vbf_deta[channels_[ch]],     "vbf_deta",         treeName);
-    DeclareVariable( b_vbf_jdphi[channels_[ch]],    "vbf_jdphi",        treeName);
-    DeclareVariable( b_vbf_ncentral[channels_[ch]], "vbf_ncentral",     treeName);
-    DeclareVariable( b_vbf_ncentral20[channels_[ch]], "vbf_ncentral20", treeName);
+    DeclareVariable( b_pzetamiss[ch],       "pzetamiss",        treeName);
+    DeclareVariable( b_pzetavis[ch],        "pzetavis",         treeName);
+    DeclareVariable( b_pzeta_disc[ch],      "pzeta_disc",       treeName);
+    DeclareVariable( b_vbf_mjj[ch],         "vbf_mjj",          treeName);
+    DeclareVariable( b_vbf_deta[ch],        "vbf_deta",         treeName);
+    DeclareVariable( b_vbf_jdphi[ch],       "vbf_jdphi",        treeName);
+    DeclareVariable( b_vbf_ncentral[ch],    "vbf_ncentral",     treeName);
+    DeclareVariable( b_vbf_ncentral20[ch],  "vbf_ncentral20",   treeName);
     
   }
   
@@ -459,6 +460,7 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
     TString dirname = "histogram_" + ch;
     TString tch = ch;
     Book( TH1F(hname, hname, 20, 0.5, 20.5 ), dirname);
+    Book( TH1F("btagweight", "btagweight", 6, 0, 6), dirname);
   }
   
   makeHistogramsForChecks();
@@ -468,6 +470,7 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
   m_BTaggingScaleTool.bookHistograms(); // to measure b tag efficiencies for our selections
   m_ScaleFactorTool.BeginInputData( id );
   m_RecoilCorrector.BeginInputData( id );
+  m_JetCorrectionTool.BeginInputData( id ); //, m_genJetAK4
   m_SVFitTool.BeginInputData( id );
   
   return;
@@ -479,12 +482,12 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
 
 
 void TauTauAnalysis::EndInputData( const SInputData& ) throw( SError ) {
-  //std::cout << "EndInputData" << std::endl;
+  std::cout << "EndInputData" << std::endl;
   m_logger << INFO << " " << SLogger::endmsg;
   m_logger << INFO << "EndInputData" << SLogger::endmsg;
   m_logger << INFO << " " << SLogger::endmsg;
   
-  std::vector<std::string> kCutNameLep{ "start", "match", "ID",        "iso", "pt" };
+  std::vector<std::string> kCutNameLep{ "start", "match", "ID", "iso", "pt" };
   //std::vector<std::string> kCutNameTau{ "start", "match", "DecayMode", "iso", "pt" };
   std::vector<std::string> kCutNameTau{ "start", "at least one reco tau", "2.3 eta and 18 pt reco cut", "tau ID", "2.3 eta and 18 pt gen cut", "match", "DecayMode", "iso", "pt" };
   std::vector<std::string> kCutNameJet{ "start", "one eta<2.3 jet && hadronic" };
@@ -492,7 +495,7 @@ void TauTauAnalysis::EndInputData( const SInputData& ) throw( SError ) {
   for(auto ch: channels_) {
     m_logger << INFO << "cut flow for " << ch << SLogger::endmsg;
     m_logger << INFO << Form( "Cut\t%25.25s\tEvents\tRelEff\tAbsEff", "Name" ) << SLogger::endmsg;
-  
+    
     TString hname = "cutflow_" + ch;
     TString dirname = "histogram_" + ch;
     Double_t ntot = Hist(hname, dirname)->GetBinContent( 1 );
@@ -516,23 +519,26 @@ void TauTauAnalysis::EndInputData( const SInputData& ) throw( SError ) {
     
   }
 
-   return;
+  return;
 }
+
+
+
 void TauTauAnalysis::printCutFlow(const std::string& ch, const std::string& name, const TString hname, const TString dirname, std::vector<std::string> cutName){
-//   std::cout << "printCutFlow" << std::endl;
-    
-    Double_t ntot = Hist(hname, dirname)->GetBinContent( 1 );
-    m_logger << INFO << " " << SLogger::endmsg;
-    m_logger << INFO << name << " cut flow for " << ch << SLogger::endmsg;
-    m_logger << INFO << Form( "Cut\t%25.25s\tEvents\tRelEff\tAbsEff", "Name" ) << SLogger::endmsg;
-    m_logger << INFO << Form( "\t%25.25s\t%6.0f", "start", ntot ) << SLogger::endmsg;
-    for( Int_t ibin = 1; ibin < (int) cutName.size(); ++ibin ){
-      Int_t    icut    = ibin;
-      Double_t nevents = Hist(hname, dirname)->GetBinContent( ibin+1 );
-      Double_t releff  = 100. * nevents / Hist(hname, dirname)->GetBinContent( ibin );
-      Double_t abseff  = 100. * nevents / ntot;
-      m_logger << INFO  << Form( "C%d\t%25.25s\t%6.0f\t%6.2f\t%6.2f", icut-1, cutName[icut].c_str(), nevents, releff, abseff ) << SLogger::endmsg;
-    }
+ //std::cout << "printCutFlow" << std::endl;
+  
+  Double_t ntot = Hist(hname, dirname)->GetBinContent( 1 );
+  m_logger << INFO << " " << SLogger::endmsg;
+  m_logger << INFO << name << " cut flow for " << ch << SLogger::endmsg;
+  m_logger << INFO << Form( "Cut\t%25.25s\tEvents\tRelEff\tAbsEff", "Name" ) << SLogger::endmsg;
+  m_logger << INFO << Form( "\t%25.25s\t%6.0f", "start", ntot ) << SLogger::endmsg;
+  for( Int_t ibin = 1; ibin < (int) cutName.size(); ++ibin ){
+    Int_t    icut    = ibin;
+    Double_t nevents = Hist(hname, dirname)->GetBinContent( ibin+1 );
+    Double_t releff  = 100. * nevents / Hist(hname, dirname)->GetBinContent( ibin );
+    Double_t abseff  = 100. * nevents / ntot;
+    m_logger << INFO  << Form( "C%d\t%25.25s\t%6.0f\t%6.2f\t%6.2f", icut-1, cutName[icut].c_str(), nevents, releff, abseff ) << SLogger::endmsg;
+  }
 }
 
 
@@ -549,7 +555,8 @@ void TauTauAnalysis::BeginInputFile( const SInputData& ) throw( SError ) {
     m_eventInfo.ConnectVariables(   m_recoTreeName.c_str(), Ntuple::EventInfoTrigger|Ntuple::EventInfoMETFilters, "" );
   }
   else {
-    m_jetAK4.ConnectVariables(      m_recoTreeName.c_str(), Ntuple::JetBasic|Ntuple::JetAnalysis|Ntuple::JetTruth, (m_jetAK4Name + "_").c_str() );
+    m_jetAK4.ConnectVariables(      m_recoTreeName.c_str(), Ntuple::JetBasic|Ntuple::JetAnalysis|Ntuple::JetTruth|Ntuple::JetJER, (m_jetAK4Name + "_").c_str() );
+    m_genJetAK4.ConnectVariables(   m_recoTreeName.c_str(), Ntuple::GenJetak4Truth,"");
     m_eventInfo.ConnectVariables(   m_recoTreeName.c_str(), Ntuple::EventInfoBasic|Ntuple::EventInfoTrigger|Ntuple::EventInfoMETFilters|Ntuple::EventInfoTruth, "" );
     m_genParticle.ConnectVariables( m_recoTreeName.c_str(), Ntuple::GenParticleBasic|Ntuple::GenParticleTauDecayAnalysis, (m_genParticleName + "_").c_str() );
   }
@@ -557,7 +564,7 @@ void TauTauAnalysis::BeginInputFile( const SInputData& ) throw( SError ) {
   m_muon.ConnectVariables(          m_recoTreeName.c_str(), Ntuple::MuonBasic|Ntuple::MuonID|Ntuple::MuonIsolation|Ntuple::MuonTrack|Ntuple::MuonBoostedIsolation, (m_muonName + "_").c_str() );
   m_tau.ConnectVariables(           m_recoTreeName.c_str(), Ntuple::TauBasic|Ntuple::TauID|Ntuple::TauAdvancedID, (m_tauName + "_").c_str() );
 
-  m_missingEt.ConnectVariables(     m_recoTreeName.c_str(), Ntuple::MissingEtBasic|Ntuple::MissingEtAnalysis|Ntuple::MissingEtCovAnalysis , (m_missingEtName + "_").c_str() );
+  m_missingEt.ConnectVariables(     m_recoTreeName.c_str(), Ntuple::MissingEtBasic|Ntuple::MissingEtAnalysis|Ntuple::MissingEtAnalysisSyst|Ntuple::MissingEtCovAnalysis , (m_missingEtName + "_").c_str() );
   m_puppimissingEt.ConnectVariables(m_recoTreeName.c_str(), Ntuple::MissingEtBasic, (m_missingEtName + "_puppi_").c_str() );
   //m_mvamissingEt.ConnectVariables(  m_recoTreeName.c_str(), Ntuple::MissingEtBasic|Ntuple::MissingEtMVAAnalysis|Ntuple::MissingEtCovAnalysis, (m_missingEtName + "_mva_").c_str() );
   
@@ -573,7 +580,7 @@ void TauTauAnalysis::BeginInputFile( const SInputData& ) throw( SError ) {
 
 void TauTauAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError ) {
   //std::cout << "ExecuteEvent" << std::endl;
-  m_logger << VERBOSE << "ExecuteEvent" << SLogger::endmsg;
+  //m_logger << VERBOSE << "ExecuteEvent" << SLogger::endmsg;
   
   b_weight_     =  1.;
   b_puweight_   =  1.; 
@@ -581,11 +588,13 @@ void TauTauAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
   b_npu_        = -1.;
   m_muonEtaCut_variable = m_muonEtaCut;
   
+  
   // Cut 0: no cuts
   for (auto ch: channels_){
     fillCutflow("cutflow_" + ch, "histogram_" + ch, kBeforeCuts, 1);
     b_channel[ch] = 0;
   }
+  
   
   // Cut 1: check for data if run/lumiblock in JSON
   if (!m_isData){
@@ -863,18 +872,17 @@ void TauTauAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
     bool isolated = mutau_pair[0].lep_iso<0.15 and goodTaus[mutau_pair[0].itau].byTightIsolationMVArun2v1DBoldDMwLT()==1;
     if( !m_isData && genmatch_2<0)
       genmatch_2 = genMatch(goodTaus[mutau_pair[0].itau].eta(), goodTaus[mutau_pair[0].itau].phi());
-    // bool match = triggerMatches(m_firedTriggers_mutau, goodMuons[mutau_pair[0].ilepton].pt(), goodMuons[mutau_pair[0].ilepton].eta(), goodMuons[mutau_pair[0].ilepton].phi(),
-    //                                                    goodTaus[mutau_pair[0].itau].pt(),    goodTaus[mutau_pair[0].itau].eta(),    goodTaus[mutau_pair[0].itau].phi()     );
-    // if(match){
     fillCutflow("cutflow_mutau", "histogram_mutau", kTriggerMatched, 1);
     if(!m_isData and isolated){
       m_BTaggingScaleTool.fillEfficiencies(goodJetsAK4); // to measure b tag efficiencies for our selections
       m_BTaggingScaleTool.fillEfficiencies(goodJetsAK4,"mutau");
     }
-    //if(!(m_doEES||m_doTES||m_doLTF) and !isolated){
-    FillBranches( "mutau", goodJetsAK4, goodTaus[mutau_pair[0].itau], genmatch_2, goodMuons[mutau_pair[0].ilepton], dummyElectron, Met, PuppiMet );//, MvaMet);
-    mu_tau++;
-    // }
+    if(!m_doTight or isolated){
+      FillBranches( "mutau", goodJetsAK4, goodTaus[mutau_pair[0].itau], genmatch_2, goodMuons[mutau_pair[0].ilepton], dummyElectron, Met, PuppiMet );//, MvaMet);
+      mu_tau++;
+    }
+    // bool match = triggerMatches(m_firedTriggers_mutau, goodMuons[mutau_pair[0].ilepton].pt(), goodMuons[mutau_pair[0].ilepton].eta(), goodMuons[mutau_pair[0].ilepton].phi(),
+    //                                                    goodTaus[mutau_pair[0].itau].pt(),    goodTaus[mutau_pair[0].itau].eta(),    goodTaus[mutau_pair[0].itau].phi()     );
   }
   
   
@@ -911,7 +919,6 @@ void TauTauAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
     // 
     // }
     
-    
     // For Jets: cut and filter our selected muon and tau
     std::vector<UZH::Jet> goodJetsAK4;
     for ( int i = 0; i < (m_jetAK4.N); ++i ) {
@@ -935,22 +942,21 @@ void TauTauAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
     //std::cout << ">>> ExecuteEvent - FillBranches eletau" << std::endl;
     Int_t genmatch_2 = goodTausGen[eletau_pair[0].itau];
     bool isolated = eletau_pair[0].lep_iso<0.15 and goodTaus[eletau_pair[0].itau].byTightIsolationMVArun2v1DBoldDMwLT()==1;
-    if( !m_isData && !m_doTES && !m_doLTF)
+    if( !m_isData && genmatch_2<0)
       genmatch_2 = genMatch(goodTaus[eletau_pair[0].itau].eta(), goodTaus[eletau_pair[0].itau].phi());
-    // bool match = triggerMatches(m_firedTriggers_etau, goodElectrons[eletau_pair[0].ilepton].pt(), goodElectrons[eletau_pair[0].ilepton].eta(), goodElectrons[eletau_pair[0].ilepton].phi(),
-    //                                                   goodTaus[eletau_pair[0].itau].pt(),         goodTaus[eletau_pair[0].itau].eta(),         goodTaus[eletau_pair[0].itau].phi()          );
-    // if(match){
     fillCutflow("cutflow_etau", "histogram_etau", kTriggerMatched, 1);
     if(!m_isData and isolated){
       if(mutau_pair.size()==0) m_BTaggingScaleTool.fillEfficiencies(goodJetsAK4); // to measure b tag efficiencies for our selections
       m_BTaggingScaleTool.fillEfficiencies(goodJetsAK4,"etau");
     }
-    //if(!(m_doEES||m_doTES||m_doLTF) and !isolated){
-    FillBranches( "etau", goodJetsAK4, goodTaus[eletau_pair[0].itau], genmatch_2, dummyMuon, goodElectrons[eletau_pair[0].ilepton], Met, PuppiMet );//, MvaMet);
-    ele_tau++;
-    //}
+    if(!m_doTight or isolated){
+      FillBranches( "etau", goodJetsAK4, goodTaus[eletau_pair[0].itau], genmatch_2, dummyMuon, goodElectrons[eletau_pair[0].ilepton], Met, PuppiMet );//, MvaMet);
+      ele_tau++;
+    }
+    // bool match = triggerMatches(m_firedTriggers_etau, goodElectrons[eletau_pair[0].ilepton].pt(), goodElectrons[eletau_pair[0].ilepton].eta(), goodElectrons[eletau_pair[0].ilepton].phi(),
+    //                                                   goodTaus[eletau_pair[0].itau].pt(),         goodTaus[eletau_pair[0].itau].eta(),         goodTaus[eletau_pair[0].itau].phi()          );
   }
-  
+      
   return;
   
 }
@@ -963,11 +969,10 @@ bool TauTauAnalysis::isGoodEvent(int runNumber, int lumiSection) {
   bool isGood = true;
   if (m_isData) {
     isGood = m_grl.HasRunLumiBlock( runNumber, lumiSection );
-    if( !isGood ) {
-      m_logger << WARNING << "Bad event! Run: " << runNumber <<  " - Lumi Section: " << lumiSection << SLogger::endmsg;
+    //if( !isGood )
+      //m_logger << WARNING << "Bad event! Run: " << runNumber <<  " - Lumi Section: " << lumiSection << SLogger::endmsg;
       //throw SError( SError::SkipEvent );
-    }
-    else m_logger << VERBOSE << "Good event! Run: " << runNumber <<  " - Lumi Section: " << lumiSection << SLogger::endmsg;
+    //else m_logger << VERBOSE << "Good event! Run: " << runNumber <<  " - Lumi Section: " << lumiSection << SLogger::endmsg;
   }
   
   return isGood;
@@ -985,49 +990,32 @@ TString TauTauAnalysis::passTrigger(int runNumber) {
   for (std::map<std::string,bool>::iterator it = (m_eventInfo.trigDecision)->begin(); it != (m_eventInfo.trigDecision)->end(); ++it){
     if (it->second){ 
     
-    // if ((it->first).find("Ele") != std::string::npos)
-    //  std::cout << it->first << " triggered " << std::endl;
-    // if ((it->first).find("Mu") != std::string::npos)
+    // if ((it->first).find("Ele") != std::string::npos or (it->first).find("Mu") != std::string::npos)
     //  std::cout << it->first << " triggered " << std::endl;
     
       // mutau
       for( auto const& trigger: m_triggers_mutau ){
         if ((it->first).find(trigger->name) != std::string::npos){
           //if (it->second){  and (!m_isData or (trigger->start <= runNumber and runNumber <= trigger->end))){
-          //m_logger << VERBOSE << "Trigger pass: " << (it->first) << SLogger::endmsg;
           //std::cout << trigger->name << ": " << it->first << std::endl;
           m_firedTriggers_mutau.push_back(trigger);
           if(      trigger->name.find("Mu22") != std::string::npos and triggerFlags.find("mt22") == std::string::npos ){ triggerFlags += "mt22-"; }
           else if( trigger->name.find("Mu24") != std::string::npos and triggerFlags.find("mt24") == std::string::npos ){ triggerFlags += "mt24-"; }
-          else if( trigger->name.find("Tau")  != std::string::npos and triggerFlags.find("mtx")  == std::string::npos ){ triggerFlags += "mtx-";  }
-          //else if(                                                    triggerFlags.find("mt-")  == std::string::npos ){ triggerFlags += "mt-";   }          
+          else if( trigger->name.find("Tau")  != std::string::npos and triggerFlags.find("mtx")  == std::string::npos ){ triggerFlags += "mtx-";  }     
       }}
     
       // etau
       for( auto const& trigger: m_triggers_etau ){
         if ((it->first).find(trigger->name) != std::string::npos){
           //if (it->second){ // and (!m_isData or (trigger->start <= runNumber and runNumber <= trigger->end))){
-          //m_logger << VERBOSE << "Trigger pass: " << (it->first) << SLogger::endmsg;
           //std::cout << trigger->name << ": " << it->first << std::endl;
           m_firedTriggers_etau.push_back(trigger);
           if(      trigger->name.find("Ele25") != std::string::npos and triggerFlags.find("et25") == std::string::npos ){ triggerFlags += "et25-"; }
           else if( trigger->name.find("Ele45") != std::string::npos and triggerFlags.find("et45") == std::string::npos ){ triggerFlags += "et45-"; }
           else if( trigger->name.find("Tau")   != std::string::npos and triggerFlags.find("etx")  == std::string::npos ){ triggerFlags += "etx-";  }
-          //else if(                                                     triggerFlags.find("et-")  == std::string::npos ){ triggerFlags += "et-";   }
       }}
       
   }}
-  
-//   bool only2p1 = false;
-//   for(auto const& trigger: m_firedTriggers_mutau){
-//     std::cout << "TauTauAnalysis::passTrigger: " << trigger->name;
-//     if(trigger->name.find("eta2p1") != std::string::npos){ std::cout << " => only2p1=true" << std::endl; only2p1=true; }
-//     else{ std::cout << " => only2p1=false; break" << std::endl; only2p1 = false; break; } 
-//   }
-//   if(only2p1 and m_firedTriggers_mutau.size()>0){
-//     std::cout << "TauTauAnalysis::passTrigger: only single muon triggers with eta2p1; setting m_muonEtaCut=2.1" << std::endl;
-//     m_muonEtaCut_variable = 2.1;
-//   }
   
   if( triggerFlags == "" ) triggerFlags = "none";
   return triggerFlags;
@@ -1140,10 +1128,10 @@ void TauTauAnalysis::fillCutflow(TString histName, TString dirName, const Int_t 
 
 
 
-void TauTauAnalysis::FillBranches(const std::string& channel, const std::vector<UZH::Jet> &Jet,
+void TauTauAnalysis::FillBranches(const std::string& channel, std::vector<UZH::Jet> &Jets,
                                   const UZH::Tau& tau, const int gen_match_2, const UZH::Muon& muon, const UZH::Electron& electron,
                                   const UZH::MissingEt& met, const UZH::MissingEt& puppimet){//, const UZH::MissingEt& mvamet){
-  //std::cout << "FillBranches" << std::endl;
+//   std::cout << "FillBranches" << std::endl;
   
   const char* ch = channel.c_str();
   b_weightbtag_ = 1.;
@@ -1168,60 +1156,62 @@ void TauTauAnalysis::FillBranches(const std::string& channel, const std::vector<
   Int_t nbtag       =  0;
   Int_t nfbtag      =  0;
   Int_t ncbtag      =  0;
+
   Int_t njets20     =  0;
   Int_t nfjets20    =  0;
   Int_t ncjets20    =  0;
   Int_t nbtag20     =  0;
   Int_t nfbtag20    =  0;
   Int_t ncbtag20    =  0;
+
   Int_t ibjet1      = -1;
   Int_t ibjet2      = -1;
   Int_t icjet1      = -1; // central jet that is not the same as leading b jet for dphi_ll_bj
   Float_t ht        =  0; // total scalar energy HT
   
   // https://twiki.cern.ch/twiki/bin/viewauth/CMS/HiggsToTauTauWorking2016#Other_common_selections
-  for( int ijet = 0; ijet < (int)Jet.size(); ++ijet ){
-    ht += Jet.at(ijet).e();
-    bool isBTagged = getBTagWeight_promote_demote(Jet.at(ijet)); // (Jet.at(ijet).csv()) > 0.8 //csv > 0.8 is medium
-    if(Jet.at(ijet).pt() > 30) njets++;
-    if(fabs(Jet.at(ijet).eta()) < 2.4 && isBTagged){
+  for( int ijet = 0; ijet < (int)Jets.size(); ++ijet ){ // already pT > 20 GeV jets
+    ht += Jets.at(ijet).e();
+    bool isBTagged = getBTagWeight_promote_demote(Jets.at(ijet)); // (Jets.at(ijet).csv()) > 0.8 // medium
+    
+    if(fabs(Jets.at(ijet).eta()) < 2.4 && isBTagged){
       nbtag++;
       if      (ibjet1 < 0) ibjet1 = ijet;
       else if (ibjet2 < 0) ibjet2 = ijet;
     }
-    if(fabs(Jet.at(ijet).eta()) < 2.4){         // CENTRAL 20 GeV
+    if(fabs(Jets.at(ijet).eta()) < 2.4){         // CENTRAL 20 GeV
       if(isBTagged) ncbtag20++;                 //  btag
       ncjets20++;                               //  jets
       if(icjet1 < 0 && (icjet1 != ibjet1 || ibjet1 < 0 )) icjet1 = ijet;
-      if(Jet.at(ijet).pt() > 30){               // CENTRAL 30 GeV
+      if(Jets.at(ijet).pt() > 30){               // CENTRAL 30 GeV
         if(isBTagged) ncbtag++;                 //  btag
         ncjets++;                               //  jets
     }}
-    else if(fabs(Jet.at(ijet).eta()) > 2.4){    // FORWARD 20 GeV
+    else if(fabs(Jets.at(ijet).eta()) > 2.4){    // FORWARD 20 GeV
       if(isBTagged) nfbtag20++;                 //  btag
       nfjets20++;                               //  jets
-      if(Jet.at(ijet).pt() > 30){               // FORWARD 30 GeV
+      if(Jets.at(ijet).pt() > 30){               // FORWARD 30 GeV
         if(isBTagged) nfbtag++;                 //  btag
         nfjets++;                               //  jets
     }}
   }
   njets20 = ncjets20 + nfjets20;
   nbtag20 = ncbtag20 + nfbtag20;
-  njets = ncjets + nfjets;
-  nbtag = ncbtag + nfbtag;
+  njets   = ncjets + nfjets;
+  nbtag   = ncbtag + nfbtag;
   
   if(njets20 > 1){
-    b_jpt_1[ch]     = Jet.at(0).pt();
-    b_jeta_1[ch]    = Jet.at(0).eta();
-    b_jphi_1[ch]    = Jet.at(0).phi();
-    b_jpt_2[ch]     = Jet.at(1).pt();
-    b_jeta_2[ch]    = Jet.at(1).eta();
-    b_jphi_2[ch]    = Jet.at(1).phi();    
+    b_jpt_1[ch]     = Jets.at(0).pt();
+    b_jeta_1[ch]    = Jets.at(0).eta();
+    b_jphi_1[ch]    = Jets.at(0).phi();
+    b_jpt_2[ch]     = Jets.at(1).pt();
+    b_jeta_2[ch]    = Jets.at(1).eta();
+    b_jphi_2[ch]    = Jets.at(1).phi();    
   }
   else if(njets20 == 1){
-    b_jpt_1[ch]     = Jet.at(0).pt();
-    b_jeta_1[ch]    = Jet.at(0).eta();
-    b_jphi_1[ch]    = Jet.at(0).phi();
+    b_jpt_1[ch]     = Jets.at(0).pt();
+    b_jeta_1[ch]    = Jets.at(0).eta();
+    b_jphi_1[ch]    = Jets.at(0).phi();
     b_jpt_2[ch]     = -1;
     b_jeta_2[ch]    = -9;
     b_jphi_2[ch]    = -9;
@@ -1237,20 +1227,20 @@ void TauTauAnalysis::FillBranches(const std::string& channel, const std::vector<
   
   // VBF
   if(njets>=2){
-    b_vbf_mjj[ch]   = (Jet.at(0).tlv() + Jet.at(1).tlv()).M();
-    b_vbf_deta[ch]  = Jet.at(0).eta() - Jet.at(1).eta();
-    b_vbf_jdphi[ch] = deltaPhi(Jet.at(0).phi(), Jet.at(1).phi());
-    Float_t min_eta = Jet.at(0).eta();
-    Float_t max_eta = Jet.at(1).eta();
+    b_vbf_mjj[ch]   = (Jets.at(0).tlv() + Jets.at(1).tlv()).M();
+    b_vbf_deta[ch]  = Jets.at(0).eta() - Jets.at(1).eta();
+    b_vbf_jdphi[ch] = deltaPhi(Jets.at(0).phi(), Jets.at(1).phi());
+    Float_t min_eta = Jets.at(0).eta();
+    Float_t max_eta = Jets.at(1).eta();
     if(min_eta > max_eta){
-      min_eta = Jet.at(1).eta(); 
-      max_eta = Jet.at(0).eta(); 
+      min_eta = Jets.at(1).eta(); 
+      max_eta = Jets.at(0).eta(); 
     }
     int ncentral    = 0;
     int ncentral20  = 0;
-    for( int ijet = 0; ijet < (int)Jet.size(); ++ijet ){
-      Float_t jeteta = Jet.at(ijet).eta();
-      Float_t jetpt  = Jet.at(ijet).pt();
+    for( int ijet = 0; ijet < (int)Jets.size(); ++ijet ){
+      Float_t jeteta = Jets.at(ijet).eta();
+      Float_t jetpt  = Jets.at(ijet).pt();
       if(min_eta < jeteta && jeteta < max_eta){
         if(jetpt > 30.) ncentral++;
         if(jetpt > 20.) ncentral20++;
@@ -1271,10 +1261,10 @@ void TauTauAnalysis::FillBranches(const std::string& channel, const std::vector<
     b_bphi_1[ch]    = -9;
     b_bcsv_1[ch]    = -1;
   }else{
-    b_bpt_1[ch]     = Jet.at(ibjet1).pt();
-    b_beta_1[ch]    = Jet.at(ibjet1).eta();
-    b_bphi_1[ch]    = Jet.at(ibjet1).phi();
-    b_bcsv_1[ch]    = Jet.at(ibjet1).csv();
+    b_bpt_1[ch]     = Jets.at(ibjet1).pt();
+    b_beta_1[ch]    = Jets.at(ibjet1).eta();
+    b_bphi_1[ch]    = Jets.at(ibjet1).phi();
+    b_bcsv_1[ch]    = Jets.at(ibjet1).csv();
   }
   if (ibjet2 < 0){
     b_bpt_2[ch]     = -1;
@@ -1283,23 +1273,21 @@ void TauTauAnalysis::FillBranches(const std::string& channel, const std::vector<
     b_bcsv_2[ch]    = -1;
   }
   else{
-    b_bpt_2[ch]     = Jet.at(ibjet2).pt();
-    b_beta_2[ch]    = Jet.at(ibjet2).eta();
-    b_bphi_2[ch]    = Jet.at(ibjet2).phi();
-    b_bcsv_2[ch]    = Jet.at(ibjet2).csv();
+    b_bpt_2[ch]     = Jets.at(ibjet2).pt();
+    b_beta_2[ch]    = Jets.at(ibjet2).eta();
+    b_bphi_2[ch]    = Jets.at(ibjet2).phi();
+    b_bcsv_2[ch]    = Jets.at(ibjet2).csv();
   }
   
   b_njets[ch]       = njets;
   b_nfjets[ch]      = nfjets;
   b_ncjets[ch]      = ncjets;
   b_nbtag[ch]       = nbtag;
-  b_nfbtag[ch]      = nfbtag;
   b_ncbtag[ch]      = ncbtag;
   b_njets20[ch]     = njets20;
   b_nfjets20[ch]    = nfjets20;
   b_ncjets20[ch]    = ncjets20;
   b_nbtag20[ch]     = nbtag20;
-  b_nfbtag20[ch]    = nfbtag20;
   b_ncbtag20[ch]    = ncbtag20;
   
   
@@ -1423,7 +1411,7 @@ void TauTauAnalysis::FillBranches(const std::string& channel, const std::vector<
     if(m_doZpt)  b_zptweight[ch]        = m_RecoilCorrector.ZptWeight( boson_tlv.M(), boson_tlv.Pt() );
     if(m_doTTpt) b_ttptweight[ch]       = genMatchSF(channel, -36); // 6*-6 = -36
     b_weightbtag[ch]                    = b_weightbtag_; // do not apply b tag weight when using promote-demote method !!!
-    //b_weightbtag[ch]                  = m_BTaggingScaleTool.getScaleFactor_veto(Jet); // getScaleFactor_veto for AK4, getScaleFactor for AK8
+    //b_weightbtag[ch]                  = m_BTaggingScaleTool.getScaleFactor_veto(Jets); // getScaleFactor_veto for AK4, getScaleFactor for AK8
     b_weight[ch] *= b_idisoweight_1[ch] * b_idisoweight_2[ch] * b_zptweight[ch] * b_ttptweight[ch]; // * b_trigweight_2[ch] * b_weightbtag[ch]
     // check boosted tau ID matching standard ID
     // if (b_gen_match_2[ch] == 5 && m_isSignal){
@@ -1450,7 +1438,7 @@ void TauTauAnalysis::FillBranches(const std::string& channel, const std::vector<
   met_tlv.SetPxPyPzE(fmet*TMath::Cos(fmetphi), fmet*TMath::Sin(fmetphi), 0, fmet);
   TLorentzVector met_tlv_corrected;
   if(m_doRecoilCorr){
-    met_tlv_corrected    = m_RecoilCorrector.CorrectPFMETByMeanResolution(  met_tlv.Px(),         met_tlv.Py(),
+    met_tlv_corrected    = m_RecoilCorrector.CorrectPFMETByMeanResolution(  met_tlv.Px(),       met_tlv.Py(),
                                                                             boson_tlv.Px(),     boson_tlv.Py(),
                                                                             boson_tlv_vis.Px(), boson_tlv_vis.Py(),
                                                                             m_jetAK4.N ); //m_eventInfo.lheNj
@@ -1481,6 +1469,7 @@ void TauTauAnalysis::FillBranches(const std::string& channel, const std::vector<
   
   if(!m_isData){
     //std::cout << ">>> before: tau pt = " << tau_tlv.Pt()  << ", m   = " << tau_tlv.M() << std::endl;
+    //std::cout << ">>> before: lep pt = " << lep_tlv.Pt()  << ", m   = " << lep_tlv.M() << std::endl;
     //std::cout << ">>> before: met    = " << met_tlv_corrected.E() << ", phi = " << met_tlv_corrected.Phi() << std::endl;
     if(m_doTES && gen_match_2==5){ // TES
       // https://twiki.cern.ch/twiki/bin/viewauth/CMS/SMTauTau2016#Tau_Energy_Scale_TES
@@ -1489,8 +1478,6 @@ void TauTauAnalysis::FillBranches(const std::string& channel, const std::vector<
       b_m_2[ch]     = tau_tlv.M();
       fmet          = met_tlv_corrected.E();
       fmetphi       = met_tlv_corrected.Phi();
-      //std::cout << ">>> after:  tau pt = " << tau_tlv.Pt()  << ", m   = " << tau_tlv.M() << std::endl;
-      //std::cout << ">>> after:  met    = " << met_tlv_corrected.E() << ", phi = " << met_tlv_corrected.Phi() << std::endl;
     }
     if(m_doLTF && gen_match_2<5){ // Lepton to tau fake (LTF)
       // https://twiki.cern.ch/twiki/bin/viewauth/CMS/SMTauTau2016#Electron_to_Tau_Fake
@@ -1499,21 +1486,34 @@ void TauTauAnalysis::FillBranches(const std::string& channel, const std::vector<
       b_m_2[ch]     = tau_tlv.M();
       fmet          = met_tlv_corrected.E();
       fmetphi       = met_tlv_corrected.Phi();
-      //std::cout << ">>> after:  tau pt = " << tau_tlv.Pt()  << ", m   = " << tau_tlv.M() << std::endl;
-      //std::cout << ">>> after:  met    = " << met_tlv_corrected.E() << ", phi = " << met_tlv_corrected.Phi() << std::endl;
     }
     if(m_doEES && channel=="etau"){ // Electron Energy Scale
-      //std::cout << ">>> before: lep pt = " << lep_tlv.Pt()  << ", m   = " << lep_tlv.M() << std::endl;
       if(fabs(electron.tlv().Eta())<1.479) shiftLeptonAndMET(m_EESshift,      lep_tlv,met_tlv_corrected,true);
       else                                 shiftLeptonAndMET(m_EESshiftEndCap,lep_tlv,met_tlv_corrected,true);
       b_pt_1[ch]    = lep_tlv.Pt();
       b_m_1[ch]     = lep_tlv.M();
       fmet          = met_tlv_corrected.E();
       fmetphi       = met_tlv_corrected.Phi();
-      //std::cout << ">>> after:  lep pt = " << lep_tlv.Pt()  << ", m   = " << lep_tlv.M() << std::endl;      
-      //std::cout << ">>> after:  met    = " << met_tlv_corrected.E() << ", phi = " << met_tlv_corrected.Phi() << std::endl;
     }
+    //std::cout << ">>> after:  tau pt = " << tau_tlv.Pt()  << ", m   = " << tau_tlv.M() << std::endl;
+    //std::cout << ">>> after:  lep pt = " << lep_tlv.Pt()  << ", m   = " << lep_tlv.M() << std::endl;      
+    //std::cout << ">>> after:  met    = " << met_tlv_corrected.E() << ", phi = " << met_tlv_corrected.Phi() << std::endl;
     //std::cout << ">>> " << std::endl;
+  }
+  
+  if (m_doJEC){
+    double b_weightbtag_bcUp_     = m_BTaggingScaleTool.getScaleFactor(Jets,+1., 0.);
+    double b_weightbtag_bcDown_   = m_BTaggingScaleTool.getScaleFactor(Jets,-1., 0.);
+    double b_weightbtag_udsgUp_   = m_BTaggingScaleTool.getScaleFactor(Jets, 0.,+1.);
+    double b_weightbtag_udsgDown_ = m_BTaggingScaleTool.getScaleFactor(Jets, 0.,-1.);
+    TString tch = ch;
+    Hist("btagweight", "histogram_"+tch)->Fill( 0., b_weightbtag_          );
+    Hist("btagweight", "histogram_"+tch)->Fill( 1., b_weightbtag_bcUp_     );
+    Hist("btagweight", "histogram_"+tch)->Fill( 2., b_weightbtag_bcDown_   );
+    Hist("btagweight", "histogram_"+tch)->Fill( 3., b_weightbtag_udsgUp_   );
+    Hist("btagweight", "histogram_"+tch)->Fill( 4., b_weightbtag_udsgDown_ );
+    
+    FillBranches_JEC( ch, Jets, met, (lep_tlv+tau_tlv).Phi() ); //ch
   }
   
   b_met[ch]         = fmet;
@@ -1543,14 +1543,13 @@ void TauTauAnalysis::FillBranches(const std::string& channel, const std::vector<
   }
   
   b_dR_ll[ch]       = tau_tlv.DeltaR(lep_tlv);
-  b_dR_ll_gen[ch]   = b_dR_ll_gen_;
   b_mt_tot[ch]      = TMath::Sqrt(TMath::Power(b_pfmt_1[ch],2) + TMath::Power(b_pfmt_2[ch],2) + 2*lep_tlv.Pt()*b_pt_2[ch]*(1-TMath::Cos(deltaPhi(lep_tlv.Phi(), b_phi_2[ch]))));
   b_ht[ch]          = ht + lep_tlv.E() + tau_tlv.E();
   
   // Delta phi( lep+tau, bj+j ) if there is one central b jet and on central jet
   // icjet1 = index of central jet that is not the same as leading b jet
   if(icjet1 != -1 && ibjet1 != -1)
-    b_dphi_ll_bj[ch] = fabs(deltaPhi( (lep_tlv+tau_tlv).Phi(), (Jet.at(ibjet1).tlv()+Jet.at(icjet1).tlv()).Phi() ));
+    b_dphi_ll_bj[ch] = fabs(deltaPhi( (lep_tlv+tau_tlv).Phi(), (Jets.at(ibjet1).tlv()+Jets.at(icjet1).tlv()).Phi() ));
   else
     b_dphi_ll_bj[ch] = -1;
   
@@ -1571,7 +1570,7 @@ void TauTauAnalysis::FillBranches(const std::string& channel, const std::vector<
   //std::cout << ">>> SVFit" << std::endl;
   // apply some extra cuts to save time
   bool doSVFit = m_doSVFit && b_iso_cuts[ch]==1 && b_lepton_vetos[ch]==0; //&& b_iso_1[ch]<0.30 && b_iso_2_medium[ch]==1 && b_lepton_vetos[ch]==0;
-  if(m_doEES || m_doTES || m_doLTF) doSVFit = doSVFit && ncbtag>0 && b_iso_1[ch]<0.15 && b_iso_2[ch]==1;
+  if(m_doTight) doSVFit = doSVFit && ncbtag>0 && b_iso_1[ch]<0.15 && b_iso_2[ch]==1;
   //bool doSVfit= false;
     
   double m_sv = -1;
@@ -1592,9 +1591,120 @@ void TauTauAnalysis::FillBranches(const std::string& channel, const std::vector<
 
 
 
+void TauTauAnalysis::FillBranches_JEC( const char* ch, const std::vector<UZH::Jet>& Jets, const UZH::MissingEt& met, const float dphi ){
+  //std::cout << "FillBranches_JEC " << ch << std::endl;
+  // TODO: use jet_jer as main jets
+  // TODO: dphi with tlvs ?
+  
+  TLorentzVector met_jesUp, met_jesDown, met_jer, met_jerUp, met_jerDown, met_UncEnUp, met_UncEnDown;
+  met_jesUp.SetPtEtaPhiE(    met.et()*met.JetEnUp(),          0.,met.phi(),met.et()*met.JetEnUp());
+  met_jesDown.SetPtEtaPhiE(  met.et()*met.JetEnDown(),        0.,met.phi(),met.et()*met.JetEnDown());
+  met_jer.SetPtEtaPhiE(      met.et(),                        0.,met.phi(),met.et());
+  met_jerUp.SetPtEtaPhiE(    met.et()*met.JetResUp(),         0.,met.phi(),met.et()*met.JetResUp());
+  met_jerDown.SetPtEtaPhiE(  met.et()*met.JetResDown(),       0.,met.phi(),met.et()*met.JetResDown());
+  met_UncEnUp.SetPtEtaPhiE(  met.et()*met.UnclusteredEnUp(),  0.,met.phi(),met.et()*met.UnclusteredEnUp());
+  met_UncEnDown.SetPtEtaPhiE(met.et()*met.UnclusteredEnDown(),0.,met.phi(),met.et()*met.UnclusteredEnDown());
+  //printRow({"met","jer","jerUp","jerDown","jesUp","jesDown"});
+  //printRow({},{},{met.et(),met_jer.Pt(),met_jerUp.Pt(),met_jerDown.Pt(),met_jesUp.Pt(),met_jesDown.Pt()});  
+  
+  Int_t nfjets_jer     =  0;
+  Int_t nfjets_jerUp   =  0;
+  Int_t nfjets_jerDown =  0;
+  Int_t nfjets_jesUp   =  0;
+  Int_t nfjets_jesDown =  0;
+  Int_t ncjets_jer     =  0;
+  Int_t ncjets_jerUp   =  0;
+  Int_t ncjets_jerDown =  0;
+  Int_t ncjets_jesUp   =  0;
+  Int_t ncjets_jesDown =  0;
+  Int_t ncbtag_jer     =  0;
+  Int_t ncbtag_jerUp   =  0;
+  Int_t ncbtag_jerDown =  0;
+  Int_t ncbtag_jesUp   =  0;
+  Int_t ncbtag_jesDown =  0;
+  
+  //printRow({"ijet","jet pt","jer","jerUp","jerDown","jesUp","jesDown"});
+  for( int ijet = 0; ijet < (int)Jets.size(); ++ijet ){ // already pT > 20 GeV jets
+      UZH::Jet jet = Jets.at(ijet);
+      
+      std::vector<TLorentzVector> jets_jes = m_JetCorrectionTool.GetCorrectedJet(jet);
+      std::vector<TLorentzVector> jets_jer = m_JetCorrectionTool.GetCorrectedJetJER(jet,m_genJetAK4);
+      
+      TLorentzVector jet_jer(jets_jer.at(0)), jet_jerUp(jets_jer.at(1)), jet_jerDown(jets_jer.at(2)),
+                                              jet_jesUp(jets_jes.at(0)), jet_jesDown(jets_jes.at(1));
+      
+      //printRow({},{ijet},{jet.pt(),jet_jer.Pt(),jet_jerUp.Pt(),jet_jerDown.Pt(),jet_jesUp.Pt(),jet_jesDown.Pt()});
+      bool isBTagged = jet.isTagged(); // tagged in promote-demote
+      
+      countJets( fabs(jet_jer.Eta()),     ncjets_jer,     nfjets_jer,     ncbtag_jer,     isBTagged );
+      countJets( fabs(jet_jerUp.Eta()),   ncjets_jerUp,   nfjets_jerUp,   ncbtag_jerUp,   isBTagged );
+      countJets( fabs(jet_jerDown.Eta()), ncjets_jerDown, nfjets_jerDown, ncbtag_jerDown, isBTagged );
+      countJets( fabs(jet_jesUp.Eta()),   ncjets_jesUp,   nfjets_jesUp,   ncbtag_jesUp,   isBTagged );
+      countJets( fabs(jet_jesDown.Eta()), ncjets_jesDown, nfjets_jesDown, ncbtag_jesDown, isBTagged );
+      
+      // met_jesUp   += myjetak4.tlv();
+      // met_jesUp   -= goodJetsAK4_jesUp;
+      // met_jesDown += myjetak4.tlv() - goodJetsAK4_jesDown;
+      // met_jerUp   += myjetak4.tlv() - goodJetsAK4_jerUp;
+      // met_jerDown += myjetak4.tlv() - goodJetsAK4_jerDown;
+      // met_jer     += myjetak4.tlv() - goodJetsAK4_jer;
+  }
+  
+  //printRow({" ","jer","jerUp","jerDown","jesUp","jesDown"});
+  //printRow({"ncjets"},{ncjets_jer,ncjets_jerUp,ncjets_jerDown,ncjets_jesUp,ncjets_jesDown});
+  //printRow({"nfjets"},{nfjets_jer,nfjets_jerUp,nfjets_jerDown,nfjets_jesUp,nfjets_jesDown});
+  //printRow({"ncbtag"},{ncbtag_jer,ncbtag_jerUp,ncbtag_jerDown,ncbtag_jesUp,ncbtag_jesDown});
+  
+  b_nfjets_jer[ch]      = nfjets_jer;
+  b_nfjets_jerUp[ch]    = nfjets_jerUp;
+  b_nfjets_jerDown[ch]  = nfjets_jerDown;
+  b_nfjets_jesUp[ch]    = nfjets_jesUp;
+  b_nfjets_jesDown[ch]  = nfjets_jesDown;
+  b_ncjets_jer[ch]      = ncjets_jer;
+  b_ncjets_jerUp[ch]    = ncjets_jerUp;
+  b_ncjets_jerDown[ch]  = ncjets_jerDown;
+  b_ncjets_jesUp[ch]    = ncjets_jesUp;
+  b_ncjets_jesDown[ch]  = ncjets_jesDown;
+  b_ncbtag_jer[ch]      = ncbtag_jer;
+  b_ncbtag_jerUp[ch]    = ncbtag_jerUp;
+  b_ncbtag_jerDown[ch]  = ncbtag_jerDown;
+  b_ncbtag_jesUp[ch]    = ncbtag_jesUp;
+  b_ncbtag_jesDown[ch]  = ncbtag_jesDown;
+  
+  b_met_jesUp[ch]       = met_jesUp.Et();
+  b_met_jesDown[ch]     = met_jesDown.Et();
+  b_met_jer[ch]         = met_jer.Et();
+  b_met_jerUp[ch]       = met_jerUp.Et();
+  b_met_jerDown[ch]     = met_jerDown.Et();
+  
+}
+
+
+
+
+
+void TauTauAnalysis::countJets(double abseta, Int_t& ncjets, Int_t& nfjets, Int_t& ncbtags, const bool isBTagged){ //, const int ijet , Int_t& icjet1, Int_t& ibjet1
+  //std::cout << "countJets" << std::endl;
+  
+  if(abseta < 2.4){         // CENTRAL 30 GeV
+    if(isBTagged){
+      ncbtags++;
+      //if(ibjet1 < 0) ibjet1 = ijet;
+    }
+    //if(icjet1 < 0 && (icjet1 != ibjet1 || ibjet1 < 0 )) icjet1 = ijet;
+    ncjets++;               //  jets
+  }
+  else if(abseta > 2.4){    // FORWARD 30 GeV
+    nfjets++;               //  jets
+  }
+}
+
+
+
+
 
 void TauTauAnalysis::genFilterZtautau(){
-//   std::cout << "genFilterZtautau" << std::endl;
+  //std::cout << "genFilterZtautau" << std::endl;
     
   for ( int p = 0; p < (m_genParticle.N); ++p ) {
     UZH::GenParticle mygoodGenPart( &m_genParticle, p );
@@ -1737,6 +1847,18 @@ Float_t TauTauAnalysis::deltaR(Float_t deta, Float_t dphi){
 
 
 
+void TauTauAnalysis::printRow(const std::vector<std::string> svec, const std::vector<int> ivec, const std::vector<double> dvec, const std::vector<float> fvec, const int w){
+    for(auto const& el: svec) std::cout << std::setw(w) << el;
+    for(auto const& el: ivec) std::cout << std::setw(w) << el;
+    for(auto const& el: fvec) std::cout << std::setw(w) << el;
+    for(auto const& el: dvec) std::cout << std::setw(w) << el;
+    std::cout << std::endl;
+}
+
+
+
+
+
 bool TauTauAnalysis::LooseJetID(const UZH::Jet& jet)
 {
 // https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetID#Recommendations_for_13_TeV_data
@@ -1830,10 +1952,14 @@ float TauTauAnalysis::genMatchSF(const std::string& channel, const int genmatch_
         else if(qq*top.pdgId()<0) { pt_top_2 = top.pt(); qq*=top.pdgId(); break; }
       }
     }
-    if(qq==-36)
+    if(qq==-36){
+      const char* ch = channel.c_str();
+      b_pt_top_1[ch] = pt_top_1;
+      b_pt_top_2[ch] = pt_top_2;
       return TMath::Sqrt(TMath::Exp(0.0615-0.0005*TMath::Min(pt_top_1,400.0))*TMath::Exp(0.0615-0.0005*TMath::Min(pt_top_2,400.0)));
-    else
+    }else{
       std::cout << ">>> TauTauAnalysis::genMatchSF: genmatch_2 = 66, qq = " << qq << " != -36 !!!" << std::endl;
+    }
   }
   
   return 1.0;
@@ -1947,7 +2073,7 @@ void TauTauAnalysis::extraLeptonVetos(const std::string& channel, const UZH::Muo
 
 
 
-bool TauTauAnalysis::getBTagWeight_promote_demote( const UZH::Jet& jet ) {
+bool TauTauAnalysis::getBTagWeight_promote_demote( UZH::Jet& jet ) {
   //std::cout << "getBTagSF_promote_demote" << std::endl;
   // https://twiki.cern.ch/twiki/bin/viewauth/CMS/HiggsToTauTauWorking2016#B_tag_scale_factors
   // example: https://github.com/rappoccio/usercode/blob/Dev_53x/EDSHyFT/plugins/BTagSFUtil_tprime.h
@@ -1960,8 +2086,7 @@ bool TauTauAnalysis::getBTagWeight_promote_demote( const UZH::Jet& jet ) {
   bool isBTagged = (jet.csv() > m_CSVWorkingPoint);
   if (m_isData) return isBTagged;
   
-  //if (isBTagged) std::cout << "Jet b tagged" << std::endl;
-  //else           std::cout << "Jet b not tagged" << std::endl;
+  //std::cout << "Jet b tagged:" << isBTagged << " -> ";
   
   TRandom3* generator = new TRandom3( (int) ((jet.eta()+5)*100000) );
   double rand = generator->Uniform(1.);
@@ -1977,11 +2102,13 @@ bool TauTauAnalysis::getBTagWeight_promote_demote( const UZH::Jet& jet ) {
     float mistagPercentage = (1.0 - BTag_SF) / (1.0 - (1.0/BTag_eff)); // fraction of jets to be promoted
     if( rand < mistagPercentage ) isBTagged = true; // PROMOTE
   }
-  else{//(BTag_SF < 1)
+  else{
     if(!isBTagged) return isBTagged;
     if( rand < 1 - BTag_SF ) isBTagged = false; // DEMOTE: 1-SF fraction of jets to be demoted
   }
   
+  jet.setTagged(isBTagged);
+  //std::cout << jet.isTagged() << ", " << isBTagged << std:;endl;
   return isBTagged;
 }
 

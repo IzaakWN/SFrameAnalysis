@@ -12,6 +12,8 @@
 // External include(s):
 #include "../NtupleVariables/include/JetNtupleObject.h"
 #include "../NtupleVariables/include/Jet.h"
+#include "../NtupleVariables/include/GenJetak4NtupleObject.h"
+#include "../NtupleVariables/include/GenJetak4.h"
 #include "../NtupleVariables/include/EventInfoNtupleObject.h"
 #include "../NtupleVariables/include/ElectronNtupleObject.h"
 #include "../NtupleVariables/include/Electron.h"
@@ -24,15 +26,14 @@
 #include "../NtupleVariables/include/GenParticleNtupleObject.h"
 #include "../NtupleVariables/include/GenParticle.h"
 #include "../GoodRunsLists/include/TGoodRunsList.h"
+#include "../GoodRunsLists/include/TGoodRunsListReader.h"
 #include "../PileupReweightingTool/include/PileupReweightingTool.h"
 #include "../BTaggingTools/include/BTaggingScaleTool.h"
 #include "../LepEff2016/interface/ScaleFactorTool.h"
 #include "../RecoilCorrections/interface/RecoilCorrector.h"
 #include "../SVFitTools/interface/SVFitTool.h"
 #include "../SVFitTools/interface/SVfitStandaloneAlgorithm.h"
-//#include "../SVFit/include/NSVfitStandaloneAlgorithm.h"
-//#include "../SVfitStandalone/interface/SVfitStandaloneAlgorithm.h"
-//#include "../SVfitStandalone/interface/SVfitStandaloneLikelihood.h"
+#include "../JetCorrectionTool/interface/JetCorrectionTool.h"
 
 //class TH1D;
 //class TH2D;
@@ -135,25 +136,25 @@ class TauTauAnalysis : public SCycleBase {
       std::vector<std::string> filterNames;
       LeptonTrigger(std::string _name, int _start, int _end, double _pt, std::vector<std::string> _names):
         Trigger(_name,_start,_end), pt(_pt), filterNames(_names) { }
-      bool matchesTriggerObject(Ntuple::EventInfoNtupleObject eventInfo, const Float_t pt1, const Float_t eta1, const Float_t phi1, const Float_t pt2, const Float_t eta2, const Float_t phi2) const {
-        //std::cout << ">>> matchesTriggerObject " << std::endl;
-        for(unsigned int i=0; i<eventInfo.trigObject_eta->size(); i++){
-          std::string triggerName = eventInfo.trigObject_lastname->at(i);
-          Float_t trig_eta = eventInfo.trigObject_eta->at(i);
-          Float_t trig_phi = eventInfo.trigObject_phi->at(i);
-          Float_t dR = deltaR(eta1 - trig_eta, deltaPhi(phi1,trig_phi));
-          if(dR < 0.5) continue;
-          for(auto const& filterName: filterNames){
-            for(std::map<std::string, std::vector<std::string>>::iterator it = (eventInfo.trigObject_filterLabels)->begin(); it != (eventInfo.trigObject_filterLabels)->end(); ++it){
-              if(it->first != triggerName) continue;
-              for(unsigned int j=0; j<it->second.size(); j++){
-                if(it->second.at(j)==filterName && pt1>pt){
-                    //std::cout << ">>> filter " << j << " (" << it->second.at(j) << ") matches with dR=" << dR << "!" << std::endl;
-                    return true;
-                }
-        }}}}
-        return false;
-      }
+//       bool matchesTriggerObject(Ntuple::EventInfoNtupleObject eventInfo, const Float_t pt1, const Float_t eta1, const Float_t phi1, const Float_t pt2, const Float_t eta2, const Float_t phi2) const {
+//         //std::cout << ">>> matchesTriggerObject " << std::endl;
+//         for(unsigned int i=0; i<eventInfo.trigObject_eta->size(); i++){
+//           std::string triggerName = eventInfo.trigObject_lastname->at(i);
+//           Float_t trig_eta = eventInfo.trigObject_eta->at(i);
+//           Float_t trig_phi = eventInfo.trigObject_phi->at(i);
+//           Float_t dR = deltaR(eta1 - trig_eta, deltaPhi(phi1,trig_phi));
+//           if(dR < 0.5) continue;
+//           for(auto const& filterName: filterNames){
+//             for(std::map<std::string, std::vector<std::string>>::iterator it = (eventInfo.trigObject_filterLabels)->begin(); it != (eventInfo.trigObject_filterLabels)->end(); ++it){
+//               if(it->first != triggerName) continue;
+//               for(unsigned int j=0; j<it->second.size(); j++){
+//                 if(it->second.at(j)==filterName && pt1>pt){
+//                     //std::cout << ">>> filter " << j << " (" << it->second.at(j) << ") matches with dR=" << dR << "!" << std::endl;
+//                     return true;
+//                 }
+//         }}}}
+//         return false;
+//       }
     };
     
     struct CrossTrigger : Trigger {
@@ -200,11 +201,11 @@ class TauTauAnalysis : public SCycleBase {
     virtual void ExecuteEvent(   const SInputData&, Double_t    ) throw( SError ); // called for every event
     virtual bool isGoodEvent(    int runNumber, int lumiSection );    // check good lumi section
     
-    /// Function to book tree branches
-    //virtual void FillBranches(const std::string& channel,  const std::vector<UZH::Jet>& Jet, const UZH::Tau& tau, const  TLorentzVector& lepton, const UZH::MissingEt& met );
-    virtual void FillBranches( const std::string& channel, const std::vector<UZH::Jet>& Jet,
+    /// Function to fill tree branches
+    virtual void FillBranches( const std::string& channel, std::vector<UZH::Jet>& Jets, // removed const for jets to change BTag status
                                const UZH::Tau& tau, const int taugen, const UZH::Muon& muon, const UZH::Electron& electron,
                                const UZH::MissingEt& met, const UZH::MissingEt& puppimet );//, const UZH::MissingEt& mvamet=NULL);
+    virtual void FillBranches_JEC( const char* ch, const std::vector<UZH::Jet>& Jets, const UZH::MissingEt& met, const float dphi );
     
     // check pass of triggers / MET filters
     virtual TString passTrigger( int runNumber = -1 );
@@ -227,7 +228,9 @@ class TauTauAnalysis : public SCycleBase {
     // help function
     static Float_t deltaPhi( Float_t p1, Float_t p2 );
     static Float_t deltaR(   Float_t p1, Float_t p2 );
+    virtual void countJets( double abseta, Int_t& ncjets, Int_t& nfjets, Int_t& ncbtags, const bool isBTagged );
     virtual void shiftLeptonAndMET( const float shift, TLorentzVector& lep_shifted, TLorentzVector& met_shifted, bool shiftEnergy = false );
+    virtual void printRow(const std::vector<std::string> svec = {}, const std::vector<int> ivec = {}, const std::vector<double> dvec = {}, const std::vector<float> fvec = {}, const int w=10);
     
     // IDs
     //virtual bool isNonTrigElectronID( const UZH::Electron& electron );
@@ -235,7 +238,7 @@ class TauTauAnalysis : public SCycleBase {
     
     // extra scaling factors
     virtual float genMatchSF( const std::string& channel, const int genmatch_2, const float tau_eta = 0. );
-    virtual bool  getBTagWeight_promote_demote( const UZH::Jet& jet );
+    virtual bool  getBTagWeight_promote_demote( UZH::Jet& jet );
     
     /// fill cut flow
     //virtual void fillCutflow( const std::string histName, const std::string dirName, const Int_t id, const Double_t weight = 1.);
@@ -257,6 +260,7 @@ class TauTauAnalysis : public SCycleBase {
     ///
     
     Ntuple::JetNtupleObject         m_jetAK4;         ///< jet container
+    Ntuple::GenJetak4NtupleObject   m_genJetAK4;      ///< Gen jet container
     Ntuple::EventInfoNtupleObject   m_eventInfo;      ///< event info container
     Ntuple::ElectronNtupleObject    m_electron;       ///< electron container
     Ntuple::MuonNtupleObject        m_muon;           ///< muon container
@@ -271,12 +275,13 @@ class TauTauAnalysis : public SCycleBase {
     /// OTHER OBJECTS
     ///
     
-    Root::TGoodRunsList m_grl;
-    PileupReweightingTool m_PileupReweightingTool;
-    BTaggingScaleTool m_BTaggingScaleTool;
-    ScaleFactorTool m_ScaleFactorTool;
-    RecoilCorrectorTool m_RecoilCorrector;
-    SVFitTool m_SVFitTool;
+    Root::TGoodRunsList     m_grl;
+    PileupReweightingTool   m_PileupReweightingTool;
+    BTaggingScaleTool       m_BTaggingScaleTool;
+    ScaleFactorTool         m_ScaleFactorTool;
+    RecoilCorrectorTool     m_RecoilCorrector;
+    JetCorrectionTool       m_JetCorrectionTool;
+    SVFitTool               m_SVFitTool;
     
     //TLorentzVector applySVFitSemileptonic (float cov00, float cov10, float cov11, float met, float met_phi, TLorentzVector lep1 , TLorentzVector lep2);
     //TLorentzVector applySVFitHadronic     (float cov00, float cov10, float cov11, float met, float met_phi, TLorentzVector lep1 , TLorentzVector lep2);
@@ -293,6 +298,7 @@ class TauTauAnalysis : public SCycleBase {
     
     int m_ntupleLevel;                ///< cut at which branches for ntuple are written out
     std::string m_jetAK4Name;         ///< name of AK4 jet collection in tree with reconstructed objects
+    std::string m_genJetAK4Name;      ///< name of AK4 jet collection in tree with reconstructed objects
     std::string m_electronName;       ///< name of electron collection in tree with reconstructed objects
     std::string m_muonName;           ///< name of muon collection in tree with reconstructed objects
     std::string m_tauName;            ///< name of tau collection in tree with reconstructed objects
@@ -307,6 +313,7 @@ class TauTauAnalysis : public SCycleBase {
     bool    m_doRecoilCorr;
     bool    m_doZpt;
     bool    m_doTTpt;
+    bool    m_doJEC;
     bool    m_doTES;
     double  m_TESshift;
     bool    m_doEES;
@@ -314,6 +321,7 @@ class TauTauAnalysis : public SCycleBase {
     double  m_EESshiftEndCap;
     bool    m_doLTF;
     double  m_LTFshift;
+    bool    m_doTight;
 
     ///
     /// CUTS
@@ -379,6 +387,10 @@ class TauTauAnalysis : public SCycleBase {
     double b_genweight_;
     double b_puweight_;
     double b_weightbtag_;
+    double b_weightbtag_bcUp_;
+    double b_weightbtag_bcDown_;
+    double b_weightbtag_udsgUp_;
+    double b_weightbtag_udsgDown_;
     double b_npu_;
     double b_dR_ll_gen_ = -1;
     Int_t b_isData_;
@@ -430,13 +442,39 @@ class TauTauAnalysis : public SCycleBase {
     std::map<std::string,Int_t>    b_ncjets;
     std::map<std::string,Int_t>    b_nbtag;
     std::map<std::string,Int_t>    b_ncbtag;
-    std::map<std::string,Int_t>    b_nfbtag;
     std::map<std::string,Int_t>    b_njets20;
     std::map<std::string,Int_t>    b_nfjets20;
     std::map<std::string,Int_t>    b_ncjets20;
     std::map<std::string,Int_t>    b_nbtag20;
     std::map<std::string,Int_t>    b_ncbtag20;
-    std::map<std::string,Int_t>    b_nfbtag20;
+
+    std::map<std::string,Int_t>    b_ncbtag_jesUp;
+    std::map<std::string,Int_t>    b_ncbtag_jesDown;
+    std::map<std::string,Int_t>    b_ncbtag_jer;
+    std::map<std::string,Int_t>    b_ncbtag_jerUp;
+    std::map<std::string,Int_t>    b_ncbtag_jerDown;
+    std::map<std::string,Int_t>    b_ncjets_jesUp;
+    std::map<std::string,Int_t>    b_ncjets_jesDown;
+    std::map<std::string,Int_t>    b_ncjets_jer;
+    std::map<std::string,Int_t>    b_ncjets_jerUp;
+    std::map<std::string,Int_t>    b_ncjets_jerDown;
+    std::map<std::string,Int_t>    b_nfjets_jesUp;
+    std::map<std::string,Int_t>    b_nfjets_jesDown;
+    std::map<std::string,Int_t>    b_nfjets_jer;
+    std::map<std::string,Int_t>    b_nfjets_jerUp;
+    std::map<std::string,Int_t>    b_nfjets_jerDown;
+    std::map<std::string,Double_t> b_met_jesUp;
+    std::map<std::string,Double_t> b_met_jesDown;
+    std::map<std::string,Double_t> b_met_jer;
+    std::map<std::string,Double_t> b_met_jerUp;
+    std::map<std::string,Double_t> b_met_jerDown;
+    std::map<std::string,Double_t> b_met_UncEnUp;
+    std::map<std::string,Double_t> b_met_UncEnDown;
+    
+    // std::map<std::string,Double_t> b_weightbtag_bcUp;
+    // std::map<std::string,Double_t> b_weightbtag_bcDown;
+    // std::map<std::string,Double_t> b_weightbtag_udsgUp;
+    // std::map<std::string,Double_t> b_weightbtag_udsgDown;
     
     std::map<std::string,Double_t> b_pt_1;
     std::map<std::string,Double_t> b_eta_1;
@@ -538,13 +576,14 @@ class TauTauAnalysis : public SCycleBase {
     std::map<std::string,Double_t> b_R_pt_m_sv;
     
     std::map<std::string,Double_t> b_dR_ll;
-    std::map<std::string,Double_t> b_dR_ll_gen;
     std::map<std::string,Double_t> b_dphi_ll_bj;
     std::map<std::string,Double_t> b_mt_tot;
     std::map<std::string,Double_t> b_ht;
     
     std::map<std::string,Double_t> b_m_genboson;
     std::map<std::string,Double_t> b_pt_genboson;
+    std::map<std::string,Double_t> b_pt_top_1;
+    std::map<std::string,Double_t> b_pt_top_2;
     
     //std::map<std::string,Double_t> b_pt_sv;
     //std::map<std::string,Double_t> b_eta_sv;

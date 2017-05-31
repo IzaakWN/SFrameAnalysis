@@ -11,13 +11,15 @@
 SVFitTool::SVFitTool(SCycleBase* parent, const char* name ): SToolBase( parent ), m_name( name ) 
 {
   SetLogName( name );
-  DeclareProperty( m_name+"ResoFile ", m_ResoFilePath = std::string (std::getenv("SFRAME_DIR")) + "/../SVFitTools/data/svFitVisMassAndPtResolutionPDF.root" ); 
+  // std::string (std::getenv("SFRAME_DIR")) + 
+  DeclareProperty( m_name+"ResoFile ", m_ResoFilePath = "$SFRAME_DIR/../SVFitTools/data/svFitVisMassAndPtResolutionPDF.root" ); 
 }
 
 
 
 void SVFitTool::BeginInputData( const SInputData& ) throw( SError ) {
 
+  m_logger << INFO << SLogger::endmsg;
   m_logger << INFO << "Initializing Mass and pT resolution for SVFit" << SLogger::endmsg;
   m_logger << INFO << "SVFit Mass and pT resolution File: " << m_ResoFilePath << SLogger::endmsg;
   TString resoFilePath(m_ResoFilePath);

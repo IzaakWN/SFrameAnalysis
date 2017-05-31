@@ -28,7 +28,7 @@ namespace UZH {
    * @author Code produced by Id: CodeIt.py 494 2010-07-30 13:41:32Z svn 
    *
    */
-
+  
   class Jet : public Basic 
  , public Particle 
   {
@@ -84,31 +84,6 @@ namespace UZH {
     floatingnumber* m_jer_sf_up;
     floatingnumber* m_jer_sf_down;
     floatingnumber* m_jer_sigma_pt;
-    int* m_subjet_softdrop_N;
-    std::vector<floatingnumber>* m_subjet_softdrop_pt;
-    std::vector<floatingnumber>* m_subjet_softdrop_eta;
-    std::vector<floatingnumber>* m_subjet_softdrop_phi;
-    std::vector<floatingnumber>* m_subjet_softdrop_e;
-    std::vector<floatingnumber>* m_subjet_softdrop_m;
-    std::vector<floatingnumber>* m_subjet_softdrop_csv;
-    std::vector<int>* m_subjet_softdrop_charge;
-    std::vector<int>* m_subjet_softdrop_partonFlavour;
-    std::vector<int>* m_subjet_softdrop_hadronFlavour;
-    std::vector<int>* m_subjet_softdrop_genParton_pdgID;
-    std::vector<int>* m_subjet_softdrop_nbHadrons;
-    std::vector<int>* m_subjet_softdrop_ncHadrons;
-    floatingnumber* m_tau1;
-    floatingnumber* m_tau2;
-    floatingnumber* m_tau3;
-    floatingnumber* m_pruned_mass;
-    floatingnumber* m_pruned_massCorr;
-    floatingnumber* m_softdrop_mass;
-    floatingnumber* m_softdrop_massCorr;
-    floatingnumber* m_pruned_jec;
-    floatingnumber* m_pruned_jecUp;
-    floatingnumber* m_pruned_jecDown;
-    floatingnumber* m_softdrop_jec;
-    floatingnumber* m_Hbbtag;
     int* m_partonFlavour;
     int* m_hadronFlavour;
     int* m_genParton_pdgID;
@@ -157,31 +132,6 @@ namespace UZH {
     floatingnumber jer_sf_up() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::kjer_sf_up)) std::cout<<"jer_sf_up not connected!"<<std::endl;*/ return *(m_jer_sf_up); } 
     floatingnumber jer_sf_down() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::kjer_sf_down)) std::cout<<"jer_sf_down not connected!"<<std::endl;*/ return *(m_jer_sf_down); } 
     floatingnumber jer_sigma_pt() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::kjer_sigma_pt)) std::cout<<"jer_sigma_pt not connected!"<<std::endl;*/ return *(m_jer_sigma_pt); } 
-    int subjet_softdrop_N() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::ksubjet_softdrop_N)) std::cout<<"subjet_softdrop_N not connected!"<<std::endl;*/ return *(m_subjet_softdrop_N); } 
-    std::vector<floatingnumber> subjet_softdrop_pt() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::ksubjet_softdrop_pt)) std::cout<<"subjet_softdrop_pt not connected!"<<std::endl;*/ return *(m_subjet_softdrop_pt); } 
-    std::vector<floatingnumber> subjet_softdrop_eta() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::ksubjet_softdrop_eta)) std::cout<<"subjet_softdrop_eta not connected!"<<std::endl;*/ return *(m_subjet_softdrop_eta); } 
-    std::vector<floatingnumber> subjet_softdrop_phi() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::ksubjet_softdrop_phi)) std::cout<<"subjet_softdrop_phi not connected!"<<std::endl;*/ return *(m_subjet_softdrop_phi); } 
-    std::vector<floatingnumber> subjet_softdrop_e() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::ksubjet_softdrop_e)) std::cout<<"subjet_softdrop_e not connected!"<<std::endl;*/ return *(m_subjet_softdrop_e); } 
-    std::vector<floatingnumber> subjet_softdrop_m() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::ksubjet_softdrop_m)) std::cout<<"subjet_softdrop_m not connected!"<<std::endl;*/ return *(m_subjet_softdrop_m); } 
-    std::vector<floatingnumber> subjet_softdrop_csv() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::ksubjet_softdrop_csv)) std::cout<<"subjet_softdrop_csv not connected!"<<std::endl;*/ return *(m_subjet_softdrop_csv); } 
-    std::vector<int> subjet_softdrop_charge() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::ksubjet_softdrop_charge)) std::cout<<"subjet_softdrop_charge not connected!"<<std::endl;*/ return *(m_subjet_softdrop_charge); } 
-    std::vector<int> subjet_softdrop_partonFlavour() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::ksubjet_softdrop_partonFlavour)) std::cout<<"subjet_softdrop_partonFlavour not connected!"<<std::endl;*/ return *(m_subjet_softdrop_partonFlavour); } 
-    std::vector<int> subjet_softdrop_hadronFlavour() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::ksubjet_softdrop_hadronFlavour)) std::cout<<"subjet_softdrop_hadronFlavour not connected!"<<std::endl;*/ return *(m_subjet_softdrop_hadronFlavour); } 
-    std::vector<int> subjet_softdrop_genParton_pdgID() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::ksubjet_softdrop_genParton_pdgID)) std::cout<<"subjet_softdrop_genParton_pdgID not connected!"<<std::endl;*/ return *(m_subjet_softdrop_genParton_pdgID); } 
-    std::vector<int> subjet_softdrop_nbHadrons() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::ksubjet_softdrop_nbHadrons)) std::cout<<"subjet_softdrop_nbHadrons not connected!"<<std::endl;*/ return *(m_subjet_softdrop_nbHadrons); } 
-    std::vector<int> subjet_softdrop_ncHadrons() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::ksubjet_softdrop_ncHadrons)) std::cout<<"subjet_softdrop_ncHadrons not connected!"<<std::endl;*/ return *(m_subjet_softdrop_ncHadrons); } 
-    floatingnumber tau1() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::ktau1)) std::cout<<"tau1 not connected!"<<std::endl;*/ return *(m_tau1); } 
-    floatingnumber tau2() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::ktau2)) std::cout<<"tau2 not connected!"<<std::endl;*/ return *(m_tau2); } 
-    floatingnumber tau3() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::ktau3)) std::cout<<"tau3 not connected!"<<std::endl;*/ return *(m_tau3); } 
-    floatingnumber pruned_mass() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::kpruned_mass)) std::cout<<"pruned_mass not connected!"<<std::endl;*/ return *(m_pruned_mass); } 
-    floatingnumber pruned_massCorr() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::kpruned_massCorr)) std::cout<<"pruned_massCorr not connected!"<<std::endl;*/ return *(m_pruned_massCorr); } 
-    floatingnumber softdrop_mass() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::ksoftdrop_mass)) std::cout<<"softdrop_mass not connected!"<<std::endl;*/ return *(m_softdrop_mass); } 
-    floatingnumber softdrop_massCorr() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::ksoftdrop_massCorr)) std::cout<<"softdrop_massCorr not connected!"<<std::endl;*/ return *(m_softdrop_massCorr); } 
-    floatingnumber pruned_jec() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::kpruned_jec)) std::cout<<"pruned_jec not connected!"<<std::endl;*/ return *(m_pruned_jec); } 
-    floatingnumber pruned_jecUp() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::kpruned_jecUp)) std::cout<<"pruned_jecUp not connected!"<<std::endl;*/ return *(m_pruned_jecUp); } 
-    floatingnumber pruned_jecDown() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::kpruned_jecDown)) std::cout<<"pruned_jecDown not connected!"<<std::endl;*/ return *(m_pruned_jecDown); } 
-    floatingnumber softdrop_jec() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::ksoftdrop_jec)) std::cout<<"softdrop_jec not connected!"<<std::endl;*/ return *(m_softdrop_jec); } 
-    floatingnumber Hbbtag() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::kHbbtag)) std::cout<<"Hbbtag not connected!"<<std::endl;*/ return *(m_Hbbtag); } 
     int partonFlavour() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::kpartonFlavour)) std::cout<<"partonFlavour not connected!"<<std::endl;*/ return *(m_partonFlavour); } 
     int hadronFlavour() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::khadronFlavour)) std::cout<<"hadronFlavour not connected!"<<std::endl;*/ return *(m_hadronFlavour); } 
     int genParton_pdgID() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::kgenParton_pdgID)) std::cout<<"genParton_pdgID not connected!"<<std::endl;*/ return *(m_genParton_pdgID); } 
@@ -217,31 +167,6 @@ namespace UZH {
     void jer_sf_up( const floatingnumber& val){ *(m_jer_sf_up)=val; } 
     void jer_sf_down( const floatingnumber& val){ *(m_jer_sf_down)=val; } 
     void jer_sigma_pt( const floatingnumber& val){ *(m_jer_sigma_pt)=val; } 
-    void subjet_softdrop_N( const int& val){ *(m_subjet_softdrop_N)=val; } 
-    void subjet_softdrop_pt( const std::vector<floatingnumber>& val){ *(m_subjet_softdrop_pt)=val; } 
-    void subjet_softdrop_eta( const std::vector<floatingnumber>& val){ *(m_subjet_softdrop_eta)=val; } 
-    void subjet_softdrop_phi( const std::vector<floatingnumber>& val){ *(m_subjet_softdrop_phi)=val; } 
-    void subjet_softdrop_e( const std::vector<floatingnumber>& val){ *(m_subjet_softdrop_e)=val; } 
-    void subjet_softdrop_m( const std::vector<floatingnumber>& val){ *(m_subjet_softdrop_m)=val; } 
-    void subjet_softdrop_csv( const std::vector<floatingnumber>& val){ *(m_subjet_softdrop_csv)=val; } 
-    void subjet_softdrop_charge( const std::vector<int>& val){ *(m_subjet_softdrop_charge)=val; } 
-    void subjet_softdrop_partonFlavour( const std::vector<int>& val){ *(m_subjet_softdrop_partonFlavour)=val; } 
-    void subjet_softdrop_hadronFlavour( const std::vector<int>& val){ *(m_subjet_softdrop_hadronFlavour)=val; } 
-    void subjet_softdrop_genParton_pdgID( const std::vector<int>& val){ *(m_subjet_softdrop_genParton_pdgID)=val; } 
-    void subjet_softdrop_nbHadrons( const std::vector<int>& val){ *(m_subjet_softdrop_nbHadrons)=val; } 
-    void subjet_softdrop_ncHadrons( const std::vector<int>& val){ *(m_subjet_softdrop_ncHadrons)=val; } 
-    void tau1( const floatingnumber& val){ *(m_tau1)=val; } 
-    void tau2( const floatingnumber& val){ *(m_tau2)=val; } 
-    void tau3( const floatingnumber& val){ *(m_tau3)=val; } 
-    void pruned_mass( const floatingnumber& val){ *(m_pruned_mass)=val; } 
-    void pruned_massCorr( const floatingnumber& val){ *(m_pruned_massCorr)=val; } 
-    void softdrop_mass( const floatingnumber& val){ *(m_softdrop_mass)=val; } 
-    void softdrop_massCorr( const floatingnumber& val){ *(m_softdrop_massCorr)=val; } 
-    void pruned_jec( const floatingnumber& val){ *(m_pruned_jec)=val; } 
-    void pruned_jecUp( const floatingnumber& val){ *(m_pruned_jecUp)=val; } 
-    void pruned_jecDown( const floatingnumber& val){ *(m_pruned_jecDown)=val; } 
-    void softdrop_jec( const floatingnumber& val){ *(m_softdrop_jec)=val; } 
-    void Hbbtag( const floatingnumber& val){ *(m_Hbbtag)=val; } 
     void partonFlavour( const int& val){ *(m_partonFlavour)=val; } 
     void hadronFlavour( const int& val){ *(m_hadronFlavour)=val; } 
     void genParton_pdgID( const int& val){ *(m_genParton_pdgID)=val; } 

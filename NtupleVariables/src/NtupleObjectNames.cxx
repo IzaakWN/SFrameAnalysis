@@ -127,7 +127,12 @@ namespace Ntuple {
     m_names["recoil_phi"] = "recoil_phi";
     m_names["recoil_pdgId"] = "recoil_pdgId";
     m_names["Nmva"] = "Nmva";
-
+    m_names["JetEnUp"] = "JetEnUp";
+    m_names["JetEnDown"] = "JetEnDown";
+    m_names["JetResUp"] = "JetResUp";
+    m_names["JetResDown"] = "JetResDown";
+    m_names["UnclusteredEnUp"] = "UnclusteredEnUp";
+    m_names["UnclusteredEnDown"] = "UnclusteredEnDown";
 
     // jets
     // flavour

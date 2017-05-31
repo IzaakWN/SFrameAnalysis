@@ -16,59 +16,48 @@ ScaleFactorTool::ScaleFactorTool(SCycleBase* parent, const char* name ):
   //   Muon_Mu19leg_2016BtoH_eff.root  = Mu  leg in cross trigger
   //   Muon_Mu22OR_eta2p1*             = IsoMu22, TkIsoMu22 (with and without |eta|< 2.1)
   
-  DeclareProperty( m_name+"_Mu22Trig",          m_File_Mu22Trig          = std::string(std::getenv("SFRAME_DIR")) + "/../LepEff2016/data/Muon/Run2016BtoH/Muon_Mu22OR_eta2p1_eff.root"                 );
-  DeclareProperty( m_name+"_Mu24Trig",          m_File_Mu24Trig          = std::string(std::getenv("SFRAME_DIR")) + "/../LepEff2016/data/Muon/Run2016BtoH/Muon_IsoMu24_OR_TkIsoMu24_2016BtoH_eff.root" );
-  DeclareProperty( m_name+"_MuTauTrig_MuLeg",   m_File_MuTauTrig_MuLeg   = std::string(std::getenv("SFRAME_DIR")) + "/../LepEff2016/data/Muon/Run2016BtoH/Muon_Mu19leg_2016BtoH_eff.root"              );
-  DeclareProperty( m_name+"_MuTauTrig_TauLeg",  m_File_MuTauTrig_TauLeg  = std::string(std::getenv("SFRAME_DIR")) + "/../LepEff2016/data/Muon/Run2016BtoH/Muon_Tau20LooseIsoPF.root"                   );
-  DeclareProperty( m_name+"_MuIdIso",           m_File_MuIdIso           = std::string(std::getenv("SFRAME_DIR")) + "/../LepEff2016/data/Muon/Run2016BtoH/Muon_IdIso_IsoLt0p15_2016BtoH_eff.root"      );
+  DeclareProperty( m_name+"_Mu22Trig",          m_File_Mu22Trig          = "$SFRAME_DIR/../LepEff2016/data/Muon/Run2016BtoH/Muon_Mu22OR_eta2p1_eff.root"                 );
+  DeclareProperty( m_name+"_Mu24Trig",          m_File_Mu24Trig          = "$SFRAME_DIR/../LepEff2016/data/Muon/Run2016BtoH/Muon_IsoMu24_OR_TkIsoMu24_2016BtoH_eff.root" );
+  DeclareProperty( m_name+"_MuTauTrig_MuLeg",   m_File_MuTauTrig_MuLeg   = "$SFRAME_DIR/../LepEff2016/data/Muon/Run2016BtoH/Muon_Mu19leg_2016BtoH_eff.root"              );
+  DeclareProperty( m_name+"_MuTauTrig_TauLeg",  m_File_MuTauTrig_TauLeg  = "$SFRAME_DIR/../LepEff2016/data/Muon/Run2016BtoH/Muon_Tau20LooseIsoPF.root"                   );
+  DeclareProperty( m_name+"_MuIdIso",           m_File_MuIdIso           = "$SFRAME_DIR/../LepEff2016/data/Muon/Run2016BtoH/Muon_IdIso_IsoLt0p15_2016BtoH_eff.root"      );
   
-  DeclareProperty( m_name+"_EleTrig",           m_File_EleTrig           = std::string(std::getenv("SFRAME_DIR")) + "/../LepEff2016/data/Electron/Run2016BtoH/Electron_Ele25_eta2p1_WPTight_eff.root"  );
-  DeclareProperty( m_name+"_EleTauTrig_EleLeg", m_File_EleTauTrig_EleLeg = std::string(std::getenv("SFRAME_DIR")) + "/../LepEff2016/data/Electron/Run2016BtoH/Electron_Ele24_eff.root"                 );
-  DeclareProperty( m_name+"_EleTauTrig_TauLeg", m_File_EleTauTrig_TauLeg = std::string(std::getenv("SFRAME_DIR")) + "/../LepEff2016/data/Electron/Run2016BtoH/Electron_TauWPLooseIsoPF.root"           );
-  DeclareProperty( m_name+"_EleIdIso",          m_File_EleIdIso          = std::string(std::getenv("SFRAME_DIR")) + "/../LepEff2016/data/Electron/Run2016BtoH/Electron_IdIso_IsoLt0p1_eff.root"        );
+  DeclareProperty( m_name+"_EleTrig",           m_File_EleTrig           = "$SFRAME_DIR/../LepEff2016/data/Electron/Run2016BtoH/Electron_Ele25_eta2p1_WPTight_eff.root"  );
+  DeclareProperty( m_name+"_EleTauTrig_EleLeg", m_File_EleTauTrig_EleLeg = "$SFRAME_DIR/../LepEff2016/data/Electron/Run2016BtoH/Electron_Ele24_eff.root"                 );
+  DeclareProperty( m_name+"_EleTauTrig_TauLeg", m_File_EleTauTrig_TauLeg = "$SFRAME_DIR/../LepEff2016/data/Electron/Run2016BtoH/Electron_TauWPLooseIsoPF.root"           );
+  DeclareProperty( m_name+"_EleIdIso",          m_File_EleIdIso          = "$SFRAME_DIR/../LepEff2016/data/Electron/Run2016BtoH/Electron_IdIso_IsoLt0p1_eff.root"        );
 }
 
 
 
 void ScaleFactorTool::BeginInputData( const SInputData& ) throw( SError ) {
   
+  m_logger << INFO << SLogger::endmsg;
   m_logger << INFO << "Initializing ScaleFactor for lepons"     << SLogger::endmsg;
-  m_logger << INFO << "Efficiency file Mu22 Trig: "             << m_File_Mu22Trig          << SLogger::endmsg;
-  m_logger << INFO << "Efficiency file Mu24 Trig: "             << m_File_Mu24Trig          << SLogger::endmsg;
-  m_logger << INFO << "Efficiency file MuTau Trig Mu Leg: "     << m_File_MuTauTrig_MuLeg   << SLogger::endmsg;
+  m_logger << INFO << "Efficiency file Mu22 Trig:      "        << m_File_Mu22Trig          << SLogger::endmsg;
+  m_logger << INFO << "Efficiency file Mu24 Trig:      "        << m_File_Mu24Trig          << SLogger::endmsg;
+  m_logger << INFO << "Efficiency file MuTau Trig Mu Leg:  "    << m_File_MuTauTrig_MuLeg   << SLogger::endmsg;
   m_logger << INFO << "Efficiency file MuTau Trig Tau Leg: "    << m_File_MuTauTrig_TauLeg  << SLogger::endmsg;
-  m_logger << INFO << "Efficiency file Mu IdIso: "              << m_File_MuIdIso           << SLogger::endmsg;
-  m_logger << INFO << "Efficiency file Ele Trig: "              << m_File_EleTrig           << SLogger::endmsg;
+  m_logger << INFO << "Efficiency file Mu IdIso:       "        << m_File_MuIdIso           << SLogger::endmsg;
+  m_logger << INFO << "Efficiency file Ele Trig:       "        << m_File_EleTrig           << SLogger::endmsg;
   m_logger << INFO << "Efficiency file EleTau Trig Ele Leg: "   << m_File_EleTauTrig_EleLeg << SLogger::endmsg;
   m_logger << INFO << "Efficiency file EleTau Trig Tau Leg: "   << m_File_EleTauTrig_TauLeg << SLogger::endmsg;
-  m_logger << INFO << "Efficiency file Ele IdIso: "             << m_File_EleIdIso          << SLogger::endmsg;
+  m_logger << INFO << "Efficiency file Ele IdIso:      "        << m_File_EleIdIso          << SLogger::endmsg;
   
   m_ScaleFactor_Mu22Trig          = new ScaleFactor( m_File_Mu22Trig );
-  m_logger << INFO << "Scale factor Mu22 Trig initialised" << SLogger:: endmsg;
-  
   m_ScaleFactor_Mu24Trig          = new ScaleFactor( m_File_Mu24Trig );
-  m_logger << INFO << "Scale factor Mu24 Trig initialised" << SLogger:: endmsg;
-   
-  m_ScaleFactor_MuTauTrig_MuLeg   = new ScaleFactor( m_File_MuTauTrig_MuLeg );
-  m_logger << INFO << "Scale factor MuTau Trig Mu Leg initialised" << SLogger:: endmsg;
-  
+  m_ScaleFactor_MuTauTrig_MuLeg   = new ScaleFactor(    m_File_MuTauTrig_MuLeg  );
   m_ScaleFactor_MuTauTrig_TauLeg  = new ScaleFactorTau( m_File_MuTauTrig_TauLeg );
-  m_logger << INFO << "Scale factor MuTau Trig Tau Leg initialised" << SLogger:: endmsg;
-  
-  m_ScaleFactor_MuIdIso           = new ScaleFactor( m_File_MuIdIso );
-  m_logger << INFO << "Scale factor Mu IdIso initialised" << SLogger:: endmsg;
-  
+  m_logger << INFO << "Scale factor Mu22, Mu24, MuTau triggers initialised" << SLogger:: endmsg;
+     
   m_ScaleFactor_EleTrig           = new ScaleFactor( m_File_EleTrig );
-  m_logger << INFO << "Scale factor Ele Trig initialised" << SLogger:: endmsg;
-  
-  m_ScaleFactor_EleTauTrig_EleLeg = new ScaleFactor( m_File_EleTauTrig_EleLeg );
-  m_logger << INFO << "Scale factor EleTau Trig Ele Leg initialised" << SLogger:: endmsg;
-  
+  m_ScaleFactor_EleTauTrig_EleLeg = new ScaleFactor(    m_File_EleTauTrig_EleLeg );
   m_ScaleFactor_EleTauTrig_TauLeg = new ScaleFactorTau( m_File_EleTauTrig_TauLeg );
-  m_logger << INFO << "Scale factor EleTau Trig Tau Leg initialised" << SLogger:: endmsg;
+  m_logger << INFO << "Scale factor Ele, EleTau Trig initialised" << SLogger:: endmsg;
   
+  m_ScaleFactor_MuIdIso           = new ScaleFactor( m_File_MuIdIso  );
   m_ScaleFactor_EleIdIso          = new ScaleFactor( m_File_EleIdIso );
-  m_logger << INFO << "Scale factor Ele IdIso initialised" << SLogger:: endmsg;
+  m_logger << INFO << "Scale factor Mu & Ele IdIso initialised" << SLogger:: endmsg;
     
   return;
 }

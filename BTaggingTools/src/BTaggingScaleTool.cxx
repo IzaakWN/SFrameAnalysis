@@ -10,7 +10,7 @@ BTaggingScaleTool::BTaggingScaleTool( SCycleBase* parent, const char* name ) :
 
   SetLogName( name );
 
-  std::string sframe_dir(std::getenv("SFRAME_DIR"));
+  std::string sframe_dir = "$SFRAME_DIR"; //(std::getenv("SFRAME_DIR"));
 
   CSV_WP.clear();
   CSV_WP["Loose"]  = 0.5426;
@@ -20,15 +20,15 @@ BTaggingScaleTool::BTaggingScaleTool( SCycleBase* parent, const char* name ) :
   currentWorkingPointCut = -1;
   m_effMaps.clear();
 
-  DeclareProperty( m_name + "_Tagger",    m_tagger = "CSVv2" );
+  DeclareProperty( m_name + "_Tagger",       m_tagger = "CSVv2" );
   DeclareProperty( m_name + "_WorkingPoint", m_workingPoint = "Medium" );  
-  DeclareProperty( m_name + "_CsvFile", m_csvFile = sframe_dir + "/../BTaggingTools/csv/CSVv2_Moriond17_B_H.csv" ); // subjet_CSVv2_ichep.csv
+  DeclareProperty( m_name + "_CsvFile",      m_csvFile = sframe_dir + "/../BTaggingTools/csv/CSVv2_Moriond17_B_H.csv" ); // subjet_CSVv2_ichep.csv
   
   DeclareProperty( m_name + "_MeasurementType_udsg", m_measurementType_udsg = "incl" ); 
-  DeclareProperty( m_name + "_MeasurementType_bc", m_measurementType_bc = "mujets" ); // for AK4 jets; for AK8 jets, use "lt"
+  DeclareProperty( m_name + "_MeasurementType_bc",   m_measurementType_bc = "mujets" ); // for AK4 jets; for AK8 jets, use "lt"
   
   DeclareProperty( m_name + "_EffHistDirectory", m_effHistDirectory = "bTagEff" );
-  DeclareProperty( m_name + "_EffFile", m_effFile = sframe_dir + "/../BTaggingTools/efficiencies/bTagEffs_HTT_baseline.root" );
+  DeclareProperty( m_name + "_EffFile",          m_effFile = sframe_dir + "/../BTaggingTools/efficiencies/bTagEffs_HTT_baseline.root" );
 
 }
 
@@ -62,31 +62,37 @@ void BTaggingScaleTool::BeginInputData( const SInputData& ) throw( SError ) {
     throw SError( ("Unknown working point: " + m_workingPoint).c_str(), SError::SkipCycle );
   }
   
-  m_logger << INFO << "Tagger:                " << m_tagger << SLogger::endmsg;
-  m_logger << INFO << "WorkingPoint:          " << m_workingPoint << SLogger::endmsg;
+  m_logger << INFO << SLogger::endmsg;
+  m_logger << INFO << "Tagger:                " << m_tagger               << SLogger::endmsg;
+  m_logger << INFO << "WorkingPoint:          " << m_workingPoint         << SLogger::endmsg;
   m_logger << INFO << "WorkingPoint Cut:      " << currentWorkingPointCut << SLogger::endmsg;
   m_logger << INFO << "MeasurementType udsg:  " << m_measurementType_udsg << SLogger::endmsg;
-  m_logger << INFO << "MeasurementType bc:    " << m_measurementType_bc << SLogger::endmsg;
-  m_logger << INFO << "EffHistDirectory:      " << m_effHistDirectory << SLogger::endmsg;
-  m_logger << INFO << "Efficiency file:       " << m_effFile << SLogger::endmsg;
-  m_logger << INFO << "CSV file:              " << m_csvFile << SLogger::endmsg;
-  m_logger << INFO << "Initializing BTagCalibrationStandalone  " << SLogger::endmsg;
-
-  BTagCalibration m_calib(m_tagger, m_csvFile);  
+  m_logger << INFO << "MeasurementType bc:    " << m_measurementType_bc   << SLogger::endmsg;
+  m_logger << INFO << "EffHistDirectory:      " << m_effHistDirectory     << SLogger::endmsg;
+  m_logger << INFO << "Efficiency file:       " << m_effFile              << SLogger::endmsg;
+  m_logger << INFO << "CSV file:              " << m_csvFile              << SLogger::endmsg;
+  m_logger << INFO << "Initializing BTagCalibrationStandalone";
   
-  m_reader.reset(      new BTagCalibrationReader(wp, "central" ));
-  m_reader_up.reset(   new BTagCalibrationReader(wp, "up"      ));
+  // Expand $SFRAME_DIR
+  std::string match = "$SFRAME_DIR";
+  std::string replacement = std::getenv("SFRAME_DIR");
+  m_csvFile.replace(0,match.length(),replacement);
+  
+  BTagCalibration m_calib(m_tagger, m_csvFile); m_logger << INFO << ".";
+  m_reader.reset(      new BTagCalibrationReader(wp, "central" )); m_logger << INFO << ".";
+  m_reader_up.reset(   new BTagCalibrationReader(wp, "up"      )); m_logger << INFO << ".";
   m_reader_down.reset( new BTagCalibrationReader(wp, "down"    ));
+  m_logger << INFO << " done" << SLogger:: endmsg;
   
   m_logger << INFO << "Reader loading";
-  m_reader->load(m_calib, BTagEntry::FLAV_B, m_measurementType_bc);
-  m_reader->load(m_calib, BTagEntry::FLAV_C, m_measurementType_bc);         m_logger << INFO << ".";
-  m_reader->load(m_calib, BTagEntry::FLAV_UDSG, m_measurementType_udsg);
-  m_reader_up->load(m_calib, BTagEntry::FLAV_B, m_measurementType_bc);
-  m_reader_up->load(m_calib, BTagEntry::FLAV_C, m_measurementType_bc);      m_logger << INFO << ".";
-  m_reader_up->load(m_calib, BTagEntry::FLAV_UDSG, m_measurementType_udsg);
-  m_reader_down->load(m_calib, BTagEntry::FLAV_B, m_measurementType_bc);    m_logger << INFO << ".";
-  m_reader_down->load(m_calib, BTagEntry::FLAV_C, m_measurementType_bc);
+  m_reader->load(m_calib,      BTagEntry::FLAV_B,    m_measurementType_bc);
+  m_reader->load(m_calib,      BTagEntry::FLAV_C,    m_measurementType_bc);   m_logger << INFO << ".";
+  m_reader->load(m_calib,      BTagEntry::FLAV_UDSG, m_measurementType_udsg);
+  m_reader_up->load(m_calib,   BTagEntry::FLAV_B,    m_measurementType_bc);
+  m_reader_up->load(m_calib,   BTagEntry::FLAV_C,    m_measurementType_bc);   m_logger << INFO << ".";
+  m_reader_up->load(m_calib,   BTagEntry::FLAV_UDSG, m_measurementType_udsg);
+  m_reader_down->load(m_calib, BTagEntry::FLAV_B,    m_measurementType_bc);   m_logger << INFO << ".";
+  m_reader_down->load(m_calib, BTagEntry::FLAV_C,    m_measurementType_bc);
   m_reader_down->load(m_calib, BTagEntry::FLAV_UDSG, m_measurementType_udsg);
   m_logger << INFO << " done" << SLogger::endmsg;
   

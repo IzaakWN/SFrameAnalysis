@@ -14,6 +14,7 @@
 class BTaggingScaleTool : public SToolBase {
   
   // Follow examples in https://twiki.cern.ch/twiki/bin/viewauth/CMS/BTagCalibration
+  // Note: UZH::JetVec is a std::vector<UZH::Jet> typedef
   
  public:
 

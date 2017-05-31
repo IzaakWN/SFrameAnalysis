@@ -419,6 +419,7 @@ class TauTauAnalysis : public SCycleBase {
     //std::map<std::string,Double_t> b_genmatchweight;
     std::map<std::string,Double_t> b_zptweight;
     std::map<std::string,Double_t> b_ttptweight;
+    std::map<std::string,Double_t> b_ttptweight_runI;
     std::map<std::string,Double_t> b_trigweight_1;
     std::map<std::string,Double_t> b_trigweight_or_1;
     std::map<std::string,Double_t> b_idisoweight_1;

@@ -6,9 +6,10 @@
   <Library Name="libPileupReweightingTool" />
   <Library Name="libBTaggingTools" />
   <Library Name="libTauTauResonances" />
-  <Library Name="libScaleFactorTool"/>
-  <Library Name="libRecoilCorrector"/>
-  <Library Name="libSVFitTool"/>
+  <Library Name="libScaleFactorTool" />
+  <Library Name="libRecoilCorrector" />
+  <Library Name="libJetCorrectionTool" />
+  <Library Name="libSVFitTool" />
 
   <Package Name="SFrameCore.par" />
   <Package Name="NtupleVariables.par" />
@@ -21,35 +22,47 @@
   <Package Name="SVFitTool.par" />
 
   <Cycle Name="TauTauAnalysis" OutputDirectory="./" PostFix="" ProofServer="lite" ProofWorkDir="" RunMode="LOCAL" TargetLumi="1.0">
-    <InputData Lumi="0.0" NEventsMax="-1" Type="TT_TuneCUETP8M1" Version="UZH" SkipValid="True">
-
-<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Spring16/Ntuple_80_190916/TT_TuneCUETP8M1_13TeV-powheg-pythia8/TT_TuneCUETP8M1_13TeV-powheg-pythia8_reHLT_ext/160919_094858/0000/flatTuple_100.root" Lumi="1.0" />
-<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Spring16/Ntuple_80_190916/TT_TuneCUETP8M1_13TeV-powheg-pythia8/TT_TuneCUETP8M1_13TeV-powheg-pythia8_reHLT_ext/160919_094858/0000/flatTuple_101.root" Lumi="1.0" />
+    <InputData Lumi="0.0" NEventsMax="-1" Type="TT_TuneCUETP8M1" Version="UZH" SkipValid="False">
+<In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond_v5/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/170412_094929/0000/flatTuple_396.root" Lumi="1.0" />
 <!-- 
-<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Spring16/Ntuple_80_190916/TT_TuneCUETP8M1_13TeV-powheg-pythia8/TT_TuneCUETP8M1_13TeV-powheg-pythia8_reHLT_ext/160919_094858/0000/flatTuple_102.root" Lumi="1.0" />
-<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Spring16/Ntuple_80_190916/TT_TuneCUETP8M1_13TeV-powheg-pythia8/TT_TuneCUETP8M1_13TeV-powheg-pythia8_reHLT_ext/160919_094858/0000/flatTuple_103.root" Lumi="1.0" />
-<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Spring16/Ntuple_80_190916/TT_TuneCUETP8M1_13TeV-powheg-pythia8/TT_TuneCUETP8M1_13TeV-powheg-pythia8_reHLT_ext/160919_094858/0000/flatTuple_104.root" Lumi="1.0" />
-<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Spring16/Ntuple_80_190916/TT_TuneCUETP8M1_13TeV-powheg-pythia8/TT_TuneCUETP8M1_13TeV-powheg-pythia8_reHLT_ext/160919_094858/0000/flatTuple_105.root" Lumi="1.0" />
-<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Spring16/Ntuple_80_190916/TT_TuneCUETP8M1_13TeV-powheg-pythia8/TT_TuneCUETP8M1_13TeV-powheg-pythia8_reHLT_ext/160919_094858/0000/flatTuple_106.root" Lumi="1.0" />
-<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Spring16/Ntuple_80_190916/TT_TuneCUETP8M1_13TeV-powheg-pythia8/TT_TuneCUETP8M1_13TeV-powheg-pythia8_reHLT_ext/160919_094858/0000/flatTuple_107.root" Lumi="1.0" />
-<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Spring16/Ntuple_80_190916/TT_TuneCUETP8M1_13TeV-powheg-pythia8/TT_TuneCUETP8M1_13TeV-powheg-pythia8_reHLT_ext/160919_094858/0000/flatTuple_108.root" Lumi="1.0" />
-<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Spring16/Ntuple_80_190916/TT_TuneCUETP8M1_13TeV-powheg-pythia8/TT_TuneCUETP8M1_13TeV-powheg-pythia8_reHLT_ext/160919_094858/0000/flatTuple_109.root" Lumi="1.0" />
-<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Spring16/Ntuple_80_190916/TT_TuneCUETP8M1_13TeV-powheg-pythia8/TT_TuneCUETP8M1_13TeV-powheg-pythia8_reHLT_ext/160919_094858/0000/flatTuple_10.root" Lumi="1.0" />
-<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Spring16/Ntuple_80_190916/TT_TuneCUETP8M1_13TeV-powheg-pythia8/TT_TuneCUETP8M1_13TeV-powheg-pythia8_reHLT_ext/160919_094858/0000/flatTuple_110.root" Lumi="1.0" />
-<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Spring16/Ntuple_80_190916/TT_TuneCUETP8M1_13TeV-powheg-pythia8/TT_TuneCUETP8M1_13TeV-powheg-pythia8_reHLT_ext/160919_094858/0000/flatTuple_111.root" Lumi="1.0" />
-<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Spring16/Ntuple_80_190916/TT_TuneCUETP8M1_13TeV-powheg-pythia8/TT_TuneCUETP8M1_13TeV-powheg-pythia8_reHLT_ext/160919_094858/0000/flatTuple_112.root" Lumi="1.0" />
+<In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond_v5/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/170412_094929/0000/flatTuple_557.root" Lumi="1.0" />
+<In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond_v5/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/170412_094929/0000/flatTuple_154.root" Lumi="1.0" />
  -->
+<!-- 
+<In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond_v5/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/170412_094929/0000/flatTuple_160.root" Lumi="1.0" />
+<In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond_v5/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/170412_094929/0000/flatTuple_487.root" Lumi="1.0" />
+<In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond_v5/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/170412_094929/0000/flatTuple_654.root" Lumi="1.0" />
+<In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond_v5/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/170412_094929/0000/flatTuple_43.root" Lumi="1.0" />
+<In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond_v5/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/170412_094929/0000/flatTuple_217.root" Lumi="1.0" />
+<In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond_v5/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/170412_094929/0000/flatTuple_594.root" Lumi="1.0" />
+<In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond_v5/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/170412_094929/0000/flatTuple_348.root" Lumi="1.0" />
+<In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond_v5/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/170412_094929/0000/flatTuple_368.root" Lumi="1.0" />
+<In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond_v5/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/170412_094929/0000/flatTuple_494.root" Lumi="1.0" />
+<In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond_v5/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/170412_094929/0000/flatTuple_855.root" Lumi="1.0" />
+<In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond_v5/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/170412_094929/0000/flatTuple_474.root" Lumi="1.0" />
+<In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond_v5/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/170412_094929/0000/flatTuple_248.root" Lumi="1.0" />
+<In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond_v5/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/170412_094929/0000/flatTuple_951.root" Lumi="1.0" />
+<In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond_v5/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/170412_094929/0000/flatTuple_774.root" Lumi="1.0" />
+<In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond_v5/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/170412_094929/0000/flatTuple_55.root" Lumi="1.0" />
+<In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond_v5/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/170412_094929/0000/flatTuple_255.root" Lumi="1.0" />
+<In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond_v5/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/170412_094929/0000/flatTuple_745.root" Lumi="1.0" />
+<In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond_v5/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/170412_094929/0000/flatTuple_933.root" Lumi="1.0" />
+<In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond_v5/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/170412_094929/0000/flatTuple_972.root" Lumi="1.0" />
+<In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond_v5/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/170412_094929/0000/flatTuple_121.root" Lumi="1.0" />
+ -->
+<!-- <In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond_v3/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/170317_201222/0000/flatTuple_921.root" Lumi="1.0" /> -->
+
 
       <InputTree Name="ntuplizer/tree" />
       <OutputTree Name="tree_mutau" />
       <OutputTree Name="tree_etau" />
     </InputData>
   <UserConfig>
-    <Item Name="RecoTreeName"               Value="tree"/>
-    <Item Name="doSVFit"                    Value="True"/>
-    <Item Name="IsSignal"                   Value="False"/>
-    <Item Name="doRecoilCorr"               Value="True"/>
-    <Item Name="doTTpt"                     Value="True"/>
+    <Item Name="RecoTreeName"               Value="tree" />
+    <Item Name="doSVFit"                    Value="True" />
+    <Item Name="IsSignal"                   Value="False" />
+    <Item Name="doRecoilCorr"               Value="True" />
+    <Item Name="doTTpt"                     Value="True" />
   </UserConfig>
   </Cycle>
 </JobConfiguration>

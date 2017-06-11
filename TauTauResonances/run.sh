@@ -1,17 +1,21 @@
 #! /bin/bash
 
+FILES=(
+    Signal.xml
+#     DYJets_M-10to50.xml
+#     DYJets_M-50.xml
+#     TT_TuneCUETP8M1.xml
+#     WJetsToLNu.xml
+#     SingleMuon.xml
+#     SingleMuon_G.xml
+#     SingleMuon_H_v3.xml
+#     SingleMuon_H_v2.xml
+)
+
+printf "\n\n\n\n\n\n\n\n"
 if make distclean && make; then
-  #sframe_main config/TauTauAnalysis_config_miniAODv2.xml 2>&1 | tee log
-  #sframe_main config/TauTauAnalysis_config_SingleMuon.xml
-  #sframe_main config/WJetsToLNu.xml
-  #sframe_main config/DYJets_M-10to50.xml
-  sframe_main config/DYJets_M-10to50_postMoriond.xml
-  #sframe_main config/DYJets_M-50_ICHEP.xml
-  #sframe_main config/DYJets_M-50_Moriond.xml
-  #sframe_main config/DYJets_M-50_postMoriond.xml
-  #sframe_main config/DYJets_M-50_tes.xml
-  #sframe_main config/Signal.xml
-  #sframe_main config/TT_TuneCUETP8M1.xml
-  #sframe_main config/SingleMuon.xml
-  #sframe_main config/SUSYGluGluToHToTauTau_M-160_TuneCUETP8M1.xml
+    for f in ${FILES[@]}; do
+        printf "\n\n\n>>> %s%s%s\n\n" "$(tput bold)$(tput setaf 2)" $f "$(tput sgr0)"
+        sframe_main config/$f
+    done
 fi

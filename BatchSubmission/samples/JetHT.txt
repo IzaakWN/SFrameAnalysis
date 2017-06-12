@@ -1,3 +1,0 @@
-/pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Data_25ns/JetHT_reclustering/JetHT_Run2015C_25ns_05Oct2015-v1
-/pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Data_25ns/JetHT_reclustering/JetHT_Run2015D_05Oct2015-v1
-/pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Data_25ns/JetHT_reclustering/JetHT_Run2015D_PromptReco-v4

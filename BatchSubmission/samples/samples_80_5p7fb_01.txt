@@ -1,3 +1,0 @@
-/pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_80_020716/JetHT/JetHT_Run2016B-PromptReco-v2/160629_120634/0001
-/pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_80_020716/SingleElectron/SingleElectron_Run2016B-PromptReco-v2/160629_120658/0001
-/pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_80_020716/SingleMuon/SingleMuon_Run2016B-PromptReco-v2/160629_120728/0001

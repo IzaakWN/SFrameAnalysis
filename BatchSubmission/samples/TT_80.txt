@@ -1,6 +1,0 @@
-/pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_80_020716/TTJets_HT-1200to2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/TTJets_HT-1200to2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/160629_114828/0000
-/pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_80_020716/TTJets_HT-2500toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/TTJets_HT-2500toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/160629_114840/0000
-/pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_80_020716/TTJets_HT-600to800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/TTJets_HT-600to800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/160629_114854/0000
-/pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_80_020716/TTJets_HT-800to1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/TTJets_HT-800to1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/160629_114906/0000
-/pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_80_020716/TT_TuneCUETP8M1_13TeV-powheg-pythia8/TT_TuneCUETP8M1_13TeV-powheg-pythia8/160629_114816/0000
-/pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_80_020716/TT_TuneCUETP8M1_13TeV-powheg-pythia8/TT_TuneCUETP8M1_13TeV-powheg-pythia8_ext/160629_114121/0000

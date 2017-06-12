@@ -1,2 +1,0 @@
-/pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_80_270516/WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_v2/160528_232415/0000
-/pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_80_270516/QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_v2/160528_230817/0000

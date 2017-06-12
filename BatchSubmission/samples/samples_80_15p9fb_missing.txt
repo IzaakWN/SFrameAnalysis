@@ -1,1 +1,0 @@
-/pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_80_280716/WJetsToLNu_HT-600To800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/WJetsToLNu_HT-600To800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_v4/160809_095945/0000/

@@ -329,8 +329,8 @@ def checkCompletion(dataSets, listOfJobs, outDir, cycleName, postFix,keepTemp):
       nMergeJobs=len([ j for j in listOfJobs if j[0]==d[0] ])
       nFiles=len(glob.glob("%s/*.root"%l[6]))
       nJobs=len(listOfJobs)
-      countCmd ="number of files to merge / number of jobs:     %3d/%d\n(%s)" % (nMergeFiles,nMergeJobs,'/'.join((fileToMerge.split('/')[-2:])))
-      countCmd+="\nnumber of all root files / number of all jobs: %3d/%d\n(%s)" % (nFiles,   nJobs,     '/'.join((l[6].split('/')[-1:])))
+      countCmd ="number of files to merge / number of jobs:     %3d/%d\n(%s.root)" % (nMergeFiles,nMergeJobs,'/'.join((fileToMerge.split('/')[-2:])))
+      countCmd+="\nnumber of all root files / number of all jobs: %3d/%d\n(%s/*.root)" % (nFiles,   nJobs,     '/'.join((l[6].split('/')[-1:])))
       countDebug="" if os.path.exists(l[6]) else "Warning! %s does not exist!"%l[6]
       lsDebug+="\n"+countCmd+"\n"+countDebug
       mergeDebug+="\n"+lsDebug

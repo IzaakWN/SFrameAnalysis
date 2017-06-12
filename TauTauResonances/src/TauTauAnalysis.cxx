@@ -205,7 +205,7 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
   m_logger << INFO << "TauName:             " <<    m_tauName           << SLogger::endmsg;
   m_logger << INFO << "GenParticleName:     " <<    m_genParticleName   << SLogger::endmsg;
   
-  m_doJEC = m_doJEC and !(m_doTES or m_doEES or m_doLTF);
+  m_doJEC = m_doJEC and !(m_doTES or m_doEES or m_doLTF or m_isData);
   m_logger << INFO << "IsData:              " <<    (m_isData   ?   "TRUE" : "FALSE") << SLogger::endmsg;
   m_logger << INFO << "IsSignal:            " <<    (m_isSignal ?   "TRUE" : "FALSE") << SLogger::endmsg;
   m_logger << INFO << "doSVFit:             " <<    (m_doSVFit  ?   "TRUE" : "FALSE") << SLogger::endmsg;
@@ -743,7 +743,8 @@ void TauTauAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
     
     // TES corrections and shifts
     Float_t taupt = mytau.pt();
-    Int_t genmatch_2 = genMatch(mytau.eta(), mytau.phi());
+    Int_t genmatch_2 = -1;
+    if(!m_isData) genMatch(mytau.eta(), mytau.phi());
     if(genmatch_2==5){
       //printRow({"tau & met","DM","tau.pt()","tau.eta()","tau.phi()","tau.e()","met.et()","met.phi()"});
       //printRow({"before"},{mytau.decayMode()},{mytau.pt(),mytau.eta(),mytau.phi(),mytau.e(),met.et(),met.phi()});

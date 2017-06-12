@@ -25,9 +25,9 @@ Examples:
    uberftp -ls $PNFS/*/*/* | awk '{print $7}' > dirs_T2.txt
    ./createXMLfile.py dirs_T2.txt -o xmls_Moriond_T2 -s PSI-T2
  
- Split files
-   cat foo.txt | wc -l
-   split -l 200 foo.txt foo_split -d
+ Split files (to run in parallel)
+   cat dirs.txt | wc -l
+   split -l 200 dirs.txt dirs_split -d
  
  Print out xml file names formatted for copy-pasting into job options files:
    cd xmls_Moriond/

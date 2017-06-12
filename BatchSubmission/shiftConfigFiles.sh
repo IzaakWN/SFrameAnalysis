@@ -17,7 +17,7 @@ S="\e[0m"
 #################
 
 DO_VAR=(      "doTES"       "doLTF"      "doEES"  )
-SHIFT=(        "0.03"        "0.03"       "0.01"  )
+SHIFT=(       "0.006"        "0.03"       "0.01"  )
 SHIFT_VAR=(  "TESshift"   "LTFshift"   "EESshift" )
 FILES=(     "$TESFILES"  "$LTFFILES"  "$EESFILES" )
 UP=(         "TES1p03"     "LTF1p03"    "EES1p01" )

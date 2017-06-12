@@ -324,8 +324,9 @@ def checkCompletion(dataSets, listOfJobs, outDir, cycleName, postFix,keepTemp):
       lock.acquire()
       WARNING="\\e[93m\\e[1m" # yellow/orange \e[93m
       END="\\e[0m"
-      countCmd="echo -e \"%snumber of \\\"%s*.root\\\" files over number of jobs: `ls -lh %s*.root | wc -l`/%s%s\""%(WARNING,'/'.join((fileToMerge.split('/')[-2:])),fileToMerge,len(listOfJobs),END)
-      countCmd+="; echo -e \"%snumber of \\\"%s/*.root\\\" files over number of jobs: `ls -lh %s/*.root | wc -l`/%s%s\""%(WARNING,'/'.join((l[6].split('/')[-1:])),  l[6],       len(listOfJobs),END)
+      nJobs = len([ j for j in listOfJobs if j[0]==d[0] ])
+      countCmd="echo -e \"%snumber of \\\"%s*.root\\\" files over number of jobs: `ls -lh %s*.root | wc -l`/%s %s\""%(WARNING,'/'.join((fileToMerge.split('/')[-2:])),fileToMerge,nJobs,END)
+      countCmd+="; echo -e \"%snumber of \\\"%s/*.root\\\" files over number of jobs: `ls -lh %s/*.root | wc -l`/%s %s\""%(WARNING,'/'.join((l[6].split('/')[-1:])),  l[6],       len(listOfJobs),END)
       subProcess=subprocess.Popen(countCmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
       countDebug=subProcess.stdout.read()
       countDebug+=subProcess.stderr.read()

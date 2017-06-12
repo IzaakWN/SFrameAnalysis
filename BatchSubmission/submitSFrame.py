@@ -15,6 +15,7 @@ sFrameExecutable="sframe_main"
 
 import os
 import sys
+import glob
 import optparse
 import tempfile
 import platform
@@ -31,9 +32,9 @@ import subprocess
 import time
 import shutil
 import socket
-starttime = time.time()
-startdate = time.strftime("%a %d/%m/%Y %H:%M:%S",time.gmtime())
-
+starttime=time.time()
+startdate=time.strftime("%a %d/%m/%Y %H:%M:%S",time.gmtime())
+succesRate="succes rate(s):\n"
 
 
 class runCommand(Process):
@@ -306,7 +307,8 @@ def checkCompletion(dataSets, listOfJobs, outDir, cycleName, postFix,keepTemp):
         print "mergeCmd is\n%s \n" %mergeCmd
         #print "mergeCmd_private_mt is %s " %mergeCmd_mt
         #print "mergeCmd_private_et is %s " %mergeCmd_et
-        
+      while "**" in fileToMerge: fileToMerge=fileToMerge.replace("**",'*')
+      
       # LS
       lock=thread.allocate_lock()
       lock.acquire()
@@ -320,21 +322,22 @@ def checkCompletion(dataSets, listOfJobs, outDir, cycleName, postFix,keepTemp):
       lock.release()
       
       # COUNT
-      lock=thread.allocate_lock()
-      lock.acquire()
-      WARNING="\\e[93m\\e[1m" # yellow/orange \e[93m
-      END="\\e[0m"
-      nJobs = len([ j for j in listOfJobs if j[0]==d[0] ])
-      countCmd="echo -e \"%snumber of \\\"%s*.root\\\" files over number of jobs: `ls -lh %s*.root | wc -l`/%s %s\""%(WARNING,'/'.join((fileToMerge.split('/')[-2:])),fileToMerge,nJobs,END)
-      countCmd+="; echo -e \"%snumber of \\\"%s/*.root\\\" files over number of all jobs: `ls -lh %s/*.root | wc -l`/%s %s\""%(WARNING,'/'.join((l[6].split('/')[-1:])),  l[6],       len(listOfJobs),END)
-      subProcess=subprocess.Popen(countCmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-      countDebug=subProcess.stdout.read()
-      countDebug+=subProcess.stderr.read()
+      global succesRate
+      WARNING='\033[1m\033[93m'
+      END='\033[0m'
+      nMergeFiles=len(glob.glob("%s*.root"%fileToMerge))
+      nMergeJobs=len([ j for j in listOfJobs if j[0]==d[0] ])
+      nFiles=len(glob.glob("%s/*.root"%l[6]))
+      nJobs=len(listOfJobs)
+      countCmd ="number of files to merge / number of jobs:     %3d/%d\n(%s)" % (nMergeFiles,nMergeJobs,'/'.join((fileToMerge.split('/')[-2:])))
+      countCmd+="\nnumber of all root files / number of all jobs: %3d/%d\n(%s)" % (nFiles,   nJobs,     '/'.join((l[6].split('/')[-1:])))
+      countDebug="" if os.path.exists(l[6]) else "Warning! %s does not exist!"%l[6]
       lsDebug+="\n"+countCmd+"\n"+countDebug
       mergeDebug+="\n"+lsDebug
       mergeDebug+="\n"+mergeCmd
-      print countDebug
-      lock.release()
+      succesRate+="  %4d /%3d %s\n"%(nMergeFiles,nMergeJobs,d[0]) # global string
+      print WARNING+countCmd+END
+      print WARNING+countDebug+END
       
       # MERGE
       lock=thread.allocate_lock()
@@ -873,10 +876,11 @@ def main():
     print "sending jobs ..."
     runningJobs=[]
     iJobs=0
-    skip=10
+    skip=1
     if   len(listOfJobs)>=1000: skip = 100
     elif len(listOfJobs)>=500:  skip =  50
-    elif len(listOfJobs)>150:   skip =  20
+    elif len(listOfJobs)>=160:  skip =  20
+    elif len(listOfJobs)>=20:   skip =  10
     for j in listOfJobs:
       
       batchScript = BatchScript(useHost, useOS, path2sframe, useEnv, cmssw, hCPU, hVMEM, cycleName, tempDirLog)
@@ -991,10 +995,10 @@ def main():
   os.chdir(currentDir)
   if not keepTemp:
     print "\nremoved temporary directory with scripts and root file:"
-    print  "  %s" % (tempDirSh)
-    print  "  %s" % (tempDirRoot)
+    print  "  %s" % ('/'.join((tempDirSh.split('/')[-1:])))
+    print  "  %s" % ('/'.join((tempDirRoot.split('/')[-1:])))
     print "kept temporary directory with log files:"
-    print  "  %s" % (tempDirLog)
+    print  "  %s" % ('/'.join((tempDirLog.split('/')[-1:])))
     shutil.rmtree(tempDirSh)
     shutil.rmtree(tempDirRoot)
   
@@ -1011,15 +1015,17 @@ def main():
 def accountTime(jobOptions,jobName,nJobs):
   # TODO: save succes rate -> on string?
   makeDirectory("nohup")
+  global succesRate, starttime, startdate
   minutes, seconds = divmod(time.time()-starttime,60)
   hours, minutes   = divmod(minutes,60)
   with open("nohup/submitSFrame.log","a") as file:
-    file.write("\n\n")
+    file.write("\n")
     file.write("%s: %s\n" % (jobName, jobOptions.split('/')[-1]))
     file.write("number of jobs: %s\n" % (nJobs))
+    file.write(succesRate)
     file.write("start: %s\n" % (startdate))
     file.write("done:  %s\n" % (time.strftime("%a %d/%m/%Y %H:%M:%S",time.gmtime())))
-    file.write("took:  %s hours, %s minutes and %.1f seconds" % (hours,minutes,seconds))
+    file.write("took:  %s hours, %s minutes and %.1f seconds\n" % (hours,minutes,seconds))
   print "\nDone after %s hours, %s minutes and %.1f seconds." % (hours,minutes,seconds)
   
 

@@ -326,7 +326,7 @@ def checkCompletion(dataSets, listOfJobs, outDir, cycleName, postFix,keepTemp):
       END="\\e[0m"
       nJobs = len([ j for j in listOfJobs if j[0]==d[0] ])
       countCmd="echo -e \"%snumber of \\\"%s*.root\\\" files over number of jobs: `ls -lh %s*.root | wc -l`/%s %s\""%(WARNING,'/'.join((fileToMerge.split('/')[-2:])),fileToMerge,nJobs,END)
-      countCmd+="; echo -e \"%snumber of \\\"%s/*.root\\\" files over number of jobs: `ls -lh %s/*.root | wc -l`/%s %s\""%(WARNING,'/'.join((l[6].split('/')[-1:])),  l[6],       len(listOfJobs),END)
+      countCmd+="; echo -e \"%snumber of \\\"%s/*.root\\\" files over number of all jobs: `ls -lh %s/*.root | wc -l`/%s %s\""%(WARNING,'/'.join((l[6].split('/')[-1:])),  l[6],       len(listOfJobs),END)
       subProcess=subprocess.Popen(countCmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
       countDebug=subProcess.stdout.read()
       countDebug+=subProcess.stderr.read()
@@ -873,6 +873,10 @@ def main():
     print "sending jobs ..."
     runningJobs=[]
     iJobs=0
+    skip=10
+    if   len(listOfJobs)>=1000: skip = 100
+    elif len(listOfJobs)>=500:  skip =  50
+    elif len(listOfJobs)>150:   skip =  20
     for j in listOfJobs:
       
       batchScript = BatchScript(useHost, useOS, path2sframe, useEnv, cmssw, hCPU, hVMEM, cycleName, tempDirLog)
@@ -940,7 +944,7 @@ def main():
         lock.release()
         submitOut = runProcess.stdout.read()
         runningJobs.append([submitOut.split(" ")[2], j[2]+j[3]])
-      if not (iJobs%10):
+      if not (iJobs%skip):
         print "submitting job %d of %d: "%(iJobs,nJobs),
         while runningJobsLimit>0:
           #subProcess=subprocess.Popen('qstat -u $USER | awk \'{print $5}\' | grep r |wc -l' , stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
@@ -1005,6 +1009,7 @@ def main():
 
 
 def accountTime(jobOptions,jobName,nJobs):
+  # TODO: save succes rate -> on string?
   makeDirectory("nohup")
   minutes, seconds = divmod(time.time()-starttime,60)
   hours, minutes   = divmod(minutes,60)

@@ -1013,7 +1013,8 @@ def main():
 
 
 def accountTime(jobOptions,jobName,nJobs):
-  # TODO: save succes rate -> on string?
+  """Append summary to a log file."""
+  
   makeDirectory("nohup")
   global succesRate, starttime, startdate
   minutes, seconds = divmod(time.time()-starttime,60)

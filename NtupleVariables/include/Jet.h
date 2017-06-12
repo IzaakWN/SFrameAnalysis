@@ -28,7 +28,7 @@ namespace UZH {
    * @author Code produced by Id: CodeIt.py 494 2010-07-30 13:41:32Z svn 
    *
    */
-  
+
   class Jet : public Basic 
  , public Particle 
   {

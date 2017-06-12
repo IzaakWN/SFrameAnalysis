@@ -6,9 +6,6 @@
 // SFrame include(s):
 #include "core/include/SCycleBase.h"
 
-// ROOT include(s):
-//#include <TBits.h>
-//#include "TMatrixD.h"
 // External include(s):
 #include "../NtupleVariables/include/JetNtupleObject.h"
 #include "../NtupleVariables/include/Jet.h"
@@ -35,15 +32,18 @@
 #include "../SVFitTools/interface/SVfitStandaloneAlgorithm.h"
 #include "../JetCorrectionTool/interface/JetCorrectionTool.h"
 
-//class TH1D;
-//class TH2D;
-//class TRandom3;
-//class TBits;
-
+// ROOT include(s):
 #include <TFile.h>
 #include <TTree.h>
 #include <TMath.h>
 #include "TRandom3.h"
+//#include <TBits.h>
+//#include "TMatrixD.h"
+
+//class TH1D;
+//class TH2D;
+//class TRandom3;
+//class TBits;
 
 
 
@@ -205,7 +205,7 @@ class TauTauAnalysis : public SCycleBase {
     virtual void FillBranches( const std::string& channel, std::vector<UZH::Jet>& Jets, // removed const for jets to change BTag status
                                const UZH::Tau& tau, const int taugen, const UZH::Muon& muon, const UZH::Electron& electron,
                                const UZH::MissingEt& met, const UZH::MissingEt& puppimet );//, const UZH::MissingEt& mvamet=NULL);
-    virtual void FillBranches_JEC( const char* ch, const std::vector<UZH::Jet>& Jets, const UZH::MissingEt& met, const float dphi );
+    virtual void FillBranches_JEC( const char* ch, const std::vector<UZH::Jet>& Jets, const float phi_ll );
     
     // check pass of triggers / MET filters
     virtual TString passTrigger( int runNumber = -1 );
@@ -228,9 +228,8 @@ class TauTauAnalysis : public SCycleBase {
     // help function
     static Float_t deltaPhi( Float_t p1, Float_t p2 );
     static Float_t deltaR(   Float_t p1, Float_t p2 );
-    virtual void countJets( double abseta, Int_t& ncjets, Int_t& nfjets, Int_t& ncbtags, const bool isBTagged );
-    virtual void shiftLeptonAndMET( const float shift, TLorentzVector& lep_shifted, TLorentzVector& met_shifted, bool shiftEnergy = false );
-    virtual void printRow(const std::vector<std::string> svec = {}, const std::vector<int> ivec = {}, const std::vector<double> dvec = {}, const std::vector<float> fvec = {}, const int w=10);
+    virtual void countJets(  const TLorentzVector& jet_tlv, Int_t& ncjets, Int_t& nfjets, Int_t& ncbtags, TLorentzVector& bjet_tlv, TLorentzVector& jet2_tlv, const bool isBTagged );
+    virtual void shiftLeptonAndMET( const float shift, TLorentzVector& lep_shifted, TLorentzVector& met_shifted, bool shiftEnergy = true );
     
     // IDs
     //virtual bool isNonTrigElectronID( const UZH::Electron& electron );
@@ -242,7 +241,7 @@ class TauTauAnalysis : public SCycleBase {
     
     /// fill cut flow
     //virtual void fillCutflow( const std::string histName, const std::string dirName, const Int_t id, const Double_t weight = 1.);
-    virtual void fillCutflow( TString histName, TString dirName, const Int_t id, const Double_t weight = 1. );
+    virtual void fillCutflow(  TString histName, TString dirName, const Int_t id, const Double_t weight = 1. );
     virtual void printCutFlow( const std::string& ch, const std::string& name, const TString hname, const TString dirname, std::vector<std::string> cutName );
     
     // checks
@@ -250,6 +249,7 @@ class TauTauAnalysis : public SCycleBase {
     virtual void checks();
     virtual void cutflowCheck( const std::string& channel );
     virtual void visiblePTCheck();
+    virtual void printRow(   const std::vector<std::string> svec = {}, const std::vector<int> ivec = {}, const std::vector<double> dvec = {}, const std::vector<float> fvec = {}, const int w=10 );
     
     
   private:
@@ -259,9 +259,9 @@ class TauTauAnalysis : public SCycleBase {
     /// INPUT VARIABLE OBJECTS:
     ///
     
+    Ntuple::EventInfoNtupleObject   m_eventInfo;      ///< event info container
     Ntuple::JetNtupleObject         m_jetAK4;         ///< jet container
     Ntuple::GenJetak4NtupleObject   m_genJetAK4;      ///< Gen jet container
-    Ntuple::EventInfoNtupleObject   m_eventInfo;      ///< event info container
     Ntuple::ElectronNtupleObject    m_electron;       ///< electron container
     Ntuple::MuonNtupleObject        m_muon;           ///< muon container
     Ntuple::TauNtupleObject         m_tau;            ///< tau container
@@ -298,7 +298,7 @@ class TauTauAnalysis : public SCycleBase {
     
     int m_ntupleLevel;                ///< cut at which branches for ntuple are written out
     std::string m_jetAK4Name;         ///< name of AK4 jet collection in tree with reconstructed objects
-    std::string m_genJetAK4Name;      ///< name of AK4 jet collection in tree with reconstructed objects
+    std::string m_genJetAK4Name;      ///< name of gen AK4 jet collection in tree with reconstructed objects
     std::string m_electronName;       ///< name of electron collection in tree with reconstructed objects
     std::string m_muonName;           ///< name of muon collection in tree with reconstructed objects
     std::string m_tauName;            ///< name of tau collection in tree with reconstructed objects
@@ -387,10 +387,10 @@ class TauTauAnalysis : public SCycleBase {
     double b_genweight_;
     double b_puweight_;
     double b_weightbtag_;
-    double b_weightbtag_bcUp_;
-    double b_weightbtag_bcDown_;
-    double b_weightbtag_udsgUp_;
-    double b_weightbtag_udsgDown_;
+    // double b_weightbtag_bcUp_;
+    // double b_weightbtag_bcDown_;
+    // double b_weightbtag_udsgUp_;
+    // double b_weightbtag_udsgDown_;
     double b_npu_;
     double b_dR_ll_gen_ = -1;
     Int_t b_isData_;
@@ -412,6 +412,9 @@ class TauTauAnalysis : public SCycleBase {
     // synchronisation:
     // https://twiki.cern.ch/twiki/bin/viewauth/CMS/HiggsToTauTauWorking2016#Synchronisation
     
+    std::map<std::string,Int_t>    b_channel;  // 1 mutau; 2 eletau;
+    std::map<std::string,Int_t>    b_isData;
+    
     std::map<std::string,Double_t> b_weight;
     std::map<std::string,Double_t> b_genweight;
     std::map<std::string,Double_t> b_puweight;
@@ -425,9 +428,7 @@ class TauTauAnalysis : public SCycleBase {
     std::map<std::string,Double_t> b_idisoweight_1;
     std::map<std::string,Double_t> b_trigweight_2;
     std::map<std::string,Double_t> b_idisoweight_2;
-    std::map<std::string,Int_t>    b_channel;  // 1 mutau; 2 eletau;
     std::map<std::string,Int_t>    b_triggers; // 0 no trigger; +1 SingleLepton; +2 CrossTrigger
-    std::map<std::string,Int_t>    b_isData;
     
     std::map<std::string,Int_t>    b_run;
     std::map<std::string,Int_t>    b_evt;
@@ -464,6 +465,11 @@ class TauTauAnalysis : public SCycleBase {
     std::map<std::string,Int_t>    b_nfjets_jer;
     std::map<std::string,Int_t>    b_nfjets_jerUp;
     std::map<std::string,Int_t>    b_nfjets_jerDown;
+    std::map<std::string,Double_t> b_dphi_ll_bj_jesUp;
+    std::map<std::string,Double_t> b_dphi_ll_bj_jesDown;
+    std::map<std::string,Double_t> b_dphi_ll_bj_jer;
+    std::map<std::string,Double_t> b_dphi_ll_bj_jerUp;
+    std::map<std::string,Double_t> b_dphi_ll_bj_jerDown;
     std::map<std::string,Double_t> b_met_jesUp;
     std::map<std::string,Double_t> b_met_jesDown;
     std::map<std::string,Double_t> b_met_jer;
@@ -471,11 +477,18 @@ class TauTauAnalysis : public SCycleBase {
     std::map<std::string,Double_t> b_met_jerDown;
     std::map<std::string,Double_t> b_met_UncEnUp;
     std::map<std::string,Double_t> b_met_UncEnDown;
+    std::map<std::string,Double_t> b_pfmt_1_jesUp;
+    std::map<std::string,Double_t> b_pfmt_1_jesDown;
+    std::map<std::string,Double_t> b_pfmt_1_jer;
+    std::map<std::string,Double_t> b_pfmt_1_jerUp;
+    std::map<std::string,Double_t> b_pfmt_1_jerDown;
+    std::map<std::string,Double_t> b_pfmt_1_UncEnUp;
+    std::map<std::string,Double_t> b_pfmt_1_UncEnDown;
     
-    // std::map<std::string,Double_t> b_weightbtag_bcUp;
-    // std::map<std::string,Double_t> b_weightbtag_bcDown;
-    // std::map<std::string,Double_t> b_weightbtag_udsgUp;
-    // std::map<std::string,Double_t> b_weightbtag_udsgDown;
+    std::map<std::string,Double_t> b_weightbtag_bcUp;
+    std::map<std::string,Double_t> b_weightbtag_bcDown;
+    std::map<std::string,Double_t> b_weightbtag_udsgUp;
+    std::map<std::string,Double_t> b_weightbtag_udsgDown;
     
     std::map<std::string,Double_t> b_pt_1;
     std::map<std::string,Double_t> b_eta_1;

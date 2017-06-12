@@ -23,6 +23,8 @@ void TauTauAnalysis::makeHistogramsForChecks(){
       Book( TH1F("runnumber", "runnumber", nperiods, periods ), dirname );
     }
     
+    Book( TH1F("triggers",          "triggers",          10,   0, 10  ), dirname);
+    
     // Book( TH1F("lepton_pt",         "lepton_pt",        100,   0, 120 ), dirname);
     // Book( TH1F("lepton_eta",        "lepton_eta",       100,   0, 3.0 ), dirname);
     // Book( TH1F("lepton_ID",         "lepton_ID",          2,   0, 2   ), dirname);
@@ -38,7 +40,6 @@ void TauTauAnalysis::makeHistogramsForChecks(){
     // Book( TH1F("lepton_pt_vtx",     "lepton_pt_vtx",    100,   0, 120 ), dirname);
     // Book( TH1F("lepton_eta_vtx",    "lepton_eta_vtx",   100,   0, 3.0 ), dirname);
     // Book( TH1F("lepton_ID_vtx",     "lepton_ID_vtx",      2,   0, 2   ), dirname);
-    Book( TH1F("triggers",          "triggers",          10,   0, 10  ), dirname);
     
     // Book( TH1F("gen_match_1_pt23_eta2p4",  "gen_match_1_pt23_eta2p4", 8, 0, 8 ), dirname);
     // Book( TH1F("gen_match_1_d0_dz",  "gen_match_1_d0_dz", 8, 0, 8 ), dirname);

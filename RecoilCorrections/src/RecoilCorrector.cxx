@@ -9,10 +9,11 @@
 
 RecoilCorrectorTool::RecoilCorrectorTool(SCycleBase* parent, const char* name ) : SToolBase( parent ), m_name( name )
 {
-  SetLogName( name );
-  DeclareProperty(  m_name+"PFMETFile",     m_PFMETFile     = std::string (std::getenv("SFRAME_DIR")) + "/../RecoilCorrections/data/TypeI-PFMet_Run2016BtoH.root" );
-  DeclareProperty(  m_name+"MVAMETFile",    m_MVAMETFile    = std::string (std::getenv("SFRAME_DIR")) + "/../RecoilCorrections/data/MvaMET_2016BCD.root" );
-  DeclareProperty(  m_name+"ZPTFile",       m_ZPTFile       = std::string (std::getenv("SFRAME_DIR")) + "/../RecoilCorrections/data/Zpt_weights_2016_BtoH.root" );
+  SetLogName( name ); 
+  // std::string (std::getenv("SFRAME_DIR"))
+  DeclareProperty(  m_name+"PFMETFile",     m_PFMETFile     = "$SFRAME_DIR/../RecoilCorrections/data/TypeI-PFMet_Run2016BtoH.root" );
+  DeclareProperty(  m_name+"MVAMETFile",    m_MVAMETFile    = "$SFRAME_DIR/../RecoilCorrections/data/MvaMET_2016BCD.root" );          // deprecated for Moriond
+  DeclareProperty(  m_name+"ZPTFile",       m_ZPTFile       = "$SFRAME_DIR/../RecoilCorrections/data/Zpt_weights_2016_BtoH.root" );
 }
 
 
@@ -21,21 +22,22 @@ RecoilCorrectorTool::RecoilCorrectorTool(SCycleBase* parent, const char* name ) 
 
 void RecoilCorrectorTool::BeginInputData( const SInputData& ) throw( SError ) {
   
+  m_logger << INFO << SLogger::endmsg;
   m_logger << INFO << "Initializing RecoilCorrector for lepons" << SLogger::endmsg;
-  m_logger << INFO << "Efficiency file PF MET: " << m_PFMETFile << SLogger::endmsg;
-  m_logger << INFO << "Efficiency file MVA MET: " << m_MVAMETFile << SLogger::endmsg;
-  m_logger << INFO << "Efficiency file for Z pT: " << m_ZPTFile << SLogger::endmsg;
-
+  m_logger << INFO << "Efficiency file PF MET:    " << m_PFMETFile << SLogger::endmsg;
+  m_logger << INFO << "Efficiency file MVA MET:   " << m_MVAMETFile << SLogger::endmsg;
+  m_logger << INFO << "Efficiency file for Z pT:  " << m_ZPTFile << SLogger::endmsg;
+  
   m_PFMETCorrector  = new RecoilCorrector(m_PFMETFile);
-  m_logger << INFO <<"RecoilCorrector for PF MET initialised"<< SLogger:: endmsg;
-
+  m_logger << INFO << "RecoilCorrector for PF MET initialised" << SLogger:: endmsg;
+  
   m_MVAMETCorrector = new RecoilCorrector(m_MVAMETFile);
-  m_logger << INFO <<"RecoilCorrector for MVA MET initialised"<< SLogger:: endmsg;
-
+  m_logger << INFO << "RecoilCorrector for MVA MET initialised" << SLogger:: endmsg;
+  
   TString ZPTFilePath(m_ZPTFile);
   TFile* zptfile = new TFile(ZPTFilePath, "read");
   m_ZPTHist = (TH1F*)zptfile->Get("zptmass_histo");
-  m_logger << INFO <<"Z pT histogram initialised"<< SLogger:: endmsg;
+  m_logger << INFO << "Z pT histogram initialised" << SLogger:: endmsg;
   
   return;
 }

@@ -6,9 +6,10 @@ loadLibs=[
     "libPileupReweightingTool",
     "libBTaggingTools",
     "libTauTauResonances",
-    "libSVFitTool",
     "libScaleFactorTool",
     "libRecoilCorrector",
+    "libJetCorrectionTool",
+    "libSVFitTool",
             ]
 
 loadPacks=[
@@ -18,9 +19,10 @@ loadPacks=[
     "PileupReweightingTool.par",
     "BTaggingTools.par",
     "TauTauResonances.par",
-    "SVFitTool.par",
     "ScaleFactorTool.par",
     "RecoilCorrector.par",
+    "JetCorrectionTool.par",
+    "SVFitTool.par",
 	        ]
 
 compilePacks=[
@@ -28,16 +30,18 @@ compilePacks=[
     "../GoodRunsLists",
     "../PileupReweightingTool",
     "../BTaggingTools",
-    "../SVFitTool",
     "../TauTauResonances",
     "../LepEff2016",
     "../RecoilCorrections",
+    "../JetCorrectionTool",
+    "../SVFitTool",
             ]
 
 AddUserItems = [
-    ["RecoTreeName","tree"], 
+    ["RecoTreeName","tree"],
+    ["doJEC","true"],
     ["doSVFit","true"],
-            ]
+                ]
   
 inputTrees=["ntuplizer/tree"]
 outputTrees=["tree_mutau","tree_etau"]

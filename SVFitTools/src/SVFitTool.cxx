@@ -92,7 +92,7 @@ void SVFitTool::addMeasuredLeptonTau( const std::string& channel, const TLorentz
     m_measuredTauLeptons.push_back(svFitStandalone::MeasuredTauLepton( svFitStandalone::kTauToElecDecay,
                                                                        lep.Pt(), lep.Eta(), lep.Phi(), 0.51100e-3 ));
     m_measuredTauLeptons.push_back(svFitStandalone::MeasuredTauLepton( svFitStandalone::kTauToMuDecay,
-                                                                       lep.Pt(), lep.Eta(), lep.Phi(), 105.658e-3 ));
+                                                                       tau.Pt(), tau.Eta(), tau.Phi(), 105.658e-3 ));
   }
   else
   {

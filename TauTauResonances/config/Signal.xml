@@ -62,7 +62,7 @@
     </InputData>
   <UserConfig>
     <Item Name="RecoTreeName"           Value="tree" />
-    <Item Name="doSVFit"                Value="False" />
+    <Item Name="doSVFit"                Value="True" />
     <Item Name="IsSignal"               Value="True" />
     <Item Name="doRecoilCorr"           Value="False" />
     <Item Name="doTES"                  Value="True" />

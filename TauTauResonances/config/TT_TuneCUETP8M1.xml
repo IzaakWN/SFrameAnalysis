@@ -19,6 +19,7 @@
   <Package Name="TauTauResonances.par" />
   <Package Name="ScaleFactorTool.par" />
   <Package Name="RecoilCorrector.par" />
+  <Package Name="JetCorrectionTool.par" />
   <Package Name="SVFitTool.par" />
 
   <Cycle Name="TauTauAnalysis" OutputDirectory="./" PostFix="" ProofServer="lite" ProofWorkDir="" RunMode="LOCAL" TargetLumi="1.0">

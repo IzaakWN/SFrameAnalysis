@@ -673,8 +673,6 @@ void TauTauAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
   // Cut 4: lepton (muon)
   //std::cout << ">>> ExecuteEvent - Cut 4 - muon" << std::endl;
   std::vector<UZH::Muon> goodMuons;
-  //int lepton_N_pt23 = 0;
-  //int lepton_N_2p4  = 0;
   //Hist("lepton_N", "histogram_mutau")->Fill(m_muon.N);
   for( int i = 0; i < m_muon.N; ++i ){
     UZH::Muon mymuon( &m_muon, i );
@@ -705,9 +703,9 @@ void TauTauAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
     if (fabs(myelectron.eta()) > m_electronEtaCut) continue;
     if (fabs(myelectron.d0_allvertices()) > m_electronD0Cut) continue;
     if (fabs(myelectron.dz_allvertices()) > m_electronDzCut) continue;
-//     std::cout << ">>> passConversionVeto()=" << myelectron.passConversionVeto();
-//     std::cout << ", expectedMissingInnerHits()=" << myelectron.expectedMissingInnerHits();
-//     std::cout << ", isMVATightElectron()=" << myelectron.isMVATightElectron() << std::endl;
+    // std::cout << ">>> passConversionVeto()=" << myelectron.passConversionVeto();
+    // std::cout << ", expectedMissingInnerHits()=" << myelectron.expectedMissingInnerHits();
+    // std::cout << ", isMVATightElectron()=" << myelectron.isMVATightElectron() << std::endl;
     if (myelectron.isMVATightElectron() < 0.5) continue;
     if (myelectron.passConversionVeto()!=1) continue;
     if (myelectron.expectedMissingInnerHits()>1) continue;
@@ -744,25 +742,27 @@ void TauTauAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
     // TES corrections and shifts
     Float_t taupt = mytau.pt();
     Int_t genmatch_2 = -1;
-    if(!m_isData) genMatch(mytau.eta(), mytau.phi());
-    if(genmatch_2==5){
-      //printRow({"tau & met","DM","tau.pt()","tau.eta()","tau.phi()","tau.e()","met.et()","met.phi()"});
-      //printRow({"before"},{mytau.decayMode()},{mytau.pt(),mytau.eta(),mytau.phi(),mytau.e(),met.et(),met.phi()});
-      TLorentzVector tau_tlv = mytau.tlv();
-      TLorentzVector met_tlv;
-      met_tlv.SetPxPyPzE(met.et()*TMath::Cos(met.phi()), met.phi()*TMath::Sin(met.phi()), 0, met.et());
-      switch ( mytau.decayMode() ) {
-        case  0: shiftLeptonAndMET(-0.018,tau_tlv,met_tlv,true); break; // 1 charged pion
-        case  1: shiftLeptonAndMET( 0.010,tau_tlv,met_tlv,true); break; // 1 charged pion + 1 neutral pion
-        case 10: shiftLeptonAndMET( 0.004,tau_tlv,met_tlv,true); break; // 3 charged pion
-      }
-      mytau.e(tau_tlv.E()); mytau.pt(tau_tlv.Pt()); taupt = mytau.pt();
-      met.et(met_tlv.E());  met.phi(met_tlv.Pt());
-      //printRow({"after"},{mytau.decayMode()},{mytau.pt(),mytau.eta(),mytau.phi(),mytau.e(),met.et(),met.phi()});
-      if(m_doTES) taupt *= (1+m_TESshift);
-    }
-    else if(m_doLTF && genmatch_2<5){
-        taupt *= (1+m_LTFshift);
+    if(!m_isData){
+        genmatch_2 = genMatch(mytau.eta(), mytau.phi());
+        if(genmatch_2==5){
+          //printRow({"tau & met","DM","tau.pt()","tau.eta()","tau.phi()","tau.e()","met.et()","met.phi()"});
+          //printRow({"before"},{mytau.decayMode()},{mytau.pt(),mytau.eta(),mytau.phi(),mytau.e(),met.et(),met.phi()});
+          TLorentzVector tau_tlv = mytau.tlv();
+          TLorentzVector met_tlv;
+          met_tlv.SetPxPyPzE(met.et()*TMath::Cos(met.phi()), met.phi()*TMath::Sin(met.phi()), 0, met.et());
+          switch ( mytau.decayMode() ) {
+            case  0: shiftLeptonAndMET(-0.018,tau_tlv,met_tlv,true); break; // 1 charged pion
+            case  1: shiftLeptonAndMET( 0.010,tau_tlv,met_tlv,true); break; // 1 charged pion + 1 neutral pion
+            case 10: shiftLeptonAndMET( 0.004,tau_tlv,met_tlv,true); break; // 3 charged pion
+          }
+          mytau.e(tau_tlv.E()); mytau.pt(tau_tlv.Pt()); taupt = mytau.pt();
+          met.et(met_tlv.E());  met.phi(met_tlv.Pt());
+          //printRow({"after"},{mytau.decayMode()},{mytau.pt(),mytau.eta(),mytau.phi(),mytau.e(),met.et(),met.phi()});
+          if(m_doTES) taupt *= (1+m_TESshift);
+        }
+        else if(m_doLTF && genmatch_2<5){
+            taupt *= (1+m_LTFshift);
+        }
     }
     if(taupt < m_tauPtCut) continue;
     
@@ -786,10 +786,10 @@ void TauTauAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
         if(dR < 0.5) continue; // remove or lower for boosted ID
         
         // ADDED YUTA for TES studies (because otherwise too heavy
-//         if(!( goodMuons[imuon].SemileptonicPFIso()/goodMuons[imuon].pt() < 0.15 && 
-//               goodTaus[itau].byTightIsolationMVArun2v1DBoldDMwLT() > 0.5 && 
-//               goodTaus[itau].againstElectronVLooseMVA6() > 0.5 && 
-//               goodTaus[itau].againstMuonTight3() > 0.5                             )) continue;
+        // if(!( goodMuons[imuon].SemileptonicPFIso()/goodMuons[imuon].pt() < 0.15 && 
+        //       goodTaus[itau].byTightIsolationMVArun2v1DBoldDMwLT() > 0.5 && 
+        //       goodTaus[itau].againstElectronVLooseMVA6() > 0.5 && 
+        //       goodTaus[itau].againstMuonTight3() > 0.5                             )) continue;
         
         Float_t mupt = goodMuons[imuon].pt();
         Float_t reliso = goodMuons[imuon].SemileptonicPFIso() / mupt;

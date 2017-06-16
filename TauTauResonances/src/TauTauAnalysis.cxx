@@ -1509,6 +1509,8 @@ void TauTauAnalysis::FillBranches(const std::string& channel, std::vector<UZH::J
       b_m_1[ch]     = lep_tlv.M();
       fmet          = met_tlv_corrected.E();
       fmetphi       = met_tlv_corrected.Phi();
+      b_trigger_cuts[ch]      = abs(b_eta_1[ch])<2.1 and ( (b_pt_1[ch]> 26 and (b_triggers[ch]==1 or b_triggers[ch]==3))
+                                                        or (b_pt_1[ch]<=26 and  b_triggers[ch]>1) );
     }
     //std::cout << ">>> after:  tau pt = " << tau_tlv.Pt()  << ", m   = " << tau_tlv.M() << std::endl;
     //std::cout << ">>> after:  lep pt = " << lep_tlv.Pt()  << ", m   = " << lep_tlv.M() << std::endl;      
@@ -1623,8 +1625,8 @@ void TauTauAnalysis::FillBranches(const std::string& channel, std::vector<UZH::J
   //std::cout << ">>> SVFit" << std::endl;
   
   // apply some extra cuts to save time
-  bool doSVFit = m_doSVFit && b_iso_cuts[ch]==1 && b_lepton_vetos[ch]==0; //&& b_iso_1[ch]<0.30 && b_iso_2_medium[ch]==1 && b_lepton_vetos[ch]==0;
-  if(m_doTight) doSVFit = doSVFit && ncbtag>0 && b_iso_1[ch]<0.15 && b_iso_2[ch]==1;
+  bool doSVFit = m_doSVFit and b_lepton_vetos[ch]==0 and b_iso_1[ch]<0.50 and (b_iso_2_medium[ch]==1 or b_iso_2[ch]==1) and b_trigger_cuts[ch]==1; // b_iso_cuts[ch]==1 && b_lepton_vetos[ch]==0;
+  if(m_doTight) doSVFit = doSVFit && ncbtag>0;
   //bool doSVfit= false;
     
   double m_sv = -1;

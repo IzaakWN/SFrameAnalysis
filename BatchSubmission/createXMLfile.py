@@ -71,11 +71,12 @@ parser.add_option("-f", "--no-failed", action="store_false",
                 dest="writeFailed", default=True,
                 help="Do not write corrupt root files to a txt file")
 (options, args) = parser.parse_args()
-if options.example:
-  parser.print_help()
-  print example
-  exit(0)
-if len(args) != 1: parser.error("Please provide at file list name")
+if options.example or len(args) is not 1:
+    parser.print_help()
+    print example
+    if len(args) is not 1:
+        parser.error("No input given. Please provide a file with a name list.")
+    exit(0)
 
 print
 sampleListName = args[0]

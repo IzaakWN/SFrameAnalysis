@@ -3,10 +3,12 @@
 import os, sys
 sys.path.append('../plots')
 import PlotTools.PlotTools
+from PlotTools.PlotTools import Comparison, makeRatio, makeCanvas, makeStatisticalError, combineWeights
 import PlotTools.CMS_lumi as CMS_lumi, PlotTools.tdrstyle as tdrstyle
-from PlotTools.PrintTools  import color, warning, error, printSameLine, header
+from PlotTools.PrintTools import color, warning, error, printSameLine, header
 import ROOT
-from ROOT import TFile, TH1F, TH2F, THStack, TCanvas, TLegend, kBlue, kAzure, kRed, kGreen, kYellow, kOrange, kMagenta, gPad, gROOT, gStyle
+from ROOT import gPad, gROOT, gStyle, gRandom, gDirectory, TFile, TTree, TH1F, TH2F, THStack, TCanvas, TLegend,\
+                 TText, TLatex, kBlue, kAzure, kRed, kGreen, kYellow, kOrange, kMagenta
 ROOT.gROOT.SetBatch(ROOT.kTRUE)
 gStyle.SetOptStat(0)
 
@@ -35,32 +37,42 @@ colors     = [ kRed+3, kAzure+4, kOrange-6, kGreen+3, kMagenta+3, kYellow+2,
 def compareOldToNew():
     print ">>>\n>>> compareOldToNew()"
     
-    MORIOND_DIR  = "/scratch/ineuteli/SFrameAnalysis/AnalysisOutput"
-    ICHEP_DIR    = "/scratch/ineuteli/SFrameAnalysis/AnalysisOutput"
+    MORIOND_DIR  = "/scratch/ineuteli/SFrameAnalysis/AnalysisOutputEM"
+    OLD_DIR      = "/scratch/ytakahas/SFrameAnalysis/AnalysisOutputEM"
     
     samples = [
-                    #("WJ",          "WJetsToLNu_TuneCUETP8M1"       ),
-                    #("TT",          "TT_TuneCUETP8M1"               ),
-                    #("DY",          "DYJetsToLL_M-50_TuneCUETP8M1"  ),
-                    ("SingleMuon",  "SingleMuon_Run2016"            ),
+        ("WJ",          "WJ",           "WJetsToLNu_TuneCUETP8M1"           ),
+        ("TT",          "TT",           "TT_TuneCUETP8M1"                   ),
+        ("DY",          "DY",           "DYJetsToLL_M-50_TuneCUETP8M1"      ),
+        #("DY",          "DY1",          "DY1JetsToLL_M-50_TuneCUETP8M1"     ),
+        #("SingleMuon",  "SingleMuon",   "SingleMuon_Run2016"                ),
+        ("MuonEG",      "MuonEG",       "MuonEG_Run2016"                    ),
                 ]
     
-    for sampledir,sample in samples:
-        print ">>>\n>>> comparison ICHEP-Moriond for \"%s\"" % (sample)
+    treename = "tree_emu"
+    oldlabel = "OLD"
+    newlabel = "Moriond"
+    norm     = True
+    
+    for sampledir,samplelabel,sample in samples:
+        print ">>>\n>>> comparison %s-%s for \"%s\"" % (oldlabel,newlabel,sample)
         
-        file1 = TFile( "%s/%s/TauTauAnalysis.%s_ICHEP.root"   % (ICHEP_DIR,  sampledir,sample))
-        file2 = TFile( "%s/%s/TauTauAnalysis.%s_Moriond.root" % (MORIOND_DIR,sampledir,sample))
-        tree1 = file1.Get("tree_mutau")
-        tree2 = file2.Get("tree_mutau")
-                
+        file1 = TFile( "%s/%s/TauTauAnalysis.%s_%s.root" % (OLD_DIR,    sampledir,sample,"Moriond"))
+        file2 = TFile( "%s/%s/TauTauAnalysis.%s_%s.root" % (MORIOND_DIR,sampledir,sample,"Moriond"))
+        tree1 = file1.Get(treename)
+        tree2 = file2.Get(treename)
+        
         nocuts      = "channel>0"
         vetos       = "dilepton_veto == 0 && extraelec_veto == 0 && extramuon_veto == 0 && againstElectronVLooseMVA6_2 == 1 && againstMuonTight3_2 == 1"
+        vetos_emu   = "extraelec_veto == 0 && extramuon_veto == 0"
         isocuts     = "iso_1<0.15 && iso_2 == 1"
-        baseline    = "channel>0 && %s && %s && q_1*q_2<0" % (isocuts, vetos)
+        isocuts_emu = "iso_1<0.20 && iso_2<0.15"
+        baseline    = "channel>0 && %s && %s && q_1*q_2<0" % (vetos_emu, isocuts_emu)
+        weight      = ""
         
         cuts        = [
-                        #("no cuts",   nocuts   ),
-                        ("baseline",  baseline ),
+            ("no cuts",   nocuts   ),
+            ("baseline",  baseline ),
                       ]
         
         for cutname, cut in cuts:
@@ -69,57 +81,68 @@ def compareOldToNew():
             
             oldcut = cut
             newcut = cut #" && ".join([cut,"triggers==1 && pt_1>23"])
-            print ">>>   ICHEP:   entries: %d" % tree1.GetEntries(cut)
-            print ">>>   Moriond: entries: %d" % tree2.GetEntries(cut)
+            print ">>>   %10s: entries: %d" % (oldlabel,tree1.GetEntries(cut))
+            print ">>>   %10s: entries: %d" % (newlabel,tree2.GetEntries(cut))
             
             vars = [
-                            ( "pfmt_1",              50,      0, 150 ),
-#                             ( "dilepton_veto",        2,      0, 2.0 ),
-#                             ( "extraelec_veto",       2,      0, 2.0 ),
-#                             ( "extramuon_veto",       2,      0, 2.0 ),
-#                             ( "lepton_vetos",         2,      0, 2.0 ),
-#                             ( "againstElectronVLooseMVA6_2", 2, 0, 2 ),
-#                             ( "againstMuonTight3_2",  2,     0,  2.0 ),
-#                             ( "lepton_vetos",         2,      0, 2.0 ),
-#                             ( "iso_1",               50,      0, 0.3 ),
-#                             ( "pt_1",               100,      0, 100 ),
-#                             ( "pt_2",               100,      0, 100 ),
-#                             ( "abs(eta_1)",          50,      0, 2.5 ),
-#                             ( "abs(eta_2)",          50,      0, 2.5 ),
-#                             ( "q_1",                100,       -4, 4 ),
-#                             ( "q_2",                100,       -4, 4 ),
-                    ]
+#                 ( "pfmt_1",                              80,      0, 200 ),
+#                 ( "dilepton_veto",                        2,      0, 2.0 ),
+#                 ( "extraelec_veto",                       2,      0, 2.0 ),
+#                 ( "extramuon_veto",                       2,      0, 2.0 ),
+#                 ( "lepton_vetos",                         2,      0, 2.0 ),
+#                 ( "againstElectronVLooseMVA6_2",          2,      0, 2.0 ),
+#                 ( "againstMuonTight3_2",                  2,      0, 2.0 ),
+#                 ( "lepton_vetos",                         2,      0, 2.0 ),
+#                 ( "iso_1",                               50,      0, 0.3 ),
+#                 ( "iso_2",                               50,      0, 0.3 ),
+#                 ( "pt_1",                               100,      0, 100 ),
+#                 ( "pt_2",                               100,      0, 100 ),
+                ( "q_1",                                  5,     -2,   3 ),
+                ( "q_2",                                  5,     -2,   3 ),
+#                 ( "abs(eta_1)",                          50,      0, 2.5 ),
+#                 ( "abs(eta_2)",                          50,      0, 2.5 ),
+#                 ( "q_1",                                100,       -4, 4 ),
+#                 ( "q_2",                                100,       -4, 4 ),
+            ]
+            weightvars = [
+                ( "weight",                             100,   -0.2, 1.5 ),
+                (("weight",     "weight*trigweight_1"), 100,   -0.2, 1.5 ),
+                ( "trigweight_1",                       100,   -0.2, 1.5 ),
+                (("trigweight_1_or","trigweight_or_1"), 100, -0.2, 1.5 ),
+                ( "trigweight_2",                       100,   -0.2, 1.5 ),
+                ( "idisoweight_1",                      100,   -0.2, 1.5 ),
+                ( "idisoweight_2",                      100,   -0.2, 1.5 ),
+                ( "puweight",                           100,   -0.2, 1.5 ),
+                ( "weightbtag",                         100,   -0.2, 1.5 ),
+                ( "ttptweight",                         100,   -0.2, 1.5 ),
+            ]
+            #vars = weightvars
             
-            weightvars = [ 
-                            ( "weight",             100,   -0.2, 1.5 ),
-                            ( "trigweight_1",       100,   -0.2, 1.5 ),
-                            ( "idisoweight_1",      100,   -0.2, 1.5 ),
-                            ( "trigweight_1",       100,   -0.2, 1.5 ),
-                            ( "puweight",           100,   -0.2, 1.5 ),
-                            ( "weightbtag",         100,   -0.2, 1.5 ),
-                        ]
-        
             for (var,N,a,b) in vars:
                 #print ">>> comparison \"%s\" with \"%s\"" % (var,cut)
             
-                oldname = "%s_old"%(var.replace('(','').replace(')',''))
-                newname = "%s_new"%(var.replace('(','').replace(')',''))
+                if isinstance(var,tuple): oldvar, newvar = var
+                else:                     oldvar, newvar = var, var
+                
+                oldname = "%s_old"%(oldvar.replace('(','').replace(')',''))
+                newname = "%s_new"%(newvar.replace('(','').replace(')',''))
             
                 hist1 = TH1F(oldname, oldname, N, a, b)
                 hist2 = TH1F(newname, newname, N, a, b)
-                tree1.Draw("%s >> %s"%(var,oldname),oldcut,"gOff")
-                tree2.Draw("%s >> %s"%(var,newname),newcut,"gOff")
+                tree1.Draw("%s >> %s"%(oldvar,oldname),oldcut,"gOff")
+                tree2.Draw("%s >> %s"%(newvar,newname),newcut,"gOff")
                 N1 = hist1.Integral()
                 N2 = hist2.Integral()
-                hist1.Scale(1/N1)
-                hist2.Scale(1/N2)
+                if norm:
+                    hist1.Scale(1/N1)
+                    hist2.Scale(1/N2)
                 
                 canvas = TCanvas("canvas","canvas",100,100,800,600)
                 canvas.SetBottomMargin(0.12)
                 canvas.SetRightMargin(0.05)
                 canvas.SetLeftMargin(0.12)
                 canvas.SetTopMargin(0.05)
-            
+                
                 hist1.SetLineWidth(3)
                 hist1.SetLineStyle(1)
                 hist1.SetLineColor(kAzure+4)
@@ -129,7 +152,7 @@ def compareOldToNew():
                 hist1.Draw("hist")
                 hist2.Draw("histsame")
                 hist1.SetTitle("")
-                hist1.GetXaxis().SetTitle(var)
+                hist1.GetXaxis().SetTitle(newvar)
                 hist1.GetYaxis().SetTitle("A.U.")
                 hist1.GetXaxis().SetTitleSize(0.05)
                 hist1.GetYaxis().SetTitleSize(0.05)
@@ -143,9 +166,9 @@ def compareOldToNew():
                 (w,h)   = (0.18,0.15)
                 (x2,y2) = (x1+w,y1-h)
                 legend = TLegend(x1,y1,x2,y2)
-                legend.SetHeader(cutname)
-                legend.AddEntry(hist1,"ICHEP   (%d)"%(hist1.GetEntries()), 'l')
-                legend.AddEntry(hist2,"Moriond (%d)"%(hist2.GetEntries()), 'l')
+                legend.SetHeader("%s - %s"%(samplelabel,cutname))
+                legend.AddEntry(hist1,"%s (%d)"%(oldlabel,hist1.GetEntries()), 'l')
+                legend.AddEntry(hist2,"%s (%d)"%(newlabel,hist2.GetEntries()), 'l')
                 legend.SetTextSize(0.040)
                 legend.SetTextFont(42)
                 legend.SetBorderSize(0)
@@ -153,7 +176,7 @@ def compareOldToNew():
                 legend.Draw()
                 gStyle.SetOptStat(0)
                 
-                canvas.SaveAs("%s/%s_%s_%s_ICHEP-Moriond.png" % (OUT_DIR,var.replace('(','').replace(')',''),cutname.replace(' ','_'),sampledir))
+                canvas.SaveAs("%s/%s_%s_%s_%s-%s.png" % (OUT_DIR,newvar.replace('(','').replace(')','').replace('*','-'),cutname.replace(' ','_'),samplelabel,oldlabel,newlabel))
                 canvas.Close()
                 ROOT.gDirectory.Delete(hist1.GetName())
                 ROOT.gDirectory.Delete(hist2.GetName())
@@ -165,125 +188,6 @@ def compareOldToNew():
 
 
 
-def shapes():
-    print ">>>\n>>> shapes()"
-    
-    weight    = "weight*trigweight_or_1"
-    
-    # TTbar CR
-    cuts_sets = [
-        ( "category 1",[
-            (" 1bj,  0cj, 0>fj",  "channel>0 && iso_cuts==1 && lepton_vetos==0 && q_1*q_2<0 && ncbtag>0 && ncjets==1 && nfjets>0"), # && met<60 && pfmt_1<60
-            (">0bj,  2cj, 0>fj",  "channel>0 && iso_cuts==1 && lepton_vetos==0 && q_1*q_2<0 && ncbtag>0 && ncjets==2 && nfjets>0"),
-            (">0bj, >1cj, 0>fj",  "channel>0 && iso_cuts==1 && lepton_vetos==0 && q_1*q_2<0 && ncbtag>0 && ncjets >1 && nfjets>0"),]),
-#         ("pfmt_1>60",       "channel>0 && iso_cuts==1 && lepton_vetos==0 && q_1*q_2<0 && ncbtag>1 && nfjets>0"),
-#         ("pfmt_1<60",       "channel>0 && iso_cuts==1 && lepton_vetos==0 && q_1*q_2<0 && ncbtag>0 && ncjets>1 && nfjets==0"),
-#         ("pfmt_1>60",       "channel>0 && iso_cuts==1 && lepton_vetos==0 && q_1*q_2<0 && ncbtag>0 && ncjets>1 && nfjets==0"),
-#         ("pfmt_1>60",       "channel>0 && iso_cuts==1 && lepton_vetos==0 && q_1*q_2<0 && ncbtag>1 && nfjets==0"),
-            ]
-    
-    samples         = [("TT",  "TT_TuneCUETP8M1",                      "ttbar",                    831.76  ), ]
-    channels        = ["mutau",] #"etau"]
-    
-    for subdir,sample,samplename,sigma in samples:
-        filename    = "%s/%s/TauTauAnalysis.%s%s.root" % (MORIOND_DIR,subdir,sample,mylabel)
-        file        = TFile( filename )
-        
-        for channel in channels:
-            
-            treename    = "tree_%s%s"%(channel,"_cut")
-            histNname   = "histogram_%s/cutflow_%s"%(channel,channel)
-            tree        = file.Get(treename)
-            histN       = file.Get(histNname)
-            
-            if not tree:  print error("shapes - did not find tree %s in %s"%(treename,filename))
-            if not histN: print error("shapes - did not find hist %s in %s"%(histNname,filename))
-            
-            N_tot       = histN.GetBinContent(8)
-            normscale   = sigma*lumi*1000/N_tot            
-            hists       = [ ]
-            var         = "m_sv"
-            (N,a,b)     = (50,0.0,250.0)
-            I0          = 0
-            print ">>> %s scale = %.3f" % (samplename,normscale)
-            
-            for cutsetname, cutset in cuts_sets:
-                for i, (cutname, cut) in enumerate(cutset):
-                    
-                    cut         = "(%s)*%s"%(cut,weight)
-                    histname    = "%s_%s_%d"%(samplename.replace(' ',''),var,i)
-                    hist        = TH1F(histname,histname,N,a,b)
-                    hist.Sumw2()
-                    out         = tree.Draw("%s >> %s"%(var,histname),cut,"gOff")
-                    print ">>> %s (%s): %s" % (histname,out,cut)
-                    hists.append(hist)
-                    hist.Scale(normscale)
-                    I           = hist.Integral()
-                    if not I:
-                        print warning("shapes - %s has integral 0, ignoring"%histname)
-                        continue
-                    if i is 0:
-                        I0 = I
-                    if not I0:
-                        print error("shapes - first histogram %s has integral 0, ignoring"%histname)
-                        exit(1)
-                    hist.Scale(I0/I)
-                    entryname   = "%.1f - %s"%(I,cutname)
-                    print ">>>   entryname = %s"%(entryname)
-                    hist.SetTitle(entryname)
-                    print ">>> hist.GetTitle()=%s"%(hist.GetTitle())
-
-                canvas = TCanvas("canvas","canvas",100,100,800,600)
-                canvas.SetBottomMargin(0.12)
-                canvas.SetRightMargin(0.05)
-                canvas.SetLeftMargin(0.12)
-                canvas.SetTopMargin(0.05)
-
-                hist = hists[0]
-                hist.SetLineWidth(3)
-                hist.SetLineStyle(1)
-                hist.SetLineColor(colors[0])
-                hist.SetMarkerSize(0)
-                hist.Draw("hist E")
-                for i,h in enumerate(hists[1:]):
-                    h.SetLineWidth(3)
-                    h.SetLineStyle(i%4+1)
-                    h.SetLineColor(colors[i+1])
-                    h.SetMarkerSize(0)
-                    h.Draw("hist E same")
-                hist.GetXaxis().SetTitle("SVFit mass m_{sv} [GeV]")
-                hist.GetYaxis().SetTitle("number of events / %s GeV"%((b-a)/N))
-                hist.GetXaxis().SetTitleSize(0.05)
-                hist.GetYaxis().SetTitleSize(0.05)
-                hist.GetXaxis().SetTitleOffset(1.00)
-                hist.GetYaxis().SetTitleOffset(1.20)
-                hist.GetXaxis().SetLabelSize(0.040)
-                hist.GetYaxis().SetLabelSize(0.040)
-                hist.GetYaxis().SetRangeUser(0,max(hist.GetMaximum(),hist.GetMaximum())*1.15)
-            
-                (x1,y1) = (0.35,0.25)
-                (w,h)   = (0.18,0.02+0.05*len(hists))
-                (x2,y2) = (x1+w,y1+h)
-                legend = TLegend(x1,y1,x2,y2)
-                legend.SetHeader("%s: %s"%(channel.replace("mu","#mu").replace("tau","#tau"),cutsetname))
-                for h in hists:
-                    print ">>> h.GetTitle()=%s"%(h.GetTitle())
-                    legend.AddEntry(h,h.GetTitle(), 'l')
-                legend.SetTextSize(0.035)
-                legend.SetTextFont(42)
-                legend.SetBorderSize(0)
-                legend.SetFillStyle(0)
-                legend.Draw()
-                gStyle.SetOptStat(0)
-            
-                canvas.SaveAs("%s/%s_%sshape_%s-%s.png" % (OUT_DIR,var.replace('(','').replace(')',''),subdir,channel,cutsetname.replace(' ','')))
-                canvas.Close()
-                #1ROOT.gDirectory.Delete(hist1.GetName())
-        
-        file.Close()
-
-
-
 def vertexDY():
     print ">>>\n>>> vertexDY()"
     
@@ -292,11 +196,12 @@ def vertexDY():
     file2 = TFile( DIR + "TauTauAnalysis.DYJets_M-50.UZH.root" )
     
     
-    histnames = [ "d0_lepton_tail", "dz_lepton_tail", "d0_lepton", "dz_lepton",
-                  "pt_muon_ID", "pt_lepton", "pt_lepton_pt23",
-                  "gen_match_1_pt23_eta2p4", "gen_match_1_d0_dz", "gen_match_1_baseline", "gen_match_2_baseline",
-                  #"pt_Z", "pt_Z_baseline"
-                  ]
+    histnames = [
+        "d0_lepton_tail", "dz_lepton_tail", "d0_lepton", "dz_lepton",
+        "pt_muon_ID", "pt_lepton", "pt_lepton_pt23",
+        "gen_match_1_pt23_eta2p4", "gen_match_1_d0_dz", "gen_match_1_baseline", "gen_match_2_baseline",
+        #"pt_Z", "pt_Z_baseline"
+    ]
     
     channel = "mutau"
     
@@ -376,6 +281,563 @@ def vertexDY():
 
 
 
+def compareVarIntegrals():
+    """Compare intregral of variables (e.g. weights) of the same sample file."""
+    print ">>>\n>>> compareVarIntegrals()"
+    
+    filenames = [
+        ("TT",  "TT_TuneCUETP8M1",               "ttbar",       ),
+#         ( "DY", "DYJetsToLL_M-50_TuneCUETP8M1",  "DY inclusive" ),
+#         ( "DY", "DY1JetsToLL_M-50_TuneCUETP8M1", "DY + 1 jet"   ),
+#         ( "DY", "DY2JetsToLL_M-50_TuneCUETP8M1", "DY + 2 jets"  ),
+#         ( "DY", "DY3JetsToLL_M-50_TuneCUETP8M1", "DY + 3 jets"  ),
+#         ( "DY", "DY4JetsToLL_M-50_TuneCUETP8M1", "DY + 4 jets"  ),
+                ]
+    
+    vars        = [
+#                     (  "btagweight",
+#                      [("weightbtag",         "nominal"                  ),
+#                       ("weightbtag_bcDown",  "heavy flavour shift down" ),
+#                       ("weightbtag_bcUp",    "heavy flavour shift up"   ),
+#                       ("weightbtag_udsgDown","heavy flavour shift down" ),
+#                       ("weightbtag_udsgUp",  "heavy flavour shift up"   ), ])
+                    (  "jet multiplicity",
+                     [("ncjets",            "nominal"                   ),
+                      ("ncjets_jesUp",      "JES up"                    ),
+                      ("ncjets_jesDown",    "JES down"                  ),
+                      ("ncjets_jer",        "JER"                       ),
+                      ("ncjets_jerUp",      "JER up"                    ),
+                      ("ncjets_jerDown",    "JER down"                  ),])
+                  ]
+    
+    mylabel       = "_Moriond"
+    channel       = "mutau"
+    weight        = "" #"weight*trigweight_or_1"
+    triggers      = "abs(eta_1)<2.1 && trigger_cuts==1"
+    baseline      = "channel>0 && iso_cuts==1 && lepton_vetos==0 && %s && q_1*q_2<0" % (triggers)
+    category1_nob = "ncjets == 1 && nfjets  > 0"
+    category2_nob = "ncjets == 2 && nfjets == 0 && dphi_ll_bj>2 && met<60"
+    category1     = "ncjets == 1 && nfjets  > 0 && nbtag > 0"
+    category2     = "ncjets == 2 && nfjets == 0 && nbtag > 0 && dphi_ll_bj>2 && met<60"
+    category12    = "ncjets == 1 && nfjets  > 0 && nbtag > 0 && met<60 && pfmt_1<60"
+    category22    = "ncjets == 2 && nfjets == 0 && nbtag > 0 && dphi_ll_bj>2 && met<60 && pfmt_1<60"
+    
+    cuts = [
+        #("no cuts",  "channel>0"),
+        ("baseline",             "%s"       % (baseline)),
+#         ("category 1 (no b)",    "%s && %s" % (baseline,category1_nob)),
+#         ("category 2 (no b)",    "%s && %s" % (baseline,category2_nob)),
+#         ("category 1",           "%s && %s" % (baseline,category1)),
+#         ("category 2",           "%s && %s" % (baseline,category2)),
+#         ("optimized category 1", "%s && %s" % (baseline,category12)),
+#         ("optimized category 2", "%s && %s" % (baseline,category22)),
+    ]
+    
+    colors     = [ kRed+1, kAzure+4, kRed-9, kGreen+2, kAzure-4, kYellow+2, ]
+    
+    for ifile, (subdir,filename0,samplename) in enumerate(filenames,1):
+        print ">>>\n>>>   %2s: %10s, %10s"%(ifile,filename0,samplename)
+        filename    = "%s/%s/TauTauAnalysis.%s%s.root"%(MORIOND_DIR,subdir,filename0,mylabel)
+        file        = TFile(filename)
+        for cutname, cut in cuts:
+            for ivar, (varname0,varlist) in enumerate(vars,1):
+                print ">>>   %s - %s" % (cutname,varname0)
+                
+                N       = len(varlist)+1
+                (a,b)   = (0,N)
+                (x1,x2) = (0.75,0.91)
+                (y1,y2) = (0.90,0.65)
+                canvas = TCanvas("canvas","canvas",100,100,800,600)
+                canvas.SetBottomMargin(0.12)
+                canvas.SetRightMargin(0.06)
+                canvas.SetLeftMargin(0.12)
+                canvas.SetTopMargin(0.05)
+                #legend = TLegend(x1,y1,x2,y2)
+                
+                var0        = varname0
+                histname0   = "%s"%(varname0)
+                hist0       = TH1F(histname0,histname0,N,a,b)
+                hists = [ ]
+                integrals   = [ ]
+                max_bin = 0
+                treename    = "tree_%s_cut_relaxed"%channel
+                
+                for i, (var,varname) in enumerate(varlist,1):
+                    histname    = "%s_%s"%(subdir,var)
+                    (N,a,b)     = (2,0,2)
+                    hist        = TH1F(histname,histname,N,a,b)
+                    tree        = file.Get(treename)
+                    weight1     = combineWeights(weight,var)
+                    cut1        = "(%s)*%s"%(cut,weight1)
+                    out         = tree.Draw("%s >> %s"%(1,histname),cut1,"gOff")
+                    N1          = hist.GetEntries()
+                    I1          = hist.GetBinContent(2)
+                    #hist.Scale(1/N1)
+                    #print ">>>     N1 = %s,I1 = %s"%(N1,I1)
+                    integrals.append(I1)
+                    hist0.SetBinContent(i,I1)
+                    hist0.GetXaxis().SetBinLabel(i,var)
+                    hmax        = hist.GetMaximum()
+                    if hmax > max_bin:
+                        max_bin = hmax
+                    #hist.SetLineWidth(3)
+                    #hist.SetLineStyle(1+(i-1)%2)
+                    #hist.SetLineColor(colors[i-1])
+                    #hist.SetMarkerSize(0)
+                    #if i==0: hist.Draw("Ehist")
+                    #else:    hist.Draw("Ehistsame")
+                    #legend.AddEntry(hist,varname, 'l')
+                    hists.append(hist)
+                
+                hist0.Draw("Ehist")
+                hist.SetLineColor(colors[0])
+                hist.SetLineWidth(2)
+                hist0.SetTitle("")
+                hist0.SetMarkerSize(0)
+                #hist0.GetXaxis().SetTitle(varname0)
+                hist0.GetYaxis().SetTitle("A.U.")
+                hist0.GetXaxis().SetTitleSize(0.06)
+                hist0.GetYaxis().SetTitleSize(0.05)
+                hist0.GetXaxis().SetTitleOffset(0.94)
+                hist0.GetYaxis().SetTitleOffset(1.26)
+                hist0.GetXaxis().SetLabelSize(0.042)
+                hist0.GetYaxis().SetLabelSize(0.040)
+                hist0.SetMaximum(max_bin*1.24)
+                #legend.SetTextSize(0.032)
+                #legend.SetBorderSize(0)
+                #legend.SetFillStyle(0)
+                #legend.Draw()
+                gStyle.SetOptStat(0)
+                
+                text = TLatex()
+                for i, I1 in enumerate(integrals):
+                    fraction = 100*(I1/integrals[0]-1)
+                    text.SetTextFont(42)
+                    text.SetTextSize(0.034)
+                    text.SetTextAlign(22)
+                    text.DrawLatex(i+0.5,max_bin*1.10,"#splitline{ %.1f}{  %6.3f%%}"%(I1,fraction))
+                
+                cutname     = cutname.replace(' ','_').replace('(','-').replace(')','')
+                filename0   = filename0.split('_')[0]
+                canvas.SaveAs("%s/%s-%s-%s_integral_comparison.png" % (OUT_DIR,var0.replace(' ','_'),cutname,filename0))
+                canvas.Close()
+                
+                ROOT.gDirectory.Delete(histname0)
+                for hist in hists: ROOT.gDirectory.Delete(hist.GetName())
+        file.Close()
+    
+
+
+def compareVarsForSamples():
+    """Compare shapes of different variables for the same sample file."""
+    print ">>>\n>>> compareVarsForSamples()"
+    
+    filenames = [
+        ("TT",  "TT_TuneCUETP8M1",               "ttbar",       ),
+#         ( "DY", "DYJetsToLL_M-50_TuneCUETP8M1",  "DY inclusive" ),
+#         ( "DY", "DY1JetsToLL_M-50_TuneCUETP8M1", "DY + 1 jet"   ),
+#         ( "DY", "DY2JetsToLL_M-50_TuneCUETP8M1", "DY + 2 jets"  ),
+#         ( "DY", "DY3JetsToLL_M-50_TuneCUETP8M1", "DY + 3 jets"  ),
+#         ( "DY", "DY4JetsToLL_M-50_TuneCUETP8M1", "DY + 4 jets"  ),
+                ]
+    
+    vars        = [
+                    ([("weightbtag",       "nominal"),
+                      ("weightbtag_bcUp",  "heavy flavour shift up"),
+                      ("weightbtag_bcDown","heavy flavour shift down")],
+                     "weightbtag_bcShifts","b tag weight",50,0,1.9),
+                    ([("weightbtag",         "nominal"),
+                      ("weightbtag_udsgUp",  "heavy flavour shift up"),
+                      ("weightbtag_udsgDown","heavy flavour shift down")],
+                     "weightbtag_udsgShifts","b tag weight",50,0,1.9),
+                  ]
+    
+    mylabel     = "_Moriond"
+    channel     = "mutau"
+    weight      = "weight*trigweight_or_1"
+    baseline    = "channel>0 && iso_cuts==1 && lepton_vetos==0 && q_1*q_2<0"
+    cut         = "(%s)*%s"%(baseline,weight)
+    
+    cuts = [
+        #("no cuts",  "channel>0"),
+        ("baseline", "channel>0 && iso_cuts==1 && lepton_vetos==0 && q_1*q_2<0"),
+    ]
+    
+    colors     = [ kRed+1, kAzure+4, kRed-9, kGreen+2, kAzure-4, kYellow+2, ]
+    
+    for ifile, (subdir,filename0,samplename) in enumerate(filenames,1):
+        print ">>>   %2s: %10s, %10s"%(ifile,filename0,samplename)
+        filename    = "%s/%s/TauTauAnalysis.%s%s.root"%(MORIOND_DIR,subdir,filename0,mylabel)
+        file        = TFile(filename)
+        for cutname, cut in cuts:
+            for ivar, (varlist,var0,varname0,N,a,b) in enumerate(vars):
+                print ">>>   %s - %s" % (cutname,varname0)
+                cut     = "(%s)*%s"%(cut,weight)
+                
+                (x1,x2) = (0.17,0.33)
+                (y1,y2) = (0.90,0.65)
+                canvas = TCanvas("canvas","canvas",100,100,800,600)
+                canvas.SetBottomMargin(0.12)
+                canvas.SetRightMargin(0.05)
+                canvas.SetLeftMargin(0.12)
+                canvas.SetTopMargin(0.05)
+                legend = TLegend(x1,y1,x2,y2)
+                
+                hists = [ ]
+                max_bin = 0
+                treename    = "tree_%s_cut_relaxed"%channel
+        
+                for i, (var,varname) in enumerate(varlist):
+                    histname    = "%s_%s"%(subdir,var)
+                    hist        = TH1F(histname,histname,N,a,b)
+                    tree        = file.Get(treename)
+                    out         = tree.Draw("%s >> %s"%(var,histname),cut,"gOff")
+                    N1          = hist.GetEntries()
+                    hist.Scale(1/N1)
+                    hmax        = hist.GetMaximum()
+                    if hmax > max_bin:
+                        max_bin = hmax
+                    hist.SetLineWidth(3)
+                    hist.SetLineStyle(1+(i-1)%2)
+                    hist.SetLineColor(colors[i-1])
+                    hist.SetMarkerSize(0)
+                    if i==0: hist.Draw("Ehist")
+                    else:    hist.Draw("Ehistsame")
+                    legend.AddEntry(hist,varname, 'l')
+                    hists.append(hist)
+            
+                hist1 = hists[0]
+                hist1.SetTitle("")
+                hist1.GetXaxis().SetTitle(varname0)
+                hist1.GetYaxis().SetTitle("A.U.")
+                hist1.GetXaxis().SetTitleSize(0.06)
+                hist1.GetYaxis().SetTitleSize(0.06)
+                hist1.GetXaxis().SetTitleOffset(0.95)
+                hist1.GetYaxis().SetTitleOffset(0.9)
+                hist1.GetXaxis().SetLabelSize(0.045)
+                hist1.GetYaxis().SetLabelSize(0.045)
+                hist1.SetMaximum(max_bin*1.10)
+                legend.SetTextSize(0.032)
+                legend.SetBorderSize(0)
+                legend.SetFillStyle(0)
+                legend.Draw()
+                gStyle.SetOptStat(0)
+                cutname     = cutname.replace(' ','_').replace('(','-').replace(')','')
+                filename0   = filename0.split('_')[0]
+                canvas.SaveAs("%s/%s-%s-%s_comparison.png" % (OUT_DIR,var0,cutname,filename0))
+                canvas.Close()
+        
+                for hist in hists: ROOT.gDirectory.Delete(hist.GetName())
+        file.Close()
+
+
+
+def compareSamplesForVars():
+    """Compare the shape of a variable for different sample files."""
+    print ">>>\n>>> NUP()"
+    
+    filenames = [ ( "DY", "DYJetsToLL_M-50_TuneCUETP8M1_Moriond",  "DY inclusive" ),
+                  ( "DY", "DY1JetsToLL_M-50_TuneCUETP8M1_Moriond", "DY + 1 jet"   ),
+                  ( "DY", "DY2JetsToLL_M-50_TuneCUETP8M1_Moriond", "DY + 2 jets"  ),
+                  ( "DY", "DY3JetsToLL_M-50_TuneCUETP8M1_Moriond", "DY + 3 jets"  ),
+                  ( "DY", "DY4JetsToLL_M-50_TuneCUETP8M1_Moriond", "DY + 4 jets"  ),]
+    
+    vars        = [ ("NUP","number of partons",7,0,7), ("njets","number of reconstructed jets",7,0,7), ]
+    
+    channel     = "mutau"
+    
+    weight      = "weight*trigweight_or_1"
+    baseline    = "channel>0 && iso_cuts==1 && lepton_vetos==0 && q_1*q_2<0"
+    cut         = "(%s)*%s"%(baseline,weight)
+    
+    colors     = [ kRed+1, kAzure+4, kRed-9, kGreen+2, kAzure-4, kYellow+2, ] #kYellow+771, # kOrange+8
+    
+    for var, varname, N, a, b in vars:
+        print ">>>   %s" % (var)
+        
+        (x1,x2) = (0.74,0.90)
+        (y1,y2) = (0.90,0.65)
+        canvas = TCanvas("canvas","canvas",100,100,800,600)
+        canvas.SetBottomMargin(0.12)
+        canvas.SetRightMargin(0.05)
+        canvas.SetLeftMargin(0.12)
+        canvas.SetTopMargin(0.05)
+        legend = TLegend(x1,y1,x2,y2)
+        
+        hists = [ ]
+        files = [ ]
+        max_bin = 0
+        treename    = "tree_%s_cut_relaxed"%channel
+        
+        for i, (subdir,filename,samplename) in enumerate(filenames,1):
+            print ">>>   %2s: %10s, %10s"%(i,filename,samplename)
+            filename    = "%s/%s/TauTauAnalysis.%s.root"%(MORIOND_DIR,subdir,filename)
+            histname    = "%s_%s"%(var,i)
+            file        = TFile(filename)
+            #print ">>>     %2s: %10s, %3s, %3s, %3s"%(i,histname,N,a,b)
+            hist        = TH1F(histname,histname,N,a,b)
+            tree        = file.Get(treename)
+            out         = tree.Draw("%s >> %s"%(var,histname),cut,"gOff")
+            N1          = hist.GetEntries()
+            #print ">>>     %2s: %10s, out=%s, N=%s"%(i,samplename,out,N)
+            hist.Scale(1/N1)
+            hmax        = hist.GetMaximum()
+            if hmax > max_bin:
+                max_bin = hmax
+                #print ">>>   %s has %d entries" % (hist.GetName(),I)
+            hist.SetLineWidth(3)
+            hist.SetLineStyle(1+(i-1)%2) #3
+            hist.SetLineColor(colors[i-1])
+            hist.SetMarkerSize(0)
+            if i==0: hist.Draw("Ehist")
+            else:    hist.Draw("Ehistsame")
+            legend.AddEntry(hist,samplename, 'l')
+            hists.append(hist)
+            #print ">>>     before %s "%(type(hists[-1]))
+            files.append(file)
+        
+        hist1 = hists[0]
+        print ">>>   after %s "%(type(hists[0]))
+        hist1.SetTitle("")
+        hist1.GetXaxis().SetTitle(varname)
+        hist1.GetYaxis().SetTitle("A.U.")
+        hist1.GetXaxis().SetTitleSize(0.06)
+        hist1.GetYaxis().SetTitleSize(0.06)
+        hist1.GetXaxis().SetTitleOffset(0.9)
+        hist1.GetYaxis().SetTitleOffset(0.9)
+        hist1.GetXaxis().SetLabelSize(0.045)
+        hist1.GetYaxis().SetLabelSize(0.045)
+        hist1.SetMaximum(max_bin*1.10)
+        legend.SetTextSize(0.032)
+        legend.SetBorderSize(0)
+        legend.SetFillStyle(0)
+        legend.Draw()
+        gStyle.SetOptStat(0)
+        canvas.SaveAs("%s/%s_comparison.png" % (OUT_DIR,var))
+        canvas.Close()
+        
+        for hist in hists: ROOT.gDirectory.Delete(hist.GetName())
+        for file in files: file.Close()
+    
+
+
+def compareCutsForVars():
+    print ">>>\n>>> compareCutsForVars()"
+    
+    triggers    = "abs(eta_1)<2.1 && trigger_cuts==1"
+    baseline    = "channel>0 && iso_cuts==1 && lepton_vetos==0 && %s && q_1*q_2<0" % (triggers)
+    category1   = "ncjets == 1 && nfjets  > 0 && ncbtag > 0"
+    category2   = "ncjets == 2 && nfjets == 0 && ncbtag > 0 && dphi_ll_bj>2 && met<60"
+    category1_jesUp = category1
+    category2_jesUp = category2
+    category1_jerUp = category1
+    category2_jerUp = category2
+    
+    replaceVars = [ "jets", "btag", "met", "pfmt_1", "dphi_ll_bj", ]
+    for var in replaceVars:
+        category1_jesUp = category1_jesUp.replace(var,"%s_jesUp"%(var))
+        category2_jesUp = category2_jesUp.replace(var,"%s_jesUp"%(var))
+        category1_jerUp = category1_jerUp.replace(var,"%s_jerUp"%(var))
+        category2_jerUp = category2_jerUp.replace(var,"%s_jerUp"%(var))
+    
+    # TTbar CR
+    cuts_sets = [
+#         ( "category 1: triggers",("m_sv",35,0.0,350),[
+#             ("both triggers",        "%s && %s && %s" % (baseline,category2,"triggers==3")),
+#             ("single lepton only",   "%s && %s && %s" % (baseline,category2,"triggers==1")),
+#             ("cross trigger only",   "%s && %s && %s" % (baseline,category2,"triggers==2")), ]),
+#         ( "category 2: triggers",("m_sv",35,0.0,350),[
+#             ("both triggers",        "%s && %s && %s" % (baseline,category2,"triggers==3")),
+#             ("single lepton only",   "%s && %s && %s" % (baseline,category2,"triggers==1")),
+#             ("cross trigger only",   "%s && %s && %s" % (baseline,category2,"triggers==2")), ]),
+#         ( "category 2: single muon",("m_sv",35,0.0,350),[
+#             ("l #rightarrow #tau",   "%s && %s && %s" % (baseline,category2,"triggers==1 && gen_match_2<5")),
+#             ("real #tau",            "%s && %s && %s" % (baseline,category2,"triggers==1 && gen_match_2==5")),
+#             ("j #rightarrow #tau",   "%s && %s && %s" % (baseline,category2,"triggers==1 && gen_match_2==6")), ]),
+#         ( "category 2: all triggers",("m_sv",35,0.0,350),[
+#             ("l #rightarrow #tau",   "%s && %s && %s" % (baseline,category2,"triggers==3 && gen_match_2<5")),
+#             ("real #tau",            "%s && %s && %s" % (baseline,category2,"triggers==3 && gen_match_2==5")),
+#             ("j #rightarrow #tau",   "%s && %s && %s" % (baseline,category2,"triggers==3 && gen_match_2==6")), ]),
+#         ( "optimized category 1: JEC",("jpt_1",35,0.0,350),[
+#             ("normative",       "%s && %s" % (baseline,category1)),
+#             ("JES up",          "%s && %s" % (baseline,category1_jesUp)),
+#             ("JES down",        "%s && %s" % (baseline,category1_jesUp.replace("Up","Down"))),
+#             #("JER nominal",     "%s && %s" % (baseline,category1_jerUp.replace("Up",""))),
+#             #("JER up",          "%s && %s" % (baseline,category1_jerUp)),
+#             #("JER down",        "%s && %s" % (baseline,category1_jerUp.replace("Up","Down"))),
+#             ]),
+        ( "optimized category 2: JES",("jpt_1",35,0.0,350),[
+            ("nominal",         "jpt_1",         "%s && %s" % (baseline,category2)),
+#             ("JER",             "%s && %s" % (baseline,category2_jerUp)),
+            ("JES up",          "%s && %s" % (baseline,category2_jesUp)),
+            ("JES down",        "%s && %s" % (baseline,category2_jesUp.replace("Up","Down"))),
+#             ("JER normative",   "%s && %s" % (baseline,category2_jerUp.replace("Up",""))),
+#             ("JER down",        "%s && %s" % (baseline,category2_jerUp.replace("Up","Down"))),
+            ]),
+        ( "optimized category 2: JES",("jpt_1",35,0.0,350),[
+#             ("nominal",         "%s && %s" % (baseline,category2)),
+            ("JER",             "%s && %s" % (baseline,category2_jerUp)),
+            ("JER up",          "%s && %s" % (baseline,category2_jerUp)),
+            ("JER down",        "%s && %s" % (baseline,category2_jerUp.replace("Up","Down"))),
+#             ("JER normative",   "%s && %s" % (baseline,category2_jerUp.replace("Up",""))),
+#             ("JER down",        "%s && %s" % (baseline,category2_jerUp.replace("Up","Down"))),
+            ]),
+#         ( "category 1",[
+#             (" 1bj,  0cj, 0>fj",  "channel>0 && iso_cuts==1 && lepton_vetos==0 && q_1*q_2<0 && ncbtag>0 && ncjets==1 && nfjets>0"), # && met<60 && pfmt_1<60
+#             (">0bj,  2cj, 0>fj",  "channel>0 && iso_cuts==1 && lepton_vetos==0 && q_1*q_2<0 && ncbtag>0 && ncjets==2 && nfjets>0"),
+#             (">0bj, >1cj, 0>fj",  "channel>0 && iso_cuts==1 && lepton_vetos==0 && q_1*q_2<0 && ncbtag>0 && ncjets >1 && nfjets>0"),]),
+#         ( "category 2",[
+#             (" 1bj,  2cj, 0fj",  "channel>0 && iso_cuts==1 && lepton_vetos==0 && q_1*q_2<0 && ncbtag==1 && ncjets==2 && nfjets==0"), # && met<60 && pfmt_1<60
+#             (">0bj,  2cj, 0fj",  "channel>0 && iso_cuts==1 && lepton_vetos==0 && q_1*q_2<0 && ncbtag>0  && ncjets==2 && nfjets==0"),
+#             (">0bj, >1cj, 0fj",  "channel>0 && iso_cuts==1 && lepton_vetos==0 && q_1*q_2<0 && ncbtag>0  && ncjets >1 && nfjets==0"),]),
+#         ("pfmt_1>60",       "channel>0 && iso_cuts==1 && lepton_vetos==0 && q_1*q_2<0 && ncbtag>1 && nfjets>0"),
+#         ("pfmt_1<60",       "channel>0 && iso_cuts==1 && lepton_vetos==0 && q_1*q_2<0 && ncbtag>0 && ncjets>1 && nfjets==0"),
+#         ("pfmt_1>60",       "channel>0 && iso_cuts==1 && lepton_vetos==0 && q_1*q_2<0 && ncbtag>0 && ncjets>1 && nfjets==0"),
+#         ("pfmt_1>60",       "channel>0 && iso_cuts==1 && lepton_vetos==0 && q_1*q_2<0 && ncbtag>1 && nfjets==0"),
+    ]
+    
+    weight      = "weight*trigweight_or_1*ttptweight_runI/ttptweight"
+    samples     = [("TT",  "TT_TuneCUETP8M1",           "ttbar",            831.76  ), ]
+    channels    = ["mutau",] #"etau"]
+    doKS                = True and False
+    drawErrorbars       = True and False
+    drawRatio           = True #and False
+    normalizeToHist0    = True #and False
+    plot_label  = "-350_JER"
+    
+    for subdir,sample,samplename,sigma in samples:
+        filename    = "%s/%s/TauTauAnalysis.%s%s.root" % (MORIOND_DIR,subdir,sample,mylabel)
+        file        = TFile( filename )
+        
+        for channel in channels:
+            
+            treename    = "tree_%s%s"%(channel,"_cut_relaxed") #_cut
+            histNname   = "histogram_%s/cutflow_%s"%(channel,channel)
+            tree        = file.Get(treename)
+            histN       = file.Get(histNname)
+            
+            if not tree:  print error("shapes - did not find tree %s in %s"%(treename,filename))
+            if not histN: print error("shapes - did not find hist %s in %s"%(histNname,filename))
+            
+            N_tot       = histN.GetBinContent(8)
+            normscale   = sigma*lumi*1000/N_tot
+            if normalizeToHist0: plot_label += "_norm"
+            I0          = 0
+            print ">>> %s scale = %.3f" % (samplename,normscale)
+            
+            for cutsetname, var_info, cutset in cuts_sets:
+                print ">>> "
+                histu0      = None
+                hists       = [ ]
+                histus      = [ ]
+                (var,N,a,b) = var_info #(50,0.0,50)
+                
+                for i, cut in enumerate(cutset):
+                    
+                    cutname = ""
+                    if len(cut) is 2:
+                        (cutname, cut) = cut
+                    else:
+                        (cutname,var,cut) = cut
+                    
+                    cut         = "(%s)*%s"%(cut,weight)
+                    histname    = "%s_%s_%d"%(samplename.replace(' ',''),var,i)
+                    histnameu   = histname+"_unbinned"
+                    hist        = TH1F(histname,histname,N,a,b)
+                    histu       = TH1F(histnameu,histnameu,10000,a,b)
+                    hist.Sumw2()
+                    out         = tree.Draw("%s >> %s"%(var,histname),cut,"gOff")
+                    out         = tree.Draw("%s >> %s"%(var,histnameu),cut,"gOff")
+                    hist.Scale(normscale)
+                    hists.append(hist)
+                    histus.append(histu)
+                    I = hist.Integral(1,hist.GetNbinsX()) #+1
+                    E = hist.GetEntries()
+                    print ">>> %s (%d, %.1f):\n>>>   %s" % (histname,I,E,cut)
+                    
+                    if not I:
+                        print warning("shapes - %s has integral 0, ignoring"%histname)
+                        continue
+                    
+                    if i is 0:
+                        histu0 = histu
+                        I0 = I
+                    elif normalizeToHist0:
+                        hist.Scale(I0/I)
+                        histu.Scale(I0/I)
+                    if not I0: print error("shapes - first histogram %s has integral 0, ignoring"%histname); exit(1)
+                    #entryname   = "%.1f - %s"%(I,cutname)
+                    entryname   = "%d - %s"%(E,cutname)
+                    
+                    if i is not 0 and doKS:
+                        KS = histu0.KolmogorovTest(histu)
+                        entryname = "%s (KS %.3f)"%(entryname,KS)
+                    
+                    
+                    print ">>>   entryname = %s"%(entryname)
+                    hist.SetTitle(entryname)
+                
+                title      = "%s - %s: %s " % (subdir,channel.replace("mu","#mu").replace("tau","#tau"),cutsetname.replace("category 1","1b1f").replace("category 2","1b1c"))
+                canvasname = "%s/%s%s_%sshape_%s-%s.png" % (OUT_DIR,var.replace('(','').replace(')',''),plot_label,subdir,channel,cutsetname.replace(': ','-').replace(' ','_'))
+                position   = "CenterRightTop" #"LeftTop"#"CenterLeftBottom" #"LeftTop"#
+                
+                comparison = Comparison(*hists)
+                comparison.Draw(title=title,xlabel=var,position=position,KS=False,linestyle=False,ratio=drawRatio,
+                                                       errorbars=drawErrorbars,staterror=True,markers=False,markers_ratio=False)
+                comparison.saveAs(canvasname)
+                
+                for hist in histus: gDirectory.Delete(hist.GetName())
+                
+                # canvas = TCanvas("canvas","canvas",100,100,800,600)
+                # canvas.SetBottomMargin(0.12)
+                # canvas.SetRightMargin(0.05)
+                # canvas.SetLeftMargin(0.12)
+                # canvas.SetTopMargin(0.05)
+                # 
+                # hist = hists[0]
+                # hist.SetLineWidth(3)
+                # hist.SetLineStyle(1)
+                # hist.SetLineColor(colors[0])
+                # hist.SetMarkerSize(0)
+                # hist.Draw("hist E")
+                # for i,h in enumerate(hists[1:]):
+                #     h.SetLineWidth(3)
+                #     h.SetLineStyle(i%4+1)
+                #     h.SetLineColor(colors[i+1])
+                #     h.SetMarkerSize(0)
+                #     h.Draw("hist E same")
+                # hist.GetXaxis().SetTitle("SVFit mass m_{sv} [GeV]")
+                # hist.GetYaxis().SetTitle("number of events / %s GeV"%((b-a)/N))
+                # hist.GetXaxis().SetTitleSize(0.05)
+                # hist.GetYaxis().SetTitleSize(0.05)
+                # hist.GetXaxis().SetTitleOffset(1.00)
+                # hist.GetYaxis().SetTitleOffset(1.20)
+                # hist.GetXaxis().SetLabelSize(0.040)
+                # hist.GetYaxis().SetLabelSize(0.040)
+                # hist.GetYaxis().SetRangeUser(0,max(hist.GetMaximum(),hist.GetMaximum())*1.15)
+                # 
+                # (x1,y1) = (0.35,0.25)
+                # (w,h)   = (0.18,0.02+0.05*len(hists))
+                # (x2,y2) = (x1+w,y1+h)
+                # legend = TLegend(x1,y1,x2,y2)
+                # legend.SetHeader("%s: %s"%(channel.replace("mu","#mu").replace("tau","#tau"),cutsetname))
+                # for h in hists:
+                #     print ">>> h.GetTitle()=%s"%(h.GetTitle())
+                #     legend.AddEntry(h,h.GetTitle(), 'l')
+                # legend.SetTextSize(0.035)
+                # legend.SetTextFont(42)
+                # legend.SetBorderSize(0)
+                # legend.SetFillStyle(0)
+                # legend.Draw()
+                # gStyle.SetOptStat(0)
+                # 
+                # canvas.SaveAs("%s/%s_%sshape_%s-%s.png" % (OUT_DIR,var.replace('(','').replace(')',''),subdir,channel,cutsetname.replace(' ','')))
+                # canvas.Close()
+                # #1ROOT.gDirectory.Delete(hist1.GetName())
+        
+        file.Close()
+        
+
 
 def zptweight():
     print ">>>\n>>> vertexDY()"
@@ -421,23 +883,22 @@ def zptweight():
 
 
 def trigweight():
+    """Compare shapes of different files."""
     print ">>>\n>>> trigweight()"
     
     channel  = "mutau"
     treename = "tree_%s" % channel
-    vars     = ["trigweight_1", "trigweight_2"]
+    vars     = [("trigweight_1","trigger weight",100,0,3), ("trigweight_1","trigger weight",100,0,3)]
     samples  = [
-                    #("DY",  "DYJetsToLL_M-10to50_TuneCUETP8M1", "DY M-10to50" ),
-                    ("DY",  "DYJetsToLL_M-50_TuneCUETP8M1", "DY M-50" ),
-                ]
+        #("DY",  "DYJetsToLL_M-10to50_TuneCUETP8M1", "DY M-10to50" ),
+        ("DY",  "DYJetsToLL_M-50_TuneCUETP8M1", "DY M-50" ),
+    ]
     cuts = [
-             ("no cuts",  "channel>0"),
-             ("baseline", "channel>0 && iso_cuts==1 && lepton_vetos==0 && q_1*q_2<0"),
-             
-            ]
-    (N,a,b)  = (100,0,3) 
+        ("no cuts",  "channel>0"),
+        ("baseline", "channel>0 && iso_cuts==1 && lepton_vetos==0 && q_1*q_2<0"),
+    ]
     
-    for var in vars:
+    for var, varnam, N,a,b in vars:
         for cutname, cut in cuts:
             for sampledir, samplename, samplelabel in samples:
                 
@@ -480,7 +941,7 @@ def trigweight():
                 hist3.Draw("histsame")
                 hist1.SetTitle("")
                 
-                xlabel = "trigger weight"
+                xlabel = varname
                 if "trigweight_1" in var: xlabel="new trigger weight"
                 if "trigweight_2" in var: xlabel="old trigger weight"
                 hist1.GetXaxis().SetTitle(xlabel)
@@ -492,7 +953,7 @@ def trigweight():
                 hist1.GetXaxis().SetLabelSize(0.045)
                 hist1.GetYaxis().SetLabelSize(0.045)
                 hist1.GetYaxis().SetRangeUser(0,max(maxs)*1.08)
-        
+                
                 (x1,y1) = (0.57,0.88)
                 (w,h)   = (0.18,0.24)
                 (x2,y2) = (x1+w,y1-h)
@@ -506,7 +967,7 @@ def trigweight():
                 legend.SetBorderSize(0)
                 legend.SetFillStyle(0)
                 legend.Draw()
-        
+                
                 gStyle.SetOptStat(0)
                 filename = ("%s/%s_%s_%s.png"%(OUT_DIR,var,samplelabel,cutname)).replace(' ','_')
                 canvas.SaveAs(filename)
@@ -527,14 +988,13 @@ def triggers():
     treename = "tree_%s" % channel
     var      = "triggers"
     samples  = [
-                    #("DY",  "DYJetsToLL_M-10to50_TuneCUETP8M1", "DY M-10to50" ),
-                    ("DY",  "DYJetsToLL_M-50_TuneCUETP8M1", "DY M-50" ),
-                ]
+        #("DY",  "DYJetsToLL_M-10to50_TuneCUETP8M1", "DY M-10to50" ),
+        ("DY",  "DYJetsToLL_M-50_TuneCUETP8M1", "DY M-50" ),
+    ]
     cuts = [
-             ("no cuts",  "channel>0"),
-             ("baseline", "channel>0 && iso_cuts==1 && lepton_vetos==0 && q_1*q_2<0"),
-             
-            ]
+        ("no cuts",  "channel>0"),
+        ("baseline", "channel>0 && iso_cuts==1 && lepton_vetos==0 && q_1*q_2<0"),             
+    ]
     (N,a,b)  = (3,1,4)
     
     for cutname, cut in cuts:
@@ -598,7 +1058,96 @@ def triggers():
             ROOT.gDirectory.Delete(hist1.GetName())
             
             file.Close()
-                
+        
+
+
+def ratioTest():
+    
+    pads = []
+    canvas = makeCanvas(ratio=True,pads=pads)
+    hist1 = TH1F("hist1","hist1",50,0,100)
+    hist2 = TH1F("hist2","hist2",50,0,100)
+    
+    for i in xrange(10000):
+        hist1.Fill(gRandom.Gaus(50,20),gRandom.Gaus(1,0.1))
+        hist2.Fill(gRandom.Gaus(50,20),gRandom.Gaus(1,0.1))
+    stats = makeStatisticalError(hist2)
+    ratio = makeRatio(hist1,hist2)
+    
+    pads[0].cd()
+    hist1.Draw("E")
+    hist2.Draw("HIST SAME")
+    stats.Draw("E2 SAME")
+    
+    pads[1].cd()
+    ratio.Draw("SAME")
+    
+    canvas.SaveAs("ratio_test.png")
+    
+
+
+def ratioTest2():
+    
+    hist1  = TH1F("hist1","hist1",50,0,100)
+    hist2  = TH1F("hist2","hist2",50,0,100)
+    hist3  = TH1F("hist3","hist3",50,0,100)
+    
+    hist1u = TH1F("hist1u","hist1u",10000,-50,150)
+    hist2u = TH1F("hist2u","hist2u",10000,-50,150)
+    hist3u = TH1F("hist3u","hist3u",10000,-50,150)
+    
+    for i in xrange(10000):
+        r = gRandom.Gaus(50,20)
+        w = gRandom.Gaus(1,0.1)
+        hist1.Fill(r,w)
+        hist1u.Fill(r,w)
+    for i in xrange(10000):
+        r = gRandom.Gaus(50,22)
+        w = gRandom.Gaus(0.99,0.1)
+        hist2.Fill(r,w)
+        hist2u.Fill(r,w)
+    for i in xrange(10000):
+        r = gRandom.Gaus(51,20)
+        w = gRandom.Gaus(1,0.2)
+        hist3.Fill(r,w)
+        hist3u.Fill(r,w)
+        
+    entries = ["1: nominal","2: other gaussian","3: another gaussian"]
+    for i,histu in enumerate([hist2u,hist3u],1):
+        Dn = hist1u.KolmogorovTest(histu)
+        print ">>> KolmogorovTest: Dn=%.3f for %s with %s" % (Dn,hist1u.GetName(),histu.GetName())
+        entries[i] = "%s (KS %.2f)" % (entries[i],Dn)
+    # for i,hist in enumerate([hist2,hist3],1):
+    #     Dn = hist1.KolmogorovTest(hist)
+    #     print ">>> KolmogorovTest: Dn=%.3f for %s with %s" % (Dn,hist1.GetName(),hist.GetName())
+    
+    comparison = Comparison(hist1,hist2,hist3)
+    comparison.Draw(title="comparing gaussians",entries=entries,markers=False,markers_ratio=False,KS=False)
+    comparison.saveAs("ratio_test3.png")
+    
+
+
+def writeCutTreeToFile(oldfilename,oldtreename,newfilename,newtreename,cut,overwrite=True,newdirname=""):
+    """Write a tree to a file. Overwrite the tree by default, If the tree already exist."""
+    
+    newfile = TFile(newfilename,"UPDATE")
+    oldfile = TFile(oldfilename,"READ")
+    newtree = newfile.Get(newtreename)
+    if overwrite or not newtree:
+        
+        if newdirname: # go to directory, and create it if it does not exist
+            newdir = newfile.GetDirectory(newdirname)
+            if not newdir:
+                print ">>> created directory %s"%(newdirname)
+                newdir = newfile.mkdir(newdirname)
+            newdir.cd()
+        
+        oldtree = oldfile.Get(oldtreename)
+        newtree = oldtree.CopyTree(cut)
+        newtree.Write(newtreename,TTree.kOverwrite)
+    oldfile.Close()
+    newfile.Close()
+    
 
 
 def makeDirectory(DIR):
@@ -617,16 +1166,20 @@ def main():
     makeDirectory(OUT_DIR)
     
     # MAIN CHECKS
-    #compareOldToNew()
-#     compareOldToNewEfficiency()
-#     compareDataSetEfficiencies()
-#     compareTriggerEfficiencies()
-#     compareSignalEfficiency()
-    #vertexDY()
-    #zptweight()
+#     compareOldToNew()
+#     vertexDY()
+#     zptweight()
 #     trigweight()
 #     triggers()
-    shapes()
+#     ratioTest()
+#     ratioTest2()
+#     compareOldToNew()
+#     compareSamplesForVars()
+#     compareVarsForSamples()
+#     compareCutsForVars()
+    compareVarIntegrals()
+#     fitVars()
+#     fitUnbinnedVars()
     
     print ">>>\n>>> done\n"
     
@@ -639,702 +1192,4 @@ if __name__ == '__main__':
 
 
 
-        
-        
-    
 
-
-# def numbers():
-#     print ">>>\n>>> numbers()"
-# 
-#     ROOT.gROOT.SetBatch(ROOT.kTRUE)
-#     lumi  = 24.5
-#     DIR = "/shome/ineuteli/analysis/SFrameAnalysis/AnalysisOutput/"
-#     samplesB = [
-# #                     ("TT/", "TT_TuneCUETP8M1",                      "ttbar",              831.76  ),
-#                     ("DY/", "DYJetsToLL_M-10to50_TuneCUETP8M1",     "Drell-Yan 10-50",  18610.0   ),
-# #                     ("DY/", "DYJetsToLL_M-50_TuneCUETP8M1",         "Drell-Yan 50",      5765.4   ),
-# #                     ("WJ/", "WJetsToLNu_TuneCUETP8M1",              "WJ",               61526.7   ),
-# #                     ("WZ/", "WZ_TuneCUETP8M1",                      "WZ",                  39.9   ), # wrong cross section 
-# #                     ("ZZ/", "ZZ_TuneCUETP8M1",                      "ZZ",                  10.32  ), # wrong cross section 
-#                ]
-# 
-# 
-#     print "\n>>> integrated luminosity L = %s pb" % lumi
-#     print ">>> "
-#     print ">>>    %15s %12s %12s %12s %12s %12s %12s" % ( " ", "cutflow N_1", "cutflow N_6", "tree N", "hist N", "sigma [pb]", "scale" )
-#     for s, i in zip(samplesB,range(len(samplesB))):
-# 
-#         file1 = TFile( DIR + s[0] + "TauTauAnalysis.%s.root" % s[1] )
-#         N_1 = file1.Get("histogram_mutau/cutflow_mutau").GetBinContent(1)
-#         N_6 = file1.Get("histogram_mutau/cutflow_mutau").GetBinContent(6)
-#     
-# #         file2 = TFile( DIR + s[0] + "%s_mutau.root" % s[1] )
-#         tree  = file1.Get("tree_mutau")
-#     
-#         hist = TH1F("hist","hist",40,-20,20)
-#         tree.Draw("weight >> hist","( channel == 1 )*weight","goff")
-#         
-#         scale = lumi * s[3] * 1000 / N_1
-#         print ">>>    %-15s %12i %12i %12i %12i %12.5g %12.5g" % ( s[2], N_1, N_6, tree.GetEntries(), hist.Integral(), s[3], scale )
-# 
-# 
-# 
-# 
-# 
-# def signalEfficiency():
-#     print ">>>\n>>> signalEfficiency()"
-# 
-#     # bin 1: no cuts
-#     # bin 2: JSON / gen weight
-#     # bin 3: triggers
-#     # bin 4: MET filters
-#     # bin 5: lepton selection
-#     # bin 6: lepton-tau pair selection
-#     # bin 7: no cuts gen weighted
-#     
-#     cuts = [    "no cuts",
-#                 "JSON/weight",
-#                 "triggers",
-#                 "MET filters",
-#                 "lepton",
-#                 "lepton-tau",
-#                 "no cuts (weighted)",
-#             ]
-#     
-#     file = TFile( DIR + "signal/TauTauAnalysis.LowMass_30GeV_DiTauResonance%s.root" % mylabel )
-#     efficiencies = [ ]
-#     for i, cut in zip(range(1,len(cuts)+1),cuts):
-#         N = file.Get("histogram_mutau/cutflow_mutau").GetBinContent(i)
-#         N_tot = 0
-#         if i is 1:
-#             N = 1
-#             N_tot = 1
-#         else:
-#             N_tot = file.Get("histogram_mutau/cutflow_mutau").GetBinContent(i-1)
-#             
-#         if N and N_tot:
-#             efficiencies.append(( cut, N / N_tot ))
-#         else:
-#             print ">>> Warning: GetBinContent(%i) = %s, GetBinContent(%i) = %s " % (i,N,i-1,N_tot)
-#     
-#     for cut, efficiency in efficiencies:
-#         print ">>> %s: %5.2f%%" % (cut,efficiency*100)
-# 
-# 
-# 
-# 
-# 
-# def ptSignalAcceptence():
-#     print ">>>\n>>> ptSignalAcceptence()"
-# 
-#     cut = 23. 
-#     file = TFile( DIR + "signal/TauTauAnalysis.LowMass_30GeV_DiTauResonance%s.root" % mylabel )
-#     pt_taus = file.Get("checks/pt_gentaus")
-#     pt_tau1 = file.Get("checks/pt_gentau1")
-#     pt_tau2 = file.Get("checks/pt_gentau2")
-#     pt_muon = file.Get("checks/pt_genmuon")
-#     
-#     bincut_taus = pt_taus.FindBin(cut)
-#     bincut_tau1 = pt_tau1.FindBin(cut)
-#     bincut_tau2 = pt_tau2.FindBin(cut)
-#     bincut_muon = pt_muon.FindBin(cut)
-#     N_taus = pt_taus.Integral()
-#     N_tau1 = pt_tau1.Integral()
-#     N_tau2 = pt_tau2.Integral()
-#     N_muon = pt_muon.Integral()
-#     
-#     eff_taus = pt_taus.Integral(bincut_taus, pt_taus.GetNbinsX()) / N_taus
-#     eff_tau1 = pt_tau1.Integral(bincut_tau1, pt_tau1.GetNbinsX()) / N_tau1
-#     eff_tau2 = pt_tau2.Integral(bincut_tau2, pt_tau2.GetNbinsX()) / N_tau2
-#     eff_muon = pt_muon.Integral(bincut_muon, pt_muon.GetNbinsX()) / N_muon
-#     
-#     print ">>> efficiency of pt cut of %s on signal's gen tau and reco muon:" % cut
-#     print ">>> gen tau:  %5.2f%%" % (100*eff_taus)
-#     print ">>> gen tau1: %5.2f%%" % (100*eff_tau1)
-#     print ">>> gen tau2: %5.2f%%" % (100*eff_tau2)
-#     print ">>> gen muon: %5.2f%%" % (100*eff_muon)
-# 
-#     print ">>> check: bincut_taus = %3i,  N_taus =%7i" % (bincut_taus,N_taus)
-#     print ">>> check: bincut_tau2 = %3i,  N_tau1 =%7i" % (bincut_tau1,N_tau1)
-#     print ">>> check: bincut_tau3 = %3i,  N_tau2 =%7i" % (bincut_tau2,N_tau2)
-#     print ">>> check: bincut_muon = %3i,  N_muon =%7i" % (bincut_muon,N_muon)
-#     
-#     # DRAW
-#     canvas = TCanvas("canvas","canvas",100,100,800,600) # 600,600
-#     canvas.SetBottomMargin(0.12)
-#     canvas.SetRightMargin(0.05)
-#     canvas.SetLeftMargin(0.12)
-#     canvas.SetTopMargin(0.05)
-#     pt_taus.SetLineWidth(3)
-#     pt_muon.SetLineWidth(3)
-#     pt_taus.SetLineColor(kAzure+4)
-#     pt_muon.SetLineColor(kRed+3)
-#     pt_taus.Scale(1/N_taus)
-#     pt_muon.Scale(1/N_muon/3)
-#     #pt_taus.Rebin(2)
-#     #pt_muon.Rebin(2)
-#     pt_taus.Draw("hist")
-#     pt_muon.Draw("histsame")
-#     pt_taus.SetTitle("")
-#     pt_taus.GetXaxis().SetRangeUser(0,100)
-#     pt_taus.GetXaxis().SetTitle("p_{T} of generator level particle")
-#     pt_taus.GetYaxis().SetTitle("A.U.")
-#     #pt_taus.GetYaxis().SetTitleSize(0)
-#     pt_taus.GetXaxis().SetTitleSize(0.05)
-#     pt_taus.GetYaxis().SetTitleSize(0.05)
-#     pt_taus.GetXaxis().SetTitleOffset(1.14)
-#     pt_taus.GetYaxis().SetTitleOffset(1.17)
-#     pt_taus.GetXaxis().SetLabelSize(0.045)
-#     pt_taus.GetYaxis().SetLabelSize(0.040)
-#     #pt_taus.GetYaxis().SetLabelSize(0)    
-#     legend = TLegend(0.56,0.68,0.80,0.84)
-#     legend.AddEntry(pt_taus, " gen #tau", 'l')
-#     legend.AddEntry(pt_muon, " gen #mu from #tau", 'l')
-#     legend.SetTextSize(0.055)
-#     legend.SetBorderSize(0)
-#     legend.SetFillStyle(0)
-#     legend.Draw()
-#     #gStyle.SetOptStat(0)
-#     canvas.SaveAs("plots_check/pt.png")
-#     canvas.Close()
-#     
-#     
-# 
-#     
-# def DYAcceptence():
-#     print ">>>\n>>> DYAcceptence()"
-# 
-#     DIR2 = "/shome/ineuteli/analysis/SFrameAnalysis/TauTauResonances/"
-# 
-# #     file = TFile( DIR2 + "TauTauAnalysis.DYJets_M-10to50.UZH.root" )
-#     file = TFile( DIR + "DY/TauTauAnalysis.DYJetsToLL_M-10to50_TuneCUETP8M1%s.root" % mylabel )
-#     pt = file.Get("checks/pt_muon")
-#     d0 = file.Get("checks/d0_muon")
-#     dz = file.Get("checks/dz_muon")
-#     d0_cut = file.Get("checks/d0_muon_cut")
-#     dz_cut = file.Get("checks/dz_muon_cut")
-# #     file2 = TFile( DIR2 + "TauTauAnalysis.DYJets_M-50.UZH.root" )
-#     file2 = TFile( DIR + "DY/TauTauAnalysis.DYJetsToLL_M-50_TuneCUETP8M1%s.root" % mylabel )
-#     pt2 = file2.Get("checks/pt_muon")
-#     d02 = file2.Get("checks/d0_muon")
-#     dz2 = file2.Get("checks/dz_muon")
-#     d02_cut = file2.Get("checks/d0_muon_cut")
-#     dz2_cut = file2.Get("checks/dz_muon_cut")
-#     var_dict = { "pt_muon":"muon p_{T}", "d0_muon":"muon d0", "dz_muon":"muon |dz|",
-#                  "d0_muon_cut":"muon d0", "dz_muon_cut":"muon |dz|" }
-#     
-#     print ">>>\n>>> overflow DY check"
-#     print ">>> DY M-10to50 pt overflow:              %9i /%9i = %5.1f%%" % ( pt.GetBinContent(pt.GetNbinsX()+1),   pt.GetEntries(),  pt.GetBinContent(pt.GetNbinsX()+1)   /  pt.GetEntries()*100 )
-#     print ">>> DY M-50     pt overflow:              %9i /%9i = %5.1f%%" % ( pt2.GetBinContent(pt2.GetNbinsX()+1), pt2.GetEntries(), pt2.GetBinContent(pt2.GetNbinsX()+1) / pt2.GetEntries()*100 )
-#     print ">>> DY M-10to50 d0 overflow:              %9i /%9i = %5.1f%%" % ( d0.GetBinContent(d0.GetNbinsX()+1),   d0.GetEntries(),  d0.GetBinContent(d0.GetNbinsX()+1)   / d0.GetEntries()*100  )
-#     print ">>> DY M-50     d0 overflow:              %9i /%9i = %5.1f%%" % ( d02.GetBinContent(d02.GetNbinsX()+1), d02.GetEntries(), d02.GetBinContent(d02.GetNbinsX()+1) / d02.GetEntries()*100 )
-#     print ">>> DY M-10to50 d0 overflow after pT cut: %9i /%9i = %5.1f%%" % ( d0_cut.GetBinContent(d0_cut.GetNbinsX()+1),   d0_cut.GetEntries(),  d0_cut.GetBinContent(d0_cut.GetNbinsX()+1)   / d0_cut.GetEntries()*100  )
-#     print ">>> DY M-50     d0 overflow after pT cut: %9i /%9i = %5.1f%%" % ( d02_cut.GetBinContent(d02_cut.GetNbinsX()+1), d02_cut.GetEntries(), d02_cut.GetBinContent(d02_cut.GetNbinsX()+1) / d02_cut.GetEntries()*100 )
-#     print ">>> DY M-10to50 dz overflow:              %9i /%9i = %5.1f%%" % ( dz.GetBinContent(dz.GetNbinsX()+1),   dz.GetEntries(),  dz.GetBinContent(dz.GetNbinsX()+1)   / dz.GetEntries()*100  )
-#     print ">>> DY M-50     dz overflow:              %9i /%9i = %5.1f%%" % ( dz2.GetBinContent(dz2.GetNbinsX()+1), dz2.GetEntries(), dz2.GetBinContent(dz2.GetNbinsX()+1) / dz2.GetEntries()*100 )
-#     print ">>> DY M-10to50 d0 overflow after pT cut: %9i /%9i = %5.1f%%" % ( dz_cut.GetBinContent(dz_cut.GetNbinsX()+1),   dz_cut.GetEntries(),  dz_cut.GetBinContent(dz_cut.GetNbinsX()+1)   / dz_cut.GetEntries()*100  )
-#     print ">>> DY M-50     d0 overflow after pT cut: %9i /%9i = %5.1f%%" % ( dz2_cut.GetBinContent(dz2_cut.GetNbinsX()+1), dz2_cut.GetEntries(), dz2_cut.GetBinContent(dz2_cut.GetNbinsX()+1) / dz2_cut.GetEntries()*100 )
-#     
-#     for var, hist, hist2 in [ ("pt_muon",pt,pt2), ("d0_muon",d0,d02), ("dz_muon",dz,dz2), ("d0_muon_cut",d0_cut,d02_cut), ("dz_muon_cut",dz_cut,dz2_cut) ]:
-#         canvas = TCanvas("canvas","canvas",100,100,800,600)
-#         canvas.SetBottomMargin(0.12)
-#         canvas.SetRightMargin(0.05)
-#         canvas.SetLeftMargin(0.05)
-#         canvas.SetTopMargin(0.05)
-#         hist.SetLineWidth(3)
-#         hist.SetLineStyle(1)
-#         hist.SetLineColor(kAzure+4)
-#         hist2.SetLineWidth(3)
-#         hist2.SetLineStyle(7)
-#         hist2.SetLineColor(kRed+3)
-#         hist.Draw("hist")
-#         hist2.Draw("histsame")
-#         hist.Scale(1/hist.Integral())
-#         hist2.Scale(1/hist2.Integral())
-#         hist.SetTitle("")
-#         #hist.GetXaxis().SetRangeUser(0,100)
-#         hist.GetXaxis().SetTitle(var_dict[var]) #replace
-#         hist.GetYaxis().SetTitleSize(0)
-#         hist.GetXaxis().SetTitleSize(0.05)
-#         hist.GetXaxis().SetTitleOffset(1.15)
-#         hist.GetXaxis().SetLabelSize(0.045)
-#         hist.GetYaxis().SetLabelSize(0)
-#         hist.GetYaxis().SetRangeUser(0,max(hist.GetMaximum(),hist2.GetMaximum())*1.12)
-#         h = 0.18
-#         w = 0.25
-#         legend = TLegend(0.64,0.7,0.64-w,0.7-h)
-#         legend.AddEntry(hist, " DY 10 < m < 50", 'l')
-#         legend.AddEntry(hist2," DY 50 > m", 'l')
-#         legend.SetTextSize(0.042)
-#         legend.SetBorderSize(0)
-#         legend.SetFillStyle(0)
-#         legend.Draw()
-#         gStyle.SetOptStat(0)
-#         canvas.SaveAs("plots_check/%s.png" % var)
-#         canvas.Close()
-#         
-#     vetos   = "dilepton_veto == 0 && extraelec_veto == 0 && extramuon_veto == 0 && againstElectronVLooseMVA6_2 == 1 && againstMuonTight3_2 == 1"
-#     isocuts = "iso_1 < 0.15 && iso_2 == 1"
-#     cuts    = [ ("SS",         "channel==1 && q_1*q_2<0"),
-#                 ("iso",        "channel==1 && %s && q_1*q_2<0" % (isocuts)),
-#                 #("isow",       "(channel==1 && %s && q_1*q_2<0)*idisoweight_1*trigweight_1" % (isocuts)),
-#                 ("vetos",      "channel==1 && %s && %s && q_1*q_2<0" % (isocuts, vetos)),
-#                 ("category 1", "channel==1 && %s && %s && q_1*q_2<0 && ncbtag > 0 && ncjets == 1 && nfjets  > 0" % (isocuts, vetos)),
-#                 ("category 2", "channel==1 && %s && %s && q_1*q_2<0 && ncbtag > 0 && ncjets  > 1 && nfjets == 0 && dphi_ll_bj > 2 && met < 60" % (isocuts, vetos)),
-#                ]
-#     # TODO weights?
-#     #  trigweight_1 * idisoweight_1 * trigweight_2 * idisoweight_2
-#     
-#     tree  = file.Get("tree_mutau")
-#     tree2 = file2.Get("tree_mutau")
-#     iso_1  = TH1F("iso_1", "iso_1", 100, -10, 10)
-#     iso_12 = TH1F("iso_12", "iso_12", 100, -10, 10)
-#     tree.Draw( "iso_1 >> iso_1",   "channel==1", "gOff")
-#     tree2.Draw("iso_1 >> iso_12",  "channel==1", "gOff")
-#     N_tot = iso_1.Integral()
-#     N_tot2 = iso_12.Integral()
-# 
-#     print ">>>\n>>> cuts on DY:"
-#     for label, cut in cuts: 
-#         iso_1.Reset()
-#         iso_12.Reset()
-#         tree.Draw("iso_1 >> iso_1",   cut, "gOff")
-#         tree2.Draw("iso_1 >> iso_12", cut, "gOff")
-#         N  = iso_1.Integral() #GetEntries
-#         N2 = iso_12.Integral()
-#         print ">>> %s:" % label
-#         if N_tot:  print ">>>   DY M-10to50: %4.1f%% (%6i,%6i)" % ( N/N_tot*100.0,   N,  N_tot  )
-#         if N_tot2: print ">>>   DY M-50:     %4.1f%% (%6i,%6i)" % ( N2/N_tot2*100.0, N2, N_tot2 )
-#         if "category" not in label and "isow" not in label:
-#             N_tot  = N
-#             N_tot2 = N2
-#         
-#     file.Close()
-#     file2.Close()
-#     
-#     
-#     
-#     
-#     
-#     
-# def deltaR():
-#     print ">>>\n>>> deltaR()"
-#     
-#     file = TFile( DIR + "signal/TauTauAnalysis.LowMass_30GeV_DiTauResonance%s.root" % mylabel )
-#     DeltaR_tautau  = file.Get("checks/DeltaR_tautau")
-#     DeltaR_taumu   = file.Get("checks/DeltaR_taumu")
-#     
-#     fileH = TFile( DIR + "gen_plots/root_files/HTT.root" )
-#     treeH = fileH.Get("Events")
-#     DeltaR_Htautau = TH1F("DeltaR_Htautau", "DeltaR_Htautau", 100, 0, 4)
-#     treeH.Draw("dR_ll >> DeltaR_Htautau")
-#     
-#     cut = 0.5
-#     bincut_tautau = DeltaR_tautau.FindBin(cut)
-#     bincut_taumu  = DeltaR_taumu.FindBin(cut)
-#     N_tautau = DeltaR_tautau.Integral()
-#     N_taumu  = DeltaR_taumu.Integral()
-#     eff_tautau = DeltaR_tautau.Integral(bincut_tautau, DeltaR_tautau.GetNbinsX()) / N_tautau
-#     eff_taumu  = DeltaR_taumu.Integral( bincut_taumu,  DeltaR_taumu.GetNbinsX())  / N_taumu
-#     print ">>> efficiency of DeltaR cut of %s on signal's gen tau and reco muon:" % cut
-#     print ">>> gen tautau:  %5.2f%%" % (100*eff_tautau)
-#     print ">>> gen taumu:   %5.2f%%" % (100*eff_taumu)
-#     print ">>> check: bincut_tautau = %3i,  N_tautau =%7i" % (bincut_tautau, N_tautau)
-#     print ">>> check: bincut_taumu  = %3i,  N_taumu  =%7i" % (bincut_taumu,  N_taumu)
-#     
-# #     for DR, hist in [ ("DeltaR_tautau",DeltaR_tautau), ("DeltaR_taumu",DeltaR_taumu) ]:
-# #         canvas = TCanvas("canvas","canvas",100,100,800,600)
-# #         canvas.SetBottomMargin(0.12)
-# #         canvas.SetRightMargin(0.05)
-# #         canvas.SetLeftMargin(0.05)
-# #         canvas.SetTopMargin(0.05)
-# #         hist.SetLineWidth(3)
-# #         hist.SetLineColor(kAzure+4)
-# #         hist.Draw("hist")
-# #         hist.Scale(1/hist.Integral())
-# #         hist.SetTitle("")
-# #         #hist.GetXaxis().SetRangeUser(0,100)
-# #         hist.GetXaxis().SetTitle(DR.replace("Delta","#Delta ").replace("_tautau","_{#tau#tau}").replace("_taumu","_{#tau#mu}"))
-# #         hist.GetYaxis().SetTitleSize(0)
-# #         hist.GetXaxis().SetTitleSize(0.05)
-# #         hist.GetXaxis().SetTitleOffset(1.15)
-# #         hist.GetXaxis().SetLabelSize(0.045)
-# #         hist.GetYaxis().SetLabelSize(0)
-# #         gStyle.SetOptStat(0)
-# #         canvas.SaveAs("plots_check/%s.png" % DR)
-# #         canvas.Close()
-#         
-#     canvas = TCanvas("canvas","canvas",100,100,800,600)
-#     canvas.SetBottomMargin(0.12)
-#     canvas.SetRightMargin(0.05)
-#     canvas.SetLeftMargin(0.12)
-#     canvas.SetTopMargin(0.05)
-#     DeltaR_tautau.SetLineWidth(3)
-#     DeltaR_tautau.SetLineStyle(1)
-#     DeltaR_tautau.SetLineColor(kAzure+4)
-#     DeltaR_taumu.SetLineWidth(3)
-#     DeltaR_taumu.SetLineStyle(7)
-#     DeltaR_taumu.SetLineColor(kRed+3)
-#     DeltaR_Htautau.SetLineWidth(3)
-#     DeltaR_Htautau.SetLineStyle(1)
-#     DeltaR_Htautau.SetLineColor(kOrange) #kYellow
-#     DeltaR_tautau.Draw(  "hist")
-#     DeltaR_Htautau.Draw( "histsame")
-#     DeltaR_tautau.Draw(  "histsame")
-#     DeltaR_taumu.Draw(   "histsame")
-#     DeltaR_tautau.Scale(  1/DeltaR_tautau.GetMaximum()) # Integral
-#     DeltaR_taumu.Scale(   1/DeltaR_taumu.GetMaximum())
-#     DeltaR_Htautau.Scale( 1/DeltaR_Htautau.GetMaximum())
-#     DeltaR_tautau.SetTitle("")
-#     DeltaR_tautau.GetXaxis().SetRangeUser(0,4)
-#     DeltaR_tautau.GetXaxis().SetTitle("#DeltaR")
-#     DeltaR_tautau.GetYaxis().SetTitle("A.U.")
-#     DeltaR_tautau.GetXaxis().SetTitleSize(0.06)
-#     DeltaR_tautau.GetYaxis().SetTitleSize(0.06)
-#     DeltaR_tautau.GetXaxis().SetTitleOffset(0.9)
-#     DeltaR_tautau.GetXaxis().SetLabelSize(0.045)
-#     DeltaR_tautau.GetYaxis().SetLabelSize(0.045)
-#     DeltaR_tautau.GetYaxis().SetRangeUser(0,DeltaR_tautau.GetMaximum()*1.12)
-#     h = 0.18
-#     w = 0.25
-#     legend = TLegend(0.61,0.75,0.61-w,0.75-h)
-#     legend.AddEntry(DeltaR_tautau,  " signal X #rightarrow #tau#tau", 'l')
-#     legend.AddEntry(DeltaR_taumu,   " signal X #rightarrow #tau#tau #rightarrow #mu#tau_{h}", 'l')
-#     legend.AddEntry(DeltaR_Htautau, " SM Higgs #rightarrow #tau#tau", 'l')
-#     legend.SetTextSize(0.042)
-#     legend.SetBorderSize(0)
-#     legend.SetFillStyle(0)
-#     legend.Draw()
-#     gStyle.SetOptStat(0)
-#     canvas.SaveAs("plots_check/DeltaR.png")
-#     canvas.Close()
-#     file.Close()
-#     fileH.Close()
-#     
-# 
-#     # MASS
-#     file = TFile( DIR + "signal/TauTauAnalysis.LowMass_30GeV_DiTauResonance%s.root" % mylabel )
-#     M_tautau  = file.Get("checks/M_tautau")
-#     
-#     canvas = TCanvas("canvas","canvas",100,100,800,600)
-#     canvas.SetBottomMargin(0.12)
-#     canvas.SetRightMargin(0.05)
-#     canvas.SetLeftMargin(0.12)
-#     canvas.SetTopMargin(0.05)
-#     M_tautau.SetLineWidth(3)
-#     M_tautau.SetLineStyle(1)
-#     M_tautau.SetLineColor(kAzure+4)
-#     M_tautau.Draw("hist")
-#     M_tautau.Scale(1/M_tautau.GetMaximum()) # Integral
-#     M_tautau.SetTitle("")
-#     M_tautau.GetXaxis().SetTitle("M_{#tau#tau}")
-#     M_tautau.GetYaxis().SetTitle("A.U.")
-#     M_tautau.GetXaxis().SetTitleSize(0.06)
-#     M_tautau.GetYaxis().SetTitleSize(0.06)
-#     M_tautau.GetXaxis().SetTitleOffset(0.9)
-#     M_tautau.GetXaxis().SetLabelSize(0.045)
-#     M_tautau.GetYaxis().SetLabelSize(0.045)
-#     M_tautau.GetYaxis().SetRangeUser(0,M_tautau.GetMaximum()*1.12)
-#     h = 0.18
-#     w = 0.25
-#     legend = TLegend(0.85,0.75,0.85-w,0.75-h)
-#     legend.AddEntry(M_tautau, " signal X #rightarrow #tau#tau", 'l')
-#     legend.SetTextSize(0.042)
-#     legend.SetBorderSize(0)
-#     legend.SetFillStyle(0)
-#     legend.Draw()
-#     gStyle.SetOptStat(0)
-#     canvas.SaveAs("plots_check/M_tautau.png")
-#     canvas.Close()
-#     file.Close()
-#     fileH.Close()
-#     
-#     
-#     
-#     
-#     
-#     
-#     
-#     
-#     
-# def deltaR2():
-#     print ">>>\n>>> deltaR2()"
-#     
-#     #DIRT = "/shome/ineuteli/analysis/SFrameAnalysis/TauTauResonances/"
-#     #file = TFile( DIRT + "TauTauAnalysis.Signal.UZH.root" )
-#     file = TFile( DIR + "signal/TauTauAnalysis.LowMass_30GeV_DiTauResonance%s.root" % mylabel )
-#     DeltaR1 = file.Get("checks/DeltaR_gentau_recotau_std")
-#     DeltaR2 = file.Get("checks/DeltaR_gentau_recotau_bst")
-#         
-#     cut = 0.2
-#     bincut1 = DeltaR1.FindBin(cut)
-#     bincut2 = DeltaR2.FindBin(cut)
-#     N1 = DeltaR1.Integral()
-#     N2 = DeltaR2.Integral()
-#     eff1 = DeltaR1.Integral(1, bincut1) / N1
-#     eff2 = DeltaR2.Integral(1, bincut2) / N2
-#     print ">>> percentage of gen-reco tau pairs with DeltaR < %s:" % cut
-#     print ">>> standard tau ID:  %5.2f%%" % (100*eff1)
-#     print ">>> boosted tau ID:   %5.2f%%" % (100*eff2)
-#     print ">>> check: bincut1 = %2i, N1 =%8i" % (bincut1, N1)
-#     print ">>> check: bincut2 = %2i, N2 =%8i" % (bincut2, N2)
-#     print ">>> check: edges bin1 = [%3.2f, %3.2f]" % (DeltaR1.GetBinLowEdge(bincut1), DeltaR1.GetBinLowEdge(bincut1)+DeltaR1.GetBinWidth(bincut1))
-#     print ">>> check: edges bin2 = [%3.2f, %3.2f]" % (DeltaR2.GetBinLowEdge(bincut2), DeltaR2.GetBinLowEdge(bincut2)+DeltaR2.GetBinWidth(bincut2))
-# 
-#         
-#     canvas = TCanvas("canvas","canvas",100,100,800,600)
-#     canvas.SetBottomMargin(0.14)
-#     canvas.SetRightMargin(0.05)
-#     canvas.SetLeftMargin(0.12)
-#     canvas.SetTopMargin(0.05)
-#     DeltaR1.SetLineWidth(3)
-#     DeltaR1.SetLineStyle(1)
-#     DeltaR1.SetLineColor(kAzure+4)
-#     DeltaR2.SetLineWidth(3)
-#     DeltaR2.SetLineStyle(7)
-#     DeltaR2.SetLineColor(kRed+3)
-#     DeltaR1.Draw("hist")
-#     DeltaR2.Draw("histsame")
-#     DeltaR1.Scale(1/DeltaR1.Integral()) # Integral / GetMaximum
-#     DeltaR2.Scale(1/DeltaR2.Integral())
-#     DeltaR1.SetTitle("")
-#     DeltaR1.GetXaxis().SetRangeUser(0,4)
-#     DeltaR1.GetXaxis().SetTitle("#DeltaR( #tau^{gen}_{h}, #tau^{reco}_{h})")
-#     DeltaR1.GetYaxis().SetTitle("A.U.")
-#     DeltaR1.GetXaxis().SetTitleSize(0.06)
-#     DeltaR1.GetYaxis().SetTitleSize(0.06)
-#     DeltaR1.GetXaxis().SetTitleOffset(0.85)
-#     DeltaR1.GetXaxis().SetLabelSize(0.045)
-#     DeltaR1.GetYaxis().SetLabelSize(0.045)
-#     DeltaR1.GetYaxis().SetRangeUser(0,DeltaR1.GetMaximum()*1.12)
-#     h = 0.18
-#     w = 0.25
-#     legend = TLegend(0.61,0.75,0.61-w,0.75-h)
-#     legend.AddEntry(DeltaR1, " standard tau ID", 'l')
-#     legend.AddEntry(DeltaR2, " boosted tau ID", 'l')
-#     legend.SetTextSize(0.042)
-#     legend.SetBorderSize(0)
-#     legend.SetFillStyle(0)
-#     legend.Draw()
-#     gStyle.SetOptStat(0)
-#     canvas.SaveAs("plots_check/DeltaR_genrecotau.png")
-#     canvas.Close()
-#     file.Close()
-#     
-#     
-#     
-#     
-#     
-# def Delta_eta_phi():
-#     print ">>>\n>>> Delta_eta_phi()"
-# 
-#     CMS_lumi.cmsTextSize = 0.50
-#     CMS_lumi.lumiTextSize = 0.45
-#     CMS_lumi.relPosX = 0.115
-#     gStyle.SetPalette(1) # for rainbow colors
-# 
-#     for sample in ["HTT", "LowMassDiTau"]:
-# 
-#         fileH = TFile( DIR + "gen_plots/root_files/%s.root" % sample )
-#         treeH = fileH.Get("Events")
-#         Delta_eta_phi = TH2F("Delta_eta_phi", "Delta_eta_phi", 100, 0, 3.2, 100, 0, 3.2)
-#         treeH.Draw("abs(dphi_ll):abs(deta_ll) >> Delta_eta_phi") #abs(deta):abs(dphi) #deta:dphi
-#     
-#         canvas = TCanvas("canvas","canvas",100,100,800,800)
-#         canvas.SetBottomMargin(0.12)
-#         canvas.SetRightMargin(0.12)
-#         canvas.SetLeftMargin(0.12)
-#         canvas.SetTopMargin(0.05)
-#         Delta_eta_phi.SetTitle("")
-#         Delta_eta_phi.Draw("colz")
-#         canvas.SaveAs("plots_check/Delta_eta_phi_%s.png" % sample)
-#         CMS_lumi.CMS_lumi(canvas,14,0)
-#         canvas.Close()
-#         fileH.Close()
-# 
-#     
-#     
-#     
-#     
-#     
-# def eta():
-#     print ">>>\n>>> eta()"
-#     
-#     fileH = TFile( DIR + "gen_plots/root_files/LowMassDiTau.root" )
-#     treeH = fileH.Get("Events")
-#     eta_l = TH1F("eta_l", "eta_l", 100, -5.5, 5.5)
-#     eta_b = TH1F("eta_b", "eta_b", 100, -5.5, 5.5)
-#     treeH.Draw("jeteta_l >> eta_l") #abs(jeteta_l)
-#     treeH.Draw("jeteta_b >> eta_b") #abs(jeteta_b)
-#         
-#     canvas = TCanvas("canvas","canvas",100,100,800,600)
-#     canvas.SetBottomMargin(0.12)
-#     canvas.SetRightMargin(0.05)
-#     canvas.SetLeftMargin(0.12)
-#     canvas.SetTopMargin(0.05)
-#     eta_l.SetLineWidth(3)
-#     eta_l.SetLineStyle(1)
-#     eta_l.SetLineColor(kAzure+4)
-#     eta_b.SetLineWidth(3)
-#     eta_b.SetLineStyle(2)
-#     eta_b.SetLineColor(kRed+3)
-#     eta_l.Draw("hist")
-#     eta_b.Draw("histsame")
-#     eta_l.Scale(1/eta_l.GetMaximum())
-#     eta_b.Scale(1/eta_b.GetMaximum())
-#     eta_l.SetTitle("")
-#     #eta_l.GetXaxis().SetRangeUser(0,5)
-#     eta_l.GetXaxis().SetTitle("quark #eta") #|#eta|
-#     eta_l.GetYaxis().SetTitle("A.U.")
-#     eta_l.GetXaxis().SetTitleSize(0.06)
-#     eta_l.GetYaxis().SetTitleSize(0.06)
-#     eta_l.GetXaxis().SetTitleOffset(0.9)
-#     eta_l.GetXaxis().SetLabelSize(0.045)
-#     eta_l.GetYaxis().SetLabelSize(0.045)
-#     eta_l.GetYaxis().SetRangeUser(0,eta_l.GetMaximum()*1.08)
-#     h = 0.12
-#     #legend = TLegend(0.8,0.65,0.52,0.45)
-#     legend = TLegend(0.8,0.35,0.42,0.35-h)
-#     legend.AddEntry(eta_l," light quark", 'l')
-#     legend.AddEntry(eta_b," b quark", 'l')
-#     legend.SetTextSize(0.045)
-#     legend.SetBorderSize(0)
-#     legend.SetFillStyle(0)
-#     legend.Draw()
-#     gStyle.SetOptStat(0)
-#     canvas.SaveAs("plots_check/eta.png")
-#     canvas.Close()
-#     fileH.Close()
-#     
-#     
-#     
-# def checkStackIntegral():
-#     print ">>>\n>>> checkStackIntegral"
-# 
-#     file_DY = TFile( DIR + "DY/TauTauAnalysis.DYJetsToLL_M-50_TuneCUETP8M1%s.root" % mylabel )
-#     file_WJ = TFile( DIR + "WJ/TauTauAnalysis.WJetsToLNu_TuneCUETP8M1%s.root" % mylabel )
-#     tree_DY = file_DY.Get("tree_mutau")
-#     tree_WJ = file_WJ.Get("tree_mutau")
-# 
-#     h1 = TH1F("h1","h1",100,0,70)
-#     h2 = TH1F("h2","h2",100,0,70)
-#     tree_DY.Draw("m_vis >> h1","weight","goff")
-#     tree_WJ.Draw("m_vis >> h2","weight","goff")
-# 
-#     stack = THStack("stack","stack")
-#     stack.Add(h1)
-#     stack.Add(h2)
-#     #stack.Draw()
-#     print ">>> hist  integral = %11.2f" % (h1.Integral())
-#     print ">>> stack integral = %11.2f" % (stack.GetStack().Last().Integral())
-#     h1.Scale(5)
-#     print ">>> hist  integral = %11.2f" % (h1.Integral())
-#     print ">>> stack integral = %11.2f" % (stack.GetStack().Last().Integral())
-#     #stack.Draw()
-#     
-#     
-#     
-# def countEvent():
-#     print ">>>\n>>> countEvent()"
-# 
-#     vetos   = "dilepton_veto == 0 && extraelec_veto == 0 && extramuon_veto == 0 && againstElectronVLooseMVA6_2 == 1 && againstMuonTight3_2 == 1"
-#     isocuts = "iso_1 < 0.15 && iso_2 == 1"
-#     cuts    = [ ("category 1", "channel==1 && %s && %s && q_1*q_2<0 && ncbtag > 0 && ncjets == 1 && nfjets  > 0" % (isocuts, vetos)),
-#                 ("category 2", "channel==1 && %s && %s && q_1*q_2<0 && ncbtag > 0 && ncjets  > 1 && nfjets == 0 && dphi_ll_bj > 2 && met < 50" % (isocuts, vetos)),
-#                ]
-# 
-#     file = TFile( DIR + "signal/TauTauAnalysis.LowMass_30GeV_DiTauResonance%s.root" % mylabel )    
-#     tree = file.Get("tree_mutau")
-#     
-#     for label, cut in cuts:
-#         hist = TH1F("hist", "hist", 35, 0, 70)
-#         canvas = TCanvas("canvas","canvas",100,100,400,300)
-#         tree.Draw("m_vis >> hist", cut)
-#         print ">>> %s: signal MC sample has %3i events" % (label,hist.Integral())
-#         canvas.SaveAs("plots_check/%s.png" % label.replace(" ","_"))
-#         ROOT.gDirectory.Delete(hist.GetName())
-#         canvas.Close()
-#         
-#     
-#     
-# def DeltaR_vs_pt_tt():
-#     print ">>>\n>>> DeltaR_vs_pt_tt"
-#     
-#     file = TFile( DIR + "signal/TauTauAnalysis.LowMass_30GeV_DiTauResonance%s.root" % mylabel )
-#     hist = file.Get("checks/DeltaR_pt_tt_vis_ltau")
-#     prof = hist.ProfileX()
-#     
-#     canvas = TCanvas("canvas","canvas",100,100,800,800)
-#     canvas.SetBottomMargin(0.10)
-#     canvas.SetRightMargin(0.12)
-#     canvas.SetLeftMargin(0.10)
-#     canvas.SetTopMargin(0.05)
-#     hist.SetTitle("")
-#     hist.Draw("colz")
-#     prof.Draw("same")
-#     prof.SetLineWidth(3)
-#     prof.SetLineStyle(1)
-#     prof.SetLineColor(kRed+3)
-#     hist.GetXaxis().SetTitleOffset(1.2)
-#     hist.GetYaxis().SetTitleOffset(1.1)
-#     hist.GetXaxis().SetTitle("generator level p_{T}^{l#tau_{h}}")
-#     hist.GetYaxis().SetTitle("generator level #DeltaR_{l#tau_{h}}")
-#     legend = TLegend(0.90,0.75,0.50,0.90)
-#     legend.AddEntry(prof,"average #DeltaR", 'l')
-#     legend.SetTextSize(0.045)
-#     legend.SetBorderSize(0)
-#     legend.SetFillStyle(0)
-#     legend.Draw()
-#     canvas.SaveAs("plots_check/DeltaR_pt_tt_vis_ltau.png")
-#     CMS_lumi.CMS_lumi(canvas,14,0)
-#     canvas.Close()
-#     file.Close()
-# 
-#     
-#     
-#     
-#     
-# def pt_tt():
-#     print ">>>\n>>> pt_tt()"
-#     
-#     file = TFile( DIR + "signal/TauTauAnalysis.LowMass_30GeV_DiTauResonance%s.root" % mylabel )
-#     hist1 = file.Get("checks/pt_tt_gen")
-#     hist2 = file.Get("checks/pt_tt_vis_ltau")
-#         
-#     canvas = TCanvas("canvas","canvas",100,100,800,600)
-#     canvas.SetBottomMargin(0.12)
-#     canvas.SetRightMargin(0.05)
-#     canvas.SetLeftMargin(0.12)
-#     canvas.SetTopMargin(0.05)
-#     hist1.SetLineWidth(3)
-#     hist1.SetLineStyle(1)
-#     hist1.SetLineColor(kAzure+4)
-#     hist2.SetLineWidth(3)
-#     hist2.SetLineStyle(2)
-#     hist2.SetLineColor(kRed+3)
-#     hist1.Draw("hist")
-#     hist2.Draw("histsame")
-#     hist1.Scale(1/hist1.GetMaximum())
-#     hist2.Scale(1/hist2.GetMaximum())
-#     hist1.SetTitle("")
-#     #hist1.GetXaxis().SetRangeUser(0,5)
-#     hist1.GetXaxis().SetTitle("generator level p_{T}^{#tau#tau}")
-#     hist1.GetYaxis().SetTitle("A.U.")
-#     hist1.GetXaxis().SetTitleSize(0.06)
-#     hist1.GetYaxis().SetTitleSize(0.06)
-#     hist1.GetXaxis().SetTitleOffset(0.9)
-#     hist1.GetXaxis().SetLabelSize(0.045)
-#     hist1.GetYaxis().SetLabelSize(0.045)
-#     hist1.GetYaxis().SetRangeUser(0,hist1.GetMaximum()*1.08)
-#     legend = TLegend(0.90,0.60,0.55,0.80)
-#     legend.AddEntry(hist1,"#tau#tau", 'l')
-#     legend.AddEntry(hist2,"lepton + #tau_{h} (visible)", 'l')
-#     legend.SetTextSize(0.045)
-#     legend.SetBorderSize(0)
-#     legend.SetFillStyle(0)
-#     legend.Draw()
-#     gStyle.SetOptStat(0)
-#     canvas.SaveAs("plots_check/pt_tt.png")
-#     canvas.Close()
-#     file.Close()

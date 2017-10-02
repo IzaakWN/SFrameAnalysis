@@ -1,19 +1,21 @@
 #! /usr/bin/env python
+# TODO: make config.py file to separate information on samples, selections
+# TODO: rename Sample.label to Sample.name
+# TODO: add preferred Samples.color, Sample.color
 
 from argparse import ArgumentParser
 import os, sys, time
+import copy
 from math import sqrt, pow, floor, ceil
 import ROOT
-from ROOT import TFile, TH1D, gDirectory, kAzure, kGreen, kRed
+from ROOT import TFile, TH1D, THStack, gDirectory, kAzure, kGreen, kRed
 import PlotTools.PlotTools, PlotTools.SampleTools
-from PlotTools.PlotTools   import Plot, Plot2D, combineCuts
+from PlotTools.PlotTools   import Plot, Plot2D, Ratio, combineCuts, setLineStyle, setStatisticalErrorStyle, makeCanvas, makeStatisticalError, makeRatio, makeLegend, makeAxes, invertIsolation
 from PlotTools.PrintTools  import color, warning, error, printSameLine, header
 from PlotTools.SampleTools import Samples, Sample, makeSamples, renormalizeWJ, renormalizeTT, getSample, getData, removeLowMassDY
 ROOT.gROOT.SetBatch(ROOT.kTRUE)
 # HTT Working TWiki: https://twiki.cern.ch/twiki/bin/viewauth/CMS/HiggsToTauTauWorking2016
 # gErrorIgnoreLevel = kInfo;
-
-
 
 argv = sys.argv
 description = '''This script make plots.'''
@@ -37,7 +39,7 @@ args = parser.parse_args()
 
 # LABELS & LUMI
 mylabel     = "_Moriond" # extra label for opening file, saving plots to dir
-plotlabel   = "" # extra label for image file #_noWJrenormalization
+plotlabel   = "_JEC_check" #_JEC_check" #_eta-weighted #_noForwardTTCR #_2xb30GeV" # extra label for image file
 lumi        = 35.9
 if "ICHEP" in mylabel: lumi = 12.9 #24.5
 
@@ -56,6 +58,15 @@ blindlimits = { "m_vis":      (  12,  36),
                 "R_pt_m_vis": ( 2.5,  10),
                 "R_pt_m_sv":  ( 2.0,  10), }
 blindlimits_norm= { "m_sv" :  (  20,  36), } # to normalize 28 GeV
+blindcuts   = {
+    "m_vis":      "( m_vis < %i || %i < m_vis )"           % blindlimits["m_vis"],
+    "m_sv" :      "( m_sv  < %i || %i < m_sv  )"           % blindlimits["m_sv" ],
+    "dR_ll":      "%i < dR_ll"                             % blindlimits["dR_ll"][1],
+    #"pt_tt"   :   "( pt_tt < %i || %i < pt_tt )"           % blindlimits["pt_tt"   ],
+    #"pt_tt_sv":   "( pt_tt_sv < %i || %i < pt_tt_sv )"     % blindlimits["pt_tt_sv"],
+    "R_pt_m_vis": "( R_pt_m_vis < %i || %i < R_pt_m_vis )" % blindlimits["R_pt_m_vis"],
+    "R_pt_m_sv" : "( R_pt_m_sv  < %i || %i < R_pt_m_sv  )" % blindlimits["R_pt_m_sv" ], 
+}
 
 
 # PLOTS OPTIONS
@@ -64,7 +75,11 @@ verbosityWJ         = 0
 verbosityTT         = 0
 verbosityPlots      = 0
 doStack             = True #and False
+compareStack        = True and False
+measureOSSS         = True and False
+measureSF           = True and False
 doSigma             = True and False
+split               = True and False
 checkYield          = True and False
 doPlot2D            = True and False
 doComparison        = True and False
@@ -75,16 +90,15 @@ doTES               = True and False
 doEES               = True and False
 doJES               = True and False
 doZpt               = True #and False
-doTTpt              = True #and False
 doQCD_WJ            = True #and False
 useCutTree          = True #and False
 recreate            = True #and False # recreate datacard
-normalizeWJ         = (doStack or doDataCard) #and False
-normalizeTT         = (doStack or doDataCard) #and False
+normalizeWJ         = (doStack or compareStack or measureOSSS or measureSF or doDataCard) #and False
+normalizeTT         = (doStack or compareStack or measureOSSS or measureSF or doDataCard) #and False
 normalizeSignal     = True #and False
 stitchDY10to50      = True #and False
 stitchDY50          = True #and False
-doQCD               = True #and False
+doQCD               = True and False
 doSignalUpScaling   = True #and False
 drawData            = True #and False
 drawSignal          = True #and False
@@ -93,43 +107,34 @@ if not doQCD:       plotlabel+="_noQCD"
 if not normalizeWJ: plotlabel+="_noWJrenormalization"
 if not normalizeTT: plotlabel+="_noTTrenormalization"
 channels  = [
-#                 "mutau",
-#                 "etau",
-                "emu",
-             ]
-
-
-blindcuts   = { "m_vis":      "( m_vis < %i || %i < m_vis )"           % blindlimits["m_vis"],
-                "m_sv" :      "( m_sv  < %i || %i < m_sv  )"           % blindlimits["m_sv" ],
-                "dR_ll":      "%i < dR_ll"                             % blindlimits["dR_ll"][1],
-                #"pt_tt"   :   "( pt_tt < %i || %i < pt_tt )"     % blindlimits["pt_tt"   ],
-                #"pt_tt_sv":   "( pt_tt_sv < %i || %i < pt_tt_sv )"     % blindlimits["pt_tt_sv"],
-                "R_pt_m_vis": "( R_pt_m_vis < %i || %i < R_pt_m_vis )" % blindlimits["R_pt_m_vis"],
-                "R_pt_m_sv" : "( R_pt_m_sv  < %i || %i < R_pt_m_sv  )" % blindlimits["R_pt_m_sv" ], }
+#     "mutau",
+#     "etau",
+    "emu",
+]
 
 
 # CATEGORIES / SELECTIONS
-weight_      = "weight"
-if "emu" in channels: weight_ += "*trigweight_1_or" # emu #*(getQCDWeight(pt_2, pt_1, dR_ll))"
-else:                 weight_ += "*trigweight_or_1" # cross trigger
-isocuts      = "iso_cuts==1"
+weight_      = "weight*trigweight_or_1"
+isocuts      = "iso_cuts==1" #iso_1<0.15 && iso_2_medium==1
 vetos        = "lepton_vetos==0"
 vetos0       = "dilepton_veto==0 && extraelec_veto==0 && extramuon_veto==0 "
 vetos_mutau  = vetos0 + "&& againstElectronVLooseMVA6_2==1 && againstMuonTight3_2==1"
 vetos_etau   = vetos0 + "&& againstElectronTightMVA6_2==1 && againstMuonLoose3_2==1"
 vetos_emu    = "extraelec_veto==0 && extramuon_veto==0"
-baseline_emu = "%s && iso_1<0.2 && iso_2<0.15 && q_1*q_2<0" % (vetos_emu)
 ptcut        = "(pt_1>26||(channel==1 && pt_1>23))"
-triggers     = "abs(eta_1)<2.1 && (( %s && (triggers==1||triggers==3))||(triggers>1))" % ptcut #pt_1>20 &&
-baseline     = "%s && %s && q_1*q_2<0 && %s" % (isocuts,vetos,triggers)
+triggers     = "abs(eta_1)<2.1 && trigger_cuts==1" # && ((%s && (triggers==1||triggers==3))||(triggers>1))" #% ptcut #pt_1>20 &&
+baseline     = "%s && %s && q_1*q_2<0 && %s" % (isocuts,vetos,triggers) # +" && bpt_1>30" #+" && jpt_1>30" && jpt_2>30
+baseline_rel = "%s && %s && q_1*q_2<0 && %s" % ("iso_1>0.15 && iso_1<0.5 && iso_2_medium==1",vetos,triggers)
+baseline_emu = "%s && iso_1<0.20 && iso_2<0.15 && q_1*q_2<0" % (vetos_emu)
+emu_check    = "njets==2 && jpt_1>30 && jpt_2>30 && pt_1>25 && pt_2>25 && abs(eta_1)<2.1 && abs(eta_2)<2.1 && iso_1<0.10 && q_1*q_2<0 && 70<m_vis&&m_vis<110" # && abs(eta_2)<2.1 # iso_1<0.15 && iso_2<0.15  && ncbtag==0
 if "emu" in channels: baseline = baseline_emu # emu
 category1    = "ncbtag > 0 && ncjets == 1 && nfjets  > 0"
 category2    = "ncbtag > 0 && ncjets == 2 && nfjets == 0 && dphi_ll_bj>2 && met<60"
 category2J   = "ncbtag > 0 && ncjets == 2 && nfjets == 0"
-# category1TT  = "ncbtag > 1 && ncjets  > 0 && nfjets  > 0 && met>60"
-# category2TT  = "ncbtag > 0 && ncjets  > 1 && nfjets == 0 && met>60"
 category1TT0 = "ncbtag > 1 && ncjets == 2 && nfjets  > 0"
 category1TT1 = "ncbtag > 1 && ncjets  > 1 && nfjets  > 0"
+#category1TT  = "ncbtag > 1 && ncjets  > 0 && nfjets  > 0 && met>60"
+#category2TT  = "ncbtag > 0 && ncjets  > 1 && nfjets == 0 && met>60"
 category1TT  = "ncbtag > 0 && ncjets == 1 && nfjets  > 0 && met>60 && pfmt_1>60"
 category2TT  = "ncbtag > 0 && ncjets == 2 && nfjets == 0 && dphi_ll_bj>2 && met>60 && pfmt_1>60"
 (metcut,mt1cut) = ("met<60","pfmt_1<60")
@@ -141,15 +146,28 @@ categories   = [
 #                 ("isolation",           "%s" % (isocuts)),
 #                 ("lepton vetos",        "%s" % (vetos)),
 #                 ("iso, lepton vetos",   "%s && %s" % (isocuts, vetos)),
-#                 ("baseline, same sign", "%s" % (baseline.replace("q_1*q_2<0","q_1*q_2>0"))),
-                ("baseline",            "%s" % (baseline)),
+#                 ("QCD CR",   "%s && %s && %s && %s && %s" % (isocuts, vetos, "q_1*q_2<0", "njets>1", triggers)),
+#                 ("baseline, same sign", "%s" % (baseline.replace("q_1*q_2<0","q_1*q_2>0"))),# 
+                ("baseline",           "%s" % (baseline)),
+#                 ("baseline 1j",        "%s && njets==1" % (baseline)),
+#                 ("baseline <45",       "%s && jpt_1<45" % (baseline)),
+#                 ("baseline >45",       "%s && jpt_1>45" % (baseline)),
+#                 ("baseline, iso SB",     "%s" % (baseline_rel)),
+#                 ("1c1c, SS, no iso", "%s && %s" % (baseline.replace("iso_cuts==1 && ",""),category2.replace("ncbtag > 0 && ",""))),
+#                 ("1c1c, SS, iso SR", "%s && %s" % (baseline.replace("q_1*q_2<0","q_1*q_2>0"),category2.replace("ncbtag > 0 && ",""))),
+#                 ("1c1c, SS, iso SB", "%s && %s" % (baseline_rel.replace("q_1*q_2<0","q_1*q_2>0"),category2.replace("ncbtag > 0 && ",""))),
 #                 ("baseline WJ CR",      "%s && %s" % (baseline,"pfmt_1>70")),
-                ("category 1",          "%s && %s" % (baseline, category1)),
-                ("category 2",          "%s && %s" % (baseline, category2)),
-#                 ("category 1, relaxed iso", "%s && %s" % (baseline.replace(isocuts,"iso_1<=0.50 && iso_2==1"),category1)),
-#                 ("category 2, relaxed iso", "%s && %s" % (baseline.replace(isocuts,"iso_1<=0.50 && iso_2==1"),category2)),
-#                 ("category 1, relaxed iso medium", "%s && %s" % (baseline.replace(isocuts,"iso_1<=0.50 && iso_2_medium==1"),category1)),
-#                 ("category 2, relaxed iso medium", "%s && %s" % (baseline.replace(isocuts,"iso_1<=0.50 && iso_2_medium==1"),category2)),
+#                 ("baseline 1c0f",       "%s && %s && %s" % (baseline,"ncjets==1 && nfjets==0","jpt_1>30")),
+#                 ("baseline 0c1f",       "%s && %s && %s" % (baseline,"ncjets==0 && nfjets==1","jpt_1>30")),
+#                 ("emu check",           "%s" % (emu_check)),
+#                 ("emu check, iso, no b-tag", "%s && %s && %s" % ("iso_1<0.15 && iso_2<0.15","ncbtag==0",emu_check)),
+                ("2j",            "%s"             % (emu_check.replace("njets==2","njets>1"))),
+#                 (">1j",           "%s"             % (emu_check.replace("njets==2","njets>1"))),
+#                 (">0j",           "%s"             % (emu_check.replace("njets==2","njets>0").replace(" && jpt_2>30",""))),
+#                 (">0j20",           "%s"             % (emu_check.replace("njets==2","njets20>0").replace(" && jpt_2>30",""))),
+#                 ("1j1f, |eta|<3", "%s && %s"       % (emu_check,"(abs(jeta_1)>3 || abs(jeta_2)>3)")),
+#                 ("category 1",          "%s && %s" % (baseline, category1)),
+#                 ("category 2",          "%s && %s" % (baseline, category2)),
 #                 ("category 1 TT CR0",   "%s && %s" % (baseline, category1TT0)),
 #                 ("category 1 TT CR1",   "%s && %s" % (baseline, category1TT1)),
 #                 ("category 2 jet cuts only", "%s && %s" % (baseline, category2J)),
@@ -164,10 +182,10 @@ categories   = [
 #                 ("category 1 SR met",   "%s && %s && %s && %s" % (baseline, category1, metcut, signalwindow)),
                 ##("category 1 SR mt1",   "%s && %s && %s && %s" % (baseline, category1, mt1cut, signalwindow)),
                 ##("category 2 SR mt1",   "%s && %s && %s && %s" % (baseline, category2, mt1cut, signalwindow)),
-                ("category 1.2",        "%s && %s && %s" % (baseline, category1, newcuts)),
-                ("category 2.2",        "%s && %s && %s" % (baseline, category2, newcuts)),
+#                 ("category 1.2",        "%s && %s && %s" % (baseline, category1, newcuts)),
+#                 ("category 2.2",        "%s && %s && %s" % (baseline, category2, newcuts)),
 #                 ("category 2.2 no dphi", "%s && %s && %s" % (baseline, category2J, newcuts)), # no dphi
-              ]
+]
 
 
 # VARIABLES
@@ -175,21 +193,30 @@ variables = [
                 ##( "m_vis",         35, 0,  70 ),
                 ##( "m_sv",          35, 0,  70 ),
 #                 ( "m_vis",         35, 0, 140 ),
-#                 ( "m_sv",          35, 0, 140 ),
+#                 ( "m_sv",          40, 0, 160 ),
+#                 ( "ht",            50, 0, 500 ),
 #                 ( "pt_tt",         50, 0, 160 ),
 #                 ( "pt_tt_sv",      30, 0, 160 ),
-                ( "dR_ll",         30, 0,   6 ), 
+#                 ( "dR_ll",         30, 0,   6 ),
 #                 ##( "R_pt_m_vis",    50, 0,   7 ),
 #                 ( "R_pt_m_sv",     50, 0,   5 ),
-#                 ##( "pfmt_1",        45, 0, 200 ),
-#                 ( "pfmt_1",        30, 0, 150 ),
-#                 ( "pfmt_1",       200, 80, 200 ), # tail
 #                 ( "pfmt_1",        40, 0, 200 ),
+#                 ( "jpt_1*(jpt_1>30) + jpt_2*(jpt_1<=30 && jpt_2>30)", 39, 5, 200 ),
+#                 ( "jpt_1*(jpt_1>30) + jpt_2*(jpt_1<=30 && jpt_2>30)", 39, 5, 200 ),
+                ( "jpt_1*(abs(jeta_1)<2.4 && jpt_1>30) + jpt_2*((abs(jeta_1)>=2.4||jpt_1<=30) && abs(jeta_2)<2.4 && jpt_2>30)",100,20,220),
+                ( "jpt_1*(abs(jeta_1)>2.4 && jpt_1>30) + jpt_2*((abs(jeta_1)<=2.4||jpt_1<=30) && abs(jeta_2)>2.4 && jpt_2>30)", 39, 5,200),
+                ( "jpt_1*(abs(jeta_1)>3.0 && jpt_1>30) + jpt_2*((abs(jeta_1)<=3.0||jpt_1<=30) && abs(jeta_2)>3.0 && jpt_2>30)",100,20,220),
+                ( "jpt_1*(abs(jeta_1)>3.0)",100,20,220),
+                ( "jpt_2*(abs(jeta_2)>3.0)",100,20,220),
 #                 ( "met",           40, 0, 200 ),
+#                 ( "metphi",           70, -3.5, 3.5 ),
 #                 ( "dphi_ll_bj",    30, 0, 4.5 ),
-#                 ( "gen_match_2",    8, 0,   8 ),
+#                 ( "gen_match_2",    9, -1,   8 ),
+#                 ( "ttptweight",    100, 0.8,  1.2 ),
                   ##( "nbtag",          5, 0,   5 ),
 #                 ( "ncbtag",         5, 0,   5 ),
+                #( "ncbtag*(isData)+ncbtag_jer*(!isData)",     5, 0,   5 ),
+                #( "njets*(isData)+njets_jer*(!isData)",     5, 0,   5 ),
 #                 ( "njets",          6, 0,   6 ),
 #                 ( "nfjets",         5, 0,   5 ),
 #                 ( "ncjets",         5, 0,   5 ),
@@ -197,81 +224,101 @@ variables = [
 #                 ##( "mt_1",          40, 0, 200 ),
 #                 ##( "NUP",            6, 0,   6 ),
 #                 ( "npu",           21, 0,  42 ),
-#                 ( "npv",           21, 0,  42 ),
+                ( "npv",           21, 0,  42 ),
 #                 ( "puppimet",      30, 0, 120 ),
 #                 ( "mvamet",        30, 0, 120 ),
-#                 ( "iso_1",         10, 0, 0.2 ),
+#                 ( "iso_1",         10, 0, 0.5 ),
 #                 ( "decayMode_2",      11, 0, 11 ),
-#                 ( "byIsolationMVA3oldDMwLTraw_2", 10, 0.4, 1 ),
-            ]
-# for p in [ ("",1), ("",2), ("j",1), ("b",1), ("j",2), ("b",2) ]:
+#                 ( "byIsolationMVA3oldDMwLTraw_2", 30, 0.0, 1.0 ),
+]
+# for p in [("",1), ("",2)]:
 #     variables.append(( "%spt_%i" % p,       30,    0, 150   ))
-#     #variables.append(( "abs(%seta_%i)" % p, 25,    0,   5   ))
 #     variables.append(( "%seta_%i" % p,      31, -3.1,   3.1 ))
+for p in [("j",1),("j",2),]: #("b",1), ("b",2)]:
+    variables.append(( "%spt_%i"  % p,      100,   20, 220   ))
+    variables.append(( "%seta_%i" % p,      50, -5.0,   5.0  ))
 # for n in [ "iso_2", "againstElectronVLooseMVA6_2", "againstMuonTight3_2" ]:
 #     variables.append(( n,             2, 0,   2 ))
 
+
+print warning ("Using explicitly JER corrected variables")
+for i, (var,N,a,b) in enumerate(variables):
+    variables[i] = (var.replace("jpt_1","jpt_1_jer").replace(
+                                "jpt_2","jpt_2_jer").replace(
+                                "jeta_1","jeta_1_jer").replace(
+                                "jeta_2","jeta_2_jer"),N,a,b)
+for i, (cutname,cut) in enumerate(categories):
+    categories[i] = (cutname,cut.replace(
+                            "jets","jets_jer").replace(
+                            "tag","tag_jer").replace(
+                            "met","met_jer").replace(
+                            "pfmt_1","pfmt_1_jer").replace(
+                            "dphi_ll_bj","dphi_ll_bj_jer").replace(
+                            "jpt_1","jpt_1_jer").replace(
+                            "jpt_2","jpt_2_jer").replace(
+                            "jeta_1","jeta_1_jer").replace(
+                            "jeta_2","jeta_2_jer"))
+    print categories[i]
 
 # SAMPLES
 # https://twiki.cern.ch/twiki/bin/viewauth/CMS/HiggsToTauTauWorking2016#MC_and_data_samples
 SFRAME = "SFrameAnalysis_Moriond"
 SAMPLE_DIR = os.path.expandvars("/scratch/ineuteli/SFrameAnalysis/AnalysisOutput/")
 if "emu" in channels: SAMPLE_DIR = os.path.expandvars("/scratch/ineuteli/SFrameAnalysis/AnalysisOutputEM/") # emu
-PLOTS_DIR  = os.path.expandvars("/shome/ineuteli/analysis/%s/plots/"%SFRAME)
-DATACARDS_DIR = PLOTS_DIR + "datacards"
+PLOTS_DIR  = os.path.expandvars("/shome/ineuteli/analysis/%s/plots"%SFRAME)
+DATACARDS_DIR = "%s/%s"%(PLOTS_DIR,"datacards")
 
 samplesB = [
-        ("TT/", "TT_TuneCUETP8M1",                      "ttbar",                    831.76  ), 
-        ###("DY/", "DYJetsToLL_M-10to50_TuneCUETP8M1",     "Drell-Yan 10-50",        18610.0   ),
-        ("DY/", "DYJetsToLL_M-10to50_TuneCUETP8M1",     "Drell-Yan 10-50",        18610.0   ), # 18610 https://cmsweb.cern.ch/das/request?input=dataset%3D%2FDYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8%2FRunIISummer15GS-MCRUN2_71_V1-v1%2FGEN-SIM&instance=prod%2Fglobal
-        ("DY/", "DY1JetsToLL_M-10to50_TuneCUETP8M1",    "Drell-Yan 1J 10-50",       421.5   ), # 421.5 https://cmsweb.cern.ch/das/request?input=dataset%3D%2FDY1JetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8%2FRunIISummer15GS-MCRUN2_71_V1-v1%2FGEN-SIM&instance=prod%2Fglobal
-        ("DY/", "DY2JetsToLL_M-10to50_TuneCUETP8M1",    "Drell-Yan 2J 10-50",       184.3   ), # 184.3 https://cmsweb.cern.ch/das/request?input=dataset%3D%2FDY2JetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8%2FRunIISummer15GS-MCRUN2_71_V1-v1%2FGEN-SIM&instance=prod%2Fglobal
-        ("DY/", "DY3JetsToLL_M-10to50_TuneCUETP8M1",    "Drell-Yan 3J 10-50",        95.0   ), # ???
-        ("DY/", "DYJetsToLL_M-50_TuneCUETP8M1",         "Drell-Yan 50",            4954.0   ), # LO 4954.0; NLO 5765.4
-        ("DY/", "DY1JetsToLL_M-50_TuneCUETP8M1",        "Drell-Yan 1J 50",         1012.5   ),
-        ("DY/", "DY2JetsToLL_M-50_TuneCUETP8M1",        "Drell-Yan 2J 50",          332.8   ),
-        ("DY/", "DY3JetsToLL_M-50_TuneCUETP8M1",        "Drell-Yan 3J 50",          101.8   ),
-        ("DY/", "DY4JetsToLL_M-50_TuneCUETP8M1",        "Drell-Yan 4J 50",           54.8   ),
-        ("WJ/", "WJetsToLNu_TuneCUETP8M1",              "W + jets",               50380.0   ), # LO 50380.0; NLO 61526.7
-        ("WJ/", "W1JetsToLNu_TuneCUETP8M1",             "W + 1J",                  9644.5   ),
-        ("WJ/", "W2JetsToLNu_TuneCUETP8M1",             "W + 2J",                  3144.5   ),
-        ("WJ/", "W3JetsToLNu_TuneCUETP8M1",             "W + 3J",                   954.8   ),
-        ("WJ/", "W4JetsToLNu_TuneCUETP8M1",             "W + 4J",                   485.6   ),
-        ("WW/", "WWTo1L1Nu2Q_13TeV_nlo",                "WWTo1L1Nu2Q",               49.997 ),
-        ("WZ/", "WZTo3LNu_TuneCUETP8M1_13TeV_nlo",      "WZTo3LNu",                   3.05  ),
-        ("WZ/", "WZTo1L1Nu2Q_13TeV_nlo",                "WZTo1L1Nu2Q",               10.71  ),
-        ("WZ/", "WZTo2L2Q_13TeV_nlo",                   "WZTo2L2Q",                   5.595 ),
-        ("WZ/", "WZJToLLLNu_nlo",                       "WZJToLLLNu",                 4.708 ),
-        ("ZZ/", "VVTo2L2Nu_13TeV_nlo",                  "VVTo2L2Nu",                 11.95  ),
-        ("ZZ/", "ZZTo2L2Q_13TeV_nlo",                   "ZZTo2L2Q",                   3.22  ),
-        ("ZZ/", "ZZTo4L_13TeV_nlo",                     "ZZTo4L",                     1.212 ),
-        ###("WW/", "WW_TuneCUETP8M1",                      "WW",                        63.21  ), # 63.21  https://cmsweb.cern.ch/das/request?input=dataset%3D%2FWW_TuneCUETP8M1_13TeV-pythia8%2FRunIISummer15GS-MCRUN2_71_V1-v1%2FGEN-SIM&instance=prod%2Fglobal
-        ###("WZ/", "WZ_TuneCUETP8M1",                      "WZ",                        22.82  ), # 10.71? https://cmsweb.cern.ch/das/request?input=dataset%3D%2FWZ_TuneCUETP8M1_13TeV-pythia8%2FRunIISummer15GS-MCRUN2_71_V1-v1%2FGEN-SIM&instance=prod%2Fglobal
-        ###("ZZ/", "ZZ_TuneCUETP8M1",                      "ZZ",                        10.32  ), #  3.22? https://cmsweb.cern.ch/das/request?input=dataset%3D%2FZZ_TuneCUETP8M1_13TeV-pythia8%2FRunIISummer15GS-MCRUN2_71_V1-v1%2FGEN-SIM&instance=prod%2Fglobal
-        ("ST/", "ST_tW_top_5f_inclusiveDecays",         "ST tW",                     35.60  ), #  38.09 https://cmsweb.cern.ch/das/request?input=dataset%3D%2FST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1%2FRunIISummer15GS-MCRUN2_71_V1-v1%2FGEN-SIM&instance=prod%2Fglobal
-        ("ST/", "ST_tW_antitop_5f_inclusiveDecays",     "ST atW",                    35.60  ), #  38.09 https://cmsweb.cern.ch/das/request?input=dataset%3D%2FST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1%2FRunIISummer15GS-MCRUN2_71_V1-v1%2FGEN-SIM&instance=prod%2Fglobal
-        ("ST/", "ST_t-channel_top_4f_inclusiveDecays",     "ST t",                  136.02  ), #  80.95 TWiki # 80.95 https://cmsweb.cern.ch/das/request?input=dataset%3D%2FST_t-channel_antitop_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1%2FRunIISummer15GS-MCRUN2_71_V1-v1%2FGEN-SIM&instance=prod%2Fglobal
-        ("ST/", "ST_t-channel_antitop_4f_inclusiveDecays", "ST at",                  80.95  ), # 136.02 TWiki # 136.02 https://cmsweb.cern.ch/das/request?input=dataset%3D%2FST_t-channel_top_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1%2FRunIISummer15GS-MCRUN2_71_V1-v1%2FGEN-SIM&instance=prod%2Fglobal 
-        ###("WW/", "WWTo1L1Nu2Q",                          "WW",                        1.212  ), # 1.212 TWiki # 45.85 https://cmsweb.cern.ch/das/request?input=dataset%3D%2FWWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8%2FRunIISummer15GS-MCRUN2_71_V1-v1%2FGEN-SIM&instance=prod%2Fglobal
-        ###("WW/", "WWTo4Q_4f",                            "WW",                        45.31  ), # 45.31 https://cmsweb.cern.ch/das/request?input=dataset%3D%2FWWTo4Q_4f_13TeV_amcatnloFXFX_madspin_pythia8%2FRunIISummer15GS-MCRUN2_71_V1-v1%2FGEN-SIM&instance=prod%2Fglobal
-        ###("ST/", "ST_tW_top_5f_NoFullyHadronicDecays",      'ST',                     38.09  ), # 
-        ###("ST/", "ST_tW_antitop_5f_NoFullyHadronicDecays",  'ST',                      0.00  ), # 
-        ###("ST/", "ST_s-channel_4f_leptonDecays",            'ST',                     10.11  ), # 10.11 https://cmsweb.cern.ch/das/request?input=dataset%3D%2FST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1%2FRunIISummer15GS-MCRUN2_71_V1-v1%2FGEN-SIM&instance=prod%2Fglobal
-        ###("ST/", "ST_t-channel_antitop_4f_inclusiveDecays", 'ST',                     80.95  ), # 80.95 https://cmsweb.cern.ch/das/request?view=list&limit=50&instance=prod%2Fglobal&input=dataset%3D%2FST_t-channel_antitop_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1%2FRunIISummer15GS-MCRUN2_71_V1-v1%2FGEN-SIM
-        ###("ST/", "ST_t-channel_top_4f_inclusiveDecays",     'ST',                      0.00  ), # 
-            ]
+    ("TT/", "TT_TuneCUETP8M1",                      "ttbar",                    831.76, "ttptweight_runI/ttptweight"  ), #,
+    ###("DY/", "DYJetsToLL_M-10to50_TuneCUETP8M1",     "Drell-Yan 10-50",        18610.0   ),
+    ("DY/", "DYJetsToLL_M-10to50_TuneCUETP8M1",     "Drell-Yan 10-50",        18610.0   ), # 18610 https://cmsweb.cern.ch/das/request?input=dataset%3D%2FDYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8%2FRunIISummer15GS-MCRUN2_71_V1-v1%2FGEN-SIM&instance=prod%2Fglobal
+    ("DY/", "DY1JetsToLL_M-10to50_TuneCUETP8M1",    "Drell-Yan 1J 10-50",       421.5   ), # 421.5 https://cmsweb.cern.ch/das/request?input=dataset%3D%2FDY1JetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8%2FRunIISummer15GS-MCRUN2_71_V1-v1%2FGEN-SIM&instance=prod%2Fglobal
+    ("DY/", "DY2JetsToLL_M-10to50_TuneCUETP8M1",    "Drell-Yan 2J 10-50",       184.3   ), # 184.3 https://cmsweb.cern.ch/das/request?input=dataset%3D%2FDY2JetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8%2FRunIISummer15GS-MCRUN2_71_V1-v1%2FGEN-SIM&instance=prod%2Fglobal
+    ("DY/", "DY3JetsToLL_M-10to50_TuneCUETP8M1",    "Drell-Yan 3J 10-50",        95.0   ), # ???
+    ("DY/", "DYJetsToLL_M-50_TuneCUETP8M1",         "Drell-Yan 50",            4954.0   ), # LO 4954.0; NLO 5765.4
+    ("DY/", "DY1JetsToLL_M-50_TuneCUETP8M1",        "Drell-Yan 1J 50",         1012.5   ),
+    ("DY/", "DY2JetsToLL_M-50_TuneCUETP8M1",        "Drell-Yan 2J 50",          332.8   ),
+    ("DY/", "DY3JetsToLL_M-50_TuneCUETP8M1",        "Drell-Yan 3J 50",          101.8   ),
+    ("DY/", "DY4JetsToLL_M-50_TuneCUETP8M1",        "Drell-Yan 4J 50",           54.8   ),
+    ("WJ/", "WJetsToLNu_TuneCUETP8M1",              "W + jets",               50380.0   ), # LO 50380.0; NLO 61526.7
+    ("WJ/", "W1JetsToLNu_TuneCUETP8M1",             "W + 1J",                  9644.5   ),
+    ("WJ/", "W2JetsToLNu_TuneCUETP8M1",             "W + 2J",                  3144.5   ),
+    ("WJ/", "W3JetsToLNu_TuneCUETP8M1",             "W + 3J",                   954.8   ),
+    ("WJ/", "W4JetsToLNu_TuneCUETP8M1",             "W + 4J",                   485.6   ),
+    ("WW/", "WWTo1L1Nu2Q_13TeV_nlo",                "WWTo1L1Nu2Q",               49.997 ),
+    ("WZ/", "WZTo3LNu_TuneCUETP8M1_13TeV_nlo",      "WZTo3LNu",                   3.05  ),
+    ("WZ/", "WZTo1L1Nu2Q_13TeV_nlo",                "WZTo1L1Nu2Q",               10.71  ),
+    ("WZ/", "WZTo2L2Q_13TeV_nlo",                   "WZTo2L2Q",                   5.595 ),
+    ("WZ/", "WZJToLLLNu_nlo",                       "WZJToLLLNu",                 4.708 ),
+    ("VV/", "VVTo2L2Nu_13TeV_nlo",                  "VVTo2L2Nu",                 11.95  ),
+    ("ZZ/", "ZZTo2L2Q_13TeV_nlo",                   "ZZTo2L2Q",                   3.22  ),
+    ("ZZ/", "ZZTo4L_13TeV_nlo",                     "ZZTo4L",                     1.212 ),
+    ###("WW/", "WW_TuneCUETP8M1",                      "WW",                        63.21  ), # 63.21  https://cmsweb.cern.ch/das/request?input=dataset%3D%2FWW_TuneCUETP8M1_13TeV-pythia8%2FRunIISummer15GS-MCRUN2_71_V1-v1%2FGEN-SIM&instance=prod%2Fglobal
+    ###("WZ/", "WZ_TuneCUETP8M1",                      "WZ",                        22.82  ), # 10.71? https://cmsweb.cern.ch/das/request?input=dataset%3D%2FWZ_TuneCUETP8M1_13TeV-pythia8%2FRunIISummer15GS-MCRUN2_71_V1-v1%2FGEN-SIM&instance=prod%2Fglobal
+    ###("ZZ/", "ZZ_TuneCUETP8M1",                      "ZZ",                        10.32  ), #  3.22? https://cmsweb.cern.ch/das/request?input=dataset%3D%2FZZ_TuneCUETP8M1_13TeV-pythia8%2FRunIISummer15GS-MCRUN2_71_V1-v1%2FGEN-SIM&instance=prod%2Fglobal
+    ("ST/", "ST_tW_top_5f_inclusiveDecays",         "ST tW",                     35.60  ), #  38.09 https://cmsweb.cern.ch/das/request?input=dataset%3D%2FST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1%2FRunIISummer15GS-MCRUN2_71_V1-v1%2FGEN-SIM&instance=prod%2Fglobal
+    ("ST/", "ST_tW_antitop_5f_inclusiveDecays",     "ST atW",                    35.60  ), #  38.09 https://cmsweb.cern.ch/das/request?input=dataset%3D%2FST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1%2FRunIISummer15GS-MCRUN2_71_V1-v1%2FGEN-SIM&instance=prod%2Fglobal
+    ("ST/", "ST_t-channel_top_4f_inclusiveDecays",     "ST t",                  136.02  ), #  80.95 TWiki # 80.95 https://cmsweb.cern.ch/das/request?input=dataset%3D%2FST_t-channel_antitop_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1%2FRunIISummer15GS-MCRUN2_71_V1-v1%2FGEN-SIM&instance=prod%2Fglobal
+    ("ST/", "ST_t-channel_antitop_4f_inclusiveDecays", "ST at",                  80.95  ), # 136.02 TWiki # 136.02 https://cmsweb.cern.ch/das/request?input=dataset%3D%2FST_t-channel_top_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1%2FRunIISummer15GS-MCRUN2_71_V1-v1%2FGEN-SIM&instance=prod%2Fglobal 
+    ###("WW/", "WWTo1L1Nu2Q",                          "WW",                        1.212  ), # 1.212 TWiki # 45.85 https://cmsweb.cern.ch/das/request?input=dataset%3D%2FWWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8%2FRunIISummer15GS-MCRUN2_71_V1-v1%2FGEN-SIM&instance=prod%2Fglobal
+    ###("WW/", "WWTo4Q_4f",                            "WW",                        45.31  ), # 45.31 https://cmsweb.cern.ch/das/request?input=dataset%3D%2FWWTo4Q_4f_13TeV_amcatnloFXFX_madspin_pythia8%2FRunIISummer15GS-MCRUN2_71_V1-v1%2FGEN-SIM&instance=prod%2Fglobal
+    ###("ST/", "ST_tW_top_5f_NoFullyHadronicDecays",      'ST',                     38.09  ), # 
+    ###("ST/", "ST_tW_antitop_5f_NoFullyHadronicDecays",  'ST',                      0.00  ), # 
+    ###("ST/", "ST_s-channel_4f_leptonDecays",            'ST',                     10.11  ), # 10.11 https://cmsweb.cern.ch/das/request?input=dataset%3D%2FST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1%2FRunIISummer15GS-MCRUN2_71_V1-v1%2FGEN-SIM&instance=prod%2Fglobal
+    ###("ST/", "ST_t-channel_antitop_4f_inclusiveDecays", 'ST',                     80.95  ), # 80.95 https://cmsweb.cern.ch/das/request?view=list&limit=50&instance=prod%2Fglobal&input=dataset%3D%2FST_t-channel_antitop_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1%2FRunIISummer15GS-MCRUN2_71_V1-v1%2FGEN-SIM
+    ###("ST/", "ST_t-channel_top_4f_inclusiveDecays",     'ST',                      0.00  ), # 
+]
 
 samplesB_comp = [
-        ("TT/", "TT_TuneCUETP8M1",                      "ttbar ttpt",               831.76,     "weight"        ),
-        ("TT/", "TT_TuneCUETP8M1_noTTpt",               "ttbar no ttpt",            831.76,     "weight"        ),
-                 ]
+    ("TT/", "TT_TuneCUETP8M1",                      "ttbar ttpt",               831.76  ),
+    ("TT/", "TT_TuneCUETP8M1_noTTpt",               "ttbar no ttpt",            831.76  ),
+]
 
 (samplesB_EES0p99,  samplesB_EES1p01)   = ([ ],[ ])
 (samplesB_JES0p97,  samplesB_JES1p03)   = ([ ],[ ])
 (samplesB_TES0p97,  samplesB_TES1p03)   = ([ ],[ ])
 (samplesB_LTF0p97,  samplesB_LTF1p03)   = ([ ],[ ])
 (samplesB_ZptUp,    samplesB_ZptDown)   = ([ ],[ ])
-(samplesB_TTptUp,   samplesB_TTptDown)  = ([ ],[ ])
 (samplesB_QCD_WJUp, samplesB_QCD_WJDown, samplesB_noQCD_WJ) = ([ ],[ ],[ ])
 for s in samplesB:
     samplesB_EES0p99.append((s[0],s[1]+"_EES0p99",s[2]+" -1% EES",s[3]))
@@ -284,11 +331,8 @@ for s in samplesB:
     if s[0] in ["DY/"]:
         samplesB_LTF0p97.append(( s[0],s[1]+"_LTF0p97", s[2]+" -3% LTF",s[3]))
         samplesB_LTF1p03.append(( s[0],s[1]+"_LTF1p03", s[2]+" +3% LTF",s[3]))
-        samplesB_ZptDown.append(( s[0],s[1],s[2]+" no Zptweight",       s[3], "weight/zptweight"))
-        samplesB_ZptUp.append((   s[0],s[1],s[2]+" Zptweight*Zptweight",s[3], "weight*zptweight"))
-    if s[0] in ["TT/"]:
-        samplesB_TTptDown.append((s[0],s[1],s[2]+" no ttptweight",        s[3], "weight/ttptweight")) # Down: no TTpt weight
-        samplesB_TTptUp.append((  s[0],s[1],s[2]+" ttptweight*ttptweight",s[3], "weight*ttptweight")) # Up:   TTpt weight twice applied
+        samplesB_ZptDown.append(( s[0],s[1],s[2]+" no Zptweight",       s[3], "1/zptweight"))
+        samplesB_ZptUp.append((   s[0],s[1],s[2]+" Zptweight*Zptweight",s[3], "zptweight"))
     if s[0] in ["WJ/"]:
         samplesB_QCD_WJDown.append((s[0],s[1],s[2]+" -30% QCD",s[3])) # QCD shifted in WJ renormalization procedure
         samplesB_QCD_WJUp.append(  (s[0],s[1],s[2]+" +30% QCD",s[3]))
@@ -304,9 +348,9 @@ samplesS_TES0p97    = [( "LowMass/", "LowMass_30GeV_DiTauResonance_TES0p97", "si
 samplesS_TES1p03    = [( "LowMass/", "LowMass_30GeV_DiTauResonance_TES1p03", "signal +3% TES", 1 )]
 
 samplesD = {
-                "mutau" :  ( "SingleMuon/",     "SingleMuon_Run2016",     "single muon"     ),
-                "etau"  :  ( "SingleElectron/", "SingleElectron_Run2016", "single electron" ),
-            }
+    "mutau" :  ( "SingleMuon/",     "SingleMuon_Run2016",     "single muon"     ),
+    "etau"  :  ( "SingleElectron/", "SingleElectron_Run2016", "single electron" ),
+}
 if "emu" in channels: samplesD = {"emu": ("MuonEG/","MuonEG_Run2016","electron-muon"),}
 if not len(samplesD):
     print warning("No data, so disabled WJ renormalization and data driven QCD!")
@@ -325,7 +369,7 @@ def plotStacks(samples, channel, **kwargs):
     print header("%s channel: Stacks plots" % channel)
     
     DIR = kwargs.get('DIR',"%s/%s" % (PLOTS_DIR,channel))
-    makeDirectory(DIR)
+    ensureDirectory(DIR)
     
     stack       = True #and False
     staterror   = True
@@ -333,7 +377,7 @@ def plotStacks(samples, channel, **kwargs):
     
     # LOOP over SELECTIONS
     for label, cuts in categories:
-        print ">>>\n>>> " + color("_%s:_%s_" % (channel.replace(' ','_'),label.replace(' ','_')), color = "magenta")
+        print ">>>\n>>> " + color("_%s:_%s_" % (channel.replace(' ','_'),label.replace(' ','_')), color = "magenta", bold=True)
         
         QCD = False
         if "q_1" in cuts and "q_2" in cuts: QCD = True and doQCD
@@ -344,7 +388,7 @@ def plotStacks(samples, channel, **kwargs):
         #if "category" in label: removeLowMassDY(samples)
         
         # TT RENORMALIZATION
-        if normalizeTT: renormalizeTT(samples, label=label, channel=channel, QCD=doQCD, reset=True, verbosity=verbosityTT)
+        if normalizeTT: renormalizeTT(samples, label=label, channel=channel, QCD=doQCD, verbosity=verbosityTT)
         
         # SIGNAL RENORMALIZATION for each jet selection category separately
         category = isCategory(label) 
@@ -352,25 +396,37 @@ def plotStacks(samples, channel, **kwargs):
             cuts_norm = "%s && "%baseline
             if "category 1" in category: cuts_norm+=category1
             else:                        cuts_norm+=category2
-            for signal in samples:
-                if signal.isSignal and normalizeSignal:
-                    scale = signal.normalizeSignal(S_exp[category][channel],signalregion=blindlimits_norm["m_sv"],cuts=cuts_norm,verbosity=verbosityPlots)
-                    print ">>>\n>>> normalized signal (%s) to %.1f events in the signal region %s (scale=%.3f)" % (signal.label,S_exp[category][channel],blindlimits_norm["m_sv"],scale)
+#             for signal in samples:
+#                 if signal.isSignal and normalizeSignal:
+#                     scale = signal.normalizeSignal(S_exp[category][channel],signalregion=blindlimits_norm["m_sv"],cuts=cuts_norm,verbosity=verbosityPlots)
+#                     print ">>>\n>>> normalized signal (%s) to %.1f events in the signal region %s (scale=%.3f)" % (signal.label,S_exp[category][channel],blindlimits_norm["m_sv"],scale)
         else: category = "baseline"
-        
         
         # LOOP over VARIABLES
         for var, nBins, a, b in variables:
+            # TODO: plot configuration in separate file
             
             # NAME
             name = "%s/%s_%s%s.png" % (DIR,var,label,plotlabel)
+            if "jpt_1" in name and name.count(">2.4") is 2:
+                name = "%s/%s_%s%s.png" % (DIR,"jpt_1_forward_all",label,plotlabel)
+            elif "jpt_1" in name and name.count(">3.0") is 2:
+                name = "%s/%s_%s%s.png" % (DIR,"jpt_1_forward3p0_all",label,plotlabel)
+            elif "jpt_1" in name and name.count("<2.4") is 2:
+                name = "%s/%s_%s%s.png" % (DIR,"jpt_1_central_all",label,plotlabel)
+            elif "jpt_1" in name and name.count(">3.0") is 1:
+                name = "%s/%s_%s%s.png" % (DIR,"jpt_1_forward3p0",label,plotlabel)
+            elif "jpt_2" in name and name.count(">3.0") is 1:
+                name = "%s/%s_%s%s.png" % (DIR,"jpt_2_forward3p0",label,plotlabel)
+            if "_jer" in var and ("_forward" in name or "_central" in name):
+                name = name.replace("jpt_1","jpt_1_jer").replace("jpt_2","jpt_2_jer")
             if "m_vis" == var or "m_sv" == var:
                 name = "%s/%s_%i_%s%s.png" % (DIR,var,b,label,plotlabel)
-            name = name.replace(" and ","-").replace(" ","").replace(",","-").replace("(","").replace(")","") #.replace("(","").replace(")","")
+            name = name.replace(" and ",'-').replace(' ','').replace(',','-').replace('(',"").replace(')',"").replace('>',"gt").replace('<',"lt").replace('|','') #.replace("(","").replace(")","")
             
             
             # TITLE
-            title = "%s: %s" % (channel.replace("tau","#tau").replace("mu","#mu"),label)
+            title = "%s: %s" % (channel.replace("tau","#tau").replace("mu","#mu").replace("eta","#eta"),label)
             title.replace("category 1.2","optimized category 1").replace("category 2.2","optimized category 2")
             
             
@@ -389,7 +445,7 @@ def plotStacks(samples, channel, **kwargs):
             
             
             # WEIGHT
-            varweight = ""
+            varweight = "" #getEtaWeight_1b1c(jeta_1)" #_noForwardTTCR
             
             
             # RESCALE Signal
@@ -399,23 +455,28 @@ def plotStacks(samples, channel, **kwargs):
                 else:                     s *= 10
                 if "etau" in channel:
                     if "m_sv" == var or "m_vis" == var:
-                        if   "1.2"      in label: s = 20
-                        elif "2.2"      in label: s = 40
+                        if   "1.2"      in label: s = 100
+                        elif "2.2"      in label: s = 100
                         elif "category" in label: s = 40
                 if "mutau" in channel:
                     if "m_sv" == var or "m_vis" == var:
                         if "category 1.2" in label: s = 100
-                        if "category 2.2" in label: s = 200
-                        elif "category" in label: s = 200
+                        if "category 2.2" in label: s = 100
+                        elif "category" in label: s = 100
                 if "emu" in channel:
                     if "m_sv" == var or "m_vis" == var:
                         if "category" in label: s = 200
                     if "dR"    in var:   s *=  2.0
+                    if "met"   in var:   s *=  2.0
+                    if "pfmt"  in var:   s *=  2.0
                 if "dR"    in var:   s *=  0.5
                 if "pt_tt" in var:   s *=  6.0
                 if "n"     in var:   s *=  5.0
                 if "SR"    in label: s *=  0.2
                 if "TT CR" in label: s *=  2.0
+                if "1c0f"  in label: s *= 2.0/5.0
+                if cuts.count("bpt")>1: s *= 0.10
+                s *= 0.1# thesis
                 
                 for sample in samples:
                     if sample.isSignal:
@@ -461,19 +522,19 @@ def plotStacks(samples, channel, **kwargs):
                 position += "Center"
             if "jeta_" in var or "beta_" in var or "NUP" in var:
                 position += "Top"
-            if "jpt_1" in var and "category" in label:
-                position += "Left"
+            #if "jpt_1" in var and "category" in label:
+            #    position += "Left"
             if "gen_match" in var:
                 position = "Left" + position
-                        
+            
             # DRAW DATA
             data  = drawData #and not ("category" in label and "CR" not in label and  "SR" not in label and "m_sv" in var)
             ratio = data
             
             # PLOT
-            plot = Plot( samples, var, nBins, a, b, cuts=cuts, QCD=QCD, verbosity=verbosityPlots, channel=channel) #, ignore=ignore, weight=varweight)
-            plot.plot(stack=stack, position=position, title=title, staterror=staterror, logy=logy, ratio=ratio, errorbars=errorbars, data=data, channel=channel)
-            if var in blindlimits: plot.checkSignal(blindlimits=blindlimits[var],S_exp=S_exp[category][channel]) # category defined above
+            plot = Plot(samples, var, nBins, a, b, cuts=cuts, weight=varweight, QCD=QCD, verbosity=verbosityPlots, channel=channel, split=split) #, ignore=ignore, weight=varweight)
+            plot.plot(stack=stack, position=position, title=title, staterror=staterror, logy=logy, ratio=ratio, errorbars=errorbars, data=data)
+            #if var in blindlimits: plot.checkSignal(blindlimits=blindlimits[var],S_exp=S_exp[category][channel]) # category defined above
             plotSignificance(plot)
             plot.saveAs(name,save=(not checkYield))
             
@@ -535,7 +596,7 @@ def plot2DCorrelation(samples, channel, **kwargs):
     
     DIR         = kwargs.get('DIR',"%s/%s" % (PLOTS_DIR,channel))+"_2D"
     profileX    = kwargs.get('profileX',True)
-    makeDirectory(DIR)
+    ensureDirectory(DIR)
     
     label = mylabel
     variables2D = [ ]
@@ -565,7 +626,7 @@ def plot2DCorrelation(samples, channel, **kwargs):
     
     # LOOP over SELECTIONS
     for label, cuts in categories:
-        print ">>>\n>>> " + color("_%s:_%s_" % (channel.replace(' ','_'),label.replace(' ','_')), color = "magenta")
+        print ">>>\n>>> " + color("_%s:_%s_" % (channel.replace(' ','_'),label.replace(' ','_')), color = "magenta", bold=True)
         
         # LOOP over VARIABLES
         for samplename, var1, nBins1, a1, b1, var2, nBins2, a2, b2 in variables2D:
@@ -754,8 +815,8 @@ def plotComparison(samples_comp, channel, **kwargs):
               ]
     
     # SETTINGS
-    DIR         = kwargs.get('DIR',PLOTS_DIR)+"_comparison"
-    makeDirectory(DIR)
+    DIR         = kwargs.get('DIR',"%s/%s"%(PLOTS_DIR,channel))+"_comparison"
+    ensureDirectory(DIR)
     weight      = "" #weight"
     norm        = True
     errorbars   = False
@@ -788,8 +849,254 @@ def plotComparison(samples_comp, channel, **kwargs):
                 plot.saveAs(name)
             
         print ">>>"
-            
+        
 
+
+
+    ################
+    # compareStack #
+    ################
+
+def compareStacks(samples, channel, **kwargs):
+    """Compare stacked histograms."""
+    print header("%s channel: Compare stacks" % channel)
+    
+    study   = "QCD" #"JEC"
+    DIR     = kwargs.get('DIR',"%s/%s_%s" % (PLOTS_DIR,channel,study))
+    ensureDirectory(DIR)
+    
+    variables0      = [ ("m_sv",40,0,160) ]
+    categories0     = [
+#         (("0c1f",                    "%s && %s"%(baseline,"ncjets==0 && nfjets==1 && jpt_1>30"),  ""),
+#          ("0c1f #eta-weighted",      "%s && %s"%(baseline,"ncjets==0 && nfjets==1 && jpt_1>30"),  "getEtaWeight_0c1f(jeta_1)")),
+#         (("1c0f",                    "%s && %s"%(baseline,"ncjets==1 && nfjets==0 && jpt_1>30"),  ""),
+#          ("1c0f #eta-weighted",      "%s && %s"%(baseline,"ncjets==1 && nfjets==0 && jpt_1>30"),  "getEtaWeight_1c0f(jeta_1)")),
+#         (("category 1",              "%s && %s && %s"%(baseline,category1,"jpt_1>30 && bpt_1>30"),""),
+#          ("category 1 #eta-weighted","%s && %s && %s"%(baseline,category1,"jpt_1>30 && bpt_1>30"),"getEtaWeight_1b1f(jeta_1)")), #_noForwardTTCR
+#         (("category 2",              "%s && %s && %s"%(baseline,category2,"jpt_1>30 && bpt_1>30"),""),
+#          ("category 2 #eta-weighted","%s && %s && %s"%(baseline,category2,"jpt_1>30 && bpt_1>30"),"getEtaWeight_1b1c(jeta_1)")),
+#         (("category 1 SR",           "%s && %s"%(baseline,category1),""),
+#          ("category 1 SB",           "%s && %s"%(invertIsolation(baseline,to="iso_1<0.5 && iso_2_medium==1 && iso_1>0.15"),category1),"")),
+        (("category 1 SR",          "%s && %s"%(baseline,category1),""),
+         ("category 1 SB",          "%s && %s"%(invertIsolation(baseline,to="iso_1>0.15 && iso_1<0.5 && (iso_2_medium==1)"),category1),"")),
+        (("category 1 SR",          "%s && %s"%(baseline,category1),""),
+         ("1c1f SB",                "%s && %s"%(invertIsolation(baseline,to="iso_1>0.15 && iso_1<0.5 && (iso_2_medium==1)"),category1.replace("ncbtag > 0 && ","")),"")),
+        (("category 1 SR",          "%s && %s"%(baseline,category1),""),
+         (">0c1f SB",               "%s && %s"%(invertIsolation(baseline,to="iso_1>0.15 && iso_1<0.5 && (iso_2_medium==1)"),category1.replace("ncbtag > 0 && ncjets == 1","ncjets > 0")),"")),
+        (("category 2 SR",          "%s && %s"%(baseline,category2),""),
+         ("category 2 SB",          "%s && %s"%(invertIsolation(baseline,to="iso_1>0.15 && iso_1<0.5 && (iso_2_medium==1)"),category2),"")),
+        (("category 2 SR",          "%s && %s"%(baseline,category2),""),
+         ("1c1c SB",                "%s && %s"%(invertIsolation(baseline,to="iso_1>0.15 && iso_1<0.5 && (iso_2_medium==1)"),category2.replace("ncbtag > 0 && ","")),"")),
+        (("category 2 SR",          "%s && %s"%(baseline,category2),""),
+         (">1c SB",                 "%s && %s"%(invertIsolation(baseline,to="iso_1>0.15 && iso_1<0.5 && (iso_2_medium==1)"),category2.replace("ncbtag > 0 && ncjets == 2","ncjets > 1")),"")),
+    ]
+    MC              = True #and False
+    QCDonly         = True and MC #and False
+    signal          = True and not MC #and False
+    verbosityStacks = verbosityPlots# + 2
+    extralabel      = "" #_noForwardTTCR" #_debugging
+    
+    # LOOP over SELECTIONS
+    for (label1,cuts1,weight1), (label2,cuts2,weight2) in categories0:
+        print ">>>\n>>> " + color("_%s:_%s_vs_%s_" % (channel.replace(' ','_'),label1.replace(' ','_'),label2.replace(' ','_')), color = "magenta", bold=True)
+        
+        # TT RENORMALIZATION
+        if normalizeTT and MC: renormalizeTT(samples, label=label1, channel=channel, QCD=doQCD, verbosity=verbosityTT)
+        
+        # LOOP over VARIABLES
+        for var, nBins, a, b in variables0:
+            
+            hist1, hist2 = None, None
+            
+            if MC:
+                stack1  = THStack("stack1","stack1")
+                stack2  = THStack("stack2","stack2")
+                plot1   = Plot(samples, var, nBins, a, b, cuts=cuts1, weight=weight1, QCD=True, append_name="1", verbosity=verbosityStacks, channel=channel)
+                plot2   = Plot(samples, var, nBins, a, b, cuts=cuts2, weight=weight2, QCD=True, append_name="2", verbosity=verbosityStacks, channel=channel)
+                if not QCDonly:
+                    for hist in plot1.histsB: stack1.Add(hist)
+                    for hist in plot2.histsB: stack2.Add(hist)
+                    hist1   = stack1.GetStack().Last()
+                    hist2   = stack2.GetStack().Last()
+                else:
+                    hist1   = copy.deepcopy(plot1.getHist("QCD")[0])
+                    hist2   = copy.deepcopy(plot2.getHist("QCD")[0])
+                    print cuts1
+                    print cuts2
+                plot1.close()
+                plot2.close()
+            elif signal:
+                signals = [s for s in samples if s.isSignal]
+                if len(signals) != 1: print warning("Not one signal sample!")
+                signal0 = signals[0]
+                
+                # normalize signal
+                print "before", signal0.scale
+                signal0.scale = lumi*1*1000/signal0.N # pb
+                print "after", signal0.scale
+                # cuts_norm1 = "%s && "%baseline; category_norm1 = ""
+                # cuts_norm2 = "%s && "%baseline; category_norm2 = ""
+                # if   "category 1" in label1: cuts_norm1+=category1; category_norm1="category 1"
+                # elif "category 2" in label1: cuts_norm1+=category2; category_norm1="category 2"
+                # if   "category 1" in label2: cuts_norm2+=category1; category_norm2="category 1"
+                # elif "category 2" in label2: cuts_norm2+=category2; category_norm2="category 2"
+                
+                # if category_norm1:
+                #     scale = signal0.normalizeSignal(S_exp[category_norm1][channel],signalregion=blindlimits_norm["m_sv"],cuts=cuts_norm1,weight=weight1,verbosity=verbosityPlots)
+                #     print ">>>\n>>> normalized signal (%s) to %.1f events in the signal region %s (scale=%.3f)" % (signal0.label,S_exp[category_norm1][channel],blindlimits_norm["m_sv"],scale)
+                hist1   = signal0.hist(var, nBins, a, b, cuts=cuts1, weight=weight1, append_name="1", verbosity=verbosityStacks)
+                
+                # if category_norm2:
+                #     scale = signal0.normalizeSignal(S_exp[category_norm1][channel],signalregion=blindlimits_norm["m_sv"],cuts=cuts_norm2,weight=weight2,verbosity=verbosityPlots)
+                #     print ">>>\n>>> normalized signal (%s) to %.1f events in the signal region %s (scale=%.3f)" % (signal0.label,S_exp[category_norm1][channel],blindlimits_norm["m_sv"],scale)
+                hist2   = signal0.hist(var, nBins, a, b, cuts=cuts2, weight=weight2, append_name="2", verbosity=verbosityStacks)
+            else:
+                datas   = [s for s in samples if s.isData]
+                if len(datas) != 1: print warning("Not one data sample!")
+                data0   = datas[0]
+                hist1   = data0.hist(var, nBins, a, b, cuts=cuts1, append_name="1", verbosity=verbosityStacks)
+                hist2   = data0.hist(var, nBins, a, b, cuts=cuts2, append_name="2", verbosity=verbosityStacks)
+            #print hist1, hist1.GetEntries(), hist1.Integral()
+            #print hist2, hist2.GetEntries(), hist2.Integral()
+            I1 = hist1.Integral()
+            I2 = hist2.Integral()
+            hist1.Scale(1./I1)
+            hist2.Scale(1./I2)
+            setLineStyle(hist1,hist2,style=False,noblack=True)
+            #hist1.SetLineWidth(3)
+            
+            entries = [ ]
+            entries.append("%s (%.2f)"%(label1,I1)) # GetEntries
+            entries.append("%s (%.2f)"%(label2,I2))
+            print ">>> %s - %8.2f"%(label1,I1)
+            print ">>> %s - %9.2f"%(label2,I2)
+            title = "%s: "%(channel.replace("mu","#mu").replace("tau","#tau"))
+            if MC:       title += "simulation"
+            elif signal: title += "signal"
+            else:        title += "data"
+            title.replace("SB","iso SB").replace("SR","iso SR")
+            position = "Left"
+            if signal: position = "CenterRight"
+            
+            pads    = [ ]
+            canvas  = makeCanvas(ratio=True,pads=pads)
+            stats   = makeStatisticalError(hist1)
+            ratio   = makeRatio(hist2,hist1)
+            pads[0].cd()
+            hist1.Draw("HIST")
+            hist1.SetMinimum(0)
+            hist1.SetMaximum(max(hist1.GetMaximum(),hist2.GetMaximum())*1.15)
+            hist1.GetYaxis().SetTitle("A.U.")
+            hist1.GetYaxis().SetTitleOffset(0.98)
+            hist2.Draw("HIST E SAME")
+            stats.Draw("E2 SAME")
+            legend = makeLegend(stats,hist2,title=title,entries=entries,position=position,fontsize=0.046,style0='lf',styles='le')
+            pads[1].cd()
+            ratio.Draw("HIST E SAME")
+            setLineStyle(ratio.line,ratio.ratio,style=False,noblack=True)
+            makeAxes(hist1, hist2, ratio=ratio, xlabel=var)
+            
+            set = "data"
+            if QCDonly:  set = "QCD"
+            elif MC:     set = "MC"
+            elif signal: set = "signal"
+            label1 = label1.replace(' ','_').replace(',','-').replace('#','').replace('>','gt').replace('<','lt')
+            label2 = label2.replace(' ','_').replace(',','-').replace('#','').replace('>','gt').replace('<','lt')
+            canvas.SaveAs("%s/%s_%s_shape_%s-%s%s.png"%(DIR,var,set,label1,label2,extralabel))
+
+            gDirectory.Delete(ratio.ratio.GetName())
+            gDirectory.Delete(ratio.line.GetName())
+            gDirectory.Delete(ratio.staterror.GetName())
+            gDirectory.Delete(stats.GetName())
+            canvas.Close()
+
+
+
+
+    ###############
+    # measureOSSS #
+    ###############
+
+def measureOSSSratios(samples, channel, **kwargs):
+    """Plot stacked histograms with data."""
+    print header("%s channel: Measure OS/SS ratio" % channel)
+    
+    variables0      = [ ("pfmt_1",100,0,400)]
+    verbosityOSSS   = 0 
+    
+    # LOOP over SELECTIONS
+    for label, cuts in categories:
+        print ">>>\n>>> " + color("_%s:_%s_" % (channel.replace(' ','_'),label.replace(' ','_')), color = "magenta", bold=True)
+        
+        # REMOVE DY LOW MASS for jet categories
+        # ignore = ""
+        # if "category" in label: ignore = "Drell-Yan 10-50"
+        
+        # TT RENORMALIZATION
+        if normalizeTT: renormalizeTT(samples, label=label, channel=channel, QCD=doQCD, verbosity=verbosityTT)        
+        
+        # LOOP over VARIABLES
+        for var, nBins, a, b in variables0:
+            
+            plot = Plot(samples, var, nBins, a, b, cuts=cuts, QCD=False, verbosity=verbosityOSSS, channel=channel) #, ignore=ignore
+            #plot.plot(stack=True, position=position, staterror=staterror, channel=channel)
+            plot.measureOSSSratio()
+            plot.measureOSSSratio(relaxed=False)
+            plot.close()
+
+
+
+
+    #############
+    # measureSF #
+    #############
+
+def measureSFs(samples, channel, **kwargs):
+    """Measure SF of a var and save to a root file."""
+    print header("%s channel: Measure SF" % channel)
+    # TODO: make directory
+    
+    DIR    = kwargs.get('DIR',"%s/%s_JEC" % (PLOTS_DIR,channel))
+    SF_DIR = kwargs.get('DIR',"%s/PlotTools/JEC" % (PLOTS_DIR))
+    ensureDirectory(DIR)
+    ensureDirectory(SF_DIR)
+    
+    variables0  = [("jeta_1",40,-5,5)]
+    categories0 = [
+        ("baseline 0c1f", "%s && %s && %s" % (baseline,"ncjets==0 && nfjets==1","jpt_1>30"), "getEtaWeight_0c1f(jeta_1)"),
+        ("baseline 1c0f", "%s && %s && %s" % (baseline,"ncjets==1 && nfjets==0","jpt_1>30"), "getEtaWeight_1c0f(jeta_1)"),
+        ("category 1",    "%s && %s && %s" % (baseline,category1,"jpt_1>30 && bpt_1>30"),    "getEtaWeight_1b1f(jeta_1)"), #_noForwardTTCR
+        ("category 2",    "%s && %s && %s" % (baseline,category2,"jpt_1>30 && bpt_1>30"),    "getEtaWeight_1b1c(jeta_1)"),
+    ]
+    verbositySF = 0
+    append_name = "" #_noForwardTTCR
+    
+    # LOOP over SELECTIONS
+    for label, cuts, extraweight in categories0:
+        print ">>>\n>>> " + color("_%s:_%s_" % (channel.replace(' ','_'),label.replace(' ','_')), color = "magenta", bold=True)
+        
+        cutname = label.replace(' ','_').replace('+','-')
+        
+        # TT RENORMALIZATION
+        if normalizeTT: renormalizeTT(samples, label=label, channel=channel, QCD=doQCD, verbosity=verbosityTT)
+        
+        # LOOP over VARIABLES
+        for var, nBins, a, b in variables0:
+            
+            position = "Right"
+            if "0c1f" in label: position = "Center"
+                
+            plot = Plot(samples, var, nBins, a, b, cuts=cuts, QCD=doQCD, verbosity=verbosityPlots, channel=channel)
+            plot.measureSF(cutname=cutname, append_name=append_name, DIR=SF_DIR, verbosity=verbositySF)
+            plot.plot(title=label,stack=True,ratio=True,staterror=True,position=position)
+            plot.saveAs("%s/%s_%s%s_SF.png"%(DIR,var,cutname.replace(' ',''),append_name))
+            
+            # check
+            if extraweight: # run this function twice to update plots with new weights !
+                title = "%s (#eta-weighted)" % (label)
+                plot2 = Plot(samples, var, nBins, a, b, cuts=cuts, QCD=doQCD, verbosity=verbosityPlots, weight=extraweight, channel=channel)
+                plot2.plot(title=title,stack=True,ratio=True,staterror=True, position=position)
+                plot2.saveAs("%s/%s_%s%s_SF_weighted.png"%(DIR,var,cutname.replace(' ',''),append_name))
 
 
 
@@ -801,7 +1108,7 @@ def writeDataCardHistograms(samples, channel, **kwargs):
     """Make histogram from a variable in a tree and write to a new root file."""
     # TODO:
     # 1) save cutflow
-    # 2) ...
+    # 2) make table in stead of sentences
     # 3) implement JES
     
     categories_DC = [
@@ -824,6 +1131,8 @@ def writeDataCardHistograms(samples, channel, **kwargs):
                         'QCD':              [   ( 'QCD',    ""                 ), ],
                         'signal':           [                                     ],
                     }
+    if "emu" in channel:    samples_dict["ttbar"]        = [ ( 'TT', "" ), ]
+    if "emu" in channel:    samples_dict["Drell-Yan 50"] = [ ( 'DY', "" ), ]
     
     # DATA
     if  "mutau" in channel: samples_dict["single muon"]     = [( "data_obs", "" )]
@@ -857,7 +1166,7 @@ def writeDataCardHistograms(samples, channel, **kwargs):
     option      = 'UPDATE'
     if kwargs.get('recreate',False): option = 'RECREATE'
     outdir      = "%s%s/" % (DIR,"datacards" if "datacards" not in DIR else "")
-    makeDirectory(outdir)
+    ensureDirectory(outdir)
     outfilename = outdir + makeDataCardOutputName(channel,"LowMassDiTau",label=label)
     outfile     = TFile(outfilename, option)
     
@@ -876,7 +1185,6 @@ def writeDataCardHistograms(samples, channel, **kwargs):
     JES         = kwargs.get('JES',"")
     LTF         = kwargs.get('LTF',"")
     Zpt         = kwargs.get('Zpt',"")
-    TTpt        = kwargs.get('TTpt',"")
     QCD_WJ      = kwargs.get('QCD_WJ',"")
     channel0    = channel.replace("tau","t").replace("mu","m")
     shift_QCD   = kwargs.get('shift_QCD',0) # e.g 0.30
@@ -892,15 +1200,14 @@ def writeDataCardHistograms(samples, channel, **kwargs):
     if JES    in ["Down","Up"]: su_label += "_CMS_xtt_shape_j_%s_%s%s"      % (channel0,E,JES)
     if LTF    in ["Down","Up"]: su_label += "_CMS_xtt_ZLShape_%s_%s%s"      % (channel0,E,LTF)
     if Zpt    in ["Down","Up"]: su_label += "_CMS_xtt_dyShape_%s_%s%s"      % (channel0,E,Zpt)
-    if TTpt   in ["Down","Up"]: su_label += "_CMS_xtt_ttbarShape_%s_%s%s"   % (channel0,E,TTpt)
-    if QCD_WJ in ["Down","Up"]: su_label += "_QCD_Extrapolation_%s_%s%s"    % (channel0,E,QCD_WJ)
+    if QCD_WJ in ["Down","Up"]: su_label += "_QCD_extrap_%s_%s%s"           % (channel0,E,QCD_WJ)
     print ">>> writing %s shapes to %s (%sd)" % (var,outfilename,option)
     if su_label: print ">>> systematic uncertainty label = " + color("%s" % (su_label.lstrip("_")), color="grey")
     
     
     # LOOP over CATEGORIES
     for category, cuts in categories_DC:
-        print ">>>\n>>> " + color("_%s:_%s_" % (channel.replace(' ','_'),category.replace(' ','_')), color = "magenta")
+        print ">>>\n>>> " + color("_%s:_%s_" % (channel.replace(' ','_'),category.replace(' ','_')), color = "magenta", bold=True)
         
         # CATEGORY 1 or 2
         categoryi = isCategory(category)
@@ -1034,7 +1341,7 @@ def makeDataCardTDir(outfile, channel, category, E="13TeV", M="28"):
     # Help functions #
     ##################
 
-def makeDirectory(DIR):
+def ensureDirectory(DIR):
     """Make directory if it does not exist."""
     if not os.path.exists(DIR):
         os.makedirs(DIR)
@@ -1118,7 +1425,6 @@ def main():
     global samplesB_TES0p97,  samplesB_TES1p03, samplesS_TES0p97,  samplesS_TES1p03
     global samplesB_LTF0p97,  samplesB_LTF1p03
     global samplesB_ZptUp,    samplesB_ZptDown
-    global samplesB_TTptUp,   samplesB_TTptDown
     global samplesB_QCD_WJUp, samplesB_QCD_WJDown, samplesB_noQCD_WJ
     global samplesB_comp
     makeSamples(samplesB=samplesB, samplesS=samplesS, samplesD=samplesD, stitchDY50=stitchDY50, stitchDY10to50=stitchDY10to50, verbosity=verbosity, weight=weight_)
@@ -1145,10 +1451,6 @@ def main():
             print header("Z pt reweighting scale samples")
             makeSamples(samplesB=samplesB_ZptDown, verbosity=verbosity)
             makeSamples(samplesB=samplesB_ZptUp,   verbosity=verbosity)
-        if doTTpt:
-            print header("Top pt reweighting scale samples")
-            makeSamples(samplesB=samplesB_TTptDown, verbosity=verbosity)
-            makeSamples(samplesB=samplesB_TTptUp,   verbosity=verbosity)
         if doQCD_WJ:
             print header("QCD scale WJ samples")
             makeSamples(samplesB=samplesB_QCD_WJUp,   verbosity=verbosity)
@@ -1187,7 +1489,7 @@ def main():
         treeName = "tree_%s" % channel
         if useCutTree and "emu" not in channel: treeName = "tree_%s_cut_relaxed" % channel
         for sample in samples+samples_EES0p99+samples_EES1p01+samplesSB_TES0p97+samplesSB_TES1p03+samplesB_LTF0p97+samplesB_LTF1p03+\
-                      samples_QCD_WJDown+samples_QCD_WJUp+samplesB_ZptDown+samplesB_ZptUp+samplesB_TTptDown+samplesB_TTptUp:
+                      samples_QCD_WJDown+samples_QCD_WJUp+samplesB_ZptDown+samplesB_ZptUp:
             if type(sample) is not tuple: sample.treeName=treeName
         
         # NORMALIZE SIGNAL
@@ -1217,11 +1519,17 @@ def main():
         
         # DIRECTORIES
         dirlabel = mylabel
-        DIR = PLOTS_DIR+channel+dirlabel
+        DIR = "%s/%s%s"%(PLOTS_DIR,channel,dirlabel)
         
         # MAIN ROUTINES
         if doStack:
             plotStacks(samples,channel,DIR=DIR)
+        if measureOSSS:
+            measureOSSSratios(samples,channel)
+        if measureSF:
+            measureSFs(samples,channel)
+        if compareStack:
+            compareStacks(samples,channel)
         if doCheckCutflow:
             checkCutflowEfficiency(samples,channel)
         if doPlot2D:
@@ -1254,9 +1562,6 @@ def main():
             if doZpt:
                 writeDataCardHistograms(samplesB_ZptDown,  channel, Zpt="Down", filter=["Drell-Yan 50"], label=binlabel, binWidth=binWidth, range=(a,b) )
                 writeDataCardHistograms(samplesB_ZptUp,    channel, Zpt="Up",   filter=["Drell-Yan 50"], label=binlabel, binWidth=binWidth, range=(a,b) )
-            if doTTpt:
-                writeDataCardHistograms(samplesB_TTptDown, channel, TTpt="Down", filter=["ttbar"], label=binlabel, binWidth=binWidth, range=(a,b) )
-                writeDataCardHistograms(samplesB_TTptUp,   channel, TTpt="Up",   filter=["ttbar"], label=binlabel, binWidth=binWidth, range=(a,b) )
             if doQCD_WJ:
                 writeDataCardHistograms(samplesB_QCD_WJDown, channel, QCD_WJ="Down", filter=["W + jets"], label=binlabel, binWidth=binWidth, range=(a,b) )
                 writeDataCardHistograms(samplesB_QCD_WJUp,   channel, QCD_WJ="Up",   filter=["W + jets"], label=binlabel, binWidth=binWidth, range=(a,b) )

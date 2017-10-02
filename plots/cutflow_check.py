@@ -4,7 +4,7 @@ import os, sys
 sys.path.append('../plots')
 import PlotTools.PlotTools
 import PlotTools.CMS_lumi as CMS_lumi, PlotTools.tdrstyle as tdrstyle
-from PlotTools.SampleTools import getEfficienciesFromHistogram, getEfficienciesFromTree
+from PlotTools.SampleTools import getEfficienciesFromHistogram, getEfficienciesFromTree, printComparingCutflow
 from math import log, floor
 import ROOT
 from ROOT import TFile, TH1F, TH2F, kRed, kBlue, THStack, TCanvas, TLegend, kAzure, kRed, kGreen, kYellow, kOrange, gPad, gROOT, gStyle
@@ -41,17 +41,17 @@ def compareSampleSetEfficiency():
                     "triggers", "MET filters",
                     "lepton",   "lepton-tau",
                     #"trigger matching" , "no cuts (weighted)",
-               ]
+    ]
     cutflowEM = [   "no cuts",  "JSON",
                     "triggers", "MET filters",
                     "muon",     "electron",     "lepton pair",
                     #, "no cuts (weighted)",
-               ]
+    ]
     cutflowMM = [   "no cuts",  "JSON",
                     "triggers", "MET filters",
                     "muon",   "muon pair",
                     #, "no cuts (weighted)",
-               ]
+    ]
                
     cutsLT = [
         ("lepton-tau",      "channel>0"),
@@ -68,7 +68,7 @@ def compareSampleSetEfficiency():
         ("nfjets==0",       "channel>0 && iso_1<0.15 && iso_2==1 && lepton_vetos==0 && q_1*q_2<0 && ncbtag>0 && ncjets==2 && nfjets==0"),
         ("dphi_ll_bj>2",    "channel>0 && iso_1<0.15 && iso_2==1 && lepton_vetos==0 && q_1*q_2<0 && ncbtag>0 && ncjets==2 && nfjets==0 && dphi_ll_bj>2"),
         ("met<60",          "channel>0 && iso_1<0.15 && iso_2==1 && lepton_vetos==0 && q_1*q_2<0 && ncbtag>0 && ncjets==2 && nfjets==0 && dphi_ll_bj>2 && met<60"),
-            ]
+    ]
     cutsEM = [
         ("emu",             "channel>0"),
         ("iso_1<0.20",      "channel>0 && iso_1<0.20"),
@@ -83,7 +83,7 @@ def compareSampleSetEfficiency():
         ("nfjets==0",       "channel>0 && iso_1<0.20 && iso_2<0.15 && extraelec_veto==0 && extramuon_veto==0 && q_1*q_2<0 && ncbtag>0 && ncjets==2 && nfjets==0"),
         ("dphi_ll_bj>2",    "channel>0 && iso_1<0.20 && iso_2<0.15 && extraelec_veto==0 && extramuon_veto==0 && q_1*q_2<0 && ncbtag>0 && ncjets==2 && nfjets==0 && dphi_ll_bj>2"),
         ("met<60",          "channel>0 && iso_1<0.20 && iso_2<0.15 && extraelec_veto==0 && extramuon_veto==0 && q_1*q_2<0 && ncbtag>0 && ncjets==2 && nfjets==0 && dphi_ll_bj>2 && met<60"),
-            ]
+    ]
     cutsMM = [
         ("mumu",            "channel>0"),
         ("iso_1<0.15",      "channel>0 && iso_1<0.15"),
@@ -98,7 +98,7 @@ def compareSampleSetEfficiency():
         ("nfjets==0",       "channel>0 && iso_1<0.15 && iso_2<0.15 && extraelec_veto==0 && extramuon_veto==0 && q_1*q_2<0 && ncbtag>0 && ncjets==2 && nfjets==0"),
         ("dphi_ll_bj>2",    "channel>0 && iso_1<0.15 && iso_2<0.15 && extraelec_veto==0 && extramuon_veto==0 && q_1*q_2<0 && ncbtag>0 && ncjets==2 && nfjets==0 && dphi_ll_bj>2"),
         ("met<60",          "channel>0 && iso_1<0.15 && iso_2<0.15 && extraelec_veto==0 && extramuon_veto==0 && q_1*q_2<0 && ncbtag>0 && ncjets==2 && nfjets==0 && dphi_ll_bj>2 && met<60"),
-            ]
+    ]
     
     # TTbar CR
     cutsTT = [
@@ -254,51 +254,79 @@ def compareSampleSetEfficiency():
 def compareOldToNewEfficiency():
     print ">>>\n>>> compareOldToNewEfficiency()"
     
-    cutflow = [ "no cuts",
-                "JSON",
-                "triggers",
-                "MET filters",
-                "lepton",
-                "lepton-tau",
-                #"no cuts (weighted)",
-               ]
+    cutflowLT = [   "no cuts",  "JSON",
+                    "triggers", "MET filters",
+                    "lepton",   "lepton-tau",
+                    #"trigger matching" , "no cuts (weighted)",
+    ]
+    cutflowEM = [   "no cuts",  "JSON",
+                    "triggers", "MET filters",
+                    "muon",     "electron",     "lepton pair",
+                    #"no cuts (weighted)",
+    ]
+    cutflowMM = [   "no cuts",  "JSON",
+                    "triggers", "MET filters",
+                    "muon",   "muon pair",
+                    #, "no cuts (weighted)",
+    ]
+    cutflow = cutflowEM
     
-    cuts = [    ("lep-tau",         "channel>0"),
-                ("pt_1>23",         "channel>0 && pt_1>23"),
-                ("iso_1<0.15",      "channel>0 && pt_1>23 && iso_1<0.15"),
-                ("iso_2==1",        "channel>0 && pt_1>23 && iso_1<0.15 && iso_2==1"),
-                ("lepton vetos",    "channel>0 && pt_1>23 && iso_1<0.15 && iso_2==1 && lepton_vetos==0"),
-                ("q_1*q_2<0",       "channel>0 && pt_1>23 && iso_1<0.15 && iso_2==1 && lepton_vetos==0 && q_1*q_2<0"),
-                ("q_1*q_2>0",       "channel>0 && pt_1>23 && iso_1<0.15 && iso_2==1 && lepton_vetos==0 && q_1*q_2>0"),
-                #("triggers",        "channel>0 && pt_1>23 && iso_1<0.15 && iso_2==1 && lepton_vetos==0 && q_1*q_2>0 && (triggers==1 || triggers==3)"),
-                #("triggers",       "channel>0 && pt_1>23 && iso_1<0.15 && iso_2==1 && lepton_vetos==0 && q_1*q_2>0 &&  triggers==1"),
-                #("againstEle",      "channel>0 && pt_1>23 && iso_2==1 && lepton_vetos==0")
-                #("againstMuon",     "channel>0 && pt_1>23 && iso_2==1 && lepton_vetos==0"),
-                #("lepton vetos",    "channel>0 && pt_1>23 && iso_2==1 && lepton_vetos==0 && "),
-            ]
-    oldcuts = cuts
-    newcuts = cuts #[(n,c+" && triggers==1" if i>1 else c) for i,(n,c) in enumerate(cuts)] 
+    cuts = [
+        ("lep-tau",         "channel>0"),
+        ("pt_1>23",         "channel>0 && pt_1>23"),
+        ("iso_1<0.15",      "channel>0 && pt_1>23 && iso_1<0.15"),
+        ("iso_2==1",        "channel>0 && pt_1>23 && iso_1<0.15 && iso_2==1"),
+        ("lepton vetos",    "channel>0 && pt_1>23 && iso_1<0.15 && iso_2==1 && lepton_vetos==0"),
+        ("q_1*q_2<0",       "channel>0 && pt_1>23 && iso_1<0.15 && iso_2==1 && lepton_vetos==0 && q_1*q_2<0"),
+        ("q_1*q_2>0",       "channel>0 && pt_1>23 && iso_1<0.15 && iso_2==1 && lepton_vetos==0 && q_1*q_2>0"),
+        #("triggers",        "channel>0 && pt_1>23 && iso_1<0.15 && iso_2==1 && lepton_vetos==0 && q_1*q_2>0 && (triggers==1 || triggers==3)"),
+        #("triggers",       "channel>0 && pt_1>23 && iso_1<0.15 && iso_2==1 && lepton_vetos==0 && q_1*q_2>0 &&  triggers==1"),
+        #("againstEle",      "channel>0 && pt_1>23 && iso_2==1 && lepton_vetos==0")
+        #("againstMuon",     "channel>0 && pt_1>23 && iso_2==1 && lepton_vetos==0"),
+        #("lepton vetos",    "channel>0 && pt_1>23 && iso_2==1 && lepton_vetos==0 && "),
+    ]
+    cuts        = [ ]
+    oldcuts     = cuts
+    newcuts     = cuts #[(n,c+" && triggers==1" if i>1 else c) for i,(n,c) in enumerate(cuts)] 
     
-    MORIOND_DIR  = "/scratch/ineuteli/SFrameAnalysis/AnalysisOutput"
-    ICHEP_DIR    = "/scratch/ineuteli/SFrameAnalysis/AnalysisOutput"
+    OLD_DIR     = "/scratch/ytakahas/SFrameAnalysis/AnalysisOutputEM"
+    NEW_DIR     = "/scratch/ineuteli/SFrameAnalysis/AnalysisOutputEM"
+    newlabel    = "_Moriond" #"_ICHEP"
+    oldlabel    = "_Moriond"
+    
+    histname    = "histogram_emu/cutflow_emu"
+    treename    = "tree_emu"
     
     samples = [
-                    #("WJ",          "WJetsToLNu_TuneCUETP8M1"       ),
-                    #("DY",          "DYJetsToLL_M-50_TuneCUETP8M1"  ),
-                    ("SingleMuon",  "SingleMuon_Run2016"            ),
-                ]
+        #("WJ",          "WJetsToLNu_TuneCUETP8M1"           ),
+        #("WJ",          "W1JetsToLNu_TuneCUETP8M1"          ),
+        #("WJ",          "W2JetsToLNu_TuneCUETP8M1"          ),
+        ("DY",          "DYJetsToLL_M-10to50_TuneCUETP8M1"  ),
+        #("DY",          "DY1JetsToLL_M-10to50_TuneCUETP8M1" ),
+        #("DY",          "DY2JetsToLL_M-10to50_TuneCUETP8M1" ),
+        #("DY",          "DY3JetsToLL_M-10to50_TuneCUETP8M1" ),
+        ("DY",          "DYJetsToLL_M-50_TuneCUETP8M1"      ),
+        #("DY",          "DY1JetsToLL_M-50_TuneCUETP8M1"     ),
+        #("DY",          "DY2JetsToLL_M-50_TuneCUETP8M1"     ),
+        #("DY",          "DY3JetsToLL_M-50_TuneCUETP8M1"     ),
+        #("DY",          "DY4JetsToLL_M-50_TuneCUETP8M1"     ),
+        ("TT",          "TT_TuneCUETP8M1"                   ),
+        #("SingleMuon",  "SingleMuon_Run2016"                ),
+        ("MuonEG",      "MuonEG_Run2016"                    ),
+    ]
     
+    print ">>>   old: %s\n>>>   new: %s" % (OLD_DIR,NEW_DIR)    
     for sampledir,sample in samples:
-        print ">>>\n>>> ICHEP - Moriond comparison for \"%s\"" % (sample)
+        print ">>>\n>>> old/new comparison for \"%s\"" % (sample)
         
-        file1 = TFile( "%s/%s/TauTauAnalysis.%s_ICHEP.root"   % (ICHEP_DIR,  sampledir,sample))
-        file2 = TFile( "%s/%s/TauTauAnalysis.%s_Moriond.root" % (MORIOND_DIR,sampledir,sample))
-        hist1 = file1.Get("histogram_mutau/cutflow_mutau")
-        hist2 = file2.Get("histogram_mutau/cutflow_mutau")
-        tree1 = file1.Get("tree_mutau")
-        tree2 = file2.Get("tree_mutau")
+        file1 = TFile("%s/%s/TauTauAnalysis.%s%s.root" % (OLD_DIR,sampledir,sample,oldlabel))
+        file2 = TFile("%s/%s/TauTauAnalysis.%s%s.root" % (NEW_DIR,sampledir,sample,newlabel))
+        hist1 = file1.Get(histname)
+        hist2 = file2.Get(histname)
+        tree1 = file1.Get(treename)
+        tree2 = file2.Get(treename)
         
-        print ">>> ratio Moriond/ICHEP = 35.9/12.9 = %.2g" % (35.9/12.9)
+        #print ">>> ratio new/old = 35.9/12.9 = %.2g" % (35.9/12.9)
         efficiencies_hist1 = getEfficienciesFromHistogram(hist1,cutflow)
         efficiencies_hist2 = getEfficienciesFromHistogram(hist2,cutflow)
         print ">>> histogram cutflow:"
@@ -457,6 +485,52 @@ def compareDataSetEfficiencies():
     
     print ">>>"
 
+
+
+
+
+def writeRunNumbers():
+    print ">>>\n>>> writeRunNumbers()"
+    
+    channel     = "emu"
+    emu_check   = "channel>0 && njets==2 && pt_1>25 && pt_2>25 && abs(eta_1)<2.1 && abs(eta_2)<2.1 && iso_1<0.10 && q_1*q_2<0 && 70<m_vis&&m_vis<110"
+    DIR         = MORIOND_DIR
+    
+    if "emu" in channel:
+        DIR = DIR.replace("AnalysisOutput","AnalysisOutputEM")
+    
+    cuts = [    
+                ("2j0b",    "%s && %s"  % ("ncbtag==0",emu_check)),
+                ("2j",      "%s"        % (emu_check)),
+    ]
+    
+    samples = [
+                    #("SingleMuon",  "SingleMuon_Run2016"    ),
+                    ("MuonEG",  "MuonEG_Run2016"            ),
+    ]
+    
+    for sampledir, sample in samples:
+        print ">>>\n>>> writing run, lumi, event number for %s" % (sample)
+    
+        file    = TFile( "%s/%s/TauTauAnalysis.%s_Moriond.root" % (DIR, sampledir,sample))
+        tree    = file.Get("tree_%s"%channel)
+        
+        for cutname, cut in cuts:
+            print ">>> cut \"%s\": \"%s\"" % (cutname,cut)
+            
+            txtname = "%s/runnumber_%s.txt" % (OUT_DIR,cutname.replace(', ','-').replace(' ','_').replace(':','-').replace('(','').replace(')','').replace('#','').replace('<','lt').replace('>','gt')) 
+            #print ">>> %d entries passing the cut"%(tree.GetEntries(cut))
+            tree.GetPlayer().SetScanRedirect(True)
+            tree.GetPlayer().SetScanFileName(txtname)
+            N = tree.Scan("run:lum:evt", cut, "precision=10") #, "colsize=20"
+            
+            with open(txtname,'r') as txtfile0: data = txtfile0.read()
+            with open(txtname,'w') as txtfile1: txtfile1.write(("# %d events with \"%s\" selections:\n#   %s\n\n"%(N,cutname,cut))+data)
+            
+            
+    
+    print ">>>"
+
                 
 
 
@@ -479,10 +553,11 @@ def main():
     
     # MAIN CHECKS
     #compareOldToNew()
-#     compareOldToNewEfficiency()
 #     compareDataSetEfficiencies()
 #     compareTriggerEfficiencies()
-    compareSampleSetEfficiency()
+#     compareSampleSetEfficiency()
+#     compareOldToNewEfficiency()
+    writeRunNumbers()
     
     print ">>>\n>>> done\n"
     
@@ -492,233 +567,3 @@ def main():
     
 if __name__ == '__main__':
     main()
-
-
- 
-# def signalEfficiency():
-#     print ">>>\n>>> signalEfficiency()"
-# 
-#     # bin 1: no cuts
-#     # bin 2: JSON / gen weight
-#     # bin 3: triggers
-#     # bin 4: MET filters
-#     # bin 5: lepton selection
-#     # bin 6: lepton-tau pair selection
-#     # bin 7: no cuts gen weighted
-#     
-#     cuts = [    "no cuts",
-#                 "JSON/weight",
-#                 "triggers",
-#                 "MET filters",
-#                 "lepton",
-#                 "lepton-tau",
-#                 "no cuts (weighted)",
-#             ]
-#     
-#     file = TFile( DIR + "signal/TauTauAnalysis.LowMass_30GeV_DiTauResonance%s.root" % mylabel )
-#     efficiencies = [ ]
-#     for i, cut in zip(range(1,len(cuts)+1),cuts):
-#         N = file.Get("histogram_mutau/cutflow_mutau").GetBinContent(i)
-#         N_tot = 0
-#         if i is 1:
-#             N = 1
-#             N_tot = 1
-#         else:
-#             N_tot = file.Get("histogram_mutau/cutflow_mutau").GetBinContent(i-1)
-#             
-#         if N and N_tot:
-#             efficiencies.append(( cut, N / N_tot ))
-#         else:
-#             print ">>> Warning: GetBinContent(%i) = %s, GetBinContent(%i) = %s " % (i,N,i-1,N_tot)
-#     
-#     for cut, efficiency in efficiencies:
-#         print ">>> %s: %5.2f%%" % (cut,efficiency*100)
-
-
-
-# def ptSignalAcceptence():
-#     print ">>>\n>>> ptSignalAcceptence()"
-# 
-#     cut = 23. 
-#     file = TFile( DIR + "signal/TauTauAnalysis.LowMass_30GeV_DiTauResonance%s.root" % mylabel )
-#     pt_taus = file.Get("checks/pt_gentaus")
-#     pt_tau1 = file.Get("checks/pt_gentau1")
-#     pt_tau2 = file.Get("checks/pt_gentau2")
-#     pt_muon = file.Get("checks/pt_genmuon")
-#     
-#     bincut_taus = pt_taus.FindBin(cut)
-#     bincut_tau1 = pt_tau1.FindBin(cut)
-#     bincut_tau2 = pt_tau2.FindBin(cut)
-#     bincut_muon = pt_muon.FindBin(cut)
-#     N_taus = pt_taus.Integral()
-#     N_tau1 = pt_tau1.Integral()
-#     N_tau2 = pt_tau2.Integral()
-#     N_muon = pt_muon.Integral()
-#     
-#     eff_taus = pt_taus.Integral(bincut_taus, pt_taus.GetNbinsX()) / N_taus
-#     eff_tau1 = pt_tau1.Integral(bincut_tau1, pt_tau1.GetNbinsX()) / N_tau1
-#     eff_tau2 = pt_tau2.Integral(bincut_tau2, pt_tau2.GetNbinsX()) / N_tau2
-#     eff_muon = pt_muon.Integral(bincut_muon, pt_muon.GetNbinsX()) / N_muon
-#     
-#     print ">>> efficiency of pt cut of %s on signal's gen tau and reco muon:" % cut
-#     print ">>> gen tau:  %5.2f%%" % (100*eff_taus)
-#     print ">>> gen tau1: %5.2f%%" % (100*eff_tau1)
-#     print ">>> gen tau2: %5.2f%%" % (100*eff_tau2)
-#     print ">>> gen muon: %5.2f%%" % (100*eff_muon)
-# 
-#     print ">>> check: bincut_taus = %3i,  N_taus =%7i" % (bincut_taus,N_taus)
-#     print ">>> check: bincut_tau2 = %3i,  N_tau1 =%7i" % (bincut_tau1,N_tau1)
-#     print ">>> check: bincut_tau3 = %3i,  N_tau2 =%7i" % (bincut_tau2,N_tau2)
-#     print ">>> check: bincut_muon = %3i,  N_muon =%7i" % (bincut_muon,N_muon)
-#     
-#     # DRAW
-#     canvas = TCanvas("canvas","canvas",100,100,800,600) # 600,600
-#     canvas.SetBottomMargin(0.12)
-#     canvas.SetRightMargin(0.05)
-#     canvas.SetLeftMargin(0.12)
-#     canvas.SetTopMargin(0.05)
-#     pt_taus.SetLineWidth(3)
-#     pt_muon.SetLineWidth(3)
-#     pt_taus.SetLineColor(kAzure+4)
-#     pt_muon.SetLineColor(kRed+3)
-#     pt_taus.Scale(1/N_taus)
-#     pt_muon.Scale(1/N_muon/3)
-#     #pt_taus.Rebin(2)
-#     #pt_muon.Rebin(2)
-#     pt_taus.Draw("hist")
-#     pt_muon.Draw("histsame")
-#     pt_taus.SetTitle("")
-#     pt_taus.GetXaxis().SetRangeUser(0,100)
-#     pt_taus.GetXaxis().SetTitle("p_{T} of generator level particle")
-#     pt_taus.GetYaxis().SetTitle("A.U.")
-#     #pt_taus.GetYaxis().SetTitleSize(0)
-#     pt_taus.GetXaxis().SetTitleSize(0.05)
-#     pt_taus.GetYaxis().SetTitleSize(0.05)
-#     pt_taus.GetXaxis().SetTitleOffset(1.14)
-#     pt_taus.GetYaxis().SetTitleOffset(1.17)
-#     pt_taus.GetXaxis().SetLabelSize(0.045)
-#     pt_taus.GetYaxis().SetLabelSize(0.040)
-#     #pt_taus.GetYaxis().SetLabelSize(0)    
-#     legend = TLegend(0.56,0.68,0.80,0.84)
-#     legend.AddEntry(pt_taus, " gen #tau", 'l')
-#     legend.AddEntry(pt_muon, " gen #mu from #tau", 'l')
-#     legend.SetTextSize(0.055)
-#     legend.SetBorderSize(0)
-#     legend.SetFillStyle(0)
-#     legend.Draw()
-#     #gStyle.SetOptStat(0)
-#     canvas.SaveAs("plots_check/pt.png")
-#     canvas.Close()
-
-
-
-# def DYAcceptence():
-#     print ">>>\n>>> DYAcceptence()"
-# 
-#     DIR2 = "/shome/ineuteli/analysis/SFrameAnalysis/TauTauResonances/"
-# 
-# #     file = TFile( DIR2 + "TauTauAnalysis.DYJets_M-10to50.UZH.root" )
-#     file = TFile( DIR + "DY/TauTauAnalysis.DYJetsToLL_M-10to50_TuneCUETP8M1%s.root" % mylabel )
-#     pt = file.Get("checks/pt_muon")
-#     d0 = file.Get("checks/d0_muon")
-#     dz = file.Get("checks/dz_muon")
-#     d0_cut = file.Get("checks/d0_muon_cut")
-#     dz_cut = file.Get("checks/dz_muon_cut")
-# #     file2 = TFile( DIR2 + "TauTauAnalysis.DYJets_M-50.UZH.root" )
-#     file2 = TFile( DIR + "DY/TauTauAnalysis.DYJetsToLL_M-50_TuneCUETP8M1%s.root" % mylabel )
-#     pt2 = file2.Get("checks/pt_muon")
-#     d02 = file2.Get("checks/d0_muon")
-#     dz2 = file2.Get("checks/dz_muon")
-#     d02_cut = file2.Get("checks/d0_muon_cut")
-#     dz2_cut = file2.Get("checks/dz_muon_cut")
-#     var_dict = { "pt_muon":"muon p_{T}", "d0_muon":"muon d0", "dz_muon":"muon |dz|",
-#                  "d0_muon_cut":"muon d0", "dz_muon_cut":"muon |dz|" }
-#     
-#     print ">>>\n>>> overflow DY check"
-#     print ">>> DY M-10to50 pt overflow:              %9i /%9i = %5.1f%%" % ( pt.GetBinContent(pt.GetNbinsX()+1),   pt.GetEntries(),  pt.GetBinContent(pt.GetNbinsX()+1)   /  pt.GetEntries()*100 )
-#     print ">>> DY M-50     pt overflow:              %9i /%9i = %5.1f%%" % ( pt2.GetBinContent(pt2.GetNbinsX()+1), pt2.GetEntries(), pt2.GetBinContent(pt2.GetNbinsX()+1) / pt2.GetEntries()*100 )
-#     print ">>> DY M-10to50 d0 overflow:              %9i /%9i = %5.1f%%" % ( d0.GetBinContent(d0.GetNbinsX()+1),   d0.GetEntries(),  d0.GetBinContent(d0.GetNbinsX()+1)   / d0.GetEntries()*100  )
-#     print ">>> DY M-50     d0 overflow:              %9i /%9i = %5.1f%%" % ( d02.GetBinContent(d02.GetNbinsX()+1), d02.GetEntries(), d02.GetBinContent(d02.GetNbinsX()+1) / d02.GetEntries()*100 )
-#     print ">>> DY M-10to50 d0 overflow after pT cut: %9i /%9i = %5.1f%%" % ( d0_cut.GetBinContent(d0_cut.GetNbinsX()+1),   d0_cut.GetEntries(),  d0_cut.GetBinContent(d0_cut.GetNbinsX()+1)   / d0_cut.GetEntries()*100  )
-#     print ">>> DY M-50     d0 overflow after pT cut: %9i /%9i = %5.1f%%" % ( d02_cut.GetBinContent(d02_cut.GetNbinsX()+1), d02_cut.GetEntries(), d02_cut.GetBinContent(d02_cut.GetNbinsX()+1) / d02_cut.GetEntries()*100 )
-#     print ">>> DY M-10to50 dz overflow:              %9i /%9i = %5.1f%%" % ( dz.GetBinContent(dz.GetNbinsX()+1),   dz.GetEntries(),  dz.GetBinContent(dz.GetNbinsX()+1)   / dz.GetEntries()*100  )
-#     print ">>> DY M-50     dz overflow:              %9i /%9i = %5.1f%%" % ( dz2.GetBinContent(dz2.GetNbinsX()+1), dz2.GetEntries(), dz2.GetBinContent(dz2.GetNbinsX()+1) / dz2.GetEntries()*100 )
-#     print ">>> DY M-10to50 d0 overflow after pT cut: %9i /%9i = %5.1f%%" % ( dz_cut.GetBinContent(dz_cut.GetNbinsX()+1),   dz_cut.GetEntries(),  dz_cut.GetBinContent(dz_cut.GetNbinsX()+1)   / dz_cut.GetEntries()*100  )
-#     print ">>> DY M-50     d0 overflow after pT cut: %9i /%9i = %5.1f%%" % ( dz2_cut.GetBinContent(dz2_cut.GetNbinsX()+1), dz2_cut.GetEntries(), dz2_cut.GetBinContent(dz2_cut.GetNbinsX()+1) / dz2_cut.GetEntries()*100 )
-#     
-#     for var, hist, hist2 in [ ("pt_muon",pt,pt2), ("d0_muon",d0,d02), ("dz_muon",dz,dz2), ("d0_muon_cut",d0_cut,d02_cut), ("dz_muon_cut",dz_cut,dz2_cut) ]:
-#         canvas = TCanvas("canvas","canvas",100,100,800,600)
-#         canvas.SetBottomMargin(0.12)
-#         canvas.SetRightMargin(0.05)
-#         canvas.SetLeftMargin(0.05)
-#         canvas.SetTopMargin(0.05)
-#         hist.SetLineWidth(3)
-#         hist.SetLineStyle(1)
-#         hist.SetLineColor(kAzure+4)
-#         hist2.SetLineWidth(3)
-#         hist2.SetLineStyle(7)
-#         hist2.SetLineColor(kRed+3)
-#         hist.Draw("hist")
-#         hist2.Draw("histsame")
-#         hist.Scale(1/hist.Integral())
-#         hist2.Scale(1/hist2.Integral())
-#         hist.SetTitle("")
-#         #hist.GetXaxis().SetRangeUser(0,100)
-#         hist.GetXaxis().SetTitle(var_dict[var]) #replace
-#         hist.GetYaxis().SetTitleSize(0)
-#         hist.GetXaxis().SetTitleSize(0.05)
-#         hist.GetXaxis().SetTitleOffset(1.15)
-#         hist.GetXaxis().SetLabelSize(0.045)
-#         hist.GetYaxis().SetLabelSize(0)
-#         hist.GetYaxis().SetRangeUser(0,max(hist.GetMaximum(),hist2.GetMaximum())*1.12)
-#         h = 0.18
-#         w = 0.25
-#         legend = TLegend(0.64,0.7,0.64-w,0.7-h)
-#         legend.AddEntry(hist, " DY 10 < m < 50", 'l')
-#         legend.AddEntry(hist2," DY 50 > m", 'l')
-#         legend.SetTextSize(0.042)
-#         legend.SetBorderSize(0)
-#         legend.SetFillStyle(0)
-#         legend.Draw()
-#         gStyle.SetOptStat(0)
-#         canvas.SaveAs("plots_check/%s.png" % var)
-#         canvas.Close()
-#         
-#     vetos   = "dilepton_veto == 0 && extraelec_veto == 0 && extramuon_veto == 0 && againstElectronVLooseMVA6_2 == 1 && againstMuonTight3_2 == 1"
-#     isocuts = "iso_1 < 0.15 && iso_2 == 1"
-#     cuts    = [ ("SS",         "channel==1 && q_1*q_2<0"),
-#                 ("iso",        "channel==1 && %s && q_1*q_2<0" % (isocuts)),
-#                 #("isow",       "(channel==1 && %s && q_1*q_2<0)*idisoweight_1*trigweight_1" % (isocuts)),
-#                 ("vetos",      "channel==1 && %s && %s && q_1*q_2<0" % (isocuts, vetos)),
-#                 ("category 1", "channel==1 && %s && %s && q_1*q_2<0 && ncbtag > 0 && ncjets == 1 && nfjets  > 0" % (isocuts, vetos)),
-#                 ("category 2", "channel==1 && %s && %s && q_1*q_2<0 && ncbtag > 0 && ncjets  > 1 && nfjets == 0 && dphi_ll_bj > 2 && met < 60" % (isocuts, vetos)),
-#                ]
-#     # TODO weights?
-#     #  trigweight_1 * idisoweight_1 * trigweight_2 * idisoweight_2
-#     
-#     tree  = file.Get("tree_mutau")
-#     tree2 = file2.Get("tree_mutau")
-#     iso_1  = TH1F("iso_1", "iso_1", 100, -10, 10)
-#     iso_12 = TH1F("iso_12", "iso_12", 100, -10, 10)
-#     tree.Draw( "iso_1 >> iso_1",   "channel==1", "gOff")
-#     tree2.Draw("iso_1 >> iso_12",  "channel==1", "gOff")
-#     N_tot = iso_1.Integral()
-#     N_tot2 = iso_12.Integral()
-# 
-#     print ">>>\n>>> cuts on DY:"
-#     for label, cut in cuts: 
-#         iso_1.Reset()
-#         iso_12.Reset()
-#         tree.Draw("iso_1 >> iso_1",   cut, "gOff")
-#         tree2.Draw("iso_1 >> iso_12", cut, "gOff")
-#         N  = iso_1.Integral() #GetEntries
-#         N2 = iso_12.Integral()
-#         print ">>> %s:" % label
-#         if N_tot:  print ">>>   DY M-10to50: %4.1f%% (%6i,%6i)" % ( N/N_tot*100.0,   N,  N_tot  )
-#         if N_tot2: print ">>>   DY M-50:     %4.1f%% (%6i,%6i)" % ( N2/N_tot2*100.0, N2, N_tot2 )
-#         if "category" not in label and "isow" not in label:
-#             N_tot  = N
-#             N_tot2 = N2
-#         
-#     file.Close()
-#     file2.Close()

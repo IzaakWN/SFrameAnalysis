@@ -32,10 +32,10 @@ PileupReweightingTool::~PileupReweightingTool(){}
 void PileupReweightingTool::BeginInputData( const SInputData& ) throw( SError ) {
 
   m_logger << INFO << SLogger::endmsg;
-  m_logger << INFO << "HistoPath:        " << m_histoPath << SLogger::endmsg;
-  m_logger << INFO << "DataRootFileName: " << m_dataRootFileName << SLogger::endmsg;
-  m_logger << INFO << "DataRootHistName: " << m_dataRootHistName << SLogger::endmsg;
-  m_logger << INFO << "MCScenario:       " << m_mcScenario << SLogger::endmsg;
+  m_logger << INFO << "HistoPath:           " << m_histoPath << SLogger::endmsg;
+  m_logger << INFO << "DataRootFileName:    " << m_dataRootFileName << SLogger::endmsg;
+  m_logger << INFO << "DataRootHistName:    " << m_dataRootHistName << SLogger::endmsg;
+  m_logger << INFO << "MCScenario:          " << m_mcScenario << SLogger::endmsg;
   
   m_puWeight.initPUWeights(m_histoPath+"/"+m_dataRootFileName, m_dataRootHistName, m_mcScenario);
   m_logger << INFO << "Pileup weights initialised" << SLogger::endmsg;

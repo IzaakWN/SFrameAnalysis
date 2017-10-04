@@ -246,7 +246,7 @@ class TauTauAnalysis : public SCycleBase {
     
     // checks
     virtual void makeHistogramsForChecks();
-    virtual void checks();
+    virtual void signalChecks();
     virtual void cutflowCheck( const std::string& channel );
     virtual void visiblePTCheck();
     virtual void printRow(   const std::vector<std::string> svec = {}, const std::vector<int> ivec = {}, const std::vector<double> dvec = {}, const std::vector<float> fvec = {}, const int w=10 );
@@ -347,7 +347,6 @@ class TauTauAnalysis : public SCycleBase {
     // muons
     double    m_muonPtCut;
     double    m_muonEtaCut;
-    double    m_muonEtaCut_variable;
     double    m_muonD0Cut;
     double    m_muonDzCut;
     double    m_muonIsoCut;
@@ -449,7 +448,17 @@ class TauTauAnalysis : public SCycleBase {
     std::map<std::string,Int_t>    b_ncjets20;
     std::map<std::string,Int_t>    b_nbtag20;
     std::map<std::string,Int_t>    b_ncbtag20;
-
+    
+    std::map<std::string,Int_t>    b_njets_jesUp;
+    std::map<std::string,Int_t>    b_njets_jesDown;
+    std::map<std::string,Int_t>    b_njets_jer;
+    std::map<std::string,Int_t>    b_njets_jerUp;
+    std::map<std::string,Int_t>    b_njets_jerDown;
+    std::map<std::string,Int_t>    b_njets20_jesUp;
+    std::map<std::string,Int_t>    b_njets20_jesDown;
+    std::map<std::string,Int_t>    b_njets20_jer;
+    std::map<std::string,Int_t>    b_njets20_jerUp;
+    std::map<std::string,Int_t>    b_njets20_jerDown;
     std::map<std::string,Int_t>    b_ncbtag_jesUp;
     std::map<std::string,Int_t>    b_ncbtag_jesDown;
     std::map<std::string,Int_t>    b_ncbtag_jer;
@@ -550,6 +559,34 @@ class TauTauAnalysis : public SCycleBase {
     std::map<std::string,Double_t> b_jeta_2;
     std::map<std::string,Double_t> b_jphi_2;
     
+    std::map<std::string,Double_t> b_jpt_1_jesUp;
+    std::map<std::string,Double_t> b_jpt_1_jesDown;
+    std::map<std::string,Double_t> b_jpt_1_jer;
+    std::map<std::string,Double_t> b_jpt_1_jerUp;
+    std::map<std::string,Double_t> b_jpt_1_jerDown;
+    std::map<std::string,Double_t> b_jeta_1_jesUp;
+    std::map<std::string,Double_t> b_jeta_1_jesDown;
+    std::map<std::string,Double_t> b_jeta_1_jer;
+    std::map<std::string,Double_t> b_jeta_1_jerUp;
+    std::map<std::string,Double_t> b_jeta_1_jerDown;
+    std::map<std::string,Double_t> b_jpt_2_jesUp;
+    std::map<std::string,Double_t> b_jpt_2_jesDown;
+    std::map<std::string,Double_t> b_jpt_2_jer;
+    std::map<std::string,Double_t> b_jpt_2_jerUp;
+    std::map<std::string,Double_t> b_jpt_2_jerDown;
+    std::map<std::string,Double_t> b_jeta_2_jesUp;
+    std::map<std::string,Double_t> b_jeta_2_jesDown;
+    std::map<std::string,Double_t> b_jeta_2_jer;
+    std::map<std::string,Double_t> b_jeta_2_jerUp;
+    std::map<std::string,Double_t> b_jeta_2_jerDown;
+    std::map<std::string,Double_t> b_jphi_1_jer;
+    std::map<std::string,Double_t> b_jphi_2_jer;
+    
+    // std::map<std::string,Double_t> b_fjpt_1;
+    // std::map<std::string,Double_t> b_fjet_1;
+    // std::map<std::string,Double_t> b_fjeta_1;
+    // std::map<std::string,Double_t> b_fjphi_1;
+    
     std::map<std::string,Double_t> b_bpt_1;
     std::map<std::string,Double_t> b_beta_1;
     std::map<std::string,Double_t> b_bphi_1;
@@ -573,10 +610,6 @@ class TauTauAnalysis : public SCycleBase {
     std::map<std::string,Double_t> b_metcov01;
     std::map<std::string,Double_t> b_metcov10;
     std::map<std::string,Double_t> b_metcov11;
-    //std::map<std::string,Double_t> b_mvacov00;
-    //std::map<std::string,Double_t> b_mvacov01;
-    //std::map<std::string,Double_t> b_mvacov10;
-    //std::map<std::string,Double_t> b_mvacov11;
     
     std::map<std::string,Double_t> b_m_vis;
     std::map<std::string,Double_t> b_pt_tt;

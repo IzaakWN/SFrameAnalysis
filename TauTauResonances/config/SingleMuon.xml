@@ -68,7 +68,7 @@
     <Item Name="doSVFit"        Value="False" />
     <Item Name="IsSignal"       Value="False" />
     <Item Name="IsData"         Value="True" />
-    <Item Name="doJEC"          Value="False" />
+    <Item Name="doJEC"          Value="True" />
   </UserConfig>
   </Cycle>
 </JobConfiguration>

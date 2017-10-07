@@ -20,12 +20,10 @@ void ScaleFactorTau::init_ScaleFactor(TString inputRootFile){
 	std::vector<std::string> etaLabels = {"endcap","barrel"};
     
     for(auto const& etaLabel: etaLabels){
-      
       getGraph(fileIn,eff_data_realTau,etaLabel,"data_genuine_"+etaLabel+"_"+isoLabel);
       getGraph(fileIn,eff_data_fakeTau,etaLabel,"data_fake_"   +etaLabel+"_"+isoLabel);
       getGraph(fileIn,eff_mc_realTau,  etaLabel,"mc_genuine_"  +etaLabel+"_"+isoLabel);
-      getGraph(fileIn,eff_mc_fakeTau,  etaLabel,"mc_fake_"     +etaLabel+"_"+isoLabel);
-      
+      getGraph(fileIn,eff_mc_fakeTau,  etaLabel,"mc_fake_"     +etaLabel+"_"+isoLabel); 
     }
     
     // for(auto const& label: eff_data_realTau)
@@ -53,19 +51,21 @@ void ScaleFactorTau::getGraph(TFile* fileIn, std::map<std::string,TGraphAsymmErr
 	std::string graphName = graphName0;
 	std::vector<std::string> dmValues = {"0","1","10"};
     
-    if (fileIn->GetListOfKeys()->Contains(TString(graphName))){
+    if (fileIn->GetListOfKeys()->Contains(TString(graphName))){ // check WITHOUT DM
       eff_map[etaLabel] = makeGraph((TGraphAsymmErrors*)fileIn->Get(TString(graphName)));
       SetAxisBins(eff_map[etaLabel]);
-      foundGraph = true;
+      return;
+      //foundGraph = true;
       //std::cout << "ScaleFactorTau::getGraph: found \"" << graphName << "\" saved as \"" << etaLabel << "\"" << std::endl;
     }else{
-      for(auto const& dm: dmValues){
+      for(auto const& dm: dmValues){ // check WITH DM
         graphName = graphName0+"_dm"+dm;
         etaLabel  = etaLabel0 +"_dm"+dm;
         if (fileIn->GetListOfKeys()->Contains(TString(graphName))){
           eff_map[etaLabel] = makeGraph((TGraphAsymmErrors*)fileIn->Get(TString(graphName)));
           SetAxisBins(eff_map[etaLabel]);
-          foundGraph = true;
+          return;
+          //foundGraph = true;
           //std::cout << "ScaleFactorTau::getGraph: found \"" << graphName << "\" saved as \"" << etaLabel << "\"" << std::endl;
         }else{
           foundGraph = false;
@@ -133,15 +133,15 @@ bool ScaleFactorTau::check_SameBinning(TGraphAsymmErrors* graph1, TGraphAsymmErr
 	int n2 = graph2->GetXaxis()->GetNbins();
 	//std::cout << "ScaleFactorTau::check_SameBinning: n1=" << n1 << ", n2=" << n2 << std::endl;
 	if (n1 != n2 ) {return false;}
-	else {
-		haveSameBins = true;
-		const int nbins = n1;
-		double x1, x2;
-		for (int i=0; i<nbins; i++){ 
-			x1 = (graph1->GetXaxis()->GetXbins())->GetArray()[i];
-			x2 = (graph2->GetXaxis()->GetXbins())->GetArray()[i]; 
-			haveSameBins = haveSameBins and (x1 == x2) ;
-		}
+	else{
+      haveSameBins = true;
+      const int nbins = n1;
+      double x1, x2;
+      for (int i=0; i<nbins; i++){ 
+          x1 = (graph1->GetXaxis()->GetXbins())->GetArray()[i];
+          x2 = (graph2->GetXaxis()->GetXbins())->GetArray()[i]; 
+          haveSameBins = haveSameBins and (x1 == x2) ;
+      }
 	}
     
 	return haveSameBins;
@@ -173,6 +173,7 @@ std::string ScaleFactorTau::FindEtaLabel(std::map<std::string,TGraphAsymmErrors*
       }
 	}
 	
+	//std::cout << "ScaleFactorTau::FindEtaLabel: eta="<<eta<<", dm="<<dm<<", found etalabel=\""<<label.first<<"\"" << std::endl;
     return etaLabel;
 }
 
@@ -239,13 +240,13 @@ double ScaleFactorTau::get_ScaleFactor(double pt, double eta, int dm, bool isRea
 	//std::cout << "ScaleFactorTau::get_ScaleFactor: pt="<<pt<<", eta="<<eta<<", dm="<<dm<<", isReal="<<isReal << std::endl;
     
 	double efficiency_data = get_EfficiencyData(pt,eta,dm,isReal);
-	double efficiency_mc   = get_EfficiencyMC(pt,eta,dm,isReal);
+	double efficiency_mc   = get_EfficiencyMC(  pt,eta,dm,isReal);
 	double SF;
     
 	if(efficiency_mc!=0){ SF = efficiency_data/efficiency_mc; }
 	else{
 	  SF=0.;
-	  std::cout << "WARNING in ScaleFactorTau::get_ScaleFactor(pt="<<pt<<",eta="<<eta<<",dm="<<dm<<",isReal="<<isReal<<"): MC efficiency = 0. Scale Factor set to 0." << std::endl;
+	  std::cout << "WARNING in ScaleFactorTau::get_ScaleFactor(pt="<<pt<<", eta="<<eta<<", dm="<<dm<<", isReal="<<isReal<<"): MC efficiency = 0. Scale Factor set to 0." << std::endl;
 	}
     
 	return SF;

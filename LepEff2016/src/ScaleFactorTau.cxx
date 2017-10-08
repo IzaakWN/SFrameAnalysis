@@ -75,8 +75,8 @@ void ScaleFactorTau::getGraph(TFile* fileIn, std::map<std::string,TGraphAsymmErr
     }
     
     if(not foundGraph){
-      std::cout << "WARNING! ScaleFactorTau::getGraph: no \"" << etaLabel0 << "\" for \"" << graphName0 << "\"" << std::endl;
-      exit(1);
+     std::cout << "WARNING! ScaleFactorTau::getGraph: no \"" << etaLabel0 << "\" for \"" << graphName0 << "\"" << std::endl;
+     exit(1);
     }
     
     //for(auto const& label: eff_map)

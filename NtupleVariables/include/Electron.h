@@ -28,12 +28,12 @@ namespace UZH {
    * @author Code produced by Id: CodeIt.py 494 2010-07-30 13:41:32Z svn 
    *
    */
-
+  
   class Electron : public Basic 
- , public Particle 
+   , public Particle 
   {
   public:
-
+  
     /// default c'tor
     Electron();
     /// default d'tor
@@ -41,17 +41,16 @@ namespace UZH {
     
     /// c'tor with index
     Electron( const Ntuple::ElectronNtupleObject* ana, const Int_t idx );
-
+    
     TLorentzVector* getTLV() const;
     TLorentzVector tlv() const;
-
-
+    
+    
     
     // variable definitions
-
-
-
-    int* m_passConversionVeto;
+    
+    
+        int* m_passConversionVeto;
     floatingnumber* m_full5x5_sigmaIetaIeta;
     floatingnumber* m_dEtaIn;
     floatingnumber* m_dPhiIn;
@@ -108,20 +107,20 @@ namespace UZH {
     floatingnumber* m_superCluster_eta;
     floatingnumber* m_superCluster_e;
 
-
-
+    
+    
     /// delta(R) function using the cluster eta/phi position of the electrons
     // floatingnumber DeltaRcluster( const Particle* p ) const;
-
+    
     /// delta(R) function using the track eta/phi position of the electrons
     // floatingnumber DeltaRtrack( const Particle* p ) const;
+    
 
-
-
-
+    
+    
 
     // check level given here must be consistent with ...NtupleObject.cxx, otherwise you'll get a segfault
-    int passConversionVeto() const { /*if(!m_ana->getConnectSucceeded(Ntuple::ElectronNtupleObject::kpassConversionVeto)) std::cout<<"passConversionVeto not connected!"<<std::endl;*/ return *(m_passConversionVeto); } 
+        int passConversionVeto() const { /*if(!m_ana->getConnectSucceeded(Ntuple::ElectronNtupleObject::kpassConversionVeto)) std::cout<<"passConversionVeto not connected!"<<std::endl;*/ return *(m_passConversionVeto); } 
     floatingnumber full5x5_sigmaIetaIeta() const { /*if(!m_ana->getConnectSucceeded(Ntuple::ElectronNtupleObject::kfull5x5_sigmaIetaIeta)) std::cout<<"full5x5_sigmaIetaIeta not connected!"<<std::endl;*/ return *(m_full5x5_sigmaIetaIeta); } 
     floatingnumber dEtaIn() const { /*if(!m_ana->getConnectSucceeded(Ntuple::ElectronNtupleObject::kdEtaIn)) std::cout<<"dEtaIn not connected!"<<std::endl;*/ return *(m_dEtaIn); } 
     floatingnumber dPhiIn() const { /*if(!m_ana->getConnectSucceeded(Ntuple::ElectronNtupleObject::kdPhiIn)) std::cout<<"dPhiIn not connected!"<<std::endl;*/ return *(m_dPhiIn); } 
@@ -178,7 +177,7 @@ namespace UZH {
     floatingnumber superCluster_eta() const { /*if(!m_ana->getConnectSucceeded(Ntuple::ElectronNtupleObject::ksuperCluster_eta)) std::cout<<"superCluster_eta not connected!"<<std::endl;*/ return *(m_superCluster_eta); } 
     floatingnumber superCluster_e() const { /*if(!m_ana->getConnectSucceeded(Ntuple::ElectronNtupleObject::ksuperCluster_e)) std::cout<<"superCluster_e not connected!"<<std::endl;*/ return *(m_superCluster_e); } 
     
-    void passConversionVeto( const int& val){ *(m_passConversionVeto)=val; } 
+        void passConversionVeto( const int& val){ *(m_passConversionVeto)=val; } 
     void full5x5_sigmaIetaIeta( const floatingnumber& val){ *(m_full5x5_sigmaIetaIeta)=val; } 
     void dEtaIn( const floatingnumber& val){ *(m_dEtaIn)=val; } 
     void dPhiIn( const floatingnumber& val){ *(m_dPhiIn)=val; } 
@@ -235,28 +234,27 @@ namespace UZH {
     void superCluster_eta( const floatingnumber& val){ *(m_superCluster_eta)=val; } 
     void superCluster_e( const floatingnumber& val){ *(m_superCluster_e)=val; } 
     
-
+    
   private:
     const Ntuple::ElectronNtupleObject* m_ana;
+    
   }; // class Electron
 
   typedef std::vector< Electron > ElectronVec;
   typedef std::vector< Electron >::iterator ElectronVecIt;
   typedef std::vector< Electron >::const_iterator ElectronVecConstIt;
 
-
-
+  
   /// sort Electrons by pT
   bool operator<( const Electron& e1, const Electron& e2 );
 
   /// function class to sort Electron vector contents by pT
   class sortElectronPt {
-  public:
-    bool operator()( const Electron& e1,
-                     const Electron& e2 );
+    public:
+      bool operator()( const Electron& e1,
+                       const Electron& e2 );
   };
-
-
+  
 
 } // end of namespace UZH
 

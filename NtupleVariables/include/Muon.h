@@ -30,12 +30,12 @@ namespace UZH {
    * @author Code produced by Id: CodeIt.py 494 2010-07-30 13:41:32Z svn 
    *
    */
-
+  
   class Muon : public Basic 
- , public Particle 
+   , public Particle 
   {
   public:
-
+  
     /// default c'tor
     Muon();
     /// default d'tor
@@ -43,17 +43,16 @@ namespace UZH {
     
     /// c'tor with index
     Muon( const Ntuple::MuonNtupleObject* ana, const Int_t idx );
-
+    
     TLorentzVector* getTLV() const;
     TLorentzVector tlv() const;
-
-
+    
+    
     
     // variable definitions
-
-
-
-    floatingnumber* m_charge;
+    
+    
+        floatingnumber* m_charge;
     int* m_pdgId;
     floatingnumber* m_pfRhoCorrRelIso03Boost;
     floatingnumber* m_pfRhoCorrRelIso04Boost;
@@ -93,14 +92,14 @@ namespace UZH {
     int* m_globalHits;
     floatingnumber* m_normChi2;
 
+    
+    
 
-
-
-
-
+    
+    
 
     // check level given here must be consistent with ...NtupleObject.cxx, otherwise you'll get a segfault
-    floatingnumber charge() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MuonNtupleObject::kcharge)) std::cout<<"charge not connected!"<<std::endl;*/ return *(m_charge); } 
+        floatingnumber charge() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MuonNtupleObject::kcharge)) std::cout<<"charge not connected!"<<std::endl;*/ return *(m_charge); } 
     int pdgId() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MuonNtupleObject::kpdgId)) std::cout<<"pdgId not connected!"<<std::endl;*/ return *(m_pdgId); } 
     floatingnumber pfRhoCorrRelIso03Boost() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MuonNtupleObject::kpfRhoCorrRelIso03Boost)) std::cout<<"pfRhoCorrRelIso03Boost not connected!"<<std::endl;*/ return *(m_pfRhoCorrRelIso03Boost); } 
     floatingnumber pfRhoCorrRelIso04Boost() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MuonNtupleObject::kpfRhoCorrRelIso04Boost)) std::cout<<"pfRhoCorrRelIso04Boost not connected!"<<std::endl;*/ return *(m_pfRhoCorrRelIso04Boost); } 
@@ -140,7 +139,7 @@ namespace UZH {
     int globalHits() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MuonNtupleObject::kglobalHits)) std::cout<<"globalHits not connected!"<<std::endl;*/ return *(m_globalHits); } 
     floatingnumber normChi2() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MuonNtupleObject::knormChi2)) std::cout<<"normChi2 not connected!"<<std::endl;*/ return *(m_normChi2); } 
     
-    void charge( const floatingnumber& val){ *(m_charge)=val; } 
+        void charge( const floatingnumber& val){ *(m_charge)=val; } 
     void pdgId( const int& val){ *(m_pdgId)=val; } 
     void pfRhoCorrRelIso03Boost( const floatingnumber& val){ *(m_pfRhoCorrRelIso03Boost)=val; } 
     void pfRhoCorrRelIso04Boost( const floatingnumber& val){ *(m_pfRhoCorrRelIso04Boost)=val; } 
@@ -180,28 +179,27 @@ namespace UZH {
     void globalHits( const int& val){ *(m_globalHits)=val; } 
     void normChi2( const floatingnumber& val){ *(m_normChi2)=val; } 
     
-
+    
   private:
     const Ntuple::MuonNtupleObject* m_ana;
+    
   }; // class Muon
 
   typedef std::vector< Muon > MuonVec;
   typedef std::vector< Muon >::iterator MuonVecIt;
   typedef std::vector< Muon >::const_iterator MuonVecConstIt;
 
-
-
+  
   /// sort Muons by pT
   bool operator<( const Muon& e1, const Muon& e2 );
 
   /// function class to sort Muon vector contents by pT
   class sortMuonPt {
-  public:
-    bool operator()( const Muon& e1,
-                     const Muon& e2 );
+    public:
+      bool operator()( const Muon& e1,
+                       const Muon& e2 );
   };
-
-
+  
 
 } // end of namespace UZH
 

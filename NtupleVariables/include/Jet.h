@@ -28,12 +28,12 @@ namespace UZH {
    * @author Code produced by Id: CodeIt.py 494 2010-07-30 13:41:32Z svn 
    *
    */
-
+  
   class Jet : public Basic 
- , public Particle 
+   , public Particle 
   {
   public:
-
+  
     /// default c'tor
     Jet();
     /// default d'tor
@@ -41,21 +41,20 @@ namespace UZH {
     
     /// c'tor with index
     Jet( const Ntuple::JetNtupleObject* ana, const Int_t idx );
-
+    
     TLorentzVector* getTLV() const;
     TLorentzVector tlv() const;
-
-
+    
+    
     
     // variable definitions
-
-
+    
     bool            m_isTagged; ///< user-level flag to indicate b-tag
-
-
+    
+    
     floatingnumber  m_scalefactor; ///< scale factor for JES shifts (0 for nominal JES)
-
-    bool m_IDLoose;
+    
+        bool m_IDLoose;
     bool m_IDTight;
     floatingnumber* m_jec;
     floatingnumber* m_jecUp;
@@ -90,20 +89,20 @@ namespace UZH {
     int* m_nbHadrons;
     int* m_ncHadrons;
 
+    
+    
 
-
-
-
+    
     void           setTagged( const bool isTagged = true ) { m_isTagged = isTagged; }
     bool           isTagged() const { return m_isTagged; }
-
-
-    floatingnumber getJetSF() const { return m_scalefactor; }
-    void           scaleJES( const floatingnumber scale);
-
+    
+    
+      floatingnumber getJetSF() const { return m_scalefactor; }
+      void           scaleJES( const floatingnumber scale);
+    
 
     // check level given here must be consistent with ...NtupleObject.cxx, otherwise you'll get a segfault
-    bool IDLoose() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::kIDLoose)) std::cout<<"IDLoose not connected!"<<std::endl;*/ return (m_IDLoose); } 
+        bool IDLoose() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::kIDLoose)) std::cout<<"IDLoose not connected!"<<std::endl;*/ return (m_IDLoose); } 
     bool IDTight() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::kIDTight)) std::cout<<"IDTight not connected!"<<std::endl;*/ return (m_IDTight); } 
     floatingnumber jec() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::kjec)) std::cout<<"jec not connected!"<<std::endl;*/ return *(m_jec); } 
     floatingnumber jecUp() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::kjecUp)) std::cout<<"jecUp not connected!"<<std::endl;*/ return *(m_jecUp); } 
@@ -138,7 +137,7 @@ namespace UZH {
     int nbHadrons() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::knbHadrons)) std::cout<<"nbHadrons not connected!"<<std::endl;*/ return *(m_nbHadrons); } 
     int ncHadrons() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::kncHadrons)) std::cout<<"ncHadrons not connected!"<<std::endl;*/ return *(m_ncHadrons); } 
     
-    void IDLoose( const bool& val){ (m_IDLoose)=val; } 
+        void IDLoose( const bool& val){ (m_IDLoose)=val; } 
     void IDTight( const bool& val){ (m_IDTight)=val; } 
     void jec( const floatingnumber& val){ *(m_jec)=val; } 
     void jecUp( const floatingnumber& val){ *(m_jecUp)=val; } 
@@ -173,18 +172,27 @@ namespace UZH {
     void nbHadrons( const int& val){ *(m_nbHadrons)=val; } 
     void ncHadrons( const int& val){ *(m_ncHadrons)=val; } 
     
-
+    
   private:
     const Ntuple::JetNtupleObject* m_ana;
+    
   }; // class Jet
 
   typedef std::vector< Jet > JetVec;
   typedef std::vector< Jet >::iterator JetVecIt;
   typedef std::vector< Jet >::const_iterator JetVecConstIt;
 
+  
+  /// sort Jets by pT
+  bool operator<( const Jet& e1, const Jet& e2 );
 
-
-
+  /// function class to sort Jet vector contents by pT
+  class sortJetPt {
+    public:
+      bool operator()( const Jet& e1,
+                       const Jet& e2 );
+  };
+  
 
 } // end of namespace UZH
 

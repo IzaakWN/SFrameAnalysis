@@ -28,12 +28,12 @@ namespace UZH {
    * @author Code produced by Id: CodeIt.py 494 2010-07-30 13:41:32Z svn 
    *
    */
-
+  
   class Tau : public Basic 
- , public Particle 
+   , public Particle 
   {
   public:
-
+  
     /// default c'tor
     Tau();
     /// default d'tor
@@ -41,17 +41,16 @@ namespace UZH {
     
     /// c'tor with index
     Tau( const Ntuple::TauNtupleObject* ana, const Int_t idx );
-
+    
     TLorentzVector* getTLV() const;
     TLorentzVector tlv() const;
-
-
+    
+    
     
     // variable definitions
-
-
-
-    floatingnumber* m_decayModeFindingNewDMs;
+    
+    
+        floatingnumber* m_decayModeFindingNewDMs;
     floatingnumber* m_decayModeFinding;
     floatingnumber* m_byLooseCombinedIsolationDeltaBetaCorr3Hits;
     floatingnumber* m_byMediumCombinedIsolationDeltaBetaCorr3Hits;
@@ -128,14 +127,14 @@ namespace UZH {
     int* m_TauType;
     int* m_decayMode;
 
+    
+    
 
-
-
-
-
+    
+    
 
     // check level given here must be consistent with ...NtupleObject.cxx, otherwise you'll get a segfault
-    floatingnumber decayModeFindingNewDMs() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kdecayModeFindingNewDMs)) std::cout<<"decayModeFindingNewDMs not connected!"<<std::endl;*/ return *(m_decayModeFindingNewDMs); } 
+        floatingnumber decayModeFindingNewDMs() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kdecayModeFindingNewDMs)) std::cout<<"decayModeFindingNewDMs not connected!"<<std::endl;*/ return *(m_decayModeFindingNewDMs); } 
     floatingnumber decayModeFinding() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kdecayModeFinding)) std::cout<<"decayModeFinding not connected!"<<std::endl;*/ return *(m_decayModeFinding); } 
     floatingnumber byLooseCombinedIsolationDeltaBetaCorr3Hits() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyLooseCombinedIsolationDeltaBetaCorr3Hits)) std::cout<<"byLooseCombinedIsolationDeltaBetaCorr3Hits not connected!"<<std::endl;*/ return *(m_byLooseCombinedIsolationDeltaBetaCorr3Hits); } 
     floatingnumber byMediumCombinedIsolationDeltaBetaCorr3Hits() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyMediumCombinedIsolationDeltaBetaCorr3Hits)) std::cout<<"byMediumCombinedIsolationDeltaBetaCorr3Hits not connected!"<<std::endl;*/ return *(m_byMediumCombinedIsolationDeltaBetaCorr3Hits); } 
@@ -212,7 +211,7 @@ namespace UZH {
     int TauType() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kTauType)) std::cout<<"TauType not connected!"<<std::endl;*/ return *(m_TauType); } 
     int decayMode() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kdecayMode)) std::cout<<"decayMode not connected!"<<std::endl;*/ return *(m_decayMode); } 
     
-    void decayModeFindingNewDMs( const floatingnumber& val){ *(m_decayModeFindingNewDMs)=val; } 
+        void decayModeFindingNewDMs( const floatingnumber& val){ *(m_decayModeFindingNewDMs)=val; } 
     void decayModeFinding( const floatingnumber& val){ *(m_decayModeFinding)=val; } 
     void byLooseCombinedIsolationDeltaBetaCorr3Hits( const floatingnumber& val){ *(m_byLooseCombinedIsolationDeltaBetaCorr3Hits)=val; } 
     void byMediumCombinedIsolationDeltaBetaCorr3Hits( const floatingnumber& val){ *(m_byMediumCombinedIsolationDeltaBetaCorr3Hits)=val; } 
@@ -289,28 +288,27 @@ namespace UZH {
     void TauType( const int& val){ *(m_TauType)=val; } 
     void decayMode( const int& val){ *(m_decayMode)=val; } 
     
-
+    
   private:
     const Ntuple::TauNtupleObject* m_ana;
+    
   }; // class Tau
 
   typedef std::vector< Tau > TauVec;
   typedef std::vector< Tau >::iterator TauVecIt;
   typedef std::vector< Tau >::const_iterator TauVecConstIt;
 
-
-
+  
   /// sort Taus by pT
   bool operator<( const Tau& e1, const Tau& e2 );
 
   /// function class to sort Tau vector contents by pT
   class sortTauPt {
-  public:
-    bool operator()( const Tau& e1,
-                     const Tau& e2 );
+    public:
+      bool operator()( const Tau& e1,
+                       const Tau& e2 );
   };
-
-
+  
 
 } // end of namespace UZH
 

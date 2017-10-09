@@ -28,12 +28,12 @@ namespace UZH {
    * @author Code produced by Id: CodeIt.py 494 2010-07-30 13:41:32Z svn 
    *
    */
-
+  
   class GenParticle : public Basic 
- , public Particle 
+   , public Particle 
   {
   public:
-
+  
     /// default c'tor
     GenParticle();
     /// default d'tor
@@ -41,19 +41,16 @@ namespace UZH {
     
     /// c'tor with index
     GenParticle( const Ntuple::GenParticleNtupleObject* ana, const Int_t idx );
-
+    
     TLorentzVector* getTLV() const;
     TLorentzVector tlv() const;
-
-
-    floatingnumber DeltaR(const GenParticle& p) const;
-
+    
+     floatingnumber DeltaR(const GenParticle& p) const; 
     
     // variable definitions
-
-
-
-    int* m_pdgId;
+    
+    
+        int* m_pdgId;
     int* m_status;
     std::vector<int>* m_mother;
     int* m_nMoth;
@@ -69,14 +66,14 @@ namespace UZH {
     floatingnumber* m_tauvismass;
     int* m_taudecay;
 
+    
+    
 
-
-
-
-
+    
+    
 
     // check level given here must be consistent with ...NtupleObject.cxx, otherwise you'll get a segfault
-    int pdgId() const { /*if(!m_ana->getConnectSucceeded(Ntuple::GenParticleNtupleObject::kpdgId)) std::cout<<"pdgId not connected!"<<std::endl;*/ return *(m_pdgId); } 
+        int pdgId() const { /*if(!m_ana->getConnectSucceeded(Ntuple::GenParticleNtupleObject::kpdgId)) std::cout<<"pdgId not connected!"<<std::endl;*/ return *(m_pdgId); } 
     int status() const { /*if(!m_ana->getConnectSucceeded(Ntuple::GenParticleNtupleObject::kstatus)) std::cout<<"status not connected!"<<std::endl;*/ return *(m_status); } 
     std::vector<int> mother() const { /*if(!m_ana->getConnectSucceeded(Ntuple::GenParticleNtupleObject::kmother)) std::cout<<"mother not connected!"<<std::endl;*/ return *(m_mother); } 
     int nMoth() const { /*if(!m_ana->getConnectSucceeded(Ntuple::GenParticleNtupleObject::knMoth)) std::cout<<"nMoth not connected!"<<std::endl;*/ return *(m_nMoth); } 
@@ -92,7 +89,7 @@ namespace UZH {
     floatingnumber tauvismass() const { /*if(!m_ana->getConnectSucceeded(Ntuple::GenParticleNtupleObject::ktauvismass)) std::cout<<"tauvismass not connected!"<<std::endl;*/ return *(m_tauvismass); } 
     int taudecay() const { /*if(!m_ana->getConnectSucceeded(Ntuple::GenParticleNtupleObject::ktaudecay)) std::cout<<"taudecay not connected!"<<std::endl;*/ return *(m_taudecay); } 
     
-    void pdgId( const int& val){ *(m_pdgId)=val; } 
+        void pdgId( const int& val){ *(m_pdgId)=val; } 
     void status( const int& val){ *(m_status)=val; } 
     void mother( const std::vector<int>& val){ *(m_mother)=val; } 
     void nMoth( const int& val){ *(m_nMoth)=val; } 
@@ -108,18 +105,17 @@ namespace UZH {
     void tauvismass( const floatingnumber& val){ *(m_tauvismass)=val; } 
     void taudecay( const int& val){ *(m_taudecay)=val; } 
     
-
+    
   private:
     const Ntuple::GenParticleNtupleObject* m_ana;
+    
   }; // class GenParticle
 
   typedef std::vector< GenParticle > GenParticleVec;
   typedef std::vector< GenParticle >::iterator GenParticleVecIt;
   typedef std::vector< GenParticle >::const_iterator GenParticleVecConstIt;
 
-
-
-
+  
 
 } // end of namespace UZH
 

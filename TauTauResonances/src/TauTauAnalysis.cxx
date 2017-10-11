@@ -260,42 +260,42 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
     TString treeName = "tree_" + channels_[chi];
     const char* ch = channels_[chi].c_str();
     
-    DeclareVariable( b_channel[ch],         "channel",          treeName);
-    DeclareVariable( b_isData[ch],          "isData",           treeName);
+    DeclareVariable( b_channel[ch],             "channel",              treeName);
+    DeclareVariable( b_isData[ch],              "isData",               treeName);
     
-    DeclareVariable( b_weight[ch],          "weight",           treeName);
-    DeclareVariable( b_genweight[ch],       "genweight",        treeName);
-    DeclareVariable( b_puweight[ch],        "puweight",         treeName);
-    DeclareVariable( b_weightbtag[ch],      "weightbtag",       treeName);
-    DeclareVariable( b_zptweight[ch],       "zptweight",        treeName);
-    DeclareVariable( b_ttptweight[ch],      "ttptweight",       treeName);
-    DeclareVariable( b_ttptweight_runI[ch], "ttptweight_runI",  treeName);
-    DeclareVariable( b_trigweight_1[ch],    "trigweight_1",     treeName);
-    DeclareVariable( b_trigweight_or_1[ch], "trigweight_or_1",  treeName);
-    DeclareVariable( b_idisoweight_1[ch],   "idisoweight_1",    treeName);
-    DeclareVariable( b_trigweight_2[ch],    "trigweight_2",     treeName);
-    DeclareVariable( b_idisoweight_2[ch],   "idisoweight_2",    treeName);
+    DeclareVariable( b_weight[ch],              "weight",               treeName);
+    DeclareVariable( b_genweight[ch],           "genweight",            treeName);
+    DeclareVariable( b_puweight[ch],            "puweight",             treeName);
+    DeclareVariable( b_weightbtag[ch],          "weightbtag",           treeName);
+    DeclareVariable( b_zptweight[ch],           "zptweight",            treeName);
+    DeclareVariable( b_ttptweight[ch],          "ttptweight",           treeName);
+    DeclareVariable( b_ttptweight_runI[ch],     "ttptweight_runI",      treeName);
+    DeclareVariable( b_trigweight_1[ch],        "trigweight_1",         treeName);
+    DeclareVariable( b_trigweight_or_1[ch],     "trigweight_or_1",      treeName);
+    DeclareVariable( b_idisoweight_1[ch],       "idisoweight_1",        treeName);
+    DeclareVariable( b_trigweight_2[ch],        "trigweight_2",         treeName);
+    DeclareVariable( b_idisoweight_2[ch],       "idisoweight_2",        treeName);
     
-    DeclareVariable( b_triggers[ch],        "triggers",         treeName);
-    DeclareVariable( b_run[ch],             "run",              treeName);
-    DeclareVariable( b_evt[ch],             "evt",              treeName);
-    DeclareVariable( b_lum[ch],             "lum",              treeName);
+    DeclareVariable( b_triggers[ch],            "triggers",             treeName);
+    DeclareVariable( b_run[ch],                 "run",                  treeName);
+    DeclareVariable( b_evt[ch],                 "evt",                  treeName);
+    DeclareVariable( b_lum[ch],                 "lum",                  treeName);
     
-    DeclareVariable( b_npv[ch],             "npv",              treeName);
-    DeclareVariable( b_npu[ch],             "npu",              treeName);
-    DeclareVariable( b_NUP[ch],             "NUP",              treeName);
-    DeclareVariable( b_rho[ch],             "rho",              treeName);
+    DeclareVariable( b_npv[ch],                 "npv",                  treeName);
+    DeclareVariable( b_npu[ch],                 "npu",                  treeName);
+    DeclareVariable( b_NUP[ch],                 "NUP",                  treeName);
+    DeclareVariable( b_rho[ch],                 "rho",                  treeName);
     
-    DeclareVariable( b_njets[ch],           "njets",            treeName);
-    DeclareVariable( b_nfjets[ch],          "nfjets",           treeName);
-    DeclareVariable( b_ncjets[ch],          "ncjets",           treeName);
-    DeclareVariable( b_nbtag[ch],           "nbtag",            treeName);
-    DeclareVariable( b_ncbtag[ch],          "ncbtag",           treeName);
-    DeclareVariable( b_njets20[ch],         "njets20",          treeName);
-    DeclareVariable( b_nfjets20[ch],        "nfjets20",         treeName);
-    DeclareVariable( b_ncjets20[ch],        "ncjets20",         treeName);
-    DeclareVariable( b_nbtag20[ch],         "nbtag20",          treeName);
-    DeclareVariable( b_ncbtag20[ch],        "ncbtag20",         treeName);
+    DeclareVariable( b_njets[ch],               "njets",                treeName);
+    DeclareVariable( b_nfjets[ch],              "nfjets",               treeName);
+    DeclareVariable( b_ncjets[ch],              "ncjets",               treeName);
+    DeclareVariable( b_nbtag[ch],               "nbtag",                treeName);
+    DeclareVariable( b_ncbtag[ch],              "ncbtag",               treeName);
+    DeclareVariable( b_njets20[ch],             "njets20",              treeName);
+    DeclareVariable( b_nfjets20[ch],            "nfjets20",             treeName);
+    DeclareVariable( b_ncjets20[ch],            "ncjets20",             treeName);
+    DeclareVariable( b_nbtag20[ch],             "nbtag20",              treeName);
+    DeclareVariable( b_ncbtag20[ch],            "ncbtag20",             treeName);
     
     if (m_doJEC){
       DeclareVariable( b_njets_jesUp[ch],           "njets_jesUp",          treeName);
@@ -374,20 +374,20 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
     DeclareVariable( b_id_e_mva_nt_loose_1[ch], "id_e_mva_nt_loose_1",  treeName);
     DeclareVariable( b_gen_match_1[ch],         "gen_match_1",          treeName);
     
-    DeclareVariable( b_pt_2[ch],            "pt_2",             treeName);
-    DeclareVariable( b_eta_2[ch],           "eta_2",            treeName);
-    DeclareVariable( b_phi_2[ch],           "phi_2",            treeName);
-    DeclareVariable( b_m_2[ch],             "m_2",              treeName);
-    DeclareVariable( b_q_2[ch],             "q_2",              treeName);
-    DeclareVariable( b_d0_2[ch],            "d0_2",             treeName);
-    DeclareVariable( b_dz_2[ch],            "dz_2",             treeName);
-    //DeclareVariable( b_mt_2[ch],            "mt_2",             treeName);
-    DeclareVariable( b_pfmt_2[ch],          "pfmt_2",           treeName);
-    DeclareVariable( b_puppimt_2[ch],       "puppimt_2",        treeName);
-    DeclareVariable( b_iso_2[ch],           "iso_2",            treeName);
-    DeclareVariable( b_iso_2_medium[ch],    "iso_2_medium",     treeName);
-    DeclareVariable( b_gen_match_2[ch],     "gen_match_2",      treeName);
-    DeclareVariable( b_pol_2[ch],           "pol_2",            treeName);
+    DeclareVariable( b_pt_2[ch],                "pt_2",                 treeName);
+    DeclareVariable( b_eta_2[ch],               "eta_2",                treeName);
+    DeclareVariable( b_phi_2[ch],               "phi_2",                treeName);
+    DeclareVariable( b_m_2[ch],                 "m_2",                  treeName);
+    DeclareVariable( b_q_2[ch],                 "q_2",                  treeName);
+    DeclareVariable( b_d0_2[ch],                "d0_2",                 treeName);
+    DeclareVariable( b_dz_2[ch],                "dz_2",                 treeName);
+    //DeclareVariable( b_mt_2[ch],                "mt_2",                 treeName);
+    DeclareVariable( b_pfmt_2[ch],              "pfmt_2",               treeName);
+    DeclareVariable( b_puppimt_2[ch],           "puppimt_2",            treeName);
+    DeclareVariable( b_iso_2[ch],               "iso_2",                treeName);
+    DeclareVariable( b_iso_2_medium[ch],        "iso_2_medium",         treeName);
+    DeclareVariable( b_gen_match_2[ch],         "gen_match_2",          treeName);
+    DeclareVariable( b_pol_2[ch],               "pol_2",                treeName);
     
     DeclareVariable( b_againstElectronVLooseMVA6_2[ch],  "againstElectronVLooseMVA6_2",  treeName);
     DeclareVariable( b_againstElectronLooseMVA6_2[ch],   "againstElectronLooseMVA6_2",   treeName);
@@ -405,107 +405,110 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
     DeclareVariable( b_decayModeFindingOldDMs_2[ch],     "decayModeFindingOldDMs_2",     treeName);
     DeclareVariable( b_decayMode_2[ch],                  "decayMode_2",                  treeName);
     
-    DeclareVariable( b_dilepton_veto[ch],   "dilepton_veto",    treeName);
-    DeclareVariable( b_extraelec_veto[ch],  "extraelec_veto",   treeName);
-    DeclareVariable( b_extramuon_veto[ch],  "extramuon_veto",   treeName);
-    DeclareVariable( b_lepton_vetos[ch],    "lepton_vetos",     treeName);
-    DeclareVariable( b_iso_cuts[ch],        "iso_cuts",         treeName);
-    DeclareVariable( b_trigger_cuts[ch],    "trigger_cuts",     treeName);
+    DeclareVariable( b_dilepton_veto[ch],       "dilepton_veto",        treeName);
+    DeclareVariable( b_extraelec_veto[ch],      "extraelec_veto",       treeName);
+    DeclareVariable( b_extramuon_veto[ch],      "extramuon_veto",       treeName);
+    DeclareVariable( b_lepton_vetos[ch],        "lepton_vetos",         treeName);
+    DeclareVariable( b_iso_cuts[ch],            "iso_cuts",             treeName);
+    DeclareVariable( b_trigger_cuts[ch],        "trigger_cuts",         treeName);
     
-    DeclareVariable( b_jpt_1[ch],           "jpt_1",            treeName);
-    DeclareVariable( b_jeta_1[ch],          "jeta_1",           treeName);
-    DeclareVariable( b_jphi_1[ch],          "jphi_1",           treeName);
-    DeclareVariable( b_jpt_2[ch],           "jpt_2",            treeName);
-    DeclareVariable( b_jeta_2[ch],          "jeta_2",           treeName);
-    DeclareVariable( b_jphi_2[ch],          "jphi_2",           treeName);
+    DeclareVariable( b_jpt_1[ch],               "jpt_1",                treeName);
+    DeclareVariable( b_jeta_1[ch],              "jeta_1",               treeName);
+    DeclareVariable( b_jphi_1[ch],              "jphi_1",               treeName);
+    DeclareVariable( b_jpt_2[ch],               "jpt_2",                treeName);
+    DeclareVariable( b_jeta_2[ch],              "jeta_2",               treeName);
+    DeclareVariable( b_jphi_2[ch],              "jphi_2",               treeName);
     
-    DeclareVariable( b_jpt_1_jer[ch],       "jpt_1_jer",        treeName);
-    DeclareVariable( b_jeta_1_jer[ch],      "jeta_1_jer",       treeName);
-    DeclareVariable( b_jpt_2_jer[ch],       "jpt_2_jer",        treeName);
-    DeclareVariable( b_jeta_2_jer[ch],      "jeta_2_jer",       treeName);
-    DeclareVariable( b_jphi_1_jer[ch],      "jphi_1_jer",       treeName);
-    DeclareVariable( b_jphi_2_jer[ch],      "jphi_2_jer",       treeName);
+    DeclareVariable( b_jpt_1_jer[ch],           "jpt_1_jer",            treeName);
+    DeclareVariable( b_jeta_1_jer[ch],          "jeta_1_jer",           treeName);
+    DeclareVariable( b_jpt_2_jer[ch],           "jpt_2_jer",            treeName);
+    DeclareVariable( b_jeta_2_jer[ch],          "jeta_2_jer",           treeName);
+    DeclareVariable( b_jphi_1_jer[ch],          "jphi_1_jer",           treeName);
+    DeclareVariable( b_jphi_2_jer[ch],          "jphi_2_jer",           treeName);
     
-    // DeclareVariable( b_fjpt_1[ch],          "fjpt_1",           treeName);
-    // DeclareVariable( b_fjet_1[ch],          "fjet_1",           treeName);
-    // DeclareVariable( b_fjeta_1[ch],         "fjeta_1",          treeName);
-    // DeclareVariable( b_fjphi_1[ch],         "fjphi_1",          treeName);
+    //DeclareVariable( b_fjpt_1[ch],              "fjpt_1",               treeName);
+    //DeclareVariable( b_fjet_1[ch],              "fjet_1",               treeName);
+    //DeclareVariable( b_fjeta_1[ch],             "fjeta_1",              treeName);
+    //DeclareVariable( b_fjphi_1[ch],             "fjphi_1",              treeName);
     
     if(!m_isData){
-        DeclareVariable( b_jpt_1_jesUp[ch],     "jpt_1_jesUp",      treeName);
-        DeclareVariable( b_jpt_1_jesDown[ch],   "jpt_1_jesDown",    treeName);
-        DeclareVariable( b_jpt_1_jerUp[ch],     "jpt_1_jerUp",      treeName);
-        DeclareVariable( b_jpt_1_jerDown[ch],   "jpt_1_jerDown",    treeName);
-        DeclareVariable( b_jeta_1_jesUp[ch],    "jeta_1_jesUp",     treeName);
-        DeclareVariable( b_jeta_1_jesDown[ch],  "jeta_1_jesDown",   treeName);
-        DeclareVariable( b_jeta_1_jerUp[ch],    "jeta_1_jerUp",     treeName);
-        DeclareVariable( b_jeta_1_jerDown[ch],  "jeta_1_jerDown",   treeName);
-        DeclareVariable( b_jpt_2_jesUp[ch],     "jpt_2_jesUp",      treeName);
-        DeclareVariable( b_jpt_2_jesDown[ch],   "jpt_2_jesDown",    treeName);
-        DeclareVariable( b_jpt_2_jerUp[ch],     "jpt_2_jerUp",      treeName);
-        DeclareVariable( b_jpt_2_jerDown[ch],   "jpt_2_jerDown",    treeName);
-        DeclareVariable( b_jeta_2_jesUp[ch],    "jeta_2_jesUp",     treeName);
-        DeclareVariable( b_jeta_2_jesDown[ch],  "jeta_2_jesDown",   treeName);
-        DeclareVariable( b_jeta_2_jerUp[ch],    "jeta_2_jerUp",     treeName);
-        DeclareVariable( b_jeta_2_jerDown[ch],  "jeta_2_jerDown",   treeName);
+        DeclareVariable( b_jpt_1_jesUp[ch],     "jpt_1_jesUp",          treeName);
+        DeclareVariable( b_jpt_1_jesDown[ch],   "jpt_1_jesDown",        treeName);
+        DeclareVariable( b_jpt_1_jerUp[ch],     "jpt_1_jerUp",          treeName);
+        DeclareVariable( b_jpt_1_jerDown[ch],   "jpt_1_jerDown",        treeName);
+        DeclareVariable( b_jeta_1_jesUp[ch],    "jeta_1_jesUp",         treeName);
+        DeclareVariable( b_jeta_1_jesDown[ch],  "jeta_1_jesDown",       treeName);
+        DeclareVariable( b_jeta_1_jerUp[ch],    "jeta_1_jerUp",         treeName);
+        DeclareVariable( b_jeta_1_jerDown[ch],  "jeta_1_jerDown",       treeName);
+        DeclareVariable( b_jpt_2_jesUp[ch],     "jpt_2_jesUp",          treeName);
+        DeclareVariable( b_jpt_2_jesDown[ch],   "jpt_2_jesDown",        treeName);
+        DeclareVariable( b_jpt_2_jerUp[ch],     "jpt_2_jerUp",          treeName);
+        DeclareVariable( b_jpt_2_jerDown[ch],   "jpt_2_jerDown",        treeName);
+        DeclareVariable( b_jeta_2_jesUp[ch],    "jeta_2_jesUp",         treeName);
+        DeclareVariable( b_jeta_2_jesDown[ch],  "jeta_2_jesDown",       treeName);
+        DeclareVariable( b_jeta_2_jerUp[ch],    "jeta_2_jerUp",         treeName);
+        DeclareVariable( b_jeta_2_jerDown[ch],  "jeta_2_jerDown",       treeName);
     }
     
-    DeclareVariable( b_bpt_1[ch],           "bpt_1",            treeName);
-    DeclareVariable( b_beta_1[ch],          "beta_1",           treeName);
-    DeclareVariable( b_bphi_1[ch],          "bphi_1",           treeName);
-    DeclareVariable( b_bcsv_1[ch],          "bcsv_1",           treeName);
-    DeclareVariable( b_bpt_2[ch],           "bpt_2",            treeName);
-    DeclareVariable( b_beta_2[ch],          "beta_2",           treeName);
-    DeclareVariable( b_bphi_2[ch],          "bphi_2",           treeName);
-    DeclareVariable( b_bcsv_2[ch],          "bcsv_2",           treeName);
+    DeclareVariable( b_bpt_1[ch],               "bpt_1",                treeName);
+    DeclareVariable( b_beta_1[ch],              "beta_1",               treeName);
+    DeclareVariable( b_bphi_1[ch],              "bphi_1",               treeName);
+    DeclareVariable( b_bcsv_1[ch],              "bcsv_1",               treeName);
+    DeclareVariable( b_bpt_2[ch],               "bpt_2",                treeName);
+    DeclareVariable( b_beta_2[ch],              "beta_2",               treeName);
+    DeclareVariable( b_bphi_2[ch],              "bphi_2",               treeName);
+    DeclareVariable( b_bcsv_2[ch],              "bcsv_2",               treeName);
     
-    DeclareVariable( b_met[ch],             "met",              treeName);
-    DeclareVariable( b_met_old[ch],         "met_old",          treeName);
-    DeclareVariable( b_metphi[ch],          "metphi",           treeName);
-    DeclareVariable( b_puppimet[ch],        "puppimet",         treeName);
-    DeclareVariable( b_puppimetphi[ch],     "puppimetphi",      treeName);
-    //DeclareVariable( b_mvamet[ch],          "mvamet",           treeName);
-    //DeclareVariable( b_mvamet_old[ch],      "mvamet_old",       treeName);
-    //DeclareVariable( b_mvametphi[ch],       "mvametphi",        treeName);
+    DeclareVariable( b_met[ch],                 "met",                  treeName);
+    DeclareVariable( b_met_old[ch],             "met_old",              treeName);
+    DeclareVariable( b_metphi[ch],              "metphi",               treeName);
+    DeclareVariable( b_puppimet[ch],            "puppimet",             treeName);
+    DeclareVariable( b_puppimetphi[ch],         "puppimetphi",          treeName);
+    //DeclareVariable( b_mvamet[ch],          "mvamet",                   treeName);
+    //DeclareVariable( b_mvamet_old[ch],      "mvamet_old",               treeName);
+    //DeclareVariable( b_mvametphi[ch],       "mvametphi",                treeName);
     
-    DeclareVariable( b_metcov00[ch],        "metcov00",         treeName);
-    DeclareVariable( b_metcov01[ch],        "metcov01",         treeName);
-    DeclareVariable( b_metcov10[ch],        "metcov10",         treeName);
-    DeclareVariable( b_metcov11[ch],        "metcov11",         treeName);
-    //DeclareVariable( b_mvacov00[ch],        "mvacov00",         treeName);
-    //DeclareVariable( b_mvacov01[ch],        "mvacov01",         treeName);
-    //DeclareVariable( b_mvacov10[ch],        "mvacov10",         treeName);
-    //DeclareVariable( b_mvacov11[ch],        "mvacov11",         treeName);
+    DeclareVariable( b_metcov00[ch],            "metcov00",             treeName);
+    DeclareVariable( b_metcov01[ch],            "metcov01",             treeName);
+    DeclareVariable( b_metcov10[ch],            "metcov10",             treeName);
+    DeclareVariable( b_metcov11[ch],            "metcov11",             treeName);
+    //DeclareVariable( b_mvacov00[ch],        "mvacov00",                 treeName);
+    //DeclareVariable( b_mvacov01[ch],        "mvacov01",                 treeName);
+    //DeclareVariable( b_mvacov10[ch],        "mvacov10",                 treeName);
+    //DeclareVariable( b_mvacov11[ch],        "mvacov11",                 treeName);
     
-    DeclareVariable( b_m_vis[ch],           "m_vis",            treeName);
-    DeclareVariable( b_pt_tt[ch],           "pt_tt",            treeName);
-    DeclareVariable( b_pt_tt_vis[ch],       "pt_tt_vis",        treeName);
-    DeclareVariable( b_R_pt_m_vis[ch],      "R_pt_m_vis",       treeName);
-    DeclareVariable( b_R_pt_m_vis2[ch],     "R_pt_m_vis2",      treeName);
+    DeclareVariable( b_m_vis[ch],               "m_vis",                treeName);
+    DeclareVariable( b_pt_tt[ch],               "pt_tt",                treeName);
+    DeclareVariable( b_pt_tt_vis[ch],           "pt_tt_vis",            treeName);
+    DeclareVariable( b_R_pt_m_vis[ch],          "R_pt_m_vis",           treeName);
+    DeclareVariable( b_R_pt_m_vis2[ch],         "R_pt_m_vis2",          treeName);
     
-    DeclareVariable( b_m_sv[ch],            "m_sv",             treeName);
-    //DeclareVariable( b_m_sv_pfmet[ch],      "m_sv_pfmet",       treeName);
-    DeclareVariable( b_pt_tt_sv[ch],        "pt_tt_sv",         treeName);
-    DeclareVariable( b_R_pt_m_sv[ch],       "R_pt_m_sv",        treeName);
+    DeclareVariable( b_m_sv[ch],                "m_sv",                 treeName);
+    //DeclareVariable( b_m_sv_pfmet[ch],          "m_sv_pfmet",           treeName);
+    DeclareVariable( b_m_taub[ch],              "m_taub",               treeName);
+    DeclareVariable( b_m_taumub[ch],            "m_taumub",             treeName);
+    DeclareVariable( b_m_mub[ch],               "m_mub",                treeName);
+    DeclareVariable( b_pt_tt_sv[ch],            "pt_tt_sv",             treeName);
+    DeclareVariable( b_R_pt_m_sv[ch],           "R_pt_m_sv",            treeName);
     
-    DeclareVariable( b_dR_ll[ch],           "dR_ll",            treeName);
-    DeclareVariable( b_dphi_ll_bj[ch],      "dphi_ll_bj",       treeName);
-    DeclareVariable( b_mt_tot[ch],          "mt_tot",           treeName);
-    DeclareVariable( b_ht[ch],              "ht",               treeName);
+    DeclareVariable( b_dR_ll[ch],               "dR_ll",                treeName);
+    DeclareVariable( b_dphi_ll_bj[ch],          "dphi_ll_bj",           treeName);
+    DeclareVariable( b_mt_tot[ch],              "mt_tot",               treeName);
+    DeclareVariable( b_ht[ch],                  "ht",                   treeName);
     
-    DeclareVariable( b_m_genboson[ch],      "m_genboson",       treeName);
-    DeclareVariable( b_pt_genboson[ch],     "pt_genboson",      treeName);
-    DeclareVariable( b_pt_top_1[ch],        "pt_top_1",         treeName);
-    DeclareVariable( b_pt_top_2[ch],        "pt_top_2",         treeName);
+    DeclareVariable( b_m_genboson[ch],          "m_genboson",           treeName);
+    DeclareVariable( b_pt_genboson[ch],         "pt_genboson",          treeName);
+    DeclareVariable( b_pt_top_1[ch],            "pt_top_1",             treeName);
+    DeclareVariable( b_pt_top_2[ch],            "pt_top_2",             treeName);
     
-    DeclareVariable( b_pzetamiss[ch],       "pzetamiss",        treeName);
-    DeclareVariable( b_pzetavis[ch],        "pzetavis",         treeName);
-    DeclareVariable( b_pzeta_disc[ch],      "pzeta_disc",       treeName);
-    DeclareVariable( b_vbf_mjj[ch],         "vbf_mjj",          treeName);
-    DeclareVariable( b_vbf_deta[ch],        "vbf_deta",         treeName);
-    DeclareVariable( b_vbf_jdphi[ch],       "vbf_jdphi",        treeName);
-    DeclareVariable( b_vbf_ncentral[ch],    "vbf_ncentral",     treeName);
-    DeclareVariable( b_vbf_ncentral20[ch],  "vbf_ncentral20",   treeName);
+    DeclareVariable( b_pzetamiss[ch],           "pzetamiss",            treeName);
+    DeclareVariable( b_pzetavis[ch],            "pzetavis",             treeName);
+    DeclareVariable( b_pzeta_disc[ch],          "pzeta_disc",           treeName);
+    DeclareVariable( b_vbf_mjj[ch],             "vbf_mjj",              treeName);
+    DeclareVariable( b_vbf_deta[ch],            "vbf_deta",             treeName);
+    DeclareVariable( b_vbf_jdphi[ch],           "vbf_jdphi",            treeName);
+    DeclareVariable( b_vbf_ncentral[ch],        "vbf_ncentral",         treeName);
+    DeclareVariable( b_vbf_ncentral20[ch],      "vbf_ncentral20",       treeName);
     
   }
   
@@ -926,6 +929,8 @@ void TauTauAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
     for ( int i = 0; i < (m_jetAK4.N); ++i ) {
       UZH::Jet myjetak4( &m_jetAK4, i );
       
+      // TODO: ...
+      
       Float_t dr_mj = deltaR(myjetak4.eta() - goodMuons[mutau_pair[0].ilepton].eta(), 
                       deltaPhi(myjetak4.phi(), goodMuons[mutau_pair[0].ilepton].phi()));
       if(dr_mj < 0.5) continue;
@@ -1006,6 +1011,9 @@ void TauTauAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
       if(dr_tj < 0.5) continue;
       
       if (fabs(myjetak4.eta()) > m_AK4jetEtaCut) continue;
+      
+      // TODO: ...
+      
       if (myjetak4.pt() < m_AK4jetPtCut) continue;
       if (!LooseJetID(myjetak4)) continue;
       
@@ -1299,11 +1307,11 @@ void TauTauAnalysis::FillBranches(const std::string& channel, std::vector<UZH::J
     b_jphi_2[ch]    = -9;
   }else{
     b_jpt_1[ch]     = -1;
-    b_jpt_1[ch]     = -1;
+    b_jeta_1[ch]    = -9;
     //b_jeta_1[ch]    = -9;
     b_jphi_1[ch]    = -9;
     b_jpt_2[ch]     = -1;
-    b_jpt_2[ch]     = -1;
+    b_jeta_2[ch]    = -9;
     //b_jeta_2[ch]    = -9;
     b_jphi_2[ch]    = -9;
   }
@@ -1337,7 +1345,7 @@ void TauTauAnalysis::FillBranches(const std::string& channel, std::vector<UZH::J
     b_vbf_jdphi[ch] = -99;
     b_vbf_ncentral[ch]   = -99;
     b_vbf_ncentral20[ch] = -99;
-  }
+  } 
   
   if(ibjet1 < 0){
     b_bpt_1[ch]     = -1;
@@ -1474,6 +1482,7 @@ void TauTauAnalysis::FillBranches(const std::string& channel, std::vector<UZH::J
       b_idisoweight_1[ch]   = m_ScaleFactorTool.get_ScaleFactor_EleIdIso(  b_pt_1[ch],fabs(b_eta_1[ch]));
     }
   }
+  
   
   
   ///////////////////////
@@ -1617,6 +1626,16 @@ void TauTauAnalysis::FillBranches(const std::string& channel, std::vector<UZH::J
   b_mt_tot[ch]      = TMath::Sqrt(TMath::Power(b_pfmt_1[ch],2) + TMath::Power(b_pfmt_2[ch],2) + 2*lep_tlv.Pt()*b_pt_2[ch]*(1-TMath::Cos(deltaPhi(lep_tlv.Phi(), b_phi_2[ch]))));
   b_ht[ch]          = ht + lep_tlv.E() + tau_tlv.E();
   
+  if(ibjet1 != -1){
+    b_m_taub[ch] = (tau_tlv + Jets.at(ibjet1).tlv()).M();
+    b_m_taumub[ch] = (lep_tlv + tau_tlv + Jets.at(ibjet1).tlv()).M();
+    b_m_mub[ch] = (lep_tlv + Jets.at(ibjet1).tlv()).M();
+  }else{
+    b_m_taub[ch] = -1;
+    b_m_taumub[ch] = -1;
+    b_m_mub[ch] = -1;
+  }
+  
   // Delta phi( lep+tau, bj+j ) if there is one central b jet and on central jet
   // icjet1 = index of central jet that is not the same as leading b jet
   if(icjet1 != -1 && ibjet1 != -1)
@@ -1634,18 +1653,14 @@ void TauTauAnalysis::FillBranches(const std::string& channel, std::vector<UZH::J
   b_pzetavis[ch]    = pZetaVis_;
   b_pzeta_disc[ch]  = pZetaMET_ - 0.5*pZetaVis_;
   
-  if(b_lepton_vetos[ch]==0 and b_iso_1[ch]<0.50 and (b_iso_2_medium[ch]==1 or b_iso_2[ch]==1)){ 
+  if(true){ //b_lepton_vetos[ch]==0 and b_iso_1[ch]<0.50 and (b_iso_2_medium[ch]==1 or b_iso_2[ch]==1)){ 
     if(m_doJEC){
-   
+      
       b_weightbtag_bcUp[ch]     = m_BTaggingScaleTool.getScaleFactor(Jets,+1., 0.);
       b_weightbtag_bcDown[ch]   = m_BTaggingScaleTool.getScaleFactor(Jets,-1., 0.);
       b_weightbtag_udsgUp[ch]   = m_BTaggingScaleTool.getScaleFactor(Jets, 0.,+1.);
       b_weightbtag_udsgDown[ch] = m_BTaggingScaleTool.getScaleFactor(Jets, 0.,-1.);
-   
-      // double b_weightbtag_bcUp_     = m_BTaggingScaleTool.getScaleFactor(Jets,+1., 0.);
-      // double b_weightbtag_bcDown_   = m_BTaggingScaleTool.getScaleFactor(Jets,-1., 0.);
-      // double b_weightbtag_udsgUp_   = m_BTaggingScaleTool.getScaleFactor(Jets, 0.,+1.);
-      // double b_weightbtag_udsgDown_ = m_BTaggingScaleTool.getScaleFactor(Jets, 0.,-1.);
+      
       // TString tch = ch;
       // if(b_iso_cuts[ch]==1 and b_lepton_vetos[ch]==0){
       //   Hist("btagweight", "histogram_"+tch)->Fill( 0., b_weightbtag_          );
@@ -1654,10 +1669,10 @@ void TauTauAnalysis::FillBranches(const std::string& channel, std::vector<UZH::J
       //   Hist("btagweight", "histogram_"+tch)->Fill( 3., b_weightbtag_udsgUp_   );
       //   Hist("btagweight", "histogram_"+tch)->Fill( 4., b_weightbtag_udsgDown_ );
       // }
-   
+      
       if(Jets.size()>0) // njets
           FillBranches_JEC( ch, Jets, (lep_tlv+tau_tlv).Phi() );
-   
+       
       // no need to substract shifts from met, use shifts available in ntuple instead:
       TLorentzVector met_jesUp, met_jesDown, met_jer, met_jerUp, met_jerDown, met_UncEnUp, met_UncEnDown;
       met_jesUp.SetPtEtaPhiE(    met.et()*met.JetEnUp(),          0.,met.phi(),met.et()*met.JetEnUp());
@@ -1669,7 +1684,7 @@ void TauTauAnalysis::FillBranches(const std::string& channel, std::vector<UZH::J
       met_UncEnDown.SetPtEtaPhiE(met.et()*met.UnclusteredEnDown(),0.,met.phi(),met.et()*met.UnclusteredEnDown());
       //printRow({"met","jer","jerUp","jerDown","jesUp","jesDown"});
       //printRow({},{},{met.et(),met_jer.Pt(),met_jerUp.Pt(),met_jerDown.Pt(),met_jesUp.Pt(),met_jesDown.Pt()});  
-   
+      
       b_met_jesUp[ch]           = met_jesUp.Et();
       b_met_jesDown[ch]         = met_jesDown.Et();
       b_met_jer[ch]             = met_jer.Et();
@@ -1677,7 +1692,7 @@ void TauTauAnalysis::FillBranches(const std::string& channel, std::vector<UZH::J
       b_met_jerDown[ch]         = met_jerDown.Et();
       b_met_UncEnUp[ch]         = met_UncEnUp.Et();
       b_met_UncEnDown[ch]       = met_UncEnDown.Et();
-   
+      
       b_pfmt_1_jesUp[ch]        = TMath::Sqrt( 2*lep_tlv.Pt()*met_jesUp.Et()    *( 1-TMath::Cos(deltaPhi(lep_tlv.Phi(),met_jesUp.Phi()     ))));
       b_pfmt_1_jesDown[ch]      = TMath::Sqrt( 2*lep_tlv.Pt()*met_jesDown.Et()  *( 1-TMath::Cos(deltaPhi(lep_tlv.Phi(),met_jesDown.Phi()   ))));
       b_pfmt_1_jer[ch]          = TMath::Sqrt( 2*lep_tlv.Pt()*met_jer.Et()      *( 1-TMath::Cos(deltaPhi(lep_tlv.Phi(),met_jer.Phi()       ))));
@@ -1756,50 +1771,85 @@ void TauTauAnalysis::FillBranches_JEC( const char* ch, const std::vector<UZH::Je
   TLorentzVector bjet_dphi_jerUp,   jet2_dphi_jerUp;
   TLorentzVector bjet_dphi_jerDown, jet2_dphi_jerDown;
   
-  //printRow({"ijet","jet pt","jer","jerUp","jerDown","jesUp","jesDown"});
+  // corrected jets may become unordered in ntuples
+  bool swap = false;
+  if (Jets.size()>1) swap = Jets.at(0).pt() < Jets.at(1).pt();
+  
+  printRow({"ijet","jet pt","jer","jerUp","jerDown","jesUp","jesDown"});
   for( int ijet = 0; ijet < (int)Jets.size(); ++ijet ){ // already pT > 20 GeV jets
       UZH::Jet jet = Jets.at(ijet);
-      
-      std::vector<TLorentzVector> jets_jes = m_JetCorrectionTool.GetCorrectedJet(jet);
-      std::vector<TLorentzVector> jets_jer = m_JetCorrectionTool.GetCorrectedJetJER(jet,m_genJetAK4);
-      
-      TLorentzVector jet_jer(jets_jer.at(0)), jet_jerUp(jets_jer.at(1)), jet_jerDown(jets_jer.at(2)),
-                                              jet_jesUp(jets_jes.at(0)), jet_jesDown(jets_jes.at(1));
-      
-      //printRow({},{ijet},{jet.pt(),jet_jer.Pt(),jet_jerUp.Pt(),jet_jerDown.Pt(),jet_jesUp.Pt(),jet_jesDown.Pt()});
       bool isBTagged = jet.isTagged(); // tagged in promote-demote
       
-      // count jets
+      // get corrections
+      std::vector<TLorentzVector> jets_jes = m_JetCorrectionTool.GetCorrectedJet(jet);
+      std::vector<TLorentzVector> jets_jer = m_JetCorrectionTool.GetCorrectedJetJER(jet,m_genJetAK4);
+      TLorentzVector jet_jer(jets_jer.at(0)), jet_jerUp(jets_jer.at(1)), jet_jerDown(jets_jer.at(2)),
+                                              jet_jesUp(jets_jes.at(0)), jet_jesDown(jets_jes.at(1));
+      printRow({},{ijet},{jet.pt(),jet_jer.Pt(),jet_jerUp.Pt(),jet_jerDown.Pt(),jet_jesUp.Pt(),jet_jesDown.Pt()});
+      
+      // count jets with 30 GeV
       countJets( jet_jesUp,   ncjets_jesUp,   nfjets_jesUp,   ncbtag_jesUp,   bjet_dphi_jesUp,   jet2_dphi_jesUp,   isBTagged );
       countJets( jet_jesDown, ncjets_jesDown, nfjets_jesDown, ncbtag_jesDown, bjet_dphi_jesDown, jet2_dphi_jesDown, isBTagged );
       countJets( jet_jer,     ncjets_jer,     nfjets_jer,     ncbtag_jer,     bjet_dphi_jer,     jet2_dphi_jer,     isBTagged );
       countJets( jet_jerUp,   ncjets_jerUp,   nfjets_jerUp,   ncbtag_jerUp,   bjet_dphi_jerUp,   jet2_dphi_jerUp,   isBTagged );
       countJets( jet_jerDown, ncjets_jerDown, nfjets_jerDown, ncbtag_jerDown, bjet_dphi_jerDown, jet2_dphi_jerDown, isBTagged );
       
+      // get leading two jets for storing kinematic variables
+      // only use the first two jets in the list, the same as in the uncorrected case.
       if( jet_jesUp.Pt() > 20 ){
         njets20_jesUp++;
-        if(      jet1_jesUp.Pt() < 20 ) jet1_jesUp.SetPtEtaPhiM(jet_jesUp.Pt(),jet_jesUp.Eta(),jet_jesUp.Phi(),jet_jesUp.M());
-        else if( jet2_jesUp.Pt() < 20 ) jet2_jesUp.SetPtEtaPhiM(jet_jesUp.Pt(),jet_jesUp.Eta(),jet_jesUp.Phi(),jet_jesUp.M());
+        if( ijet == 0 ){
+          if(swap) jet2_jesUp.SetPtEtaPhiM(jet_jesUp.Pt(),jet_jesUp.Eta(),jet_jesUp.Phi(),jet_jesUp.M());
+          else     jet1_jesUp.SetPtEtaPhiM(jet_jesUp.Pt(),jet_jesUp.Eta(),jet_jesUp.Phi(),jet_jesUp.M());
+        }
+        else if( ijet == 1 ){
+          if(swap) jet1_jesUp.SetPtEtaPhiM(jet_jesUp.Pt(),jet_jesUp.Eta(),jet_jesUp.Phi(),jet_jesUp.M());
+          else     jet2_jesUp.SetPtEtaPhiM(jet_jesUp.Pt(),jet_jesUp.Eta(),jet_jesUp.Phi(),jet_jesUp.M());
+        }
       }
       if( jet_jesDown.Pt() > 20 ){
         njets20_jesDown++;
-        if(      jet1_jesDown.Pt() < 20 ) jet1_jesDown.SetPtEtaPhiM(jet_jesDown.Pt(),jet_jesDown.Eta(),jet_jesDown.Phi(),jet_jesDown.M());
-        else if( jet2_jesDown.Pt() < 20 ) jet2_jesDown.SetPtEtaPhiM(jet_jesDown.Pt(),jet_jesDown.Eta(),jet_jesDown.Phi(),jet_jesDown.M());
+        if( ijet == 0 ){
+          if(swap) jet2_jesDown.SetPtEtaPhiM(jet_jesDown.Pt(),jet_jesDown.Eta(),jet_jesDown.Phi(),jet_jesDown.M());
+          else     jet1_jesDown.SetPtEtaPhiM(jet_jesDown.Pt(),jet_jesDown.Eta(),jet_jesDown.Phi(),jet_jesDown.M());
+        }
+        else if( ijet == 1 ){
+          if(swap) jet1_jesDown.SetPtEtaPhiM(jet_jesDown.Pt(),jet_jesDown.Eta(),jet_jesDown.Phi(),jet_jesDown.M());
+          else     jet2_jesDown.SetPtEtaPhiM(jet_jesDown.Pt(),jet_jesDown.Eta(),jet_jesDown.Phi(),jet_jesDown.M());
+        }
       }
       if( jet_jer.Pt() > 20 ){
         njets20_jer++;
-        if(      jet1_jer.Pt() < 20 ) jet1_jer.SetPtEtaPhiM(jet_jer.Pt(),jet_jer.Eta(),jet_jer.Phi(),jet_jer.M());
-        else if( jet2_jer.Pt() < 20 ) jet2_jer.SetPtEtaPhiM(jet_jer.Pt(),jet_jer.Eta(),jet_jer.Phi(),jet_jer.M());
+        if( ijet == 0 ){
+          if(swap) jet2_jer.SetPtEtaPhiM(jet_jer.Pt(),jet_jer.Eta(),jet_jer.Phi(),jet_jer.M());
+          else     jet1_jer.SetPtEtaPhiM(jet_jer.Pt(),jet_jer.Eta(),jet_jer.Phi(),jet_jer.M());
+        }
+        else if( ijet == 1 ){
+          if(swap) jet1_jer.SetPtEtaPhiM(jet_jer.Pt(),jet_jer.Eta(),jet_jer.Phi(),jet_jer.M());
+          else     jet2_jer.SetPtEtaPhiM(jet_jer.Pt(),jet_jer.Eta(),jet_jer.Phi(),jet_jer.M());
+        }
       }
       if( jet_jerUp.Pt() > 20 ){
         njets20_jerUp++;
-        if(      jet1_jerUp.Pt() < 20 ) jet1_jerUp.SetPtEtaPhiM(jet_jerUp.Pt(),jet_jerUp.Eta(),jet_jerUp.Phi(),jet_jerUp.M());
-        else if( jet2_jerUp.Pt() < 20 ) jet2_jerUp.SetPtEtaPhiM(jet_jerUp.Pt(),jet_jerUp.Eta(),jet_jerUp.Phi(),jet_jerUp.M());
+        if( ijet == 0 ){
+          if(swap) jet2_jerUp.SetPtEtaPhiM(jet_jerUp.Pt(),jet_jerUp.Eta(),jet_jerUp.Phi(),jet_jerUp.M());
+          else     jet1_jerUp.SetPtEtaPhiM(jet_jerUp.Pt(),jet_jerUp.Eta(),jet_jerUp.Phi(),jet_jerUp.M());
+        }
+        else if( ijet == 1 ){
+          if(swap) jet1_jerUp.SetPtEtaPhiM(jet_jerUp.Pt(),jet_jerUp.Eta(),jet_jerUp.Phi(),jet_jerUp.M());
+          else     jet2_jerUp.SetPtEtaPhiM(jet_jerUp.Pt(),jet_jerUp.Eta(),jet_jerUp.Phi(),jet_jerUp.M());
+        }
       }
       if( jet_jerDown.Pt() > 20 ){
         njets20_jerDown++;
-        if(      jet1_jerDown.Pt() < 20 ) jet1_jerDown.SetPtEtaPhiM(jet_jerDown.Pt(),jet_jerDown.Eta(),jet_jerDown.Phi(),jet_jerDown.M());
-        else if( jet2_jerDown.Pt() < 20 ) jet2_jerDown.SetPtEtaPhiM(jet_jerDown.Pt(),jet_jerDown.Eta(),jet_jerDown.Phi(),jet_jerDown.M());
+        if( ijet == 0 ){
+          if(swap) jet2_jerDown.SetPtEtaPhiM(jet_jerDown.Pt(),jet_jerDown.Eta(),jet_jerDown.Phi(),jet_jerDown.M());
+          else     jet1_jerDown.SetPtEtaPhiM(jet_jerDown.Pt(),jet_jerDown.Eta(),jet_jerDown.Phi(),jet_jerDown.M());
+        }
+        else if( ijet == 1 ){
+          if(swap) jet1_jerDown.SetPtEtaPhiM(jet_jerDown.Pt(),jet_jerDown.Eta(),jet_jerDown.Phi(),jet_jerDown.M());
+          else     jet2_jerDown.SetPtEtaPhiM(jet_jerDown.Pt(),jet_jerDown.Eta(),jet_jerDown.Phi(),jet_jerDown.M());
+        }
       }
   }
   
@@ -1819,139 +1869,183 @@ void TauTauAnalysis::FillBranches_JEC( const char* ch, const std::vector<UZH::Je
   b_njets_jerUp[ch]    = nfjets_jerUp   + ncjets_jerUp;      b_njets20_jerUp[ch]   = njets20_jerUp;
   b_njets_jerDown[ch]  = nfjets_jerDown + ncjets_jerDown;    b_njets20_jerDown[ch] = njets20_jerDown;
   
-  if(njets20_jer > 0){
-    if(njets20_jer > 1){
-      if (jet1_jer.Pt()>jet2_jer.Pt()){
-        b_jpt_1_jer[ch]   = jet1_jer.Pt();
-        b_jeta_1_jer[ch]  = jet1_jer.Eta();
-        b_jphi_1_jer[ch]  = jet1_jer.Phi();
-        b_jpt_2_jer[ch]   = jet2_jer.Pt();
-        b_jeta_2_jer[ch]  = jet2_jer.Eta();
-        b_jphi_2_jer[ch]  = jet2_jer.Phi();
-      }else{
-        b_jpt_1_jer[ch]   = jet2_jer.Pt();
-        b_jeta_1_jer[ch]  = jet2_jer.Eta();
-        b_jphi_1_jer[ch]  = jet2_jer.Phi();
-        b_jpt_2_jer[ch]   = jet1_jer.Pt();
-        b_jeta_2_jer[ch]  = jet1_jer.Eta();
-        b_jphi_2_jer[ch]  = jet1_jer.Phi();
-      }
-    }else{
-      b_jpt_1_jer[ch]     = jet1_jer.Pt();
-      b_jeta_1_jer[ch]    = jet1_jer.Eta();
-      b_jphi_1_jer[ch]    = jet1_jer.Phi();
-      b_jpt_2_jer[ch]     = -1;
-      b_jeta_2_jer[ch]    = -9;
-      b_jphi_2_jer[ch]    = -9;
-    }
+  // fill jet kinematics separately
+  // JER
+  if(jet1_jer.Pt()>20){ //njets20_jer > 1){
+    b_jpt_1_jer[ch]   = jet1_jer.Pt();
+    b_jeta_1_jer[ch]  = jet1_jer.Eta();
   }else{
-    b_jpt_1_jer[ch]       = -1;
-    b_jeta_1_jer[ch]      = -9;
-    b_jphi_1_jer[ch]      = -9;
-    b_jpt_2_jer[ch]       = -1;
-    b_jeta_2_jer[ch]      = -9;
-    b_jphi_2_jer[ch]      = -9;
+    b_jpt_1_jer[ch]   = -1;
+    b_jeta_1_jer[ch]  = -9;
   }
-  if(njets20_jerUp > 0){
-    if(njets20_jerUp > 1){
-      if (jet1_jerUp.Pt()>jet2_jerUp.Pt()){
-        b_jpt_1_jerUp[ch]   = jet1_jerUp.Pt();
-        b_jeta_1_jerUp[ch]  = jet1_jerUp.Eta();
-        b_jpt_2_jerUp[ch]   = jet2_jerUp.Pt();
-        b_jeta_2_jerUp[ch]  = jet2_jerUp.Eta();
-      }else{
-        b_jpt_1_jerUp[ch]   = jet2_jerUp.Pt();
-        b_jeta_1_jerUp[ch]  = jet2_jerUp.Eta();
-        b_jpt_2_jerUp[ch]   = jet1_jerUp.Pt();
-        b_jeta_2_jerUp[ch]  = jet1_jerUp.Eta();
-      }
-    }else{
-      b_jpt_1_jerUp[ch]     = jet1_jerUp.Pt();
-      b_jeta_1_jerUp[ch]    = jet1_jerUp.Eta();
-      b_jpt_2_jerUp[ch]     = -1;
-      b_jeta_2_jerUp[ch]    = -9;
-    }
+  if(jet2_jer.Pt()>20){
+    b_jpt_2_jer[ch]   = jet2_jer.Pt();
+    b_jeta_2_jer[ch]  = jet2_jer.Eta();
   }else{
-    b_jpt_1_jerUp[ch]       = -1;
-    b_jeta_1_jerUp[ch]      = -9;
-    b_jpt_2_jerUp[ch]       = -1;
-    b_jeta_2_jerUp[ch]      = -9;
+    b_jpt_2_jer[ch]   = -1;
+    b_jeta_2_jer[ch]  = -9;
   }
-  if(njets20_jerDown > 0){
-    if(njets20_jerDown > 1){
-      if (jet1_jerDown.Pt()>jet2_jerDown.Pt()){
-        b_jpt_1_jerDown[ch]   = jet1_jerDown.Pt();
-        b_jeta_1_jerDown[ch]  = jet1_jerDown.Eta();
-        b_jpt_2_jerDown[ch]   = jet2_jerDown.Pt();
-        b_jeta_2_jerDown[ch]  = jet2_jerDown.Eta();
-      }else{
-        b_jpt_1_jerDown[ch]   = jet2_jerDown.Pt();
-        b_jeta_1_jerDown[ch]  = jet2_jerDown.Eta();
-        b_jpt_2_jerDown[ch]   = jet1_jerDown.Pt();
-        b_jeta_2_jerDown[ch]  = jet1_jerDown.Eta();
-      }
-    }else{
-      b_jpt_1_jerDown[ch]     = jet1_jerDown.Pt();
-      b_jeta_1_jerDown[ch]    = jet1_jerDown.Eta();
-      b_jpt_2_jerDown[ch]     = -1;
-      b_jeta_2_jerDown[ch]    = -9;
-    }
+  // JER UP
+  if(jet1_jerUp.Pt()>20){ //njets20_jerUp > 1){
+    b_jpt_1_jerUp[ch]   = jet1_jerUp.Pt();
+    b_jeta_1_jerUp[ch]  = jet1_jerUp.Eta();
   }else{
-    b_jpt_1_jerDown[ch]     = -1;
-    b_jeta_1_jerDown[ch]    = -9;
-    b_jpt_2_jerDown[ch]     = -1;
-    b_jeta_2_jerDown[ch]    = -9;
+    b_jpt_1_jerUp[ch]   = -1;
+    b_jeta_1_jerUp[ch]  = -9;
   }
-  if(njets20_jesUp > 0){
-    if(njets20_jesUp > 1){
-      if (jet1_jesUp.Pt()>jet2_jesUp.Pt()){
-        b_jpt_1_jesUp[ch]   = jet1_jesUp.Pt();
-        b_jeta_1_jesUp[ch]  = jet1_jesUp.Eta();
-        b_jpt_2_jesUp[ch]   = jet2_jesUp.Pt();
-        b_jeta_2_jesUp[ch]  = jet2_jesUp.Eta();
-      }else{
-        b_jpt_1_jesUp[ch]   = jet2_jesUp.Pt();
-        b_jeta_1_jesUp[ch]  = jet2_jesUp.Eta();
-        b_jpt_2_jesUp[ch]   = jet1_jesUp.Pt();
-        b_jeta_2_jesUp[ch]  = jet1_jesUp.Eta();
-      }
-    }else{
-      b_jpt_1_jesUp[ch]     = jet1_jesUp.Pt();
-      b_jeta_1_jesUp[ch]    = jet1_jesUp.Eta();
-      b_jpt_2_jesUp[ch]     = -1;
-      b_jeta_2_jesUp[ch]    = -9;
-    }
+  if(jet2_jerUp.Pt()>20){
+    b_jpt_2_jerUp[ch]   = jet2_jerUp.Pt();
+    b_jeta_2_jerUp[ch]  = jet2_jerUp.Eta();
   }else{
-    b_jpt_1_jesUp[ch]       = -1;
-    b_jeta_1_jesUp[ch]      = -9;
-    b_jpt_2_jesUp[ch]       = -1;
-    b_jeta_2_jesUp[ch]      = -9;
+    b_jpt_2_jerUp[ch]   = -1;
+    b_jeta_2_jerUp[ch]  = -9;
   }
-  if(njets20_jesDown > 0){
-    if(njets20_jesDown > 1){
-      if (jet1_jesDown.Pt()>jet2_jesDown.Pt()){
-        b_jpt_1_jesDown[ch]   = jet1_jesDown.Pt();
-        b_jeta_1_jesDown[ch]  = jet1_jesDown.Eta();
-        b_jpt_2_jesDown[ch]   = jet2_jesDown.Pt();
-        b_jeta_2_jesDown[ch]  = jet2_jesDown.Eta();
-      }else{
-        b_jpt_1_jesDown[ch]   = jet2_jesDown.Pt();
-        b_jeta_1_jesDown[ch]  = jet2_jesDown.Eta();
-        b_jpt_2_jesDown[ch]   = jet1_jesDown.Pt();
-        b_jeta_2_jesDown[ch]  = jet1_jesDown.Eta();
-      }
-    }else{
-      b_jpt_1_jesDown[ch]     = jet1_jesDown.Pt();
-      b_jeta_1_jesDown[ch]    = jet1_jesDown.Eta();
-      b_jpt_2_jesDown[ch]     = -1;
-      b_jeta_2_jesDown[ch]    = -9;
-    }
+  // JER DOWN
+  if(jet1_jerDown.Pt()>20){ //njets20_jerDown > 1){
+    b_jpt_1_jerDown[ch]   = jet1_jerDown.Pt();
+    b_jeta_1_jerDown[ch]  = jet1_jerDown.Eta();
   }else{
-    b_jpt_1_jesDown[ch]     = -1;
-    b_jeta_1_jesDown[ch]    = -9;
-    b_jpt_2_jesDown[ch]     = -1;
-    b_jeta_2_jesDown[ch]    = -9;
+    b_jpt_1_jerDown[ch]   = -1;
+    b_jeta_1_jerDown[ch]  = -9;
   }
+  if(jet2_jerDown.Pt()>20){
+    b_jpt_2_jerDown[ch]   = jet2_jerDown.Pt();
+    b_jeta_2_jerDown[ch]  = jet2_jerDown.Eta();
+  }else{
+    b_jpt_2_jerDown[ch]   = -1;
+    b_jeta_2_jerDown[ch]  = -9;
+  }
+  // JES UP
+  if(jet1_jesUp.Pt()>20){ //njets20_jesUp > 1){
+    b_jpt_1_jesUp[ch]   = jet1_jesUp.Pt();
+    b_jeta_1_jesUp[ch]  = jet1_jesUp.Eta();
+  }else{
+    b_jpt_1_jesUp[ch]   = -1;
+    b_jeta_1_jesUp[ch]  = -9;
+  }
+  if(jet2_jesUp.Pt()>20){
+    b_jpt_2_jesUp[ch]   = jet2_jesUp.Pt();
+    b_jeta_2_jesUp[ch]  = jet2_jesUp.Eta();
+  }else{
+    b_jpt_2_jesUp[ch]   = -1;
+    b_jeta_2_jesUp[ch]  = -9;
+  }
+  // JES DOWN
+  if(jet1_jesDown.Pt()>20){ //njets20_jesDown > 1){
+    b_jpt_1_jesDown[ch]   = jet1_jesDown.Pt();
+    b_jeta_1_jesDown[ch]  = jet1_jesDown.Eta();
+  }else{
+    b_jpt_1_jesDown[ch]   = -1;
+    b_jeta_1_jesDown[ch]  = -9;
+  }
+  if(jet2_jesDown.Pt()>20){
+    b_jpt_2_jesDown[ch]   = jet2_jesDown.Pt();
+    b_jeta_2_jesDown[ch]  = jet2_jesDown.Eta();
+  }else{
+    b_jpt_2_jesDown[ch]   = -1;
+    b_jeta_2_jesDown[ch]  = -9;
+  }
+  
+//   if(njets20_jerUp > 0){
+//     if(njets20_jerUp > 1){
+//       if (jet1_jerUp.Pt()>jet2_jerUp.Pt()){
+//         b_jpt_1_jerUp[ch]   = jet1_jerUp.Pt();
+//         b_jeta_1_jerUp[ch]  = jet1_jerUp.Eta();
+//         b_jpt_2_jerUp[ch]   = jet2_jerUp.Pt();
+//         b_jeta_2_jerUp[ch]  = jet2_jerUp.Eta();
+//       }else{
+//         b_jpt_1_jerUp[ch]   = jet2_jerUp.Pt();
+//         b_jeta_1_jerUp[ch]  = jet2_jerUp.Eta();
+//         b_jpt_2_jerUp[ch]   = jet1_jerUp.Pt();
+//         b_jeta_2_jerUp[ch]  = jet1_jerUp.Eta();
+//       }
+//     }else{
+//       b_jpt_1_jerUp[ch]     = jet1_jerUp.Pt();
+//       b_jeta_1_jerUp[ch]    = jet1_jerUp.Eta();
+//       b_jpt_2_jerUp[ch]     = -1;
+//       b_jeta_2_jerUp[ch]    = -9;
+//     }
+//   }else{
+//     b_jpt_1_jerUp[ch]       = -1;
+//     b_jeta_1_jerUp[ch]      = -9;
+//     b_jpt_2_jerUp[ch]       = -1;
+//     b_jeta_2_jerUp[ch]      = -9;
+//   }
+//   if(njets20_jerDown > 0){
+//     if(njets20_jerDown > 1){
+//       if (jet1_jerDown.Pt()>jet2_jerDown.Pt()){
+//         b_jpt_1_jerDown[ch]   = jet1_jerDown.Pt();
+//         b_jeta_1_jerDown[ch]  = jet1_jerDown.Eta();
+//         b_jpt_2_jerDown[ch]   = jet2_jerDown.Pt();
+//         b_jeta_2_jerDown[ch]  = jet2_jerDown.Eta();
+//       }else{
+//         b_jpt_1_jerDown[ch]   = jet2_jerDown.Pt();
+//         b_jeta_1_jerDown[ch]  = jet2_jerDown.Eta();
+//         b_jpt_2_jerDown[ch]   = jet1_jerDown.Pt();
+//         b_jeta_2_jerDown[ch]  = jet1_jerDown.Eta();
+//       }
+//     }else{
+//       b_jpt_1_jerDown[ch]     = jet1_jerDown.Pt();
+//       b_jeta_1_jerDown[ch]    = jet1_jerDown.Eta();
+//       b_jpt_2_jerDown[ch]     = -1;
+//       b_jeta_2_jerDown[ch]    = -9;
+//     }
+//   }else{
+//     b_jpt_1_jerDown[ch]     = -1;
+//     b_jeta_1_jerDown[ch]    = -9;
+//     b_jpt_2_jerDown[ch]     = -1;
+//     b_jeta_2_jerDown[ch]    = -9;
+//   }
+//   if(njets20_jesUp > 0){
+//     if(njets20_jesUp > 1){
+//       if (jet1_jesUp.Pt()>jet2_jesUp.Pt()){
+//         b_jpt_1_jesUp[ch]   = jet1_jesUp.Pt();
+//         b_jeta_1_jesUp[ch]  = jet1_jesUp.Eta();
+//         b_jpt_2_jesUp[ch]   = jet2_jesUp.Pt();
+//         b_jeta_2_jesUp[ch]  = jet2_jesUp.Eta();
+//       }else{
+//         b_jpt_1_jesUp[ch]   = jet2_jesUp.Pt();
+//         b_jeta_1_jesUp[ch]  = jet2_jesUp.Eta();
+//         b_jpt_2_jesUp[ch]   = jet1_jesUp.Pt();
+//         b_jeta_2_jesUp[ch]  = jet1_jesUp.Eta();
+//       }
+//     }else{
+//       b_jpt_1_jesUp[ch]     = jet1_jesUp.Pt();
+//       b_jeta_1_jesUp[ch]    = jet1_jesUp.Eta();
+//       b_jpt_2_jesUp[ch]     = -1;
+//       b_jeta_2_jesUp[ch]    = -9;
+//     }
+//   }else{
+//     b_jpt_1_jesUp[ch]       = -1;
+//     b_jeta_1_jesUp[ch]      = -9;
+//     b_jpt_2_jesUp[ch]       = -1;
+//     b_jeta_2_jesUp[ch]      = -9;
+//   }
+//   if(njets20_jesDown > 0){
+//     if(njets20_jesDown > 1){
+//       if (jet1_jesDown.Pt()>jet2_jesDown.Pt()){
+//         b_jpt_1_jesDown[ch]   = jet1_jesDown.Pt();
+//         b_jeta_1_jesDown[ch]  = jet1_jesDown.Eta();
+//         b_jpt_2_jesDown[ch]   = jet2_jesDown.Pt();
+//         b_jeta_2_jesDown[ch]  = jet2_jesDown.Eta();
+//       }else{
+//         b_jpt_1_jesDown[ch]   = jet2_jesDown.Pt();
+//         b_jeta_1_jesDown[ch]  = jet2_jesDown.Eta();
+//         b_jpt_2_jesDown[ch]   = jet1_jesDown.Pt();
+//         b_jeta_2_jesDown[ch]  = jet1_jesDown.Eta();
+//       }
+//     }else{
+//       b_jpt_1_jesDown[ch]     = jet1_jesDown.Pt();
+//       b_jeta_1_jesDown[ch]    = jet1_jesDown.Eta();
+//       b_jpt_2_jesDown[ch]     = -1;
+//       b_jeta_2_jesDown[ch]    = -9;
+//     }
+//   }else{
+//     b_jpt_1_jesDown[ch]     = -1;
+//     b_jeta_1_jesDown[ch]    = -9;
+//     b_jpt_2_jesDown[ch]     = -1;
+//     b_jeta_2_jesDown[ch]    = -9;
+//   }
   
   if( bjet_dphi_jesDown.Pt() > 10 and jet2_dphi_jesDown.Pt() > 10 ){
     b_dphi_ll_bj_jesUp[ch]    = fabs(deltaPhi( phi_ll, (bjet_dphi_jesUp  +jet2_dphi_jesUp  ).Phi() ));

@@ -10,24 +10,25 @@ from cStringIO import StringIO # for stdout capturing
 def color(string,**kwargs):
     """Color"""
     # http://stackoverflow.com/questions/287871/print-in-terminal-with-colors-using-python
-    text_color_dict = { "black"     : "0;30;",  "red"       : "1;31;",
-                        "green"     : "0;32;",  "yellow"    : "1;33;", "orange"    : "1;33;",
-                        "blue"      : "1;34;",  "purple"    : "0;35;",
-                        "magenta"   : "1;36;",  "grey"      : "0;37;",  }
-    background_color_dict = {   "black"     : "40", "red"       : "41",
-                                "green"     : "42", "yellow"    : "43", "orange"    : "43",
-                                "blue"      : "44", "purple"    : "45",
-                                "magenta"   : "46", "grey"      : "47", }                  
-    color_code = text_color_dict[kwargs.get('color',"red")] + background_color_dict[kwargs.get('background',"black")]
-    return kwargs.get('prepend',"") + "\x1b[%sm%s\033[0m" % ( color_code, string )
+    text_color_dict = {         "black"     : 30,   "red"       : 31,
+                                "green"     : 32,   "yellow"    : 33,   "orange" : 33,
+                                "blue"      : 34,   "purple"    : 35,
+                                "magenta"   : 36,   "grey"      : 37,  }
+    background_color_dict = {   "black"     : 40,   "red"       : 41,
+                                "green"     : 42,   "yellow"    : 43,   "orange" : 43,
+                                "blue"      : 44,   "purple"    : 45,
+                                "magenta"   : 46,   "grey"      : 47, }
+    bold_code  = kwargs.get('bold',False)
+    color_code = "%d;%d;%d" % ( bold_code, text_color_dict[kwargs.get('color',"red")], background_color_dict[kwargs.get('background',"black")])
+    return kwargs.get('prepend',"") + "\x1b[%sm%s\033[0m" % (color_code, string )
 
 def warning(string,*trigger,**kwargs):
     if len(trigger)==0 or trigger:
-        return color("Warning! "+string, color="yellow", prepend=">>> "+kwargs.get('prepend',""))
+        return color(kwargs.get('exclamation',"Warning! ")+string, color="yellow", bold=True, prepend=">>> "+kwargs.get('prepend',""))
     
 def error(string,*trigger,**kwargs):
     if len(trigger)==0 or trigger:
-        return color("ERROR! "+string, color="red", prepend=">>> "+kwargs.get('prepend',""))
+        return color(kwargs.get('exclamation',"ERROR! ")+string, color="red", bold=True, prepend=">>> "+kwargs.get('prepend',""))
     
 
 
@@ -40,28 +41,20 @@ def printVerbose(string,verbosity,**kwargs):
         if verbosity>=level: print string
     elif verbosity: print string
     
-
-
-
-
 def printSameLine(string):
     """Print string without making new line. (Write to stdout and flush.)"""
     #http://stackoverflow.com/questions/3249524/print-in-one-line-dynamically
     if string: string = string+" "
     sys.stdout.write(string)
     sys.stdout.flush()
-
-
-
-
-
-def header(header):
+    
+def header(header0):
     """Returns formatted header"""
     
     return ( ">>>\n>>>\n" +
-             ">>>   ###%s\n"    % ('#'*(len(header)+3)) +
-             ">>>   #  %s  #\n" % (header) +
-             ">>>   ###%s\n"    % ('#'*(len(header)+3)) +
+             ">>>   ###%s\n"    % ('#'*(len(header0)+3)) +
+             ">>>   #  %s  #\n" % (header0) +
+             ">>>   ###%s\n"    % ('#'*(len(header0)+3)) +
              ">>>" )
     
 

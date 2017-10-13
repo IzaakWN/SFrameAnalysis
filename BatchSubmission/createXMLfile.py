@@ -13,23 +13,23 @@
 example = """
 Examples:
  
- Tier 3 PNFS:
+ \033[1mTier 3 PNFS\033[0m:
    PNFS="/pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Summer16/Ntuple_80_20170206"
    ls -d $PNFS/DYJ*/*/*/* > dirs_DYJ.txt
    ls -d $PNFS/*/*/*/* > dirs.txt
    ./createXMLfile.py dirs.txt -o xmls_Moriond
  
- Tier 2 PNFS:
+ \033[1mTier 2 PNFS\033[0m:
    PNFS="gsiftp://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_Moriond17"
-   uberftp -ls $PNFS/DY1J*/*/* | awk '{print $7}' > dirs_T2_DY1J.txt
-   uberftp -ls $PNFS/*/*/* | awk '{print $7}' > dirs_T2.txt
+   uberftp -ls $PNFS/DY1J*/*/* | awk '{print $8}' > dirs_T2_DY1J.txt
+   uberftp -ls $PNFS/*/*/* | awk '{print $8}' > dirs_T2.txt
    ./createXMLfile.py dirs_T2.txt -o xmls_Moriond_T2 -s PSI-T2
  
- Split files (to run in parallel)
+ \033[1mSplit files\033[0m (to run in parallel):
    cat dirs.txt | wc -l
    split -l 200 dirs.txt dirs_split -d
  
- Print out xml file names formatted for copy-pasting into job options files:
+ \033[1mPrint out xml file names\033[0m formatted for copy-pasting into job options files:
    cd xmls_Moriond/
    ls *.xml | xargs -I@ echo \\"@\\",
 """
@@ -72,11 +72,11 @@ parser.add_option("-f", "--no-failed", action="store_false",
                 help="Do not write corrupt root files to a txt file")
 (options, args) = parser.parse_args()
 if options.example or len(args) is not 1:
-    parser.print_help()
-    print example
-    if len(args) is not 1:
-        parser.error("No input given. Please provide a file with a name list.")
-    exit(0)
+  parser.print_help()
+  print example
+  if len(args) is not 1:
+    parser.error("No input given. Please provide a file with a name list.")
+  exit(0)
 
 print
 sampleListName = args[0]
@@ -95,15 +95,20 @@ dCacheInstances={}
 dCacheInstances["PSI"]=["root://t3dcachedb.psi.ch:1094/", "dcap://t3se01.psi.ch:22125/"]
 dCacheInstances["PSI-T3"]=dCacheInstances["PSI"]
 dCacheInstances["T3"]=dCacheInstances["PSI"]
-dCacheInstances["PSI-T2"]=["root://storage01.lcg.cscs.ch/",  "root://storage01.lcg.cscs.ch/"] # PSI Tier 2
+dCacheInstances["PSI-T2"]=["root://storage01.lcg.cscs.ch/", "root://storage01.lcg.cscs.ch/"] # PSI Tier 2
 dCacheInstances["T2"]=dCacheInstances["PSI-T2"]
 if site not in dCacheInstances:
-    print "ERROR! Site %s not registered as a dCacheInstances"
-    sys.exit(1)
+  print "ERROR! Site \"%s\" not registered as a dCacheInstances! Please use one of the following options with the -s flag:\n"%site+\
+        '\n'.join([ "%12s:  %s"%(k,', '.join(v)) for k,v in sorted(dCacheInstances.items()) ]) + '\n'
+  sys.exit(1)
 
 
 def main():
-    
+
+  nSamples = 0
+  with open(sampleListName) as sampleList:
+    nSamples = len([l for l in sampleList if not (l.startswith("#") or l.isspace())])
+
   with open(sampleListName) as sampleList:
     
     print "  Creating XML files in         %s," % (outDir)
@@ -115,20 +120,24 @@ def main():
       os.makedirs(outDir)
   
     # LOOP over all samples
+    iSample = 0
     for sample in sampleList:
       if sample.startswith("#") or sample.isspace():
         continue
       print "- "*10
+      iSample+=1
       sample = sample.strip("\n")
       sampleName = (sample.strip("/")).rsplit("/",1)[1]
       sampleName_file=(sample.strip("/")).rsplit("/",3)[1]
       sampleName_file+="_"+sampleName
-      print "Sample: %s in location: %s producing file with list %s" %(sampleName,sample,sampleName_file )
+      print "Sample %d/%d: %s in location: %s producing file with list %s" %(iSample,nSamples,sampleName,sample,sampleName_file )
       fileList=[]
       
       # CHECK directory existence
       if not isDir(sample):
         print sample,"is not a directory."
+        if "lcg.cscs.ch" in sample and "T2" not in site:
+          print "Please use the \"-s PSI-T2\" option if you samples are on PSI-T2!"
       else:
         prefix = ""
         if (sample.startswith("/pnfs")):

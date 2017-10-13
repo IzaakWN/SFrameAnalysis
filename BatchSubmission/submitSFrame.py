@@ -34,7 +34,7 @@ import shutil
 import socket
 starttime=time.time()
 startdate=time.strftime("%a %d/%m/%Y %H:%M:%S",time.gmtime())
-succesRate="succes rate(s):\n"
+succesRates=[ ]
 
 
 class runCommand(Process):
@@ -322,7 +322,7 @@ def checkCompletion(dataSets, listOfJobs, outDir, cycleName, postFix,keepTemp):
       lock.release()
       
       # COUNT
-      global succesRate
+      global succesRates
       WARNING='\033[1m\033[93m'
       END='\033[0m'
       nMergeFiles=len(glob.glob("%s*.root"%fileToMerge))
@@ -335,7 +335,7 @@ def checkCompletion(dataSets, listOfJobs, outDir, cycleName, postFix,keepTemp):
       lsDebug+="\n"+countCmd+"\n"+countDebug
       mergeDebug+="\n"+lsDebug
       mergeDebug+="\n"+mergeCmd
-      succesRate+="  %4d /%3d %s\n"%(nMergeFiles,nMergeJobs,d[0]) # global string
+      succesRates.append("  %4d /%3d %s"%(nMergeFiles,nMergeJobs,d[0])) # global list
       print WARNING+countCmd+END
       print WARNING+countDebug+END
       
@@ -768,7 +768,7 @@ def main():
     os.system( "mv SFrameSandbox.tar.gz %s" %(tempDirSh) )
     print "sandbox creation finished!"
 
-  print "using temporary directory %s" %(tempDirSh)
+  print "using temporary directories\n  %s (scripts)\n  %s (root)\n  %s (log)" %(tempDirSh,tempDirRoot,tempDirLog)
   os.chdir(tempDirSh)
 
   # clean up for new run
@@ -878,9 +878,10 @@ def main():
     iJobs=0
     skip=1
     if   len(listOfJobs)>=1000: skip = 100
-    elif len(listOfJobs)>=500:  skip =  50
-    elif len(listOfJobs)>=160:  skip =  20
-    elif len(listOfJobs)>=20:   skip =  10
+    elif len(listOfJobs)>= 500: skip =  50
+    elif len(listOfJobs)>= 160: skip =  20
+    elif len(listOfJobs)>=  50: skip =  10
+    elif len(listOfJobs)>=  20: skip =   5
     for j in listOfJobs:
       
       batchScript = BatchScript(useHost, useOS, path2sframe, useEnv, cmssw, hCPU, hVMEM, cycleName, tempDirLog)
@@ -1017,18 +1018,25 @@ def accountTime(jobOptions,jobName,nJobs):
   
   logdir="nohup"
   makeDirectory(logdir)
-  global succesRate, starttime, startdate
+  filepath="%s/submitSFrame.log"%logdir
+  new = not os.path.exists(filepath)
+  
+  global succesRates, starttime, startdate
+  succesRates = "succes rate(s):\n" + '\n'.join(sorted(succesRates))
   minutes, seconds = divmod(time.time()-starttime,60)
   hours, minutes   = divmod(minutes,60)
-  with open("%s/submitSFrame.log"%logdir,"a") as file:
-    file.write("\n")
+  
+  with open(filepath,"a") as file:
+    if new: file.write("# log file of submitSFrame.py\n\n")
     file.write("%s: %s\n" % (jobName, jobOptions.split('/')[-1]))
     file.write("number of jobs: %s\n" % (nJobs))
-    file.write(succesRate)
+    file.write(succesRates)
     file.write("start: %s\n" % (startdate))
     file.write("done:  %s\n" % (time.strftime("%a %d/%m/%Y %H:%M:%S",time.gmtime())))
     file.write("took:  %s hours, %s minutes and %.1f seconds\n" % (hours,minutes,seconds))
+    file.write("\n")
   print "\nDone after %s hours, %s minutes and %.1f seconds." % (hours,minutes,seconds)  
+  
 
 
 def makeDirectory(DIR):
@@ -1036,7 +1044,7 @@ def makeDirectory(DIR):
   if not os.path.exists(DIR):
     os.makedirs(DIR)
     #print ">>> made directory " + DIR
-
+    
 
 
 if __name__ == "__main__":

@@ -24,7 +24,7 @@
   <Package Name="SVFitTool.par" />
 
   <Cycle Name="TauTauAnalysis" OutputDirectory="./" PostFix="" ProofServer="lite" ProofWorkDir="" RunMode="LOCAL" TargetLumi="1.0">
-    <InputData Lumi="0.0" NEventsMax="-1" Type="SingleMuon" Version="UZH" SkipValid="False">
+    <InputData Lumi="0.0" NEventsMax="10000" Type="SingleMuon" Version="UZH" SkipValid="False">
 
 <In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Moriond17/SingleMuon/SingleMuon_Run2016B-03Feb2017_ver2-v2SingleMuon_BCD_03Feb2017/170331_125018/0000/flatTuple_100.root" Lumi="1.0" />
 <In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Moriond17/SingleMuon/SingleMuon_Run2016B-03Feb2017_ver2-v2SingleMuon_BCD_03Feb2017/170331_125018/0000/flatTuple_101.root" Lumi="1.0" />
@@ -34,7 +34,6 @@
 <In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Moriond17/SingleMuon/SingleMuon_Run2016F-03Feb2017-v1SingleMuon_G_03Feb2017/170331_125656/0000/flatTuple_100.root" Lumi="1.0" />
 <In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Moriond17/SingleMuon/SingleMuon_Run2016H-03Feb2017_ver2-v1SingleMuon_H_03Feb2017/170331_125931/0000/flatTuple_100.root" Lumi="1.0" />
 <In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Moriond17/SingleMuon/SingleMuon_Run2016H-03Feb2017_ver2-v1SingleMuon_H_03Feb2017/170331_125931/0002/flatTuple_2000.root" Lumi="1.0" />
-<!-- 
 <In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Moriond17/SingleMuon/SingleMuon_Run2016B-03Feb2017_ver2-v2SingleMuon_BCD_03Feb2017/170331_125018/0000/flatTuple_102.root" Lumi="1.0" />
 <In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Moriond17/SingleMuon/SingleMuon_Run2016B-03Feb2017_ver2-v2SingleMuon_BCD_03Feb2017/170331_125018/0000/flatTuple_103.root" Lumi="1.0" />
 <In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Moriond17/SingleMuon/SingleMuon_Run2016B-03Feb2017_ver2-v2SingleMuon_BCD_03Feb2017/170331_125018/0000/flatTuple_104.root" Lumi="1.0" />
@@ -57,7 +56,6 @@
 <In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Moriond17/SingleMuon/SingleMuon_Run2016H-03Feb2017_ver2-v1SingleMuon_H_03Feb2017/170331_125931/0002/flatTuple_2002.root" Lumi="1.0" />
 <In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Moriond17/SingleMuon/SingleMuon_Run2016H-03Feb2017_ver2-v1SingleMuon_H_03Feb2017/170331_125931/0002/flatTuple_2003.root" Lumi="1.0" />
 <In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Moriond17/SingleMuon/SingleMuon_Run2016H-03Feb2017_ver2-v1SingleMuon_H_03Feb2017/170331_125931/0002/flatTuple_2004.root" Lumi="1.0" />
- -->
 
       <InputTree Name="ntuplizer/tree" />
       <OutputTree Name="tree_mutau" />

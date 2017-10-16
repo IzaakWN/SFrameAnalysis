@@ -23,7 +23,7 @@
   <Package Name="SVFitTool.par" />
 
   <Cycle Name="TauTauAnalysis" OutputDirectory="./" PostFix="" ProofServer="lite" ProofWorkDir="" RunMode="LOCAL" TargetLumi="1.0">
-    <InputData Lumi="0.0" NEventsMax="-1" Type="Signal" Version="UZH" SkipValid="False">
+    <InputData Lumi="0.0" NEventsMax="10000" Type="Signal" Version="UZH" SkipValid="False">
 
 <In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Summer16/LowMassSignal/jobtmp_LowMass_30GeV_TauTau_13TeV_Resonance_RunIISpring16MiniAODv2_PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_v1/LowMass_30GeV_TauTau_13TeV_Resonance_RunIISpring16MiniAODv2_PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_v1-1/flatTuple.root" Lumi="1.0" />
 <In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Summer16/LowMassSignal/jobtmp_LowMass_30GeV_TauTau_13TeV_Resonance_RunIISpring16MiniAODv2_PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_v1/LowMass_30GeV_TauTau_13TeV_Resonance_RunIISpring16MiniAODv2_PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_v1-10/flatTuple.root" Lumi="1.0" />
@@ -32,7 +32,6 @@
 <In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Summer16/LowMassSignal/jobtmp_LowMass_30GeV_TauTau_13TeV_Resonance_RunIISpring16MiniAODv2_PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_v1/LowMass_30GeV_TauTau_13TeV_Resonance_RunIISpring16MiniAODv2_PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_v1-11/flatTuple.root" Lumi="1.0" />
 <In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Summer16/LowMassSignal/jobtmp_LowMass_30GeV_TauTau_13TeV_Resonance_RunIISpring16MiniAODv2_PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_v1/LowMass_30GeV_TauTau_13TeV_Resonance_RunIISpring16MiniAODv2_PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_v1-110/flatTuple.root" Lumi="1.0" />
 <In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Summer16/LowMassSignal/jobtmp_LowMass_30GeV_TauTau_13TeV_Resonance_RunIISpring16MiniAODv2_PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_v1/LowMass_30GeV_TauTau_13TeV_Resonance_RunIISpring16MiniAODv2_PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_v1-115/flatTuple.root" Lumi="1.0" />
-<!-- 
 <In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Summer16/LowMassSignal/jobtmp_LowMass_30GeV_TauTau_13TeV_Resonance_RunIISpring16MiniAODv2_PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_v1/LowMass_30GeV_TauTau_13TeV_Resonance_RunIISpring16MiniAODv2_PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_v1-116/flatTuple.root" Lumi="1.0" />
 <In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Summer16/LowMassSignal/jobtmp_LowMass_30GeV_TauTau_13TeV_Resonance_RunIISpring16MiniAODv2_PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_v1/LowMass_30GeV_TauTau_13TeV_Resonance_RunIISpring16MiniAODv2_PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_v1-120/flatTuple.root" Lumi="1.0" />
 <In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Summer16/LowMassSignal/jobtmp_LowMass_30GeV_TauTau_13TeV_Resonance_RunIISpring16MiniAODv2_PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_v1/LowMass_30GeV_TauTau_13TeV_Resonance_RunIISpring16MiniAODv2_PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_v1-121/flatTuple.root" Lumi="1.0" />
@@ -66,7 +65,7 @@
 <In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Summer16/LowMassSignal/jobtmp_LowMass_30GeV_TauTau_13TeV_Resonance_RunIISpring16MiniAODv2_PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_v1/LowMass_30GeV_TauTau_13TeV_Resonance_RunIISpring16MiniAODv2_PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_v1-388/flatTuple.root" Lumi="1.0" />
 <In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Summer16/LowMassSignal/jobtmp_LowMass_30GeV_TauTau_13TeV_Resonance_RunIISpring16MiniAODv2_PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_v1/LowMass_30GeV_TauTau_13TeV_Resonance_RunIISpring16MiniAODv2_PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_v1-389/flatTuple.root" Lumi="1.0" />
 <In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Summer16/LowMassSignal/jobtmp_LowMass_30GeV_TauTau_13TeV_Resonance_RunIISpring16MiniAODv2_PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_v1/LowMass_30GeV_TauTau_13TeV_Resonance_RunIISpring16MiniAODv2_PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_v1-39/flatTuple.root" Lumi="1.0" />
- -->
+
 
       <InputTree Name="ntuplizer/tree" />
       <OutputTree Name="tree_mutau" />

@@ -4,6 +4,7 @@
 #include <limits>
 #include <TFile.h>
 #include "../src/EnergyScaleCorrection_class.cc"
+//#include "../TauTauResonances/include/TauTauAnalysis.h" // for printRow
 
 
 
@@ -11,26 +12,26 @@ JetCorrectionTool::JetCorrectionTool(SCycleBase* parent, const char* name ): STo
   SetLogName( name );
   
   // Electrons
-  DeclareProperty(  m_name+"_CorrectionFileName",  m_CorrectionFileName = "$SFRAME_DIR/../JetCorrectionTool/data/Electron/ScalesSmearings/Winter_2016_reReco_v1_ele" );
+  DeclareProperty( m_name+"_CorrectionFileName",     m_CorrectionFileName     = "$SFRAME_DIR/../JetCorrectionTool/data/Electron/ScalesSmearings/Winter_2016_reReco_v1_ele" );
   
   // Jet
-  DeclareProperty(  m_name+"_JetResFileName",      m_JetResFileName     = "$SFRAME_DIR/../JetCorrectionTool/data/Jet/Spring16_25nsV10_MC_SF_AK8PFchs.txt" );
-  DeclareProperty(  m_name+"_JetResFileNameAK4",   m_JetResFileNameAK4  = "$SFRAME_DIR/../JetCorrectionTool/data/Jet/Spring16_25nsV10_MC_SF_AK4PFchs.txt" );
+  DeclareProperty( m_name+"_JetResFileName",         m_JetResFileName         = "$SFRAME_DIR/../JetCorrectionTool/data/Jet/Spring16_25nsV10_MC_SF_AK8PFchs.txt" );
+  DeclareProperty( m_name+"_JetResFileNameAK4",      m_JetResFileNameAK4      = "$SFRAME_DIR/../JetCorrectionTool/data/Jet/Spring16_25nsV10_MC_SF_AK4PFchs.txt" );
   
   // Mass
   //DeclareProperty(  m_name+"_MassFileName", m_MassFileName = std::string (std::getenv("SFRAME_DIR")) + "/../CorrectionTool/data/Mass/puppiCorr.root" );
   //DeclareProperty(  m_name+"_MassGenHistName", m_MassGenHistName = "puppiJECcorr_gen" );
   //DeclareProperty(  m_name+"_MassBarrelHistName", m_MassBarrelHistName = "puppiJECcorr_reco_0eta1v3" );
   //DeclareProperty(  m_name+"_MassEndcapHistName", m_MassEndcapHistName = "puppiJECcorr_reco_1v3eta2v5" );
-  DeclareProperty(  m_name+"_MassGenFileName",       m_MassGenFileName       = "$SFRAME_DIR/../JetCorrectionTool/data/Mass/genCorr.root" );
-  DeclareProperty(  m_name+"_MassGenBarrelHistName", m_MassGenBarrelHistName = "gC_forCorr" );
-  DeclareProperty(  m_name+"_MassGenEndcapHistName", m_MassGenEndcapHistName = "gF_forCorr" );
-  DeclareProperty(  m_name+"_MassRecoFileName",      m_MassRecoFileName      = "$SFRAME_DIR/../JetCorrectionTool/data/Mass/recoCorr.root" );
-  DeclareProperty(  m_name+"_MassRecoBarrelHistName", m_MassRecoBarrelHistName = "gC_forCorr" );
-  DeclareProperty(  m_name+"_MassRecoEndcapHistName", m_MassRecoEndcapHistName = "gF_forCorr" );
-  DeclareProperty(  m_name+"_MassResFileName",       m_MassResFileName       = "$SFRAME_DIR/../JetCorrectionTool/data/Mass/puppiSoftdropResol.root" );
-  DeclareProperty(  m_name+"_MassResBarrelHistName", m_MassResBarrelHistName = "massResolution_0eta1v3" );
-  DeclareProperty(  m_name+"_MassResEndcapHistName", m_MassResEndcapHistName = "massResolution_1v3eta2v5" );
+  DeclareProperty( m_name+"_MassGenFileName",        m_MassGenFileName        = "$SFRAME_DIR/../JetCorrectionTool/data/Mass/genCorr.root" );
+  DeclareProperty( m_name+"_MassGenBarrelHistName",  m_MassGenBarrelHistName  = "gC_forCorr" );
+  DeclareProperty( m_name+"_MassGenEndcapHistName",  m_MassGenEndcapHistName  = "gF_forCorr" );
+  DeclareProperty( m_name+"_MassRecoFileName",       m_MassRecoFileName       = "$SFRAME_DIR/../JetCorrectionTool/data/Mass/recoCorr.root" );
+  DeclareProperty( m_name+"_MassRecoBarrelHistName", m_MassRecoBarrelHistName = "gC_forCorr" );
+  DeclareProperty( m_name+"_MassRecoEndcapHistName", m_MassRecoEndcapHistName = "gF_forCorr" );
+  DeclareProperty( m_name+"_MassResFileName",        m_MassResFileName        = "$SFRAME_DIR/../JetCorrectionTool/data/Mass/puppiSoftdropResol.root" );
+  DeclareProperty( m_name+"_MassResBarrelHistName",  m_MassResBarrelHistName  = "massResolution_0eta1v3" );
+  DeclareProperty( m_name+"_MassResEndcapHistName",  m_MassResEndcapHistName  = "massResolution_1v3eta2v5" );
 }
 
 
@@ -258,17 +259,16 @@ std::vector<TLorentzVector> JetCorrectionTool::GetCorrectedJet(const UZH::Jet& j
   TLorentzVector jet_tlv_jesDown;
   jet_tlv_jesUp.SetPtEtaPhiE(  jet.pt(), jet.eta(), jet.phi(), jet.e());
   jet_tlv_jesDown.SetPtEtaPhiE(jet.pt(), jet.eta(), jet.phi(), jet.e());
-
+  
   float eta = jet.eta();
   int etaBin = -1;
-    
+  
   if (sigmaRes!=0){
     
     std::vector<float*> JetRes0;
     if (is_ak8) JetRes0 = JetRes;
     else        JetRes0 = JetResAK4;
-      
-//     if (is_ak8){
+    
     std::cout<< "JetCorrectionTool::GetCorrectedJet: ak8"<< std::endl;
     for(unsigned int i=0; i<JetRes0.size()-1; i++) if(eta > JetRes0[i][0] && eta < JetRes0[i+1][1]) etaBin = i;
     if(etaBin < 0) {
@@ -280,19 +280,6 @@ std::vector<TLorentzVector> JetCorrectionTool::GetCorrectedJet(const UZH::Jet& j
     float jer2_Up(std::max(res+sigmaRes*resUp,float(1.))), jer2_Down(std::max(res+sigmaRes*resDown,float(1.)));
     jet_tlv_jesUp   *= trandom->Gaus(1., sqrt(jer2_Up  *jer2_Up  -1.)*(res-1.));
     jet_tlv_jesDown *= trandom->Gaus(1., sqrt(jer2_Down*jer2_Down-1.)*(res-1.));
-//     }else{
-//       std::cout<< "JetCorrectionTool::GetCorrectedJet: ak4"<< std::endl;
-//       for(unsigned int i=0; i<JetResAK4.size()-1; i++) if(eta > JetResAK4[i][0] && eta < JetResAK4[i+1][1]) etaBin = i;
-//       if(etaBin < 0) {
-//           m_logger << WARNING << "Eta bin not found for jet with eta = " << eta << SLogger::endmsg;
-//           return {jet.tlv(),jet.tlv()};
-//       }
-//       float res(JetResAK4[etaBin][3]), resUp(JetResAK4[etaBin][5]-JetResAK4[etaBin][3]),
-//                                        resDown(JetResAK4[etaBin][3]-JetResAK4[etaBin][4]);
-//       float jer2_Up(std::max(res+sigmaRes*resUp,float(1.))), jer2_Down(std::max(res+sigmaRes*resDown,float(1.)));
-//       jet_tlv_jesUp   *= trandom->Gaus(1., sqrt(jer2_Up  *jer2_Up  -1.)*(res-1.));
-//       jet_tlv_jesDown *= trandom->Gaus(1., sqrt(jer2_Down*jer2_Down-1.)*(res-1.));
-//     }
   }
   
   //std::cout <<"jet pt "<< jet.Pt()<<std::endl;
@@ -300,25 +287,24 @@ std::vector<TLorentzVector> JetCorrectionTool::GetCorrectedJet(const UZH::Jet& j
   jet_tlv_jesDown *= jet.jecDown()/jet.jec();
   //std::cout <<"jec up jet pt : "<< jet.Pt()<< " jec UP "<<  "  "<< jecUp<<std::endl;
   //std::cout <<"jec down jet pt :jec DoWN "<< jet.Pt() <<""<<jecDown <<std::endl;
-    
+  
   return {jet_tlv_jesUp,jet_tlv_jesDown};
 }
 
 
 
-TLorentzVector JetCorrectionTool::GetCorrectedJetJER(TLorentzVector jet,TLorentzVector Genjet, float jer, float jerUp, float jerDown, int sigmaRes, bool isGenJetMatched, double random ) {
+TLorentzVector JetCorrectionTool::GetCorrectedJetJER( TLorentzVector jet,TLorentzVector genJet, float jer, float jerUp, float jerDown, int sigmaRes, bool isGenJetMatched, double random ) {
   //std::cout<< "JetCorrectionTool::GetCorrectedJetJER"<< std::endl;
   if(!(jet.Pt() > 0.)) return jet;
-  //std::cout <<"Initial jet.pt()  " << jet.Pt() << " gen jet pt "<<Genjet.Pt() << std::endl;
+  //std::cout <<"Initial jet.pt()  " << jet.Pt() << " gen jet pt " << genJet.Pt() << std::endl;
   double jer_sf=1;
   if (sigmaRes==0) jer_sf=jer;
   if (sigmaRes >0) jer_sf=jerUp;
   if (sigmaRes<0)  jer_sf=jerDown;
  
   double smearFactor=1.;
-  //std::cout <<"ak8"<< std::endl;
   if (isGenJetMatched){
-    double dPt = jet.Pt() - Genjet.Pt();
+    double dPt = jet.Pt() - genJet.Pt();
     smearFactor = 1 + (jer_sf - 1.) * dPt / jet.Pt();
     jet *= smearFactor;
   }else if (jer_sf>1){
@@ -356,13 +342,54 @@ TLorentzVector JetCorrectionTool::GetCorrectedJetJER(TLorentzVector jet,TLorentz
 
 
 
-std::vector<TLorentzVector> JetCorrectionTool::GetCorrectedJetJER(const UZH::Jet& jet, const Ntuple::GenJetak4NtupleObject& m_genJetAK4) {
+TLorentzVector JetCorrectionTool::GetCorrectedJetJER(const UZH::Jet& jet, const Ntuple::GenJetak4NtupleObject& m_genJetAK4) {
   //std::cout<< "JetCorrectionTool::GetCorrectedJetJER"<< std::endl;
-  if(!(jet.pt() > 0.)) return {jet.tlv(),jet.tlv(),jet.tlv()};
-  //std::cout <<"Initial jet.pt()  " << jet.Pt() << " gen jet pt "<<Genjet.Pt() << std::endl;
+  if(!(jet.pt() > 0.)) return jet.tlv();
   
+  // match jet to genJets to find real jet pt
   bool matched = false;
-  float dR  = 0.4;
+  float dR  = 0.2; // (jet cone size)/ 2 = 0.2 for 0.4 jets
+  float dpt = 3*jet.pt()*jet.jer_sigma_pt();
+  double genjetpt = 0; // only used if matched
+  for (unsigned int j=0; j<(*m_genJetAK4.genJetAK4_pt).size(); ++j){
+      UZH::GenJetak4 genjet( &m_genJetAK4, j );
+      TLorentzVector genjet_tlv;
+      genjet_tlv.SetPtEtaPhiE(genjet.genJetAK4_pt(), genjet.genJetAK4_eta(), genjet.genJetAK4_phi(), genjet.genJetAK4_e());
+      if (genjet_tlv.DeltaR(jet.tlv()) < dR){
+        if (fabs(jet.pt()-genjet_tlv.Pt()) < dpt){
+          matched = true;
+          dR = genjet_tlv.DeltaR( jet.tlv() );
+          genjetpt = genjet.genJetAK4_pt();
+        }
+      }
+  }
+  
+  TLorentzVector jet_tlv_jer;
+  jet_tlv_jer.SetPtEtaPhiE(    jet.pt(), jet.eta(), jet.phi(), jet.e());
+  double random = trandom->Gaus(0.,jet.jer_sigma_pt());
+  
+  //std::cout << ">>> JetCorrectionTool::GetCorrectedJetJER: jet matches with genJet = " << matched << std::endl;
+  if (matched){
+    dpt = jet.pt()-genjetpt;
+    jet_tlv_jer *= 1 + (jet.jer_sf()-1.)*dpt/jet.pt();
+  }else{
+    if (jet.jer_sf()>1) jet_tlv_jer *= std::max(0.0,1. + random*std::sqrt(jet.jer_sf() *jet.jer_sf() - 1));
+    else std::cout << "Warning! JetCorrectionTool::GetCorrectedJetJER: SF = " << jet.jer_sf() << " <= 1 !" << std::endl;
+  }
+  
+  return jet_tlv_jer;
+}
+
+
+
+std::vector<TLorentzVector> JetCorrectionTool::GetCorrectedJetJERShifted(const UZH::Jet& jet, const Ntuple::GenJetak4NtupleObject& m_genJetAK4) {
+  //std::cout<< "JetCorrectionTool::GetCorrectedJetJER"<< std::endl;
+  // https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetResolution#Smearing_procedures
+  if(!(jet.pt() > 0.)) return {jet.tlv(),jet.tlv(),jet.tlv()};
+  
+  // match jet to genJets to find real jet pt
+  bool matched = false;
+  float dR  = 0.2; // (jet cone size)/ 2 = 0.2 for 0.4 jets
   float dpt = 3*jet.pt()*jet.jer_sigma_pt();
   double genjetpt = 0; // only used if matched
   for (unsigned int j=0; j<(*m_genJetAK4.genJetAK4_pt).size(); ++j){
@@ -381,26 +408,28 @@ std::vector<TLorentzVector> JetCorrectionTool::GetCorrectedJetJER(const UZH::Jet
   TLorentzVector jet_tlv_jer;
   TLorentzVector jet_tlv_jerUp;
   TLorentzVector jet_tlv_jerDown;
-  jet_tlv_jer.SetPtEtaPhiE(jet.pt(), jet.eta(), jet.phi(), jet.e());
-  jet_tlv_jerUp.SetPtEtaPhiE(jet.pt(), jet.eta(), jet.phi(), jet.e());
+  jet_tlv_jer.SetPtEtaPhiE(    jet.pt(), jet.eta(), jet.phi(), jet.e());
+  jet_tlv_jerUp.SetPtEtaPhiE(  jet.pt(), jet.eta(), jet.phi(), jet.e());
   jet_tlv_jerDown.SetPtEtaPhiE(jet.pt(), jet.eta(), jet.phi(), jet.e());
-  //double smearFactor=1.;
-  double random = trandom->Gaus(0.,jet.jer_sigma_pt());
   
   if (matched){
     dpt = jet.pt()-genjetpt;
-    //smearFactor = 1 + (jer_sf - 1.) * dPt / jet.Pt();
     jet_tlv_jer     *= 1 + (jet.jer_sf()     -1.)*dpt/jet.pt();
     jet_tlv_jerUp   *= 1 + (jet.jer_sf_up()  -1.)*dpt/jet.pt();
-    jet_tlv_jerDown *= 1 + (jet.jer_sf_down()-1.)*dpt/jet.pt();
+    jet_tlv_jerDown *= 1 + (jet.jer_sf_down()-1.)*dpt/jet.pt();    
   }else{
-    //smearFactor = 1. + random * std::sqrt(jer_sf * jer_sf - 1);
-    if (jet.jer_sf()>1)      jet_tlv_jer     *= 1. + random*std::sqrt(jet.jer_sf()     *jet.jer_sf()     -1);
-    else std::cout << "Warning! JetCorrectionTool::GetCorrectedJetJER: SF = " << jet.jer_sf() << " <= 1 !" << std::endl;
-    if (jet.jer_sf_up()>1)   jet_tlv_jerUp   *= 1. + random*std::sqrt(jet.jer_sf_up()  *jet.jer_sf_up()  -1);
-    else std::cout << "Warning! JetCorrectionTool::GetCorrectedJetJER: SF up = " << jet.jer_sf_up() << " <= 1 !" << std::endl;
-    if (jet.jer_sf_down()>1) jet_tlv_jerDown *= 1. + random*std::sqrt(jet.jer_sf_down()*jet.jer_sf_down()-1);
-    else std::cout << "Warning! JetCorrectionTool::GetCorrectedJetJER: SF down = " << jet.jer_sf_down() << " <= 1 !" << std::endl;
+    double random = trandom->Gaus(0.,jet.jer_sigma_pt());
+    if (jet.jer_sf()>1)      jet_tlv_jer     *= std::max(0.0,1. + random*std::sqrt(jet.jer_sf()     *jet.jer_sf()     -1));
+    else std::cout << "Warning! JetCorrectionTool::GetCorrectedJetJER: SF = " << jet.jer_sf() << " <= 1 !\n";
+    if (jet.jer_sf_up()>1)   jet_tlv_jerUp   *= std::max(0.0,1. + random*std::sqrt(jet.jer_sf_up()  *jet.jer_sf_up()  -1));
+    else std::cout << "Warning! JetCorrectionTool::GetCorrectedJetJER: SF up = " << jet.jer_sf_up() << " <= 1 !\n";
+    if (jet.jer_sf_down()>1) jet_tlv_jerDown *= std::max(0.0,1. + random*std::sqrt(jet.jer_sf_down()*jet.jer_sf_down()-1));
+    else std::cout << "Warning! JetCorrectionTool::GetCorrectedJetJER: SF down = " << jet.jer_sf_down() << " <= 1 !\n";
+  
+    //if(jet_tlv_jerDown.Pt()<jet_tlv_jer.Pt() and jet_tlv_jerUp.Pt()<jet_tlv_jer.Pt()){
+    //  std::cout << "!!! GetCorrectedJetJERShifted: JER UP/DOWN both have pt < JER central pt:\n";
+    //  TauTauAnalysis::printRow({"pt original","pt jer","pt jerUp","pt jerDown","jer_sf","jer_sf_up","jer_sf_down","random","jer_sigma_pt"},{},{},{},14);
+    //  TauTauAnalysis::printRow({},{},{jet.pt(),jet_tlv_jer.Pt(),jet_tlv_jerUp.Pt(),jet_tlv_jerDown.Pt(),jet.jer_sf(),jet.jer_sf_up(),jet.jer_sf_down(),random,jet.jer_sigma_pt()},{},14); }
   }
   
   return {jet_tlv_jer,jet_tlv_jerUp,jet_tlv_jerDown};
@@ -424,6 +453,7 @@ double JetCorrectionTool::GetCorrectedMass(double mass, double pt, double eta, b
   }
   
   if(mc) {
+      
       // Scale correction
       float jms = 0.999;
       float jmsUnc = 0.004;

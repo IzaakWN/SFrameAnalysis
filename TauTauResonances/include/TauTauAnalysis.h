@@ -202,10 +202,13 @@ class TauTauAnalysis : public SCycleBase {
     virtual bool isGoodEvent(    int runNumber, int lumiSection );    // check good lumi section
     
     /// Function to fill tree branches
-    virtual void FillBranches( const std::string& channel, std::vector<UZH::Jet>& Jets, // removed const for jets to change BTag status
+    virtual void FillBranches( const std::string& channel,
                                const UZH::Tau& tau, const int taugen, const UZH::Muon& muon, const UZH::Electron& electron,
-                               const UZH::MissingEt& met, const UZH::MissingEt& puppimet );//, const UZH::MissingEt& mvamet=NULL);
-    virtual void FillBranches_JEC( const char* ch, const std::vector<UZH::Jet>& Jets, const float phi_ll );
+                                     std::vector<UZH::Jet>& Jets, UZH::MissingEt& met, UZH::MissingEt& puppimet );
+    virtual void FillJetBranches(     const char* ch, std::vector<UZH::Jet>& Jets,   UZH::MissingEt& met,
+                                                const TLorentzVector& tau_tlv, const TLorentzVector& lep_tlv );
+    virtual void FillJetBranches_JEC( double& jpt, double& jeta, const TLorentzVector& jet, bool save=true );
+    virtual void FillJetBranches_JEC( double& jpt_1, double& jeta_1, double& jpt_2, double& jeta_2, const TLorentzVector& jet1, const TLorentzVector& jet2, bool swap = false );
     
     // check pass of triggers / MET filters
     virtual TString passTrigger( int runNumber = -1 );
@@ -249,7 +252,7 @@ class TauTauAnalysis : public SCycleBase {
     virtual void signalChecks();
     virtual void cutflowCheck( const std::string& channel );
     virtual void visiblePTCheck();
-    virtual void printRow(   const std::vector<std::string> svec = {}, const std::vector<int> ivec = {}, const std::vector<double> dvec = {}, const std::vector<float> fvec = {}, const int w=10 );
+    static void printRow(   const std::vector<std::string> svec = {}, const std::vector<int> ivec = {}, const std::vector<double> dvec = {}, const std::vector<float> fvec = {}, const int w=10 );
     
     
   private:
@@ -394,6 +397,7 @@ class TauTauAnalysis : public SCycleBase {
     double b_dR_ll_gen_ = -1;
     Int_t b_isData_;
     
+    bool b_isolated_; // to reduce saved information
     bool b_dilepton_veto_;
     bool b_extraelec_veto_;
     bool b_extramuon_veto_;
@@ -451,44 +455,44 @@ class TauTauAnalysis : public SCycleBase {
     
     std::map<std::string,Int_t>    b_njets_jesUp;
     std::map<std::string,Int_t>    b_njets_jesDown;
-    std::map<std::string,Int_t>    b_njets_jer;
+    std::map<std::string,Int_t>    b_njets_nom;
     std::map<std::string,Int_t>    b_njets_jerUp;
     std::map<std::string,Int_t>    b_njets_jerDown;
     std::map<std::string,Int_t>    b_njets20_jesUp;
     std::map<std::string,Int_t>    b_njets20_jesDown;
-    std::map<std::string,Int_t>    b_njets20_jer;
+    std::map<std::string,Int_t>    b_njets20_nom;
     std::map<std::string,Int_t>    b_njets20_jerUp;
     std::map<std::string,Int_t>    b_njets20_jerDown;
     std::map<std::string,Int_t>    b_ncbtag_jesUp;
     std::map<std::string,Int_t>    b_ncbtag_jesDown;
-    std::map<std::string,Int_t>    b_ncbtag_jer;
+    std::map<std::string,Int_t>    b_ncbtag_nom;
     std::map<std::string,Int_t>    b_ncbtag_jerUp;
     std::map<std::string,Int_t>    b_ncbtag_jerDown;
     std::map<std::string,Int_t>    b_ncjets_jesUp;
     std::map<std::string,Int_t>    b_ncjets_jesDown;
-    std::map<std::string,Int_t>    b_ncjets_jer;
+    std::map<std::string,Int_t>    b_ncjets_nom;
     std::map<std::string,Int_t>    b_ncjets_jerUp;
     std::map<std::string,Int_t>    b_ncjets_jerDown;
     std::map<std::string,Int_t>    b_nfjets_jesUp;
     std::map<std::string,Int_t>    b_nfjets_jesDown;
-    std::map<std::string,Int_t>    b_nfjets_jer;
+    std::map<std::string,Int_t>    b_nfjets_nom;
     std::map<std::string,Int_t>    b_nfjets_jerUp;
     std::map<std::string,Int_t>    b_nfjets_jerDown;
     std::map<std::string,Double_t> b_dphi_ll_bj_jesUp;
     std::map<std::string,Double_t> b_dphi_ll_bj_jesDown;
-    std::map<std::string,Double_t> b_dphi_ll_bj_jer;
+    std::map<std::string,Double_t> b_dphi_ll_bj_nom;
     std::map<std::string,Double_t> b_dphi_ll_bj_jerUp;
     std::map<std::string,Double_t> b_dphi_ll_bj_jerDown;
     std::map<std::string,Double_t> b_met_jesUp;
     std::map<std::string,Double_t> b_met_jesDown;
-    std::map<std::string,Double_t> b_met_jer;
+    std::map<std::string,Double_t> b_met_nom;
     std::map<std::string,Double_t> b_met_jerUp;
     std::map<std::string,Double_t> b_met_jerDown;
     std::map<std::string,Double_t> b_met_UncEnUp;
     std::map<std::string,Double_t> b_met_UncEnDown;
     std::map<std::string,Double_t> b_pfmt_1_jesUp;
     std::map<std::string,Double_t> b_pfmt_1_jesDown;
-    std::map<std::string,Double_t> b_pfmt_1_jer;
+    std::map<std::string,Double_t> b_pfmt_1_nom;
     std::map<std::string,Double_t> b_pfmt_1_jerUp;
     std::map<std::string,Double_t> b_pfmt_1_jerDown;
     std::map<std::string,Double_t> b_pfmt_1_UncEnUp;
@@ -561,31 +565,29 @@ class TauTauAnalysis : public SCycleBase {
     
     std::map<std::string,Double_t> b_jpt_1_jesUp;
     std::map<std::string,Double_t> b_jpt_1_jesDown;
-    std::map<std::string,Double_t> b_jpt_1_jer;
+    std::map<std::string,Double_t> b_jpt_1_nom;
     std::map<std::string,Double_t> b_jpt_1_jerUp;
     std::map<std::string,Double_t> b_jpt_1_jerDown;
     std::map<std::string,Double_t> b_jeta_1_jesUp;
     std::map<std::string,Double_t> b_jeta_1_jesDown;
-    std::map<std::string,Double_t> b_jeta_1_jer;
+    std::map<std::string,Double_t> b_jeta_1_nom;
     std::map<std::string,Double_t> b_jeta_1_jerUp;
     std::map<std::string,Double_t> b_jeta_1_jerDown;
     std::map<std::string,Double_t> b_jpt_2_jesUp;
     std::map<std::string,Double_t> b_jpt_2_jesDown;
-    std::map<std::string,Double_t> b_jpt_2_jer;
+    std::map<std::string,Double_t> b_jpt_2_nom;
     std::map<std::string,Double_t> b_jpt_2_jerUp;
     std::map<std::string,Double_t> b_jpt_2_jerDown;
     std::map<std::string,Double_t> b_jeta_2_jesUp;
     std::map<std::string,Double_t> b_jeta_2_jesDown;
-    std::map<std::string,Double_t> b_jeta_2_jer;
+    std::map<std::string,Double_t> b_jeta_2_nom;
     std::map<std::string,Double_t> b_jeta_2_jerUp;
     std::map<std::string,Double_t> b_jeta_2_jerDown;
-    std::map<std::string,Double_t> b_jphi_1_jer;
-    std::map<std::string,Double_t> b_jphi_2_jer;
     
-    // std::map<std::string,Double_t> b_fjpt_1;
-    // std::map<std::string,Double_t> b_fjet_1;
-    // std::map<std::string,Double_t> b_fjeta_1;
-    // std::map<std::string,Double_t> b_fjphi_1;
+    //std::map<std::string,Double_t> b_fjpt_1;
+    //std::map<std::string,Double_t> b_fjet_1;
+    //std::map<std::string,Double_t> b_fjeta_1;
+    //std::map<std::string,Double_t> b_fjphi_1;
     
     std::map<std::string,Double_t> b_bpt_1;
     std::map<std::string,Double_t> b_beta_1;
@@ -619,6 +621,9 @@ class TauTauAnalysis : public SCycleBase {
     
     std::map<std::string,Double_t> b_m_sv; 
     //std::map<std::string,Double_t> b_m_sv_pfmet;
+    std::map<std::string,Double_t> b_m_taub;
+    std::map<std::string,Double_t> b_m_taumub;
+    std::map<std::string,Double_t> b_m_mub;
     std::map<std::string,Double_t> b_pt_tt_sv;
     std::map<std::string,Double_t> b_R_pt_m_sv;
     

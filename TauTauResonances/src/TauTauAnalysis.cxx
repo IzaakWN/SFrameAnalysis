@@ -1542,15 +1542,9 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
   // b_weightbtag_udsgDown[ch] = m_BTaggingScaleTool.getScaleFactor(Jets, 0.,-1.);
   
   // https://twiki.cern.ch/twiki/bin/viewauth/CMS/HiggsToTauTauWorking2016#Other_common_selections
-  //std::cout << "!!! -------------------------------- START" << std::endl;
   //if(Jets.size()>0) printRow({"ijet","jet pt","jerDown","jer","jerUp","jesDown","jesUp"});
   //printRow({"ijet","jer sf DOWN","jer sf","jer sf UP"},{},{},{},15);
   for( int ijet = 0; ijet < (int)Jets.size(); ++ijet ){ // already |eta|<4.7 jets
-      
-      
-      if(Jets.at(ijet).pt()<m_AK4jetPtCut)
-           std::cout << "pt = "<<Jets.at(ijet).pt()<<" <  20 !!!\n";
-      //else std::cout << "pt = "<<Jets.at(ijet).pt()<<" >= 20\n";
       
       // "normative" jet      
       if     (ijet == 0){ jet1_nom = Jets.at(ijet).tlv(); }
@@ -1576,8 +1570,6 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
           // checks
           //printRow({},{ijet},{pt,jet_jerDown.Pt(),jet_jer.Pt(),jet_jerUp.Pt(),jet_jesDown.Pt(),jet_jesUp.Pt()});
           //printRow({},{ijet},{Jets.at(ijet).jer_sf_down(),Jets.at(ijet).jer_sf(),Jets.at(ijet).jer_sf_up()},{},15);
-          //if(Jets.at(ijet).jer_sf_down()>Jets.at(ijet).jer_sf_up()) std::cout << "!!! jer sf down > jer sf up\n";
-          //if(pt>jet_jesUp.Pt()) std::cout << "!!! WARNING! In for loop: jet nom pt > jes up pt\n";
           
           // save nominal and shifts
           if(ijet == 0){      jet1_jesUp   = jet_jesUp;     jet1_jerUp   = jet_jerUp;
@@ -1592,13 +1584,10 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
           countJets( jet_jerDown, ncjets_jerDown, nfjets_jerDown, ncbtag_jerDown, bjet_dphi_jerDown, jet2_dphi_jerDown, isBTagged );
         }else{ // only do smearing
           jet_jer = m_JetCorrectionTool.GetCorrectedJetJER(Jets.at(ijet),m_genJetAK4);
-          //if     (ijet == 0){ jet1 = jet_jer; jet1_nom = Jets.at(ijet).tlv(); }
-          //else if(ijet == 1){ jet2 = jet_jer; jet2_nom = Jets.at(ijet).tlv(); }
         }
         
         pt = jet_jer.Pt();
         if(pt<m_AK4jetPtCut) continue; // only count >20 GeV jets
-        // TODO: correct met
         b_weightbtag_ *= m_BTaggingScaleTool.getScaleFactor(Jets.at(ijet)); // before smearing
         Jets.at(ijet).pt(pt); // correct UZH::Jet object's pt
       }
@@ -1654,15 +1643,6 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
     b_njets_jerDown[ch]  = nfjets_jerDown + ncjets_jerDown;         //b_njets20_jerDown[ch] = njets20_jerDown;
   }
   
-//   if(Jets.size()>0){
-//     std::cout << "!!! -------------------------------- Filling the tree" << std::endl;
-//     //printRow({"ijet","jet pt","jer","jerDown","jerUp","jesDown","jesUp"});
-//     printRow({},{0},{jet1_nom.Pt(),Jets.at(0).pt(),jet1_jerDown.Pt(),jet1_jerUp.Pt(),jet1_jesDown.Pt(),jet1_jesUp.Pt()});
-//     if(Jets.size()>1){
-//       printRow({},{1},{jet2_nom.Pt(),Jets.at(1).pt(),jet2_jerDown.Pt(),jet2_jerUp.Pt(),jet2_jesDown.Pt(),jet2_jesUp.Pt()});
-//     }
-//     std::cout << "!!! --------------------------------" << std::endl;
-//   }
   bool swap = false;
   if(Jets.size()>1) swap = (Jets.at(0).pt()<Jets.at(1).pt());
   
@@ -1670,19 +1650,6 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
     if(!swap){
       b_jpt_1[ch] = Jets.at(0).pt();    b_jeta_1[ch] = Jets.at(0).eta();    b_jphi_1[ch] = Jets.at(0).phi();
       b_jpt_2[ch] = Jets.at(1).pt();    b_jeta_2[ch] = Jets.at(1).eta();    b_jphi_2[ch] = Jets.at(1).phi();
-      
-//       FillJetBranches_JEC(  b_jpt_1_nom[ch],    b_jeta_1_nom[ch],    jet1_nom,    jet1_nom.Pt()    >m_AK4jetPtCut);
-//       FillJetBranches_JEC(  b_jpt_2_nom[ch],    b_jeta_2_nom[ch],    jet2_nom,    jet2_nom.Pt()    >m_AK4jetPtCut);
-//       if(doJEC){
-//         FillJetBranches_JEC(b_jpt_1_jesUp[ch],  b_jeta_1_jesUp[ch],  jet1_jesUp,  jet1_jesUp.Pt()  >m_AK4jetPtCut);
-//         FillJetBranches_JEC(b_jpt_2_jesUp[ch],  b_jeta_2_jesUp[ch],  jet2_jesUp,  jet2_jesUp.Pt()  >m_AK4jetPtCut);
-//         FillJetBranches_JEC(b_jpt_1_jesDown[ch],b_jeta_1_jesDown[ch],jet1_jesDown,jet1_jesDown.Pt()>m_AK4jetPtCut);
-//         FillJetBranches_JEC(b_jpt_2_jesDown[ch],b_jeta_2_jesDown[ch],jet2_jesDown,jet2_jesDown.Pt()>m_AK4jetPtCut);
-//         FillJetBranches_JEC(b_jpt_1_jerUp[ch],  b_jeta_1_jerUp[ch],  jet1_jerUp,  jet1_jerUp.Pt()  >m_AK4jetPtCut);
-//         FillJetBranches_JEC(b_jpt_2_jerUp[ch],  b_jeta_2_jerUp[ch],  jet2_jerUp,  jet2_jerUp.Pt()  >m_AK4jetPtCut);
-//         FillJetBranches_JEC(b_jpt_1_jerDown[ch],b_jeta_1_jerDown[ch],jet1_jerDown,jet1_jerDown.Pt()>m_AK4jetPtCut);
-//         FillJetBranches_JEC(b_jpt_2_jerDown[ch],b_jeta_2_jerDown[ch],jet2_jerDown,jet2_jerDown.Pt()>m_AK4jetPtCut);
-//       }
     }else{ // swap
       b_jpt_1[ch] = Jets.at(1).pt();    b_jeta_1[ch] = Jets.at(1).eta();    b_jphi_1[ch] = Jets.at(1).phi();
       b_jpt_2[ch] = Jets.at(0).pt();    b_jeta_2[ch] = Jets.at(0).eta();    b_jphi_2[ch] = Jets.at(0).phi();
@@ -1704,8 +1671,6 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
   }
   
   if(doJEC){
-   //std::cout << "----------------------------------------------------------\n";
-    //if(swap) std::cout << "WARNING - swap\n";
     //if(jet1_jerUp.Pt()  <jet2_jerUp.Pt()  ) std::cout << "WARNING - jet1_jerUp.Pt() = "  <<jet1_jerUp.Pt()  <<" < "<<jet2_jerUp.Pt()  <<" = jet2_jerUp.Pt()\n";
     //if(jet1_jerDown.Pt()<jet2_jerDown.Pt()) std::cout << "WARNING - jet1_jerDown.Pt() = "<<jet1_jerDown.Pt()<<" < "<<jet2_jerDown.Pt()<<" = jet2_jerDown.Pt()\n";
     FillJetBranches_JEC(b_jpt_1_nom[ch],     b_jeta_1_nom[ch],     b_jpt_2_nom[ch],     b_jeta_2_nom[ch],     jet1_nom,     jet2_nom,     swap);
@@ -1713,17 +1678,8 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
     FillJetBranches_JEC(b_jpt_1_jesDown[ch], b_jeta_1_jesDown[ch], b_jpt_2_jesDown[ch], b_jeta_2_jesDown[ch], jet1_jesDown, jet2_jesDown, swap);
     FillJetBranches_JEC(b_jpt_1_jerUp[ch],   b_jeta_1_jerUp[ch],   b_jpt_2_jerUp[ch],   b_jeta_2_jerUp[ch],   jet1_jerUp,   jet2_jerUp,   swap); //and jet1_jerUp.Pt()  <jet2_jerUp.Pt()  ); //jet1_jerUp.Pt()  <jet2_jerUp.Pt()
     FillJetBranches_JEC(b_jpt_1_jerDown[ch], b_jeta_1_jerDown[ch], b_jpt_2_jerDown[ch], b_jeta_2_jerDown[ch], jet1_jerDown, jet2_jerDown, swap); //and jet1_jerDown.Pt()<jet2_jerDown.Pt()); //jet1_jerDown.Pt()<jet2_jerDown.Pt()
-    
-    //if(jet1_jesUp.Pt()<jet2_jesUp.Pt()) std::cout << "WARNING - jet1_jesUp.Pt() = "<<jet1_jesUp.Pt()<<" < "<<jet2_jesUp.Pt()<<" = jet2_jesUp.Pt()\n";
-    //if(jet1_jerUp.Pt()  <jet2_jerUp.Pt()  ) std::cout << "WARNING - jet1_jerUp.Pt() = "  <<jet1_jerUp.Pt()  <<" < "<<jet2_jerUp.Pt()  <<" = jet2_jerUp.Pt()\n";
-    //if(jet1_jerDown.Pt()<jet2_jerDown.Pt()) std::cout << "WARNING - jet1_jerDown.Pt() = "<<jet1_jerDown.Pt()<<" < "<<jet2_jerDown.Pt()<<" = jet2_jerDown.Pt()\n";
-    //if(jet1_jesUp.Pt()  <jet2_jesUp.Pt()  ) std::cout << "WARNING - jet1_jesUp.Pt() = "  <<jet1_jesUp.Pt()  <<" < "<<jet2_jesUp.Pt()  <<" = jet2_jesUp.Pt()\n";
-    //if(jet1_jesDown.Pt()<jet2_jesDown.Pt()) std::cout << "WARNING - jet1_jesDown.Pt() = "<<jet1_jesDown.Pt()<<" < "<<jet2_jesDown.Pt()<<" = jet2_jesDown.Pt()\n";
     //if(b_jpt_1_jerUp[ch] > b_jpt_1[ch] and b_jpt_1_jerDown[ch] > b_jpt_1[ch]) std::cout << "WARNING - JER UP/DOWN both have pt ("<<b_jpt_1_jerUp[ch]<<","<<b_jpt_1_jerDown[ch]<<") > JER central pt ("<<b_jpt_1[ch]<<")\n";
     //if(b_jpt_1_jerUp[ch] < b_jpt_1[ch] and b_jpt_1_jerDown[ch] < b_jpt_1[ch]) std::cout << "WARNING - JER UP/DOWN both have pt ("<<b_jpt_1_jerUp[ch]<<","<<b_jpt_1_jerDown[ch]<<") < JER central pt ("<<b_jpt_1[ch]<<")\n";
-    //if(b_jpt_1_jerUp[ch]  <b_jpt_2_jerUp[ch]  ) std::cout << "WARNING - jpt_1_jerUp   = "<<b_jpt_1_jerUp[ch]  <<" < "<<b_jpt_2_jerUp[ch]  <<" = jpt_2_jerUp\n";
-    //if(b_jpt_1_jerDown[ch]<b_jpt_2_jerDown[ch]) std::cout << "WARNING - jpt_1_jerDown = "<<b_jpt_1_jerDown[ch]<<" < "<<b_jpt_2_jerDown[ch]<<" = jpt_2_jerDown\n";
-    //std::cout << "----------------------------------------------------------\n";
   }
   
   // b jets
@@ -1842,46 +1798,46 @@ void TauTauAnalysis::FillJetBranches_JEC( double& jpt_1, double& jeta_1, double&
   // Helpfunction to fill jet pt/eta branches for JEC corrections and reduce code clutter
   // Swap order if "default" jets were swapped
   
-//   if(!swap){
-//     FillJetBranches_JEC( jpt_1, jeta_1, jet1, jet1.Pt()>m_AK4jetPtCut);
-//     FillJetBranches_JEC( jpt_2, jeta_2, jet2, jet2.Pt()>m_AK4jetPtCut);
-//   }else{
-//     FillJetBranches_JEC( jpt_1, jeta_1, jet2, jet2.Pt()>m_AK4jetPtCut);
-//     FillJetBranches_JEC( jpt_2, jeta_2, jet1, jet1.Pt()>m_AK4jetPtCut);
-//   }
-  
-  bool jet1_passes = jet1.Pt()>m_AK4jetPtCut;
-  bool jet2_passes = jet2.Pt()>m_AK4jetPtCut;
-  int njets20_leading2 = (jet1_passes)+(jet2_passes);
-  if(njets20_leading2>1){
-    if(!swap){
-        jpt_1  = jet1.Pt();     jeta_1 = jet1.Eta();
-        jpt_2  = jet2.Pt();     jeta_2 = jet2.Eta();
-    }else{
-        jpt_1  = jet2.Pt();     jeta_1 = jet2.Eta();
-        jpt_2  = jet1.Pt();     jeta_2 = jet1.Eta();
-    }
-  }else if(njets20_leading2==1){
-    if(!swap){
-      if(jet1_passes){
-        jpt_1  = jet1.Pt();     jeta_1 = jet1.Eta();
-        jpt_2  = -1;            jeta_2 = -9;
-      }else{
-        jpt_1  = -1;            jeta_1 = -9;
-        jpt_2  = jet2.Pt();     jeta_2 = jet2.Eta();
-      }
-    }else{
-      if(jet1_passes){
-        jpt_1  = -1;            jeta_1 = -9;
-        jpt_2  = jet1.Pt();     jeta_2 = jet1.Eta();
-      }else{
-        jpt_1  = jet2.Pt();     jeta_1 = jet2.Eta();
-        jpt_2  = -1;            jeta_2 = -9;
-    }}
+  if(!swap){
+    FillJetBranches_JEC( jpt_1, jeta_1, jet1, jet1.Pt()>m_AK4jetPtCut);
+    FillJetBranches_JEC( jpt_2, jeta_2, jet2, jet2.Pt()>m_AK4jetPtCut);
   }else{
-    jpt_1  = -1;            jeta_1 = -9;
-    jpt_2  = -1;            jeta_2 = -9;  
+    FillJetBranches_JEC( jpt_1, jeta_1, jet2, jet2.Pt()>m_AK4jetPtCut);
+    FillJetBranches_JEC( jpt_2, jeta_2, jet1, jet1.Pt()>m_AK4jetPtCut);
   }
+  
+//   bool jet1_passes = jet1.Pt()>m_AK4jetPtCut;
+//   bool jet2_passes = jet2.Pt()>m_AK4jetPtCut;
+//   int njets20_leading2 = (jet1_passes)+(jet2_passes);
+//   if(njets20_leading2>1){
+//     if(!swap){
+//         jpt_1  = jet1.Pt();     jeta_1 = jet1.Eta();
+//         jpt_2  = jet2.Pt();     jeta_2 = jet2.Eta();
+//     }else{
+//         jpt_1  = jet2.Pt();     jeta_1 = jet2.Eta();
+//         jpt_2  = jet1.Pt();     jeta_2 = jet1.Eta();
+//     }
+//   }else if(njets20_leading2==1){
+//     if(!swap){
+//       if(jet1_passes){
+//         jpt_1  = jet1.Pt();     jeta_1 = jet1.Eta();
+//         jpt_2  = -1;            jeta_2 = -9;
+//       }else{
+//         jpt_1  = -1;            jeta_1 = -9;
+//         jpt_2  = jet2.Pt();     jeta_2 = jet2.Eta();
+//       }
+//     }else{
+//       if(jet1_passes){
+//         jpt_1  = -1;            jeta_1 = -9;
+//         jpt_2  = jet1.Pt();     jeta_2 = jet1.Eta();
+//       }else{
+//         jpt_1  = jet2.Pt();     jeta_1 = jet2.Eta();
+//         jpt_2  = -1;            jeta_2 = -9;
+//     }}
+//   }else{
+//     jpt_1  = -1;            jeta_1 = -9;
+//     jpt_2  = -1;            jeta_2 = -9;  
+//   }
 }
 
 

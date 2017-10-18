@@ -420,9 +420,9 @@ std::vector<TLorentzVector> JetCorrectionTool::GetCorrectedJetJERShifted(const U
   }else{
     double random = trandom->Gaus(0.,jet.jer_sigma_pt());
     if (jet.jer_sf()>1)      jet_tlv_jer     *= std::max(0.0,1. + random*std::sqrt(jet.jer_sf()     *jet.jer_sf()     -1));
-    else std::cout << "Warning! JetCorrectionTool::GetCorrectedJetJER: SF = " << jet.jer_sf() << " <= 1 !\n";
+    else std::cout << "Warning! JetCorrectionTool::GetCorrectedJetJER: SF = "     << jet.jer_sf()       << " <= 1 !\n";
     if (jet.jer_sf_up()>1)   jet_tlv_jerUp   *= std::max(0.0,1. + random*std::sqrt(jet.jer_sf_up()  *jet.jer_sf_up()  -1));
-    else std::cout << "Warning! JetCorrectionTool::GetCorrectedJetJER: SF up = " << jet.jer_sf_up() << " <= 1 !\n";
+    else std::cout << "Warning! JetCorrectionTool::GetCorrectedJetJER: SF up = "  << jet.jer_sf_up()    << " <= 1 !\n";
     if (jet.jer_sf_down()>1) jet_tlv_jerDown *= std::max(0.0,1. + random*std::sqrt(jet.jer_sf_down()*jet.jer_sf_down()-1));
     else std::cout << "Warning! JetCorrectionTool::GetCorrectedJetJER: SF down = " << jet.jer_sf_down() << " <= 1 !\n";
   

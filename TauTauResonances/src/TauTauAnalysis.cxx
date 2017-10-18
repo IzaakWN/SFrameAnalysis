@@ -205,6 +205,9 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
   m_logger << INFO << "TauName:             " <<    m_tauName           << SLogger::endmsg;
   m_logger << INFO << "GenParticleName:     " <<    m_genParticleName   << SLogger::endmsg;
   
+  m_doTES = m_doTES and !m_isData;
+  m_doEES = m_doEES and !m_isData;
+  m_doLTF = m_doLTF and !m_isData;
   m_doJEC = m_doJEC and !(m_doTES or m_doEES or m_doLTF or m_isData);
   m_logger << INFO << "IsData:              " <<    (m_isData   ?   "TRUE" : "FALSE") << SLogger::endmsg;
   m_logger << INFO << "IsSignal:            " <<    (m_isSignal ?   "TRUE" : "FALSE") << SLogger::endmsg;
@@ -1143,8 +1146,8 @@ void TauTauAnalysis::fillCutflow(TString histName, TString dirName, const Int_t 
 
 
 
-void TauTauAnalysis::FillBranches(const std::string& channel,
-                                  const UZH::Tau& tau, const int gen_match_2, const UZH::Muon& muon, const UZH::Electron& electron,
+void TauTauAnalysis::FillBranches(const std::string& channel, const UZH::Tau& tau, const int gen_match_2,
+                                  const UZH::Muon& muon, const UZH::Electron& electron,
                                   std::vector<UZH::Jet> &Jets, UZH::MissingEt& met, UZH::MissingEt& puppimet){//, const UZH::MissingEt& mvamet){
   //std::cout << "FillBranches" << std::endl;
   
@@ -1164,7 +1167,7 @@ void TauTauAnalysis::FillBranches(const std::string& channel,
   b_npv[ch]         = m_eventInfo.PV_N;
   b_NUP[ch]         = m_eventInfo.lheNj;
   b_rho[ch]         = m_eventInfo.rho;
-    
+  
   
   
   ////////////////
@@ -1274,9 +1277,6 @@ void TauTauAnalysis::FillBranches(const std::string& channel,
   
   
   
-  
-  
-  
   //////////////////
   // MARK: Shifts //
   //////////////////
@@ -1287,10 +1287,10 @@ void TauTauAnalysis::FillBranches(const std::string& channel,
   met_tlv.SetPxPyPzE(met.et()*TMath::Cos(met.phi()), met.et()*TMath::Sin(met.phi()), 0, met.et());
   TLorentzVector met_tlv_corrected;
   if(m_doRecoilCorr){
-    met_tlv_corrected    = m_RecoilCorrector.CorrectPFMETByMeanResolution(  met_tlv.Px(),       met_tlv.Py(),
-                                                                            boson_tlv.Px(),     boson_tlv.Py(),
-                                                                            boson_tlv_vis.Px(), boson_tlv_vis.Py(),
-                                                                            m_jetAK4.N ); //m_eventInfo.lheNj
+    met_tlv_corrected = m_RecoilCorrector.CorrectPFMETByMeanResolution(  met_tlv.Px(),       met_tlv.Py(),
+                                                                         boson_tlv.Px(),     boson_tlv.Py(),
+                                                                         boson_tlv_vis.Px(), boson_tlv_vis.Py(),
+                                                                         m_jetAK4.N ); //m_eventInfo.lheNj
     b_m_genboson[ch]  = boson_tlv.M();
     b_pt_genboson[ch] = boson_tlv.Pt();
   }else{
@@ -1334,16 +1334,12 @@ void TauTauAnalysis::FillBranches(const std::string& channel,
   
   
   
-  
-  
   ////////////////
   // MARK: Jets //
   ////////////////
   
   //if(b_isolated_) std::sort(Jets.begin(), Jets.end(), UZH::sortJetPt() );
   FillJetBranches( ch, Jets, met, lep_tlv, tau_tlv );
-  
-  
   
   
   
@@ -1372,9 +1368,10 @@ void TauTauAnalysis::FillBranches(const std::string& channel,
   b_pfmt_1[ch]      = TMath::Sqrt(2*lep_tlv.Pt()*fmet*(      1-TMath::Cos(deltaPhi(lep_tlv.Phi(), fmetphi     ))));
   b_puppimt_1[ch]   = TMath::Sqrt(2*lep_tlv.Pt()*fpuppimet*( 1-TMath::Cos(deltaPhi(lep_tlv.Phi(), fpuppimetphi))));
   
-  b_pfmt_2[ch]      = TMath::Sqrt(2*b_pt_2[ch]*fmet*(      1-TMath::Cos(deltaPhi(b_phi_2[ch], fmetphi      ))));
-  b_puppimt_2[ch]   = TMath::Sqrt(2*b_pt_2[ch]*fpuppimet*( 1-TMath::Cos(deltaPhi(b_phi_2[ch], fpuppimetphi ))));
+  b_pfmt_2[ch]      = TMath::Sqrt(2*tau_tlv.Pt()*fmet*(      1-TMath::Cos(deltaPhi(tau_tlv.Phi(), fmetphi      ))));
+  b_puppimt_2[ch]   = TMath::Sqrt(2*tau_tlv.Pt()*fpuppimet*( 1-TMath::Cos(deltaPhi(tau_tlv.Phi(), fpuppimetphi ))));
   
+  // discriminating variables
   b_m_vis[ch]       = (lep_tlv + tau_tlv).M();
   b_pt_tt[ch]       = (lep_tlv + tau_tlv + met_tlv).Pt();
   b_pt_tt_vis[ch]   = (lep_tlv + tau_tlv).Pt();
@@ -1383,7 +1380,6 @@ void TauTauAnalysis::FillBranches(const std::string& channel,
     b_R_pt_m_vis[ch] = b_pt_tt[ch]/b_m_vis[ch];
     b_R_pt_m_vis2[ch] = b_pt_tt_vis[ch]/b_m_vis[ch];
   }
-  
   b_dR_ll[ch]       = tau_tlv.DeltaR(lep_tlv);
   b_mt_tot[ch]      = TMath::Sqrt(TMath::Power(b_pfmt_1[ch],2) + TMath::Power(b_pfmt_2[ch],2) + 2*lep_tlv.Pt()*b_pt_2[ch]*(1-TMath::Cos(deltaPhi(lep_tlv.Phi(), b_phi_2[ch]))));
   
@@ -1424,8 +1420,6 @@ void TauTauAnalysis::FillBranches(const std::string& channel,
   
   
   
-  
-  
   ///////////////////
   // MARK: Weights //
   ///////////////////
@@ -1457,7 +1451,6 @@ void TauTauAnalysis::FillBranches(const std::string& channel,
     //   Hist("N_match0p30_bst_std_"+tch, "histogram_"+tch)->Fill( nMatch );
     // }
   }
-  
   
   
   

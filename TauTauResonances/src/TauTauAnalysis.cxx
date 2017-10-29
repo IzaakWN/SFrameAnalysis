@@ -26,7 +26,7 @@ TauTauAnalysis::TauTauAnalysis() : SCycleBase(),
     m_JetCorrectionTool( this ),
     m_SVFitTool( this )
 {
-
+  
   m_logger << INFO << "Hello!" << SLogger::endmsg;
   SetLogName( GetName() );
   
@@ -223,6 +223,7 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
   m_logger << INFO << "EESshiftEndCap:      " <<    m_EESshiftEndCap    << SLogger::endmsg;
   m_logger << INFO << "doLTF:               " <<    (m_doLTF    ?   "TRUE" : "FALSE") << SLogger::endmsg;
   m_logger << INFO << "LTFshift:            " <<    m_TESshift          << SLogger::endmsg;
+  m_logger << INFO << "doTight:             " <<    (m_doTight  ?   "TRUE" : "FALSE") << SLogger::endmsg;
 
   m_logger << INFO << "ElectronPtCut:       " <<    m_electronPtCut     << SLogger::endmsg;
   m_logger << INFO << "ElectronEtaCut:      " <<    m_electronEtaCut    << SLogger::endmsg;
@@ -896,8 +897,8 @@ void TauTauAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
     fillCutflow("cutflow_mutau", "histogram_mutau", kLepTau, 1);
     sort(mutau_pair.begin(), mutau_pair.end());
     Int_t genmatch_2 = goodTausGen[mutau_pair[0].itau];
-    bool b_isolated_ = mutau_pair[0].lep_iso<0.50 and (goodTaus[mutau_pair[0].itau].byMediumIsolationMVArun2v1DBoldDMwLT()==1 or
-                                                       goodTaus[mutau_pair[0].itau].byTightIsolationMVArun2v1DBoldDMwLT()==1);
+    b_isolated_ = mutau_pair[0].lep_iso<0.50 and (goodTaus[mutau_pair[0].itau].byMediumIsolationMVArun2v1DBoldDMwLT()==1 or
+                                                  goodTaus[mutau_pair[0].itau].byTightIsolationMVArun2v1DBoldDMwLT()==1);
     
     // For Jets: cut and filter our selected muon and tau
     std::vector<UZH::Jet> goodJetsAK4;
@@ -1355,6 +1356,7 @@ void TauTauAnalysis::FillBranches(const std::string& channel, const UZH::Tau& ta
   float fpuppimetphi = puppimet.phi();
   
   b_met[ch]         = fmet;
+  b_met_nom[ch]     = fmet;
   b_metphi[ch]      = fmetphi;
   b_puppimet[ch]    = fpuppimet;
   b_puppimetphi[ch] = fpuppimetphi;
@@ -1538,13 +1540,15 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
   //if(Jets.size()>0) printRow({"ijet","jet pt","jerDown","jer","jerUp","jesDown","jesUp"});
   //printRow({"ijet","jer sf DOWN","jer sf","jer sf UP"},{},{},{},15);
   for( int ijet = 0; ijet < (int)Jets.size(); ++ijet ){ // already |eta|<4.7 jets
-      
-      // "normative" jet      
+      // TODO: reorder jets, by saving the index of the two leading smeared jets
+           
+      // "nominal" jet      
       if     (ijet == 0){ jet1_nom = Jets.at(ijet).tlv(); }
       else if(ijet == 1){ jet2_nom = Jets.at(ijet).tlv(); }
       Float_t abseta = fabs(Jets.at(ijet).eta());
       Float_t pt     = Jets.at(ijet).pt();
       bool isBTagged = getBTagWeight_promote_demote(Jets.at(ijet));
+      countJets( Jets.at(ijet).tlv(), ncjets_nom, nfjets_nom, ncbtag_nom, bjet_dphi_nom, jet2_dphi_nom, isBTagged );
       
       // smeared jet
       if(m_isData){
@@ -1611,7 +1615,7 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
           nfjets++;                   //  jets
       }}
   }
-    
+  
   // jet multiplicities
   njets             = ncjets + nfjets;      njets20         = ncjets20 + nfjets20;
   nbtag             = ncbtag + nfbtag;      nbtag20         = ncbtag20 + nfbtag20;
@@ -1700,17 +1704,6 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
     b_bcsv_2[ch]    = Jets.at(ibjet2).csv();
   }
   
-  if(m_isData){
-    b_njets_nom[ch]      = b_njets[ch];         b_njets20_nom[ch]    = b_njets20[ch];
-    b_ncjets_nom[ch]     = b_ncjets[ch];        b_nfjets_nom[ch]     = b_nfjets[ch];
-    b_ncbtag_nom[ch]     = b_ncbtag[ch];
-    b_jpt_1_nom[ch]      = b_jpt_1[ch];         b_jpt_2_nom[ch]      = b_jpt_2[ch];
-    b_jeta_1_nom[ch]     = b_jeta_1[ch];        b_jeta_2_nom[ch]     = b_jeta_2[ch];
-    b_met_nom[ch]        = b_met[ch];
-    b_pfmt_1_nom[ch]     = b_pfmt_1[ch];
-    b_dphi_ll_bj_nom[ch] = b_dphi_ll_bj[ch];
-  }
-  
   // VBF
   if(b_njets[ch]>=2){
     b_vbf_mjj[ch]   = (Jets.at(0).tlv() + Jets.at(1).tlv()).M();
@@ -1773,6 +1766,18 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
       b_dphi_ll_bj_jerUp[ch]    = -9;
       b_dphi_ll_bj_jerDown[ch]  = -9;
   }}
+  
+  // Data
+  if(m_isData){
+    b_njets_nom[ch]      = b_njets[ch];         b_njets20_nom[ch]    = b_njets20[ch];
+    b_ncjets_nom[ch]     = b_ncjets[ch];        b_nfjets_nom[ch]     = b_nfjets[ch];
+    b_ncbtag_nom[ch]     = b_ncbtag[ch];
+    b_jpt_1_nom[ch]      = b_jpt_1[ch];         b_jpt_2_nom[ch]      = b_jpt_2[ch];
+    b_jeta_1_nom[ch]     = b_jeta_1[ch];        b_jeta_2_nom[ch]     = b_jeta_2[ch];
+    b_met_nom[ch]        = b_met[ch];
+    b_pfmt_1_nom[ch]     = b_pfmt_1[ch];
+    b_dphi_ll_bj_nom[ch] = b_dphi_ll_bj[ch];
+  }
   
 }
 

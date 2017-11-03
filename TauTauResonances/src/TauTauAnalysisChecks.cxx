@@ -49,18 +49,18 @@ void TauTauAnalysis::makeHistogramsForChecks(){
   }
   
   // histograms - checks
-//   if(m_isSignal){
-//   
-//     // gen level distributions checks
-//     Book( TH1F("pt_gentaus",      "gen taus pt",      150, 0, 150 ), "checks");
-//     Book( TH1F("pt_gentau1",      "gen tau 1 pt",     150, 0, 150 ), "checks");
-//     Book( TH1F("pt_gentau2",      "gen tau 2 pt",     150, 0, 150 ), "checks");
-//     Book( TH1F("pt_genmuon",      "gen muon pt",      100, 0, 100 ), "checks");
-//     Book( TH1F("pt_tt_gen",       "gen pt_tt",        150, 0, 200 ), "checks");
-//     Book( TH1F("DeltaR_tautau",   "DeltaR_tautau",    150, 0,   5 ), "checks");
-//     Book( TH1F("DeltaR_taumu",    "DeltaR_taumu",     150, 0,   5 ), "checks");
-//     Book( TH1F("M_tautau",        "M_tautau",         200, 0,  60 ), "checks");
-//     
+  if(m_isSignal){
+  
+    // gen level distributions checks
+    Book( TH1F("pt_gentaus",      "gen taus pt",      150, 0, 150 ), "checks");
+    Book( TH1F("pt_gentau1",      "gen tau 1 pt",     150, 0, 150 ), "checks");
+    Book( TH1F("pt_gentau2",      "gen tau 2 pt",     150, 0, 150 ), "checks");
+    Book( TH1F("pt_genmuon",      "gen muon pt",      100, 0, 100 ), "checks");
+    Book( TH1F("pt_tt_gen",       "gen pt_tt",        150, 0, 200 ), "checks");
+    Book( TH1F("DeltaR_tautau",   "DeltaR_tautau",    150, 0,   5 ), "checks");
+    Book( TH1F("DeltaR_taumu",    "DeltaR_taumu",     150, 0,   5 ), "checks");
+    Book( TH1F("M_tautau",        "M_tautau",         200, 0,  60 ), "checks");
+    
 //     // cutflow checks
 //     Book( TH1F("N_tauh_gen",      "N_tauh_gen",         5, 0,   5 ), "checks");
 //     Book( TH1F("N_tau_gen",       "N_tau_gen",          5, 0,   5 ), "checks");
@@ -98,21 +98,34 @@ void TauTauAnalysis::makeHistogramsForChecks(){
 //     Book( TH2F("DeltaR_pt_tt_vis_ltau_std", "DeltaR_pt_tt_vis_ltau_std", 100, 0, 200, 100, 0,   5 ), "checks");
 //     Book( TH2F("DeltaR_pt_tt_vis_ltau_bst", "DeltaR_pt_tt_vis_ltau_bst", 100, 0, 200, 100, 0,   5 ), "checks");
 //     
-//   }
+  }
+  
+  Book( TH1F("btag_tau",          "btag_tau",      3, 0, 3 ), "checks");
+  Book( TH1F("btag_tau_DM0",      "btag_tau_DM0",  3, 0, 3 ), "checks");
+  Book( TH1F("btag_tau_DM1",      "btag_tau_DM1",  3, 0, 3 ), "checks");
+  Book( TH1F("btag_tau_DM10",     "btag_tau_DM10", 3, 0, 3 ), "checks");
+  Book( TH1F("btag_tau_recoDM0",  "btag_tau_recoDM0",  3, 0, 3 ), "checks");
+  Book( TH1F("btag_tau_recoDM1",  "btag_tau_recoDM1",  3, 0, 3 ), "checks");
+  Book( TH1F("btag_tau_recoDM10", "btag_tau_recoDM10", 3, 0, 3 ), "checks");
+  Book( TH1F("btag_LooseJetID_tau",          "btag_LooseJetID_tau",      3, 0, 3 ), "checks");
+  Book( TH1F("btag_LooseJetID_tau_DM0",      "btag_LooseJetID_tau_DM0",  3, 0, 3 ), "checks");
+  Book( TH1F("btag_LooseJetID_tau_DM1",      "btag_LooseJetID_tau_DM1",  3, 0, 3 ), "checks");
+  Book( TH1F("btag_LooseJetID_tau_DM10",     "btag_LooseJetID_tau_DM10", 3, 0, 3 ), "checks");
+  Book( TH1F("btag_LooseJetID_tau_recoDM0",  "btag_LooseJetID_tau_recoDM0",  3, 0, 3 ), "checks");
+  Book( TH1F("btag_LooseJetID_tau_recoDM1",  "btag_LooseJetID_tau_recoDM1",  3, 0, 3 ), "checks");
+  Book( TH1F("btag_LooseJetID_tau_recoDM10", "btag_LooseJetID_tau_recoDM10", 3, 0, 3 ), "checks");
+
+  
 }
 
 
-
-
-
-
-void TauTauAnalysis::checks(){
+void TauTauAnalysis::signalChecks(){
   //std::cout << "checks" << std::endl;
 
   /// GEN TAUS
   std::vector<UZH::GenParticle> taus;
   std::vector<UZH::GenParticle> muons;
-//   std::vector<UZH::GenParticle> quarks;
+  //std::vector<UZH::GenParticle> quarks;
   for ( int p = 0; p < (m_genParticle.N); ++p ) {
     UZH::GenParticle mygoodGenPart( &m_genParticle, p );
     Int_t pdgID = fabs(mygoodGenPart.pdgId());
@@ -128,8 +141,8 @@ void TauTauAnalysis::checks(){
     else if ( pdgID == 13 && mygoodGenPart.isDirectPromptTauDecayProduct()){
       muons.push_back(mygoodGenPart);
     }
-//     else if ( pdgID < 5 ) quarks.push_back(mygoodGenPart);
-//     if (muons.size() > 1) break;
+  //else if ( pdgID < 5 ) quarks.push_back(mygoodGenPart);
+  //if (muons.size() > 1) break;
   }
   
   if(taus.size() < 2) std::cout << "Warning: taus.size() < 2" << std::endl;
@@ -612,5 +625,182 @@ void TauTauAnalysis::visiblePTCheck(){
   Hist("pt_tt_vis", "checks")->Fill( pt_tt_vis );
   
 }
+
+
+
+
+
+void TauTauAnalysis::countBTaggedTaus(){
+  // Check b tag fake rate of taus
+  // Other checks: tau or jet IDs?
+  
+  // loop over recoTaus
+  for ( int i = 0; i <   (m_tau.N); ++i ) {
+    UZH::Tau tau( &m_tau, i );
+    
+    // match recoTau with genTaus and find decayMode
+    int dm = genDecayMode(tau.pt(),tau.eta());
+    if(dm<0) continue;
+    
+    // loop over recoJets
+    for ( int i = 0; i < (m_jetAK4.N); ++i ) {
+      UZH::Jet jet( &m_jetAK4, i );
+      
+      // match recoTau with recoJet
+      if( tau.tlv().DeltaR(jet.tlv())<0.5 ){
+      
+        int isBTagged = (int) (jet.csv() > m_CSVWorkingPoint); // medium
+        
+        // all jets
+        Hist("btag_tau", "checks")->Fill( isBTagged );
+        
+        // recoDM
+        if(tau.decayMode()==0)
+          Hist("btag_tau_recoDM0",  "checks")->Fill( isBTagged );
+        else if(tau.decayMode()==1)
+          Hist("btag_tau_recoDM1",  "checks")->Fill( isBTagged );
+        else if(tau.decayMode()==10)
+          Hist("btag_tau_recoDM10", "checks")->Fill( isBTagged );
+                
+        // LooseJetID
+        if(LooseJetID(jet)){
+          
+          Hist("btag_LooseJetID_tau", "checks")->Fill( isBTagged );
+          
+          // genDM
+          if(dm==0)
+            Hist("btag_LooseJetID_tau_DM0",  "checks")->Fill( isBTagged );
+          else if(dm==1)
+            Hist("btag_LooseJetID_tau_DM1",  "checks")->Fill( isBTagged );
+          else if(dm==10)
+            Hist("btag_LooseJetID_tau_DM10", "checks")->Fill( isBTagged );
+          
+          // recoDM
+          if(tau.decayMode()==0)
+            Hist("btag_LooseJetID_tau_recoDM0",  "checks")->Fill( isBTagged );
+          else if(tau.decayMode()==1)
+            Hist("btag_LooseJetID_tau_recoDM1",  "checks")->Fill( isBTagged );
+          else if(tau.decayMode()==10)
+            Hist("btag_LooseJetID_tau_recoDM10", "checks")->Fill( isBTagged );
+        
+          
+        }
+      }
+    }
+  }
+}
+
+
+
+int TauTauAnalysis::genDecayMode(Float_t lep_eta, Float_t lep_phi) {
+  
+  // Retrieve visible pT of the taus !
+  std::map<int, TLorentzVector> gennus;
+  std::map<int, TLorentzVector> gentaus;
+  std::map<int, int> decaymode;
+  Float_t min_dR = 1000;
+  
+  for ( int p = 0; p < (m_genParticle.N); ++p ) {
+    UZH::GenParticle mygoodGenPart( &m_genParticle, p );
+    
+    Float_t pt = mygoodGenPart.pt();
+    Float_t eta = mygoodGenPart.eta();
+    Float_t phi = mygoodGenPart.phi();
+    Float_t energy = mygoodGenPart.e();
+    Int_t pdgId = mygoodGenPart.pdgId();
+    Int_t abspdgId = abs(mygoodGenPart.pdgId());
+    Int_t isPrompt = mygoodGenPart.isPrompt();
+
+    Int_t mother = -999;
+    if(mygoodGenPart.nMoth() !=0){
+      mother = abs(mygoodGenPart.mother()[0]);
+    }
+
+    // save gen tau neutrino
+    if(mygoodGenPart.status()==1 && abspdgId==16 && mother==15){
+      TLorentzVector genNeutrino;
+      genNeutrino.SetPtEtaPhiE(pt,eta,phi,energy);
+      gennus[pdgId] = genNeutrino;
+    }
+    
+    // skip if not tau
+    if(!(mygoodGenPart.status()==2 && abspdgId==15 && isPrompt > 0.5)) continue;
+    
+    bool isleptonic = false;
+    
+    int count_neutral_pi = 0;
+    int count_charged_pi = 0;
+
+    for(int daughter=0; daughter < (int)mygoodGenPart.nDau(); daughter++){
+      Int_t daughter_pdgId = abs(mygoodGenPart.dau()[daughter]);
+      if(daughter_pdgId==11 || daughter_pdgId==13 || daughter_pdgId==15) isleptonic = true;
+      if(daughter_pdgId==111){
+        count_neutral_pi++;
+      }
+      if(daughter_pdgId==211){
+        count_charged_pi++;
+      }
+    }
+    if(isleptonic==false){
+      TLorentzVector genPt;
+      genPt.SetPtEtaPhiE(pt,eta,phi,energy);
+      gentaus[pdgId] = genPt;
+
+      if(count_charged_pi==1){
+        if(count_neutral_pi==0) decaymode[pdgId] = 0;
+        if(count_neutral_pi==1) decaymode[pdgId] = 1;
+        if(count_neutral_pi==2) decaymode[pdgId] = 2;
+        if(count_neutral_pi==3) decaymode[pdgId] = 3;
+        if(count_neutral_pi==4) decaymode[pdgId] = 4;
+        if(count_neutral_pi>=5) decaymode[pdgId] = 5;
+      }else if(count_charged_pi==3){
+        if(count_neutral_pi==0) decaymode[pdgId] = 10;
+        if(count_neutral_pi==1) decaymode[pdgId] = 11;
+        if(count_neutral_pi==2) decaymode[pdgId] = 12;
+        if(count_neutral_pi==3) decaymode[pdgId] = 13;
+        if(count_neutral_pi>=4) decaymode[pdgId] = 14;
+      }else{
+        decaymode[pdgId] = -1;
+      }
+    }
+  }
+
+
+  // if tau decays hadronically: loop over gentaus, gennus
+  // substract gennu pt from gentau pt
+  for(std::map<int, TLorentzVector>::iterator it = gentaus.begin(); it!=gentaus.end(); ++it){
+    Int_t pdg = (*it).first;
+    for(std::map<int, TLorentzVector>::iterator itn = gennus.begin(); itn!=gennus.end(); ++itn){
+      Int_t nu = (*itn).first;
+      if(pdg==15){
+        if(nu==16) (*it).second -= (*itn).second;
+      }else if(pdg==-15){
+        if(nu==-16) (*it).second -= (*itn).second;
+      }else{
+          std::cout << "Impossible !!!" << std::endl;
+      }
+    }
+  }
+
+
+  Int_t dm = -1;
+  for(std::map<int, TLorentzVector>::iterator it = gentaus.begin(); it!=gentaus.end(); ++it){
+    Float_t dr = deltaR(lep_eta - (*it).second.Eta(),
+                        deltaPhi(lep_phi, (*it).second.Phi()));
+    if(dr < min_dR){
+      min_dR = dr;
+      dm = decaymode[(*it).first];
+    }
+  }
+  //if(dm==-1) std::cout << "Impossible decay mode = " << dm << std::endl;
+  return dm;
+
+}
+
+
+
+
+
+
 
 

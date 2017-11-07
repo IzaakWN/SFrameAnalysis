@@ -208,7 +208,7 @@ class TauTauAnalysis : public SCycleBase {
     virtual void FillJetBranches(     const char* ch, std::vector<UZH::Jet>& Jets,   UZH::MissingEt& met,
                                                 const TLorentzVector& tau_tlv, const TLorentzVector& lep_tlv );
     virtual void FillJetBranches_JEC( double& jpt, double& jeta, const TLorentzVector& jet, bool save=true );
-    virtual void FillJetBranches_JEC( double& jpt_1, double& jeta_1, double& jpt_2, double& jeta_2, const TLorentzVector& jet1, const TLorentzVector& jet2, bool swap = false );
+    virtual void FillJetBranches_JEC( double& jpt_1, double& jeta_1, double& jpt_2, double& jeta_2, const TLorentzVector& jet1, const TLorentzVector& jet2 ); //, bool swap = false
     
     // check pass of triggers / MET filters
     virtual TString passTrigger( int runNumber = -1 );
@@ -252,7 +252,9 @@ class TauTauAnalysis : public SCycleBase {
     virtual void signalChecks();
     virtual void cutflowCheck( const std::string& channel );
     virtual void visiblePTCheck();
-    static void printRow(   const std::vector<std::string> svec = {}, const std::vector<int> ivec = {}, const std::vector<double> dvec = {}, const std::vector<float> fvec = {}, const int w=10 );
+    void countBTaggedTaus();
+    int genDecayMode(Float_t lep_eta, Float_t lep_phi);
+    static void printRow( const std::vector<std::string> svec = {}, const std::vector<int> ivec = {}, const std::vector<double> dvec = {}, const std::vector<float> fvec = {}, const int w=10 );
     
     
   private:

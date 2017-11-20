@@ -209,6 +209,7 @@ class TauTauAnalysis : public SCycleBase {
                                                 const TLorentzVector& tau_tlv, const TLorentzVector& lep_tlv );
     virtual void FillJetBranches_JEC( double& jpt, double& jeta, const TLorentzVector& jet, bool save=true );
     virtual void FillJetBranches_JEC( double& jpt_1, double& jeta_1, double& jpt_2, double& jeta_2, const TLorentzVector& jet1, const TLorentzVector& jet2 ); //, bool swap = false
+    virtual void countJets(  const TLorentzVector& jet_tlv, Int_t& ncjets, Int_t& nfjets, Int_t& ncbtags, TLorentzVector& bjet_tlv, TLorentzVector& jet2_tlv, const bool isBTagged );
     
     // check pass of triggers / MET filters
     virtual TString passTrigger( int runNumber = -1 );
@@ -231,8 +232,8 @@ class TauTauAnalysis : public SCycleBase {
     // help function
     static Float_t deltaPhi( Float_t p1, Float_t p2 );
     static Float_t deltaR(   Float_t p1, Float_t p2 );
-    virtual void countJets(  const TLorentzVector& jet_tlv, Int_t& ncjets, Int_t& nfjets, Int_t& ncbtags, TLorentzVector& bjet_tlv, TLorentzVector& jet2_tlv, const bool isBTagged );
-    virtual void shiftLeptonAndMET( const float shift, TLorentzVector& lep_shifted, TLorentzVector& met_shifted, bool shiftEnergy = true );
+    void shiftLeptonAndMET( const float shift, TLorentzVector& lep_shifted, TLorentzVector& met_shifted, bool shiftEnergy = true );
+    void shiftMET(TLorentzVector& shift, UZH::MissingEt& met);
     
     // IDs
     //virtual bool isNonTrigElectronID( const UZH::Electron& electron );
@@ -248,10 +249,10 @@ class TauTauAnalysis : public SCycleBase {
     virtual void printCutFlow( const std::string& ch, const std::string& name, const TString hname, const TString dirname, std::vector<std::string> cutName );
     
     // checks
-    virtual void makeHistogramsForChecks();
-    virtual void signalChecks();
-    virtual void cutflowCheck( const std::string& channel );
-    virtual void visiblePTCheck();
+    void makeHistogramsForChecks();
+    void signalChecks();
+    void cutflowCheck( const std::string& channel );
+    void visiblePTCheck();
     void countBTaggedTaus();
     int genDecayMode(Float_t lep_eta, Float_t lep_phi);
     static void printRow( const std::vector<std::string> svec = {}, const std::vector<int> ivec = {}, const std::vector<double> dvec = {}, const std::vector<float> fvec = {}, const int w=10 );
@@ -602,13 +603,11 @@ class TauTauAnalysis : public SCycleBase {
     std::map<std::string,Double_t> b_bcsv_2;
     
     std::map<std::string,Double_t> b_met;
-    std::map<std::string,Double_t> b_met_old;
     std::map<std::string,Double_t> b_metphi;
     //std::map<std::string,Double_t> b_metcorrphi;
     std::map<std::string,Double_t> b_puppimet;
     std::map<std::string,Double_t> b_puppimetphi;
     //std::map<std::string,Double_t> b_mvamet;
-    //std::map<std::string,Double_t> b_mvamet_old;
     //std::map<std::string,Double_t> b_mvametphi;
     
     std::map<std::string,Double_t> b_metcov00;

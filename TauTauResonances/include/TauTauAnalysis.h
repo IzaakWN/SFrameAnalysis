@@ -121,73 +121,6 @@ class TauTauAnalysis : public SCycleBase {
     };
     
     
-    //
-    // TRIGGERS
-    //
-    
-    struct Trigger{ // classes behaviour: cpp.sh/5723a
-      std::string name; int start; int end;
-      Trigger(std::string _name, int _start, int _end) : name(_name), start(_start), end(_end) { } ;
-      virtual bool matchesTriggerObject(Ntuple::EventInfoNtupleObject eventInfo, const Float_t pt1, const Float_t eta1, const Float_t phi1, const Float_t pt2, const Float_t eta2, const Float_t phi2) const { return false; }
-    };
-    
-    struct LeptonTrigger : Trigger {
-      double pt;
-      std::vector<std::string> filterNames;
-      LeptonTrigger(std::string _name, int _start, int _end, double _pt, std::vector<std::string> _names):
-        Trigger(_name,_start,_end), pt(_pt), filterNames(_names) { }
-//       bool matchesTriggerObject(Ntuple::EventInfoNtupleObject eventInfo, const Float_t pt1, const Float_t eta1, const Float_t phi1, const Float_t pt2, const Float_t eta2, const Float_t phi2) const {
-//         //std::cout << ">>> matchesTriggerObject " << std::endl;
-//         for(unsigned int i=0; i<eventInfo.trigObject_eta->size(); i++){
-//           std::string triggerName = eventInfo.trigObject_lastname->at(i);
-//           Float_t trig_eta = eventInfo.trigObject_eta->at(i);
-//           Float_t trig_phi = eventInfo.trigObject_phi->at(i);
-//           Float_t dR = deltaR(eta1 - trig_eta, deltaPhi(phi1,trig_phi));
-//           if(dR < 0.5) continue;
-//           for(auto const& filterName: filterNames){
-//             for(std::map<std::string, std::vector<std::string>>::iterator it = (eventInfo.trigObject_filterLabels)->begin(); it != (eventInfo.trigObject_filterLabels)->end(); ++it){
-//               if(it->first != triggerName) continue;
-//               for(unsigned int j=0; j<it->second.size(); j++){
-//                 if(it->second.at(j)==filterName && pt1>pt){
-//                     //std::cout << ">>> filter " << j << " (" << it->second.at(j) << ") matches with dR=" << dR << "!" << std::endl;
-//                     return true;
-//                 }
-//         }}}}
-//         return false;
-//       }
-    };
-    
-    struct CrossTrigger : Trigger {
-      double pt_leg1; double pt_leg2;
-      std::string filterName_leg1;
-      std::string filterName_leg2;
-      bool noleg2 = false;  
-      CrossTrigger(std::string _name, int _start, int _end, double pt1, double pt2,
-                   std::string names1, std::string names2 = "NOLEG1"):
-        Trigger(_name,_start,_end), pt_leg1(pt1), pt_leg2(pt2), filterName_leg1(names1), filterName_leg2(names2)
-        { noleg2 = (filterName_leg2.find("NOLEG1") != std::string::npos);}
-//       virtual bool matchesTrigObject(Ntuple::EventInfoNtupleObject eventInfo, const Float_t pt1, const Float_t eta1, const Float_t phi1, const Float_t pt2, const Float_t eta2, const Float_t phi2) const {
-//         bool match_leg1 = false;
-//         bool match_leg2 = false;
-//         for(unsigned int i = 0; i < eventInfo.trigObject_eta->size(); i++){
-//           std::string triggerName = eventInfo.trigObject_lastname->at(i);
-//           Float_t trig_eta = eventInfo.trigObject_eta->at(i);
-//           Float_t trig_phi = eventInfo.trigObject_phi->at(i);
-//           Float_t dR1 = deltaR(eta1 - trig_eta, deltaPhi(phi1,trig_phi));
-//           Float_t dR2 = 0.0;
-//           if(noleg2) dR2 = deltaR(eta2 - trig_eta, deltaPhi(phi2,trig_phi));
-//           for(std::map<std::string, std::vector<std::string>>::iterator it = (eventInfo.trigObject_filterLabels)->begin(); it != (eventInfo.trigObject_filterLabels)->end(); ++it){
-//             if(it->first != triggerName) continue;
-//             for(unsigned int j=0; j < it->second.size(); j++){
-//               //std::cout << ">>> filter " << j << ": " << it->second.at(j) << std::endl;
-//               if(           it->second.at(j)==filterName_leg1 and dR1<0.5 and pt1>pt_leg1) match_leg1 = true;
-//               if(noleg2 and it->second.at(j)==filterName_leg2 and dR2<0.5 and pt2>pt_leg2) match_leg2 = true;
-//         }}}
-//         return match_leg1 and (match_leg2 or noleg2);
-//       }
-    };
-    
-    
     // default constructor and destructor
     TauTauAnalysis();  // default constructor
     ~TauTauAnalysis(); // default destructor
@@ -207,13 +140,11 @@ class TauTauAnalysis : public SCycleBase {
                                      std::vector<UZH::Jet>& Jets, UZH::MissingEt& met, UZH::MissingEt& puppimet );
     virtual void FillJetBranches(     const char* ch, std::vector<UZH::Jet>& Jets,   UZH::MissingEt& met,
                                                 const TLorentzVector& tau_tlv, const TLorentzVector& lep_tlv );
-    virtual void FillJetBranches_JEC( double& jpt, double& jeta, const TLorentzVector& jet, bool save=true );
-    virtual void FillJetBranches_JEC( double& jpt_1, double& jeta_1, double& jpt_2, double& jeta_2, const TLorentzVector& jet1, const TLorentzVector& jet2 ); //, bool swap = false
-    virtual void countJets(  const TLorentzVector& jet_tlv, Int_t& ncjets, Int_t& nfjets, Int_t& ncbtags, TLorentzVector& bjet_tlv, TLorentzVector& jet2_tlv, const bool isBTagged );
+    virtual void FillJetBranches_JEC( Float_t& jpt, Float_t& jeta, const TLorentzVector& jet, bool save=true );
+    virtual void countJets( const TLorentzVector& jet_tlv, Int_t& ncjets, Int_t& nfjets, Int_t& ncbtags, TLorentzVector& bjet_tlv, TLorentzVector& jet2_tlv, const bool isBTagged );
     
     // check pass of triggers / MET filters
     virtual TString passTrigger( int runNumber = -1 );
-    virtual bool triggerMatches(const std::vector<Trigger*> firedTriggers, const Float_t pt1, const Float_t eta1, const Float_t phi1, const Float_t pt2, const Float_t eta2, const Float_t phi2);
     virtual bool passMETFilters();
     
     // obtain event weights for MC
@@ -334,10 +265,10 @@ class TauTauAnalysis : public SCycleBase {
     ///
      
     // jet
-    double    m_jetPtCut;         ///< cut on jet pT
-    double    m_jetEtaCut;        ///< cut on jet eta
-    double    m_AK4jetPtCut;      ///< cut on jet pT
-    double    m_AK4jetEtaCut;     ///< cut on jet eta
+    double    m_jetPtCut;
+    double    m_jetEtaCut;
+    double    m_AK4jetPtCut;
+    double    m_AK4jetEtaCut;
     double    m_CSVWorkingPoint;
     
     // b-tagging
@@ -375,12 +306,10 @@ class TauTauAnalysis : public SCycleBase {
     
         
     std::string m_trigger_Flags;
-    std::vector<Trigger*> m_triggers_mutau;
-    std::vector<Trigger*> m_triggers_etau;
-    std::vector<Trigger*> m_triggers_emu;
-    std::vector<Trigger*> m_firedTriggers_mutau;
-    std::vector<Trigger*> m_firedTriggers_etau;
-    std::vector<Trigger*> m_firedTriggers_emu;
+    std::vector<std::string> m_triggers_mutau;
+    std::vector<std::string> m_triggers_etau;
+    std::vector<std::string> m_firedTriggers_mutau;
+    std::vector<std::string> m_firedTriggers_etau;
     
     
     
@@ -416,241 +345,238 @@ class TauTauAnalysis : public SCycleBase {
     
     
     // synchronisation:
-    // https://twiki.cern.ch/twiki/bin/viewauth/CMS/HiggsToTauTauWorking2016#Synchronisation
+    // https://twiki.cern.ch/twiki/bin/view/CMS/HiggsToTauTauWorking2017#Synchronisation_Ntuple
     
     std::map<std::string,Int_t>    b_channel;  // 1 mutau; 2 eletau;
     std::map<std::string,Int_t>    b_isData;
     
-    std::map<std::string,Double_t> b_weight;
-    std::map<std::string,Double_t> b_genweight;
-    std::map<std::string,Double_t> b_puweight;
-    std::map<std::string,Double_t> b_weightbtag;
-    //std::map<std::string,Double_t> b_genmatchweight;
-    std::map<std::string,Double_t> b_zptweight;
-    std::map<std::string,Double_t> b_ttptweight;
-    std::map<std::string,Double_t> b_ttptweight_runI;
-    std::map<std::string,Double_t> b_trigweight_1;
-    std::map<std::string,Double_t> b_trigweight_or_1;
-    std::map<std::string,Double_t> b_idisoweight_1;
-    std::map<std::string,Double_t> b_trigweight_2;
-    std::map<std::string,Double_t> b_idisoweight_2;
-    std::map<std::string,Int_t>    b_triggers; // 0 no trigger; +1 SingleLepton; +2 CrossTrigger
+    std::map<std::string,Float_t> b_weight;
+    std::map<std::string,Float_t> b_genweight;
+    std::map<std::string,Float_t> b_puweight;
+    std::map<std::string,Float_t> b_weightbtag;
+    std::map<std::string,Float_t> b_zptweight;
+    std::map<std::string,Float_t> b_ttptweight;
+    std::map<std::string,Float_t> b_ttptweight_runI;
+    std::map<std::string,Float_t> b_trigweight_1;
+    std::map<std::string,Float_t> b_trigweight_or_1;
+    std::map<std::string,Float_t> b_idisoweight_1;
+    std::map<std::string,Float_t> b_trigweight_2;
+    std::map<std::string,Float_t> b_idisoweight_2;
+    std::map<std::string,Int_t>   b_triggers; // 0 no trigger; +1 SingleLepton; +2 CrossTrigger
     
-    std::map<std::string,Int_t>    b_run;
-    std::map<std::string,Int_t>    b_evt;
-    std::map<std::string,Int_t>    b_lum;
+    std::map<std::string,Int_t>   b_run;
+    std::map<std::string,Int_t>   b_evt;
+    std::map<std::string,Int_t>   b_lum;
     
-    std::map<std::string,Int_t>    b_npv;
-    std::map<std::string,Int_t>    b_npu; 
-    std::map<std::string,Int_t>    b_NUP;
-    std::map<std::string,Double_t> b_rho;
+    std::map<std::string,Int_t>   b_npv;
+    std::map<std::string,Int_t>   b_npu; 
+    std::map<std::string,Int_t>   b_NUP;
+    std::map<std::string,Float_t> b_rho;
     
-    std::map<std::string,Int_t>    b_njets;
-    std::map<std::string,Int_t>    b_nfjets;
-    std::map<std::string,Int_t>    b_ncjets;
-    std::map<std::string,Int_t>    b_nbtag;
-    std::map<std::string,Int_t>    b_ncbtag;
-    std::map<std::string,Int_t>    b_njets20;
-    std::map<std::string,Int_t>    b_nfjets20;
-    std::map<std::string,Int_t>    b_ncjets20;
-    std::map<std::string,Int_t>    b_nbtag20;
-    std::map<std::string,Int_t>    b_ncbtag20;
+    std::map<std::string,Int_t>   b_njets;
+    std::map<std::string,Int_t>   b_nfjets;
+    std::map<std::string,Int_t>   b_ncjets;
+    std::map<std::string,Int_t>   b_nbtag;
+    std::map<std::string,Int_t>   b_ncbtag;
+    std::map<std::string,Int_t>   b_njets20;
+    std::map<std::string,Int_t>   b_nfjets20;
+    std::map<std::string,Int_t>   b_ncjets20;
+    std::map<std::string,Int_t>   b_nbtag20;
+    std::map<std::string,Int_t>   b_ncbtag20;
     
-    std::map<std::string,Int_t>    b_njets_jesUp;
-    std::map<std::string,Int_t>    b_njets_jesDown;
-    std::map<std::string,Int_t>    b_njets_nom;
-    std::map<std::string,Int_t>    b_njets_jerUp;
-    std::map<std::string,Int_t>    b_njets_jerDown;
-    std::map<std::string,Int_t>    b_njets20_jesUp;
-    std::map<std::string,Int_t>    b_njets20_jesDown;
-    std::map<std::string,Int_t>    b_njets20_nom;
-    std::map<std::string,Int_t>    b_njets20_jerUp;
-    std::map<std::string,Int_t>    b_njets20_jerDown;
-    std::map<std::string,Int_t>    b_ncbtag_jesUp;
-    std::map<std::string,Int_t>    b_ncbtag_jesDown;
-    std::map<std::string,Int_t>    b_ncbtag_nom;
-    std::map<std::string,Int_t>    b_ncbtag_jerUp;
-    std::map<std::string,Int_t>    b_ncbtag_jerDown;
-    std::map<std::string,Int_t>    b_ncjets_jesUp;
-    std::map<std::string,Int_t>    b_ncjets_jesDown;
-    std::map<std::string,Int_t>    b_ncjets_nom;
-    std::map<std::string,Int_t>    b_ncjets_jerUp;
-    std::map<std::string,Int_t>    b_ncjets_jerDown;
-    std::map<std::string,Int_t>    b_nfjets_jesUp;
-    std::map<std::string,Int_t>    b_nfjets_jesDown;
-    std::map<std::string,Int_t>    b_nfjets_nom;
-    std::map<std::string,Int_t>    b_nfjets_jerUp;
-    std::map<std::string,Int_t>    b_nfjets_jerDown;
+    std::map<std::string,Int_t>   b_njets_jesUp;
+    std::map<std::string,Int_t>   b_njets_jesDown;
+    std::map<std::string,Int_t>   b_njets_nom;
+    std::map<std::string,Int_t>   b_njets_jerUp;
+    std::map<std::string,Int_t>   b_njets_jerDown;
+    std::map<std::string,Int_t>   b_njets20_jesUp;
+    std::map<std::string,Int_t>   b_njets20_jesDown;
+    std::map<std::string,Int_t>   b_njets20_nom;
+    std::map<std::string,Int_t>   b_njets20_jerUp;
+    std::map<std::string,Int_t>   b_njets20_jerDown;
+    std::map<std::string,Int_t>   b_ncbtag_jesUp;
+    std::map<std::string,Int_t>   b_ncbtag_jesDown;
+    std::map<std::string,Int_t>   b_ncbtag_nom;
+    std::map<std::string,Int_t>   b_ncbtag_jerUp;
+    std::map<std::string,Int_t>   b_ncbtag_jerDown;
+    std::map<std::string,Int_t>   b_ncjets_jesUp;
+    std::map<std::string,Int_t>   b_ncjets_jesDown;
+    std::map<std::string,Int_t>   b_ncjets_nom;
+    std::map<std::string,Int_t>   b_ncjets_jerUp;
+    std::map<std::string,Int_t>   b_ncjets_jerDown;
+    std::map<std::string,Int_t>   b_nfjets_jesUp;
+    std::map<std::string,Int_t>   b_nfjets_jesDown;
+    std::map<std::string,Int_t>   b_nfjets_nom;
+    std::map<std::string,Int_t>   b_nfjets_jerUp;
+    std::map<std::string,Int_t>   b_nfjets_jerDown;
     
-    std::map<std::string,Double_t> b_dphi_ll_bj_jesUp;
-    std::map<std::string,Double_t> b_dphi_ll_bj_jesDown;
-    std::map<std::string,Double_t> b_dphi_ll_bj_nom;
-    std::map<std::string,Double_t> b_dphi_ll_bj_jerUp;
-    std::map<std::string,Double_t> b_dphi_ll_bj_jerDown;
-    std::map<std::string,Double_t> b_met_jesUp;
-    std::map<std::string,Double_t> b_met_jesDown;
-    std::map<std::string,Double_t> b_met_nom;
-    std::map<std::string,Double_t> b_met_jerUp;
-    std::map<std::string,Double_t> b_met_jerDown;
-    std::map<std::string,Double_t> b_met_UncEnUp;
-    std::map<std::string,Double_t> b_met_UncEnDown;
-    std::map<std::string,Double_t> b_pfmt_1_jesUp;
-    std::map<std::string,Double_t> b_pfmt_1_jesDown;
-    std::map<std::string,Double_t> b_pfmt_1_nom;
-    std::map<std::string,Double_t> b_pfmt_1_jerUp;
-    std::map<std::string,Double_t> b_pfmt_1_jerDown;
-    std::map<std::string,Double_t> b_pfmt_1_UncEnUp;
-    std::map<std::string,Double_t> b_pfmt_1_UncEnDown;
+    std::map<std::string,Float_t> b_dphi_ll_bj_jesUp;
+    std::map<std::string,Float_t> b_dphi_ll_bj_jesDown;
+    std::map<std::string,Float_t> b_dphi_ll_bj_nom;
+    std::map<std::string,Float_t> b_dphi_ll_bj_jerUp;
+    std::map<std::string,Float_t> b_dphi_ll_bj_jerDown;
+    std::map<std::string,Float_t> b_met_jesUp;
+    std::map<std::string,Float_t> b_met_jesDown;
+    std::map<std::string,Float_t> b_met_nom;
+    std::map<std::string,Float_t> b_met_jerUp;
+    std::map<std::string,Float_t> b_met_jerDown;
+    std::map<std::string,Float_t> b_met_UncEnUp;
+    std::map<std::string,Float_t> b_met_UncEnDown;
+    std::map<std::string,Float_t> b_pfmt_1_jesUp;
+    std::map<std::string,Float_t> b_pfmt_1_jesDown;
+    std::map<std::string,Float_t> b_pfmt_1_nom;
+    std::map<std::string,Float_t> b_pfmt_1_jerUp;
+    std::map<std::string,Float_t> b_pfmt_1_jerDown;
+    std::map<std::string,Float_t> b_pfmt_1_UncEnUp;
+    std::map<std::string,Float_t> b_pfmt_1_UncEnDown;
     
-    std::map<std::string,Double_t> b_weightbtag_bcUp;
-    std::map<std::string,Double_t> b_weightbtag_bcDown;
-    std::map<std::string,Double_t> b_weightbtag_udsgUp;
-    std::map<std::string,Double_t> b_weightbtag_udsgDown;
+    std::map<std::string,Float_t> b_weightbtag_bcUp;
+    std::map<std::string,Float_t> b_weightbtag_bcDown;
+    std::map<std::string,Float_t> b_weightbtag_udsgUp;
+    std::map<std::string,Float_t> b_weightbtag_udsgDown;
     
-    std::map<std::string,Double_t> b_pt_1;
-    std::map<std::string,Double_t> b_eta_1;
-    std::map<std::string,Double_t> b_phi_1;
-    std::map<std::string,Double_t> b_m_1;
-    std::map<std::string,Int_t>    b_q_1;
-    std::map<std::string,Double_t> b_d0_1;
-    std::map<std::string,Double_t> b_dz_1;
-    //std::map<std::string,Double_t> b_mt_1;
-    std::map<std::string,Double_t> b_pfmt_1;
-    std::map<std::string,Double_t> b_puppimt_1;
-    std::map<std::string,Double_t> b_iso_1;
-    std::map<std::string,Int_t>    b_id_e_mva_nt_loose_1;
-    std::map<std::string,Int_t>    b_id_e_mva_nt_loose_1_old;
-    std::map<std::string,Int_t>    b_gen_match_1;
+    std::map<std::string,Float_t> b_pt_1;
+    std::map<std::string,Float_t> b_eta_1;
+    std::map<std::string,Float_t> b_phi_1;
+    std::map<std::string,Float_t> b_m_1;
+    std::map<std::string,Int_t>   b_q_1;
+    std::map<std::string,Float_t> b_d0_1;
+    std::map<std::string,Float_t> b_dz_1;
+    std::map<std::string,Float_t> b_pfmt_1;
+    std::map<std::string,Float_t> b_puppimt_1;
+    std::map<std::string,Float_t> b_iso_1;
+    std::map<std::string,Int_t>   b_id_e_mva_nt_loose_1;
+    std::map<std::string,Int_t>   b_id_e_mva_nt_loose_1_old;
+    std::map<std::string,Int_t>   b_gen_match_1;
     
-    std::map<std::string,Double_t> b_pt_2;
-    std::map<std::string,Double_t> b_eta_2;
-    std::map<std::string,Double_t> b_phi_2;
-    std::map<std::string,Double_t> b_m_2;
-    std::map<std::string,Int_t>    b_q_2;
-    std::map<std::string,Double_t> b_d0_2;
-    std::map<std::string,Double_t> b_dz_2;
-    std::map<std::string,Double_t> b_mt_2;
-    std::map<std::string,Double_t> b_pfmt_2;
-    std::map<std::string,Double_t> b_puppimt_2;
-    std::map<std::string,Double_t> b_iso_2;
-    std::map<std::string,Double_t> b_iso_2_medium;
-    std::map<std::string,Int_t>    b_gen_match_2;
-    std::map<std::string,Double_t> b_pol_2;
+    std::map<std::string,Float_t> b_pt_2;
+    std::map<std::string,Float_t> b_eta_2;
+    std::map<std::string,Float_t> b_phi_2;
+    std::map<std::string,Float_t> b_m_2;
+    std::map<std::string,Int_t>   b_q_2;
+    std::map<std::string,Float_t> b_d0_2;
+    std::map<std::string,Float_t> b_dz_2;
+    std::map<std::string,Float_t> b_mt_2;
+    std::map<std::string,Float_t> b_pfmt_2;
+    std::map<std::string,Float_t> b_puppimt_2;
+    std::map<std::string,Float_t> b_iso_2;
+    std::map<std::string,Float_t> b_iso_2_medium;
+    std::map<std::string,Int_t>   b_gen_match_2;
+    std::map<std::string,Float_t> b_pol_2;
     
-    std::map<std::string,Double_t> b_againstElectronVLooseMVA6_2;
-    std::map<std::string,Double_t> b_againstElectronLooseMVA6_2;
-    std::map<std::string,Double_t> b_againstElectronMediumMVA6_2;
-    std::map<std::string,Double_t> b_againstElectronTightMVA6_2;
-    std::map<std::string,Double_t> b_againstElectronVTightMVA6_2;
-    std::map<std::string,Double_t> b_againstMuonLoose3_2;
-    std::map<std::string,Double_t> b_againstMuonTight3_2;
-    std::map<std::string,Double_t> b_byCombinedIsolationDeltaBetaCorrRaw3Hits_2;
-    std::map<std::string,Double_t> b_byIsolationMVA3newDMwLTraw_2;
-    std::map<std::string,Double_t> b_byIsolationMVA3oldDMwLTraw_2;
-    std::map<std::string,Double_t> b_chargedIsoPtSum_2;
-    std::map<std::string,Double_t> b_neutralIsoPtSum_2;
-    std::map<std::string,Double_t> b_puCorrPtSum_2;
-    std::map<std::string,Double_t> b_decayModeFindingOldDMs_2;
-    std::map<std::string,Double_t> b_decayMode_2;
+    std::map<std::string,Float_t> b_againstElectronVLooseMVA6_2;
+    std::map<std::string,Float_t> b_againstElectronLooseMVA6_2;
+    std::map<std::string,Float_t> b_againstElectronMediumMVA6_2;
+    std::map<std::string,Float_t> b_againstElectronTightMVA6_2;
+    std::map<std::string,Float_t> b_againstElectronVTightMVA6_2;
+    std::map<std::string,Float_t> b_againstMuonLoose3_2;
+    std::map<std::string,Float_t> b_againstMuonTight3_2;
+    std::map<std::string,Float_t> b_byCombinedIsolationDeltaBetaCorrRaw3Hits_2;
+    std::map<std::string,Float_t> b_byIsolationMVA3newDMwLTraw_2;
+    std::map<std::string,Float_t> b_byIsolationMVA3oldDMwLTraw_2;
+    std::map<std::string,Float_t> b_chargedIsoPtSum_2;
+    std::map<std::string,Float_t> b_neutralIsoPtSum_2;
+    std::map<std::string,Float_t> b_puCorrPtSum_2;
+    std::map<std::string,Float_t> b_decayModeFindingOldDMs_2;
+    std::map<std::string,Float_t> b_decayMode_2;
     
-    std::map<std::string,Int_t>    b_dilepton_veto;
-    std::map<std::string,Int_t>    b_extraelec_veto;
-    std::map<std::string,Int_t>    b_extramuon_veto;
-    std::map<std::string,Int_t>    b_lepton_vetos; // 0 pass (no veto); 1 fail (veto)
-    std::map<std::string,Int_t>    b_iso_cuts;     // 0 fail; 1 pass
-    std::map<std::string,Int_t>    b_trigger_cuts; // 0 fail; 1 pass
+    std::map<std::string,Int_t>   b_dilepton_veto;
+    std::map<std::string,Int_t>   b_extraelec_veto;
+    std::map<std::string,Int_t>   b_extramuon_veto;
+    std::map<std::string,Int_t>   b_lepton_vetos; // 0 pass (no veto); 1 fail (veto)
+    std::map<std::string,Int_t>   b_iso_cuts;     // 0 fail; 1 pass
+    std::map<std::string,Int_t>   b_trigger_cuts; // 0 fail; 1 pass
     
-    std::map<std::string,Double_t> b_jpt_1;
-    std::map<std::string,Double_t> b_jeta_1;
-    std::map<std::string,Double_t> b_jphi_1;
-    std::map<std::string,Double_t> b_jpt_2;
-    std::map<std::string,Double_t> b_jeta_2;
-    std::map<std::string,Double_t> b_jphi_2;
+    std::map<std::string,Float_t> b_jpt_1;
+    std::map<std::string,Float_t> b_jeta_1;
+    std::map<std::string,Float_t> b_jphi_1;
+    std::map<std::string,Float_t> b_jpt_2;
+    std::map<std::string,Float_t> b_jeta_2;
+    std::map<std::string,Float_t> b_jphi_2;
     
-    std::map<std::string,Double_t> b_jpt_1_jesUp;
-    std::map<std::string,Double_t> b_jpt_1_jesDown;
-    std::map<std::string,Double_t> b_jpt_1_nom;
-    std::map<std::string,Double_t> b_jpt_1_jerUp;
-    std::map<std::string,Double_t> b_jpt_1_jerDown;
-    std::map<std::string,Double_t> b_jeta_1_jesUp;
-    std::map<std::string,Double_t> b_jeta_1_jesDown;
-    std::map<std::string,Double_t> b_jeta_1_nom;
-    std::map<std::string,Double_t> b_jeta_1_jerUp;
-    std::map<std::string,Double_t> b_jeta_1_jerDown;
-    std::map<std::string,Double_t> b_jpt_2_jesUp;
-    std::map<std::string,Double_t> b_jpt_2_jesDown;
-    std::map<std::string,Double_t> b_jpt_2_nom;
-    std::map<std::string,Double_t> b_jpt_2_jerUp;
-    std::map<std::string,Double_t> b_jpt_2_jerDown;
-    std::map<std::string,Double_t> b_jeta_2_jesUp;
-    std::map<std::string,Double_t> b_jeta_2_jesDown;
-    std::map<std::string,Double_t> b_jeta_2_nom;
-    std::map<std::string,Double_t> b_jeta_2_jerUp;
-    std::map<std::string,Double_t> b_jeta_2_jerDown;
+    std::map<std::string,Float_t> b_jpt_1_jesUp;
+    std::map<std::string,Float_t> b_jpt_1_jesDown;
+    std::map<std::string,Float_t> b_jpt_1_nom;
+    std::map<std::string,Float_t> b_jpt_1_jerUp;
+    std::map<std::string,Float_t> b_jpt_1_jerDown;
+    std::map<std::string,Float_t> b_jeta_1_jesUp;
+    std::map<std::string,Float_t> b_jeta_1_jesDown;
+    std::map<std::string,Float_t> b_jeta_1_nom;
+    std::map<std::string,Float_t> b_jeta_1_jerUp;
+    std::map<std::string,Float_t> b_jeta_1_jerDown;
+    std::map<std::string,Float_t> b_jpt_2_jesUp;
+    std::map<std::string,Float_t> b_jpt_2_jesDown;
+    std::map<std::string,Float_t> b_jpt_2_nom;
+    std::map<std::string,Float_t> b_jpt_2_jerUp;
+    std::map<std::string,Float_t> b_jpt_2_jerDown;
+    std::map<std::string,Float_t> b_jeta_2_jesUp;
+    std::map<std::string,Float_t> b_jeta_2_jesDown;
+    std::map<std::string,Float_t> b_jeta_2_nom;
+    std::map<std::string,Float_t> b_jeta_2_jerUp;
+    std::map<std::string,Float_t> b_jeta_2_jerDown;
     
-    //std::map<std::string,Double_t> b_fjpt_1;
-    //std::map<std::string,Double_t> b_fjet_1;
-    //std::map<std::string,Double_t> b_fjeta_1;
-    //std::map<std::string,Double_t> b_fjphi_1;
+    //std::map<std::string,Float_t> b_fjpt_1;
+    //std::map<std::string,Float_t> b_fjet_1;
+    //std::map<std::string,Float_t> b_fjeta_1;
+    //std::map<std::string,Float_t> b_fjphi_1;
     
-    std::map<std::string,Double_t> b_bpt_1;
-    std::map<std::string,Double_t> b_beta_1;
-    std::map<std::string,Double_t> b_bphi_1;
-    std::map<std::string,Double_t> b_bcsv_1;
-    std::map<std::string,Double_t> b_bpt_2;
-    std::map<std::string,Double_t> b_beta_2;
-    std::map<std::string,Double_t> b_bphi_2;
-    std::map<std::string,Double_t> b_bcsv_2;
+    std::map<std::string,Float_t> b_bpt_1;
+    std::map<std::string,Float_t> b_beta_1;
+    std::map<std::string,Float_t> b_bphi_1;
+    std::map<std::string,Float_t> b_bcsv_1;
+    std::map<std::string,Float_t> b_bpt_2;
+    std::map<std::string,Float_t> b_beta_2;
+    std::map<std::string,Float_t> b_bphi_2;
+    std::map<std::string,Float_t> b_bcsv_2;
     
-    std::map<std::string,Double_t> b_met;
-    std::map<std::string,Double_t> b_metphi;
-    //std::map<std::string,Double_t> b_metcorrphi;
-    std::map<std::string,Double_t> b_puppimet;
-    std::map<std::string,Double_t> b_puppimetphi;
-    //std::map<std::string,Double_t> b_mvamet;
-    //std::map<std::string,Double_t> b_mvametphi;
+    std::map<std::string,Float_t> b_met;
+    std::map<std::string,Float_t> b_metphi;
+    //std::map<std::string,Float_t> b_metcorrphi;
+    std::map<std::string,Float_t> b_puppimet;
+    std::map<std::string,Float_t> b_puppimetphi;
+    //std::map<std::string,Float_t> b_mvamet;
+    //std::map<std::string,Float_t> b_mvametphi;
     
-    std::map<std::string,Double_t> b_metcov00;
-    std::map<std::string,Double_t> b_metcov01;
-    std::map<std::string,Double_t> b_metcov10;
-    std::map<std::string,Double_t> b_metcov11;
+    std::map<std::string,Float_t> b_metcov00;
+    std::map<std::string,Float_t> b_metcov01;
+    std::map<std::string,Float_t> b_metcov10;
+    std::map<std::string,Float_t> b_metcov11;
     
-    std::map<std::string,Double_t> b_m_vis;
-    std::map<std::string,Double_t> b_pt_tt;
-    std::map<std::string,Double_t> b_pt_tt_vis;
-    std::map<std::string,Double_t> b_R_pt_m_vis;
-    std::map<std::string,Double_t> b_R_pt_m_vis2;
+    std::map<std::string,Float_t> b_m_vis;
+    std::map<std::string,Float_t> b_pt_tt;
+    std::map<std::string,Float_t> b_pt_tt_vis;
+    std::map<std::string,Float_t> b_R_pt_m_vis;
+    std::map<std::string,Float_t> b_R_pt_m_vis2;
     
-    std::map<std::string,Double_t> b_m_sv; 
-    //std::map<std::string,Double_t> b_m_sv_pfmet;
-    std::map<std::string,Double_t> b_m_taub;
-    std::map<std::string,Double_t> b_m_taumub;
-    std::map<std::string,Double_t> b_m_mub;
-    std::map<std::string,Double_t> b_pt_tt_sv;
-    std::map<std::string,Double_t> b_R_pt_m_sv;
+    std::map<std::string,Float_t> b_m_sv;
+    std::map<std::string,Float_t> b_m_taub;
+    std::map<std::string,Float_t> b_m_taumub;
+    std::map<std::string,Float_t> b_m_mub;
+    std::map<std::string,Float_t> b_pt_tt_sv;
+    std::map<std::string,Float_t> b_R_pt_m_sv;
     
-    std::map<std::string,Double_t> b_dR_ll;
-    std::map<std::string,Double_t> b_dphi_ll_bj;
-    std::map<std::string,Double_t> b_mt_tot;
-    std::map<std::string,Double_t> b_ht;
+    std::map<std::string,Float_t> b_dR_ll;
+    std::map<std::string,Float_t> b_dphi_ll_bj;
+    std::map<std::string,Float_t> b_mt_tot;
+    std::map<std::string,Float_t> b_ht;
     
-    std::map<std::string,Double_t> b_m_genboson;
-    std::map<std::string,Double_t> b_pt_genboson;
-    std::map<std::string,Double_t> b_pt_top_1;
-    std::map<std::string,Double_t> b_pt_top_2;
+    std::map<std::string,Float_t> b_m_genboson;
+    std::map<std::string,Float_t> b_pt_genboson;
+    std::map<std::string,Float_t> b_pt_top_1;
+    std::map<std::string,Float_t> b_pt_top_2;
     
-    //std::map<std::string,Double_t> b_pt_sv;
-    //std::map<std::string,Double_t> b_eta_sv;
-    //std::map<std::string,Double_t> b_phi_sv;
-    std::map<std::string,Double_t> b_pzetamiss;
-    std::map<std::string,Double_t> b_pzetavis;
-    std::map<std::string,Double_t> b_pzeta_disc;
+    //std::map<std::string,Float_t> b_pt_sv;
+    //std::map<std::string,Float_t> b_eta_sv;
+    //std::map<std::string,Float_t> b_phi_sv;
+    std::map<std::string,Float_t> b_pzetamiss;
+    std::map<std::string,Float_t> b_pzetavis;
+    std::map<std::string,Float_t> b_pzeta_disc;
     
-    std::map<std::string,Double_t> b_vbf_mjj;
-    std::map<std::string,Double_t> b_vbf_deta;
-    std::map<std::string,Double_t> b_vbf_jdphi;
-    std::map<std::string,Int_t>    b_vbf_ncentral;
-    std::map<std::string,Int_t>    b_vbf_ncentral20;
+    std::map<std::string,Float_t> b_vbf_mjj;
+    std::map<std::string,Float_t> b_vbf_deta;
+    std::map<std::string,Float_t> b_vbf_jdphi;
+    std::map<std::string,Int_t>   b_vbf_ncentral;
+    std::map<std::string,Int_t>   b_vbf_ncentral20;
     
     // Macro adding the functions for dictionary generation
     ClassDef( TauTauAnalysis, 0 );

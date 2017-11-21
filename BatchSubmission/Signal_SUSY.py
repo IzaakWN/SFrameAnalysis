@@ -1,17 +1,16 @@
-path2xml="$SFRAME_DIR/../BatchSubmission/xmls_postMoriond_T2"
+path2xml="$SFRAME_DIR/../BatchSubmission/xmls_SUSY" #xmls_postMoriond_T2"
 path2tmp="$SFRAME_DIR/../AnalysisTemp"
 jobName="SUSY"
-outDir="/scratch/$USER/SFrameAnalysis/AnalysisOutput/"+jobName #"$SFRAME_DIR/../AnalysisOutput/"+jobName
+outDir="/scratch/$USER/SFrameAnalysis_ltau2017/AnalysisOutput/"+jobName #"$SFRAME_DIR/../AnalysisOutput/"+jobName
 cycleName="TauTauAnalysis"
 nEventsMax=-1
 #nEventsMax=200
 nProcesses=1
-nFiles=6
-hCPU="03:30:00"
+nFiles=4
+hCPU="04:30:00"
 hVMEM="5000M"
-postFix="_Moriond"
-dataSets = [  
-    
+postFix="_2017"
+dataSets = [
     
     # SUSYGluGluToBBa1ToTauTau
    [ "SUSYGluGluToBBa1ToTauTau_M-25",

@@ -7,10 +7,10 @@
 #include "TH1.h"
 #include "TString.h"
 
-// Compute pile-up weights to match data distribtution
+// Compute pile-up weights to match data distribution
 class PUWeight {
 public:
-  enum Scenario { Winter15_25ns, Spring16_25ns, Moriond17_25ns};
+  enum Scenario { Winter17_25ns, Winter15_25ns, Moriond17_25ns };
 
   static Scenario toScenario(const std::string& str);
   static std::string toString(const Scenario sc);

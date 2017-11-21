@@ -1,15 +1,15 @@
 path2xml="$SFRAME_DIR/../BatchSubmission/xmls_postMoriond_T2"
 path2tmp="$SFRAME_DIR/../AnalysisTemp"
 jobName="ST"
-outDir="/scratch/$USER/SFrameAnalysis/AnalysisOutput/"+jobName #"$SFRAME_DIR/../AnalysisOutput/"+jobName
+outDir="/scratch/$USER/SFrameAnalysis_ltau2017/AnalysisOutput/"+jobName #"$SFRAME_DIR/../AnalysisOutput/"+jobName
 cycleName="TauTauAnalysis"
 nEventsMax=-1
 #nEventsMax=200
 nProcesses=1
 nFiles=3
-hCPU="03:30:00"
+hCPU="04:30:00"
 hVMEM="5000M"
-postFix="_Moriond"
+postFix="_2017"
 dataSets = [
         
        [ "ST_tW_top_5f_inclusiveDecays",

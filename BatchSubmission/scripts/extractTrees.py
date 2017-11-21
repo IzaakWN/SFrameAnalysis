@@ -100,7 +100,7 @@ def cutTree(oldfilename, treenames, **kwargs):
     newfile.Close()
     oldfile.Close()
     
-    print ">>>   took %.2f seconds." % (time.time()-start_here)
+    print ">>> took %.2f seconds." % (time.time()-start_here)
     print ">>> "
 
 

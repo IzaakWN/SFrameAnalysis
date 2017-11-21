@@ -1,7 +1,7 @@
-path2xml="$SFRAME_DIR/../BatchSubmission/xmls_Moriond"
+path2xml="$SFRAME_DIR/../BatchSubmission/xmls_2017"
 path2tmp="$SFRAME_DIR/../AnalysisTemp"
 jobName="DY"
-outDir="/scratch/$USER/SFrameAnalysis/AnalysisOutput/"+jobName #"$SFRAME_DIR/../AnalysisOutput/"+jobName
+outDir="/scratch/$USER/SFrameAnalysis_ltau2017/AnalysisOutput/"+jobName #"$SFRAME_DIR/../AnalysisOutput/"+jobName
 cycleName="TauTauAnalysis"
 nEventsMax=-1
 #nEventsMax=200
@@ -9,7 +9,7 @@ nProcesses=1
 nFiles=3
 hCPU="03:30:00"
 hVMEM="5000M"
-postFix="_Moriond"
+postFix="_2017"
 dataSets = [
         
        [ "DYJetsToLL_M-10to50_nlo",

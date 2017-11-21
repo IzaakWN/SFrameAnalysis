@@ -1,1 +1,0 @@
-root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_postMoriond_v5/WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/170412_094414/0000/flatTuple_127.root

@@ -286,7 +286,7 @@ def checkCompletion(dataSets, listOfJobs, outDir, cycleName, postFix,keepTemp):
         fileToMerge=fileBaseNameRoot.partition("pythia8")[0]+fileBaseNameRoot.partition("pythia8")[1]+'*'
         fileToMerge=fileToMerge.partition("Run2016")[0]+fileToMerge.partition("Run2016")[1]+'*'
         fileToMerge=fileToMerge.partition("madgraph")[0]+fileToMerge.partition("madgraph")[1]+'*'
-
+        
         # print "l[6] %s ,l[1] %s, l[2] %s ,l[3] %s , fileBaseNameRoot %s ," %(l[6],l[1],l[2],l[3],fileBaseNameRoot)
       elif l[0]==d[0] and l[4]=="":
         checkReady=False
@@ -329,8 +329,8 @@ def checkCompletion(dataSets, listOfJobs, outDir, cycleName, postFix,keepTemp):
       nMergeJobs=len([ j for j in listOfJobs if j[0]==d[0] ])
       nFiles=len(glob.glob("%s/*.root"%l[6]))
       nJobs=len(listOfJobs)
-      countCmd ="number of files to merge / number of jobs:     %3d/%d\n(%s.root)" % (nMergeFiles,nMergeJobs,'/'.join((fileToMerge.split('/')[-2:])))
-      countCmd+="\nnumber of all root files / number of all jobs: %3d/%d\n(%s/*.root)" % (nFiles,   nJobs,     '/'.join((l[6].split('/')[-1:])))
+      countCmd ="number of files to merge / number of jobs: %3d/%3d\n(%s.root)" % (nMergeFiles,nMergeJobs,'/'.join((fileToMerge.split('/')[-2:])))
+      #countCmd+="\nnumber of all root files / number of all jobs: %3d/%d\n(%s/*.root)" % (nFiles,   nJobs,     '/'.join((l[6].split('/')[-1:])))
       countDebug="" if os.path.exists(l[6]) else "Warning! %s does not exist!"%l[6]
       lsDebug+="\n"+countCmd+"\n"+countDebug
       mergeDebug+="\n"+lsDebug
@@ -1022,7 +1022,7 @@ def accountTime(jobOptions,jobName,nJobs):
   new = not os.path.exists(filepath)
   
   global succesRates, starttime, startdate
-  succesRates = "succes rate(s):\n" + '\n'.join(sorted(succesRates))
+  succesRates = "succes rate(s):\n" + '\n'.join(sorted(succesRates)) + '\n'
   minutes, seconds = divmod(time.time()-starttime,60)
   hours, minutes   = divmod(minutes,60)
   
@@ -1033,9 +1033,9 @@ def accountTime(jobOptions,jobName,nJobs):
     file.write(succesRates)
     file.write("start: %s\n" % (startdate))
     file.write("done:  %s\n" % (time.strftime("%a %d/%m/%Y %H:%M:%S",time.gmtime())))
-    file.write("took:  %s hours, %s minutes and %.1f seconds\n" % (hours,minutes,seconds))
+    file.write("took:  %d hours, %d minutes and %.1f seconds\n" % (hours,minutes,seconds))
     file.write("\n")
-  print "\nDone after %s hours, %s minutes and %.1f seconds." % (hours,minutes,seconds)  
+  print "\nDone after %d hours, %d minutes and %.1f seconds." % (hours,minutes,seconds)
   
 
 

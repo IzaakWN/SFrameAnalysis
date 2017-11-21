@@ -1,15 +1,15 @@
 path2xml="$SFRAME_DIR/../BatchSubmission/xmls_postMoriond_T2"
 path2tmp="$SFRAME_DIR/../AnalysisTemp"
 jobName="WJ"
-outDir="/scratch/$USER/SFrameAnalysis/AnalysisOutput/"+jobName #"$SFRAME_DIR/../AnalysisOutput/"+jobName
+outDir="/scratch/$USER/SFrameAnalysis_ltau2017/AnalysisOutput/"+jobName #"$SFRAME_DIR/../AnalysisOutput/"+jobName
 cycleName="TauTauAnalysis"
 nEventsMax=-1
 #nEventsMax=200
 nProcesses=1
-nFiles=12
-hCPU="04:00:00"
+nFiles=17
+hCPU="04:45:00"
 hVMEM="5000M"
-postFix="_Moriond"
+postFix="_2017"
 dataSets = [
             
        [ "WJetsToLNu_TuneCUETP8M1",
@@ -60,14 +60,14 @@ dataSets = [
             "W4JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_additional_0000.xml",
             "W4JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_ext_0000.xml", ]], # only in postMoriond
             
-            ]
+]
 
 userItems = [ 
-                ["IsData","false"],
-                ["IsSignal","false"],
-                ["doRecoilCorr","true"],
-                ["doEES","false"],
-                ["EESshift","0.00"],
+        ["IsData","false"],
+        ["IsSignal","false"],
+        ["doRecoilCorr","true"],
+        ["doEES","false"],
+        ["EESshift","0.00"],
              ]
 
 jobOptionsFile2=open("AnalysisOptions.py", 'r')

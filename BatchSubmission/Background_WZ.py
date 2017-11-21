@@ -1,15 +1,15 @@
 path2xml="$SFRAME_DIR/../BatchSubmission/xmls_postMoriond_T2"
 path2tmp="$SFRAME_DIR/../AnalysisTemp"
 jobName="WZ"
-outDir="/scratch/$USER/SFrameAnalysis/AnalysisOutput/"+jobName #"$SFRAME_DIR/../AnalysisOutput/"+jobName
+outDir="/scratch/$USER/SFrameAnalysis_ltau2017/AnalysisOutput/"+jobName #"$SFRAME_DIR/../AnalysisOutput/"+jobName
 cycleName="TauTauAnalysis"
 nEventsMax=-1
 #nEventsMax=200
 nProcesses=1
-nFiles=8
-hCPU="03:30:00"
+nFiles=5
+hCPU="04:30:00"
 hVMEM="5000M"
-postFix="_Moriond"
+postFix="_2017"
 dataSets = [
 
        [ "WZTo3LNu_TuneCUETP8M1_13TeV_nlo",
@@ -26,15 +26,15 @@ dataSets = [
        [ "WZJToLLLNu_nlo",
         [   "WZJToLLLNu_TuneCUETP8M1_13TeV-amcnlo-pythia8_0000.xml", ]],
         
-            ]
+]
 
 userItems = [ 
-                ["IsData","false"],
-                ["IsSignal","false"],
-                ["doRecoilCorr","false"],
-                ["doEES","false"],
-                ["EESshift","0.00"],
-             ]
+        ["IsData","false"],
+        ["IsSignal","false"],
+        ["doRecoilCorr","false"],
+        ["doEES","false"],
+        ["EESshift","0.00"],
+]
 
 jobOptionsFile2=open("AnalysisOptions.py", 'r')
 command2=""

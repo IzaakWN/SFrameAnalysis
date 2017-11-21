@@ -289,6 +289,7 @@ def isDir(samplepath):
 
 
 def writeFailedRootFiles(failedRootFiles,i,outDir,outName):
+  '''Write names of root files that could not be opened to a log file.'''
   outDirFailed=outDir #.strip("/")+"_failed"
   outNameFailed=outName+"_failed"
   if not os.path.exists(outDirFailed):
@@ -304,6 +305,7 @@ def writeFailedRootFiles(failedRootFiles,i,outDir,outName):
 
 
 def plural(list,y=False):
+  '''Make plural if there is more than one element in the list.'''
   if len(list) > 1:
       if y: return "ies"
       else: return "s"

@@ -10,7 +10,7 @@ loadLibs=[
     "libRecoilCorrector",
     "libJetCorrectionTool",
     "libSVFitTool",
-            ]
+]
 
 loadPacks=[
     "SFrameCore.par",
@@ -23,25 +23,25 @@ loadPacks=[
     "RecoilCorrector.par",
     "JetCorrectionTool.par",
     "SVFitTool.par",
-	        ]
+]
 
 compilePacks=[
     "../NtupleVariables",
     "../GoodRunsLists",
     "../PileupReweightingTool",
-    "../BTaggingTools",
     "../TauTauResonances",
+    "../BTaggingTools",
     "../LepEff2016",
     "../RecoilCorrections",
     "../JetCorrectionTool",
     "../SVFitTool",
-            ]
+]
 
 AddUserItems = [
     ["RecoTreeName","tree"],
     ["doJEC","true"],
     ["doSVFit","true"],
-                ]
+]
   
 inputTrees=["ntuplizer/tree"]
 outputTrees=["tree_mutau","tree_etau"]

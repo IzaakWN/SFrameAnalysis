@@ -72,15 +72,14 @@ class TauTauAnalysis : public SCycleBase {
   
     // enumeration of all cut flags
     typedef enum {
-      kBeforeCuts,            // C0
-      kJSON,                  // C1
-      kTrigger,               // C2
-      kMetFilters,            // C3
-      kLepton,                // C4
-      kLepTau,                // C6
-      kTriggerMatched,        // C7
-      kBeforeCutsWeighted,    // C8
-      kNumCuts                // last!
+      kBeforeCuts,              // C0
+      kJSON,                    // C1
+      kTrigger,                 // C2
+      kLepton,                  // C3
+      kLepTau,                  // C4
+      kTriggerMatched,          // C5
+      kBeforeCutsWeighted,      // C6
+      kNumCuts                  // last!
     } SelectionCuts;
   
     // static array of all cut names
@@ -88,11 +87,10 @@ class TauTauAnalysis : public SCycleBase {
       "BeforeCuts",             // C0
       "JSON",                   // C1
       "Trigger",                // C2
-      "MetFilters",             // C3
-      "Lepton",                 // C4
-      "LepTau",                 // C6
-      "TriggerMatched",         // C7
-      "BeforeCutsWeighted",     // C8
+      "Lepton",                 // C3
+      "LepTau",                 // C4
+      "TriggerMatched",         // C5
+      "BeforeCutsWeighted",     // C6
     };
     
 
@@ -181,10 +179,10 @@ class TauTauAnalysis : public SCycleBase {
     
     // checks
     void makeHistogramsForChecks();
-    void signalChecks();
-    void cutflowCheck( const std::string& channel );
-    void visiblePTCheck();
-    void countBTaggedTaus();
+    //void signalChecks();
+    //void cutflowCheck( const std::string& channel );
+    //void visiblePTCheck();
+    //void countBTaggedTaus();
     int genDecayMode(Float_t lep_eta, Float_t lep_phi);
     static void printRow( const std::vector<std::string> svec = {}, const std::vector<int> ivec = {}, const std::vector<double> dvec = {}, const std::vector<float> fvec = {}, const int w=10 );
     

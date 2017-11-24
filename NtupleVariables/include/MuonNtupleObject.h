@@ -24,16 +24,16 @@
 #include "plug-ins/include/SInputVariables.h"
 
 namespace Ntuple {
-
-  /**
-  *  @short Class that can read the variables produced by MuonNtupleObject
-  *
-  *         This class can be used to read the offline muon information from
-  *         an ntuple produced by the SingleTopDPDMaker code.
-  *
-  * @author Code produced by Id: CodeIt.py 494 2010-07-30 13:41:32Z svn   
-  *
-  */
+  
+  /*
+   *  @short Class that can read the variables produced by MuonNtupleObject
+   *
+   *         This class can be used to read the offline muon information from
+   *         an ntuple produced by the SingleTopDPDMaker code.
+   *
+   * @author Code produced by Id: CodeIt.py 494 2010-07-30 13:41:32Z svn   
+   *
+   */
   
   enum MuonDetails {
     MuonTrack = 1,
@@ -42,101 +42,80 @@ namespace Ntuple {
     MuonID = 8,
     MuonBasic = 16,
     MuonAll = 31,
-
   };
   
   // forward declaration of NtupleObjectNames
   class NtupleObjectNames;
   class MuonNtupleObject : public SInputVariables< SCycleBaseNTuple > {
-
+    
     public:
-    /// Constructor specifying the parent of the object
+    
+    // constructor specifying the parent of the object
     MuonNtupleObject( SCycleBaseNTuple* parent );
-
-    /// remember if connect succeeded
+    
+    // remember if connect succeeded
     void setConnectSucceeded(const unsigned int index, const bool success);
     bool getConnectSucceeded(const unsigned int index) const {return m_connectsucceeded.at(index);}  
-
-    /// Connect the variables to the input branches
+    
+    // connect the variables to the input branches
     void ConnectVariables( const TString& treeName,
                            UInt_t detail_level = 0,
                            const TString& prefix = "Muon_",
                            const TString& ntupleType = "NtupleMakerNtuple" ) throw( SError );
-
+    
     void ConnectVariables( const TString& treeName,
                            const TString& prefix = "Muon_",
                            const TString& ntupleType = "NtupleMakerNtuple" ) throw( SError );
-
-    int getDetailLevel() const {return detailLevel;}   
-
-
+    
+    int getDetailLevel() const { return detailLevel; }
+    
     // particle vector size
-    Int_t                   N;
-   
+    Int_t N;
+    
     enum ConnectionIndex { 
-     kcharge=1, 
-     kpdgId=2, 
-     kpfRhoCorrRelIso03Boost=31, 
-     kpfRhoCorrRelIso04Boost=32, 
-     kpfDeltaCorrRelIsoBoost=33, 
-     kpfRelIsoBoost=34, 
-     kphotonIsoBoost=35, 
-     kneutralHadIsoBoost=36, 
-     kchargedHadIsoBoost=37, 
-     kSemileptonicPFIso=38, 
-     kSemileptonicCorrPFIso=39, 
-     kisHighPtMuon=3, 
-     kisLooseMuon=4, 
-     kisTightMuon=5, 
-     kisMediumMuon=6, 
-     kisMediumMuonGH=7, 
-     kisPFMuon=8, 
-     kisGlobalMuon=9, 
-     kisTrackerMuon=10, 
-     kisSoftMuon=11, 
-     kpfRhoCorrRelIso03=12, 
-     kpfRhoCorrRelIso04=13, 
-     kpfDeltaCorrRelIso=14, 
-     kpfRelIso=15, 
-     kphotonIso=16, 
-     kneutralHadIso=17, 
-     kchargedHadIso=18, 
-     ktrackIso=19, 
-     kd0=20, 
-     kdz=21, 
-     kd0_allvertices=22, 
-     kdz_allvertices=23, 
-     kbestTrack_pt=24, 
-     kbestTrack_ptErr=25, 
-     ktrackerHits=26, 
-     kmatchedStations=27, 
-     kpixelHits=28, 
-     kglobalHits=29, 
-     knormChi2=30, 
- 
-      kEnd 
+      kcharge = 1,
+      kpdgId = 2,
+      kSemileptonicPFIso = 28,
+      kSemileptonicCorrPFIso = 29,
+      kisHighPtMuon = 3,
+      kisLooseMuon = 4,
+      kisTightMuon = 5,
+      kisMediumMuon = 6,
+      kisMediumMuonGH = 7,
+      kisPFMuon = 8,
+      kisGlobalMuon = 9,
+      kisTrackerMuon = 10,
+      kisSoftMuon = 11,
+      kpfDeltaCorrRelIso = 12,
+      kphotonIso = 13,
+      kneutralHadIso = 14,
+      kchargedHadIso = 15,
+      ktrackIso = 16,
+      kd0 = 17,
+      kdz = 18,
+      kd0_allvertices = 19,
+      kdz_allvertices = 20,
+      kbestTrack_pt = 21,
+      kbestTrack_ptErr = 22,
+      ktrackerHits = 23,
+      kmatchedStations = 24,
+      kpixelHits = 25,
+      kglobalHits = 26,
+      knormChi2 = 27,
+      kEnd
     }; 
-
-
+    
+    
     // vectors of properties defined in Particle.h
-    std::vector< floatingnumber >  *e;
     std::vector< floatingnumber >  *pt;
     std::vector< floatingnumber >  *eta;
     std::vector< floatingnumber >  *phi;
     std::vector< floatingnumber >  *m;
-    
-
+    std::vector< floatingnumber >  *e;
     
     // vectors of object specific variables
     std::vector< floatingnumber >  *charge;
     std::vector< int >  *pdgId;
-    std::vector< floatingnumber >  *pfRhoCorrRelIso03Boost;
-    std::vector< floatingnumber >  *pfRhoCorrRelIso04Boost;
-    std::vector< floatingnumber >  *pfDeltaCorrRelIsoBoost;
-    std::vector< floatingnumber >  *pfRelIsoBoost;
-    std::vector< floatingnumber >  *photonIsoBoost;
-    std::vector< floatingnumber >  *neutralHadIsoBoost;
-    std::vector< floatingnumber >  *chargedHadIsoBoost;
     std::vector< floatingnumber >  *SemileptonicPFIso;
     std::vector< floatingnumber >  *SemileptonicCorrPFIso;
     std::vector< int >  *isHighPtMuon;
@@ -148,10 +127,7 @@ namespace Ntuple {
     std::vector< int >  *isGlobalMuon;
     std::vector< int >  *isTrackerMuon;
     std::vector< int >  *isSoftMuon;
-    std::vector< floatingnumber >  *pfRhoCorrRelIso03;
-    std::vector< floatingnumber >  *pfRhoCorrRelIso04;
     std::vector< floatingnumber >  *pfDeltaCorrRelIso;
-    std::vector< floatingnumber >  *pfRelIso;
     std::vector< floatingnumber >  *photonIso;
     std::vector< floatingnumber >  *neutralHadIso;
     std::vector< floatingnumber >  *chargedHadIso;
@@ -167,14 +143,13 @@ namespace Ntuple {
     std::vector< int >  *pixelHits;
     std::vector< int >  *globalHits;
     std::vector< floatingnumber >  *normChi2;
-
-
+    
     std::vector<int> m_connectsucceeded;
-
+    
     // save actual detail level and group
     Int_t detailLevel;
     std::string detailGroup;
-
+    
   }; // class MuonNtupleObject
 
 } // namespace Ntuple

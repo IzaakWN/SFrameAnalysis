@@ -11,14 +11,13 @@
 #include "GenParticleNtupleObject.h"
 
 
-
 namespace Ntuple {
   class GenParticleNtupleObject;
 }
 
 namespace UZH {
   
-  /**
+  /*
    *  @short Class that maps GenParticleNtupleObjects to GenParticle Particle class
    *
    *         This class can be used to map the offline GenParticle information from
@@ -29,28 +28,26 @@ namespace UZH {
    *
    */
   
-  class GenParticle : public Basic 
-   , public Particle 
-  {
-  public:
-  
-    /// default c'tor
+  class GenParticle : public Basic , public Particle  {
+    
+    public:
+    
+    // default constructor
     GenParticle();
-    /// default d'tor
+    
+    // default destructor
     ~GenParticle();
     
-    /// c'tor with index
+    // constructor with index
     GenParticle( const Ntuple::GenParticleNtupleObject* ana, const Int_t idx );
     
     TLorentzVector* getTLV() const;
     TLorentzVector tlv() const;
     
-     floatingnumber DeltaR(const GenParticle& p) const; 
+    floatingnumber DeltaR(const GenParticle& p) const;
     
     // variable definitions
-    
-    
-        int* m_pdgId;
+    int* m_pdgId;
     int* m_status;
     std::vector<int>* m_mother;
     int* m_nMoth;
@@ -65,15 +62,9 @@ namespace UZH {
     floatingnumber* m_tauvisphi;
     floatingnumber* m_tauvismass;
     int* m_taudecay;
-
     
-    
-
-    
-    
-
-    // check level given here must be consistent with ...NtupleObject.cxx, otherwise you'll get a segfault
-        int pdgId() const { /*if(!m_ana->getConnectSucceeded(Ntuple::GenParticleNtupleObject::kpdgId)) std::cout<<"pdgId not connected!"<<std::endl;*/ return *(m_pdgId); } 
+    // there must be consistent with ...NtupleObject.cxx, otherwise you'll get a segfault
+    int pdgId() const { /*if(!m_ana->getConnectSucceeded(Ntuple::GenParticleNtupleObject::kpdgId)) std::cout<<"pdgId not connected!"<<std::endl;*/ return *(m_pdgId); } 
     int status() const { /*if(!m_ana->getConnectSucceeded(Ntuple::GenParticleNtupleObject::kstatus)) std::cout<<"status not connected!"<<std::endl;*/ return *(m_status); } 
     std::vector<int> mother() const { /*if(!m_ana->getConnectSucceeded(Ntuple::GenParticleNtupleObject::kmother)) std::cout<<"mother not connected!"<<std::endl;*/ return *(m_mother); } 
     int nMoth() const { /*if(!m_ana->getConnectSucceeded(Ntuple::GenParticleNtupleObject::knMoth)) std::cout<<"nMoth not connected!"<<std::endl;*/ return *(m_nMoth); } 
@@ -88,8 +79,8 @@ namespace UZH {
     floatingnumber tauvisphi() const { /*if(!m_ana->getConnectSucceeded(Ntuple::GenParticleNtupleObject::ktauvisphi)) std::cout<<"tauvisphi not connected!"<<std::endl;*/ return *(m_tauvisphi); } 
     floatingnumber tauvismass() const { /*if(!m_ana->getConnectSucceeded(Ntuple::GenParticleNtupleObject::ktauvismass)) std::cout<<"tauvismass not connected!"<<std::endl;*/ return *(m_tauvismass); } 
     int taudecay() const { /*if(!m_ana->getConnectSucceeded(Ntuple::GenParticleNtupleObject::ktaudecay)) std::cout<<"taudecay not connected!"<<std::endl;*/ return *(m_taudecay); } 
-    
-        void pdgId( const int& val){ *(m_pdgId)=val; } 
+        
+    void pdgId( const int& val){ *(m_pdgId)=val; } 
     void status( const int& val){ *(m_status)=val; } 
     void mother( const std::vector<int>& val){ *(m_mother)=val; } 
     void nMoth( const int& val){ *(m_nMoth)=val; } 
@@ -104,24 +95,22 @@ namespace UZH {
     void tauvisphi( const floatingnumber& val){ *(m_tauvisphi)=val; } 
     void tauvismass( const floatingnumber& val){ *(m_tauvismass)=val; } 
     void taudecay( const int& val){ *(m_taudecay)=val; } 
+        
     
+    private:
     
-  private:
     const Ntuple::GenParticleNtupleObject* m_ana;
     
   }; // class GenParticle
-
+  
   typedef std::vector< GenParticle > GenParticleVec;
   typedef std::vector< GenParticle >::iterator GenParticleVecIt;
   typedef std::vector< GenParticle >::const_iterator GenParticleVecConstIt;
-
   
-
 } // end of namespace UZH
 
-/// output stream operator overloaded for GenParticle objects
+// output stream operator overloaded for GenParticle objects
 std::ostream& operator<<( std::ostream& out,
                           const UZH::GenParticle& rhs );
-
 
 #endif //__UZH_GenParticle_H__

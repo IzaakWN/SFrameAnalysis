@@ -9,12 +9,9 @@ Basic::Basic( int idx ) :
   ContainerBase(),
   m_isGood( false ),
   m_idx( idx )
-{
-}
+{ }
 
-Basic::~Basic()
-{
-}
+Basic::~Basic() { }
 
 void Basic::checkLevel(int detailLvl) const {
   if (m_lvl < detailLvl) {

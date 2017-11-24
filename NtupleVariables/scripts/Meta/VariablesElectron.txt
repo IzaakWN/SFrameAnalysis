@@ -59,13 +59,6 @@ BoostedID	int*	isTightElectronBoosted
 BoostedID	int*	isHeepElectronBoosted
 BoostedID	int*	isLooseElectronBoosted
 
-BoostedIsolation	floatingnumber*	pfRhoCorrRelIso03Boost
-BoostedIsolation	floatingnumber*	pfRhoCorrRelIso04Boost
-BoostedIsolation	floatingnumber*	pfDeltaCorrRelIsoBoost
-BoostedIsolation	floatingnumber*	pfRelIsoBoost
-BoostedIsolation	floatingnumber*	photonIsoBoost
-BoostedIsolation	floatingnumber*	neutralHadIsoBoost
-BoostedIsolation	floatingnumber*	chargedHadIsoBoost
 BoostedIsolation	floatingnumber*	SemileptonicPFIso
 BoostedIsolation	floatingnumber*	SemileptonicCorrPFIso
 

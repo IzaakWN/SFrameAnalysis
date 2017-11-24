@@ -21,7 +21,7 @@ namespace Ntuple {
     //
     ConnectVariable( treeName, m_objectNames.getName("runNumber"), runNumber );
     ConnectVariable( treeName, m_objectNames.getName("eventNumber"), eventNumber );
-    ConnectVariable( treeName, m_objectNames.getName("lumiBlock"  ), lumiBlock            );
+    ConnectVariable( treeName, m_objectNames.getName("lumiBlock"  ), lumiBlock );
 
     if( ( (detail_level & Ntuple::EventInfoBasic) == Ntuple::EventInfoBasic) ) {
       ConnectVariable( treeName, m_objectNames.getName("averageIntPerXing"    ), averageIntPerXing    );
@@ -31,11 +31,11 @@ namespace Ntuple {
     }
     if( (detail_level & Ntuple::EventInfoTrigger) == Ntuple::EventInfoTrigger ) {
       ConnectVariable( treeName, m_objectNames.getName("trigDecision"), trigDecision  );
-      ConnectVariable( treeName, m_objectNames.getName("trigObject_pt"), trigObject_pt  );  
-      ConnectVariable( treeName, m_objectNames.getName("trigObject_eta"), trigObject_eta  );     
-      ConnectVariable( treeName, m_objectNames.getName("trigObject_phi"), trigObject_phi  );
-      ConnectVariable( treeName, m_objectNames.getName("trigObject_lastname"), trigObject_lastname  );
-      ConnectVariable( treeName, m_objectNames.getName("trigObject_filterLabels"), trigObject_filterLabels  );
+      //ConnectVariable( treeName, m_objectNames.getName("trigObject_pt"), trigObject_pt  );  
+      //ConnectVariable( treeName, m_objectNames.getName("trigObject_eta"), trigObject_eta  );     
+      //ConnectVariable( treeName, m_objectNames.getName("trigObject_phi"), trigObject_phi  );
+      //ConnectVariable( treeName, m_objectNames.getName("trigObject_lastname"), trigObject_lastname  );
+      //ConnectVariable( treeName, m_objectNames.getName("trigObject_filterLabels"), trigObject_filterLabels  );
 
     }
     if( (detail_level & Ntuple::EventInfoTruth) == Ntuple::EventInfoTruth ) {

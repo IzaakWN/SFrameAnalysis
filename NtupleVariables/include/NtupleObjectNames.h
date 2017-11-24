@@ -17,17 +17,17 @@
 namespace Ntuple {
 
   /**
-  *  @short Class that returns the right branch names for ntuple type
-  *
-  *         This class can be used to return the right branch names 
-  *         ntuple type, for instance for ntuples created by the SingleTopDPDMaker
-  *         code or SM Ntuples.
-  *
-  * @author Clemens Lange <Clemens.Lange@desy.de>
-  *
-  * $Rev: 42092 $
-  * $Date: 2014-03-19 16:37:47 +0100 (Wed, 19 Mar 2014) $
-  */
+   *  @short Class that returns the right branch names for ntuple type
+   *
+   *         This class can be used to return the right branch names 
+   *         ntuple type, for instance for ntuples created by the SingleTopDPDMaker
+   *         code or SM Ntuples.
+   *
+   * @author Clemens Lange <Clemens.Lange@desy.de>
+   *
+   * $Rev: 42092 $
+   * $Date: 2014-03-19 16:37:47 +0100 (Wed, 19 Mar 2014) $
+   */
   // pseudo-flexibility for different ntuples, also change in Particle.h
   typedef float floatingnumber;
   class NtupleObjectNames {

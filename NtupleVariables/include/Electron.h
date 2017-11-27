@@ -11,14 +11,13 @@
 #include "ElectronNtupleObject.h"
 
 
-
 namespace Ntuple {
   class ElectronNtupleObject;
 }
 
 namespace UZH {
   
-  /**
+  /*
    *  @short Class that maps ElectronNtupleObjects to Electron Particle class
    *
    *         This class can be used to map the offline Electron information from
@@ -29,28 +28,24 @@ namespace UZH {
    *
    */
   
-  class Electron : public Basic 
-   , public Particle 
-  {
-  public:
-  
-    /// default c'tor
+  class Electron : public Basic , public Particle  {
+    
+    public:
+    
+    // default constructor
     Electron();
-    /// default d'tor
+    
+    // default destructor
     ~Electron();
     
-    /// c'tor with index
+    // constructor with index
     Electron( const Ntuple::ElectronNtupleObject* ana, const Int_t idx );
     
     TLorentzVector* getTLV() const;
     TLorentzVector tlv() const;
     
-    
-    
     // variable definitions
-    
-    
-        int* m_passConversionVeto;
+    int* m_passConversionVeto;
     floatingnumber* m_full5x5_sigmaIetaIeta;
     floatingnumber* m_dEtaIn;
     floatingnumber* m_dPhiIn;
@@ -75,18 +70,6 @@ namespace UZH {
     int* m_pdgId;
     floatingnumber* m_charge;
     floatingnumber* m_et;
-    int* m_isVetoElectronBoosted;
-    int* m_isMediumElectronBoosted;
-    int* m_isTightElectronBoosted;
-    int* m_isHeepElectronBoosted;
-    int* m_isLooseElectronBoosted;
-    floatingnumber* m_pfRhoCorrRelIso03Boost;
-    floatingnumber* m_pfRhoCorrRelIso04Boost;
-    floatingnumber* m_pfDeltaCorrRelIsoBoost;
-    floatingnumber* m_pfRelIsoBoost;
-    floatingnumber* m_photonIsoBoost;
-    floatingnumber* m_neutralHadIsoBoost;
-    floatingnumber* m_chargedHadIsoBoost;
     floatingnumber* m_SemileptonicPFIso;
     floatingnumber* m_SemileptonicCorrPFIso;
     int* m_isVetoElectron;
@@ -106,21 +89,15 @@ namespace UZH {
     floatingnumber* m_trackIso;
     floatingnumber* m_superCluster_eta;
     floatingnumber* m_superCluster_e;
-
     
     
-    /// delta(R) function using the cluster eta/phi position of the electrons
-    // floatingnumber DeltaRcluster( const Particle* p ) const;
+    // delta(R) function using the cluster eta/phi position of the electrons
+    //floatingnumber DeltaRcluster( const Particle* p ) const;
+    // delta(R) function using the track eta/phi position of the electrons
+    //floatingnumber DeltaRtrack( const Particle* p ) const;
     
-    /// delta(R) function using the track eta/phi position of the electrons
-    // floatingnumber DeltaRtrack( const Particle* p ) const;
-    
-
-    
-    
-
-    // check level given here must be consistent with ...NtupleObject.cxx, otherwise you'll get a segfault
-        int passConversionVeto() const { /*if(!m_ana->getConnectSucceeded(Ntuple::ElectronNtupleObject::kpassConversionVeto)) std::cout<<"passConversionVeto not connected!"<<std::endl;*/ return *(m_passConversionVeto); } 
+    // there must be consistent with ...NtupleObject.cxx, otherwise you'll get a segfault
+    int passConversionVeto() const { /*if(!m_ana->getConnectSucceeded(Ntuple::ElectronNtupleObject::kpassConversionVeto)) std::cout<<"passConversionVeto not connected!"<<std::endl;*/ return *(m_passConversionVeto); } 
     floatingnumber full5x5_sigmaIetaIeta() const { /*if(!m_ana->getConnectSucceeded(Ntuple::ElectronNtupleObject::kfull5x5_sigmaIetaIeta)) std::cout<<"full5x5_sigmaIetaIeta not connected!"<<std::endl;*/ return *(m_full5x5_sigmaIetaIeta); } 
     floatingnumber dEtaIn() const { /*if(!m_ana->getConnectSucceeded(Ntuple::ElectronNtupleObject::kdEtaIn)) std::cout<<"dEtaIn not connected!"<<std::endl;*/ return *(m_dEtaIn); } 
     floatingnumber dPhiIn() const { /*if(!m_ana->getConnectSucceeded(Ntuple::ElectronNtupleObject::kdPhiIn)) std::cout<<"dPhiIn not connected!"<<std::endl;*/ return *(m_dPhiIn); } 
@@ -145,18 +122,6 @@ namespace UZH {
     int pdgId() const { /*if(!m_ana->getConnectSucceeded(Ntuple::ElectronNtupleObject::kpdgId)) std::cout<<"pdgId not connected!"<<std::endl;*/ return *(m_pdgId); } 
     floatingnumber charge() const { /*if(!m_ana->getConnectSucceeded(Ntuple::ElectronNtupleObject::kcharge)) std::cout<<"charge not connected!"<<std::endl;*/ return *(m_charge); } 
     floatingnumber et() const { /*if(!m_ana->getConnectSucceeded(Ntuple::ElectronNtupleObject::ket)) std::cout<<"et not connected!"<<std::endl;*/ return *(m_et); } 
-    int isVetoElectronBoosted() const { /*if(!m_ana->getConnectSucceeded(Ntuple::ElectronNtupleObject::kisVetoElectronBoosted)) std::cout<<"isVetoElectronBoosted not connected!"<<std::endl;*/ return *(m_isVetoElectronBoosted); } 
-    int isMediumElectronBoosted() const { /*if(!m_ana->getConnectSucceeded(Ntuple::ElectronNtupleObject::kisMediumElectronBoosted)) std::cout<<"isMediumElectronBoosted not connected!"<<std::endl;*/ return *(m_isMediumElectronBoosted); } 
-    int isTightElectronBoosted() const { /*if(!m_ana->getConnectSucceeded(Ntuple::ElectronNtupleObject::kisTightElectronBoosted)) std::cout<<"isTightElectronBoosted not connected!"<<std::endl;*/ return *(m_isTightElectronBoosted); } 
-    int isHeepElectronBoosted() const { /*if(!m_ana->getConnectSucceeded(Ntuple::ElectronNtupleObject::kisHeepElectronBoosted)) std::cout<<"isHeepElectronBoosted not connected!"<<std::endl;*/ return *(m_isHeepElectronBoosted); } 
-    int isLooseElectronBoosted() const { /*if(!m_ana->getConnectSucceeded(Ntuple::ElectronNtupleObject::kisLooseElectronBoosted)) std::cout<<"isLooseElectronBoosted not connected!"<<std::endl;*/ return *(m_isLooseElectronBoosted); } 
-    floatingnumber pfRhoCorrRelIso03Boost() const { /*if(!m_ana->getConnectSucceeded(Ntuple::ElectronNtupleObject::kpfRhoCorrRelIso03Boost)) std::cout<<"pfRhoCorrRelIso03Boost not connected!"<<std::endl;*/ return *(m_pfRhoCorrRelIso03Boost); } 
-    floatingnumber pfRhoCorrRelIso04Boost() const { /*if(!m_ana->getConnectSucceeded(Ntuple::ElectronNtupleObject::kpfRhoCorrRelIso04Boost)) std::cout<<"pfRhoCorrRelIso04Boost not connected!"<<std::endl;*/ return *(m_pfRhoCorrRelIso04Boost); } 
-    floatingnumber pfDeltaCorrRelIsoBoost() const { /*if(!m_ana->getConnectSucceeded(Ntuple::ElectronNtupleObject::kpfDeltaCorrRelIsoBoost)) std::cout<<"pfDeltaCorrRelIsoBoost not connected!"<<std::endl;*/ return *(m_pfDeltaCorrRelIsoBoost); } 
-    floatingnumber pfRelIsoBoost() const { /*if(!m_ana->getConnectSucceeded(Ntuple::ElectronNtupleObject::kpfRelIsoBoost)) std::cout<<"pfRelIsoBoost not connected!"<<std::endl;*/ return *(m_pfRelIsoBoost); } 
-    floatingnumber photonIsoBoost() const { /*if(!m_ana->getConnectSucceeded(Ntuple::ElectronNtupleObject::kphotonIsoBoost)) std::cout<<"photonIsoBoost not connected!"<<std::endl;*/ return *(m_photonIsoBoost); } 
-    floatingnumber neutralHadIsoBoost() const { /*if(!m_ana->getConnectSucceeded(Ntuple::ElectronNtupleObject::kneutralHadIsoBoost)) std::cout<<"neutralHadIsoBoost not connected!"<<std::endl;*/ return *(m_neutralHadIsoBoost); } 
-    floatingnumber chargedHadIsoBoost() const { /*if(!m_ana->getConnectSucceeded(Ntuple::ElectronNtupleObject::kchargedHadIsoBoost)) std::cout<<"chargedHadIsoBoost not connected!"<<std::endl;*/ return *(m_chargedHadIsoBoost); } 
     floatingnumber SemileptonicPFIso() const { /*if(!m_ana->getConnectSucceeded(Ntuple::ElectronNtupleObject::kSemileptonicPFIso)) std::cout<<"SemileptonicPFIso not connected!"<<std::endl;*/ return *(m_SemileptonicPFIso); } 
     floatingnumber SemileptonicCorrPFIso() const { /*if(!m_ana->getConnectSucceeded(Ntuple::ElectronNtupleObject::kSemileptonicCorrPFIso)) std::cout<<"SemileptonicCorrPFIso not connected!"<<std::endl;*/ return *(m_SemileptonicCorrPFIso); } 
     int isVetoElectron() const { /*if(!m_ana->getConnectSucceeded(Ntuple::ElectronNtupleObject::kisVetoElectron)) std::cout<<"isVetoElectron not connected!"<<std::endl;*/ return *(m_isVetoElectron); } 
@@ -176,8 +141,8 @@ namespace UZH {
     floatingnumber trackIso() const { /*if(!m_ana->getConnectSucceeded(Ntuple::ElectronNtupleObject::ktrackIso)) std::cout<<"trackIso not connected!"<<std::endl;*/ return *(m_trackIso); } 
     floatingnumber superCluster_eta() const { /*if(!m_ana->getConnectSucceeded(Ntuple::ElectronNtupleObject::ksuperCluster_eta)) std::cout<<"superCluster_eta not connected!"<<std::endl;*/ return *(m_superCluster_eta); } 
     floatingnumber superCluster_e() const { /*if(!m_ana->getConnectSucceeded(Ntuple::ElectronNtupleObject::ksuperCluster_e)) std::cout<<"superCluster_e not connected!"<<std::endl;*/ return *(m_superCluster_e); } 
-    
-        void passConversionVeto( const int& val){ *(m_passConversionVeto)=val; } 
+        
+    void passConversionVeto( const int& val){ *(m_passConversionVeto)=val; } 
     void full5x5_sigmaIetaIeta( const floatingnumber& val){ *(m_full5x5_sigmaIetaIeta)=val; } 
     void dEtaIn( const floatingnumber& val){ *(m_dEtaIn)=val; } 
     void dPhiIn( const floatingnumber& val){ *(m_dPhiIn)=val; } 
@@ -202,18 +167,6 @@ namespace UZH {
     void pdgId( const int& val){ *(m_pdgId)=val; } 
     void charge( const floatingnumber& val){ *(m_charge)=val; } 
     void et( const floatingnumber& val){ *(m_et)=val; } 
-    void isVetoElectronBoosted( const int& val){ *(m_isVetoElectronBoosted)=val; } 
-    void isMediumElectronBoosted( const int& val){ *(m_isMediumElectronBoosted)=val; } 
-    void isTightElectronBoosted( const int& val){ *(m_isTightElectronBoosted)=val; } 
-    void isHeepElectronBoosted( const int& val){ *(m_isHeepElectronBoosted)=val; } 
-    void isLooseElectronBoosted( const int& val){ *(m_isLooseElectronBoosted)=val; } 
-    void pfRhoCorrRelIso03Boost( const floatingnumber& val){ *(m_pfRhoCorrRelIso03Boost)=val; } 
-    void pfRhoCorrRelIso04Boost( const floatingnumber& val){ *(m_pfRhoCorrRelIso04Boost)=val; } 
-    void pfDeltaCorrRelIsoBoost( const floatingnumber& val){ *(m_pfDeltaCorrRelIsoBoost)=val; } 
-    void pfRelIsoBoost( const floatingnumber& val){ *(m_pfRelIsoBoost)=val; } 
-    void photonIsoBoost( const floatingnumber& val){ *(m_photonIsoBoost)=val; } 
-    void neutralHadIsoBoost( const floatingnumber& val){ *(m_neutralHadIsoBoost)=val; } 
-    void chargedHadIsoBoost( const floatingnumber& val){ *(m_chargedHadIsoBoost)=val; } 
     void SemileptonicPFIso( const floatingnumber& val){ *(m_SemileptonicPFIso)=val; } 
     void SemileptonicCorrPFIso( const floatingnumber& val){ *(m_SemileptonicCorrPFIso)=val; } 
     void isVetoElectron( const int& val){ *(m_isVetoElectron)=val; } 
@@ -233,34 +186,31 @@ namespace UZH {
     void trackIso( const floatingnumber& val){ *(m_trackIso)=val; } 
     void superCluster_eta( const floatingnumber& val){ *(m_superCluster_eta)=val; } 
     void superCluster_e( const floatingnumber& val){ *(m_superCluster_e)=val; } 
+        
     
+    private:
     
-  private:
     const Ntuple::ElectronNtupleObject* m_ana;
     
   }; // class Electron
-
+  
   typedef std::vector< Electron > ElectronVec;
   typedef std::vector< Electron >::iterator ElectronVecIt;
   typedef std::vector< Electron >::const_iterator ElectronVecConstIt;
-
   
-  /// sort Electrons by pT
+  // sort Electrons by pT
   bool operator<( const Electron& e1, const Electron& e2 );
-
-  /// function class to sort Electron vector contents by pT
+  
+  // function class to sort Electron vector contents by pT
   class sortElectronPt {
     public:
-      bool operator()( const Electron& e1,
-                       const Electron& e2 );
+      bool operator()( const Electron& e1, const Electron& e2 );
   };
   
-
 } // end of namespace UZH
 
-/// output stream operator overloaded for Electron objects
+// output stream operator overloaded for Electron objects
 std::ostream& operator<<( std::ostream& out,
                           const UZH::Electron& rhs );
-
 
 #endif //__UZH_Electron_H__

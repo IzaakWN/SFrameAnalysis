@@ -53,19 +53,19 @@ AdvancedID	floatingnumber*	full5x5_e1x5
 AdvancedID	floatingnumber*	dr03TkSumPt
 AdvancedID	floatingnumber*	hadronicOverEm
 
-BoostedID	int*	isVetoElectronBoosted
-BoostedID	int*	isMediumElectronBoosted
-BoostedID	int*	isTightElectronBoosted
-BoostedID	int*	isHeepElectronBoosted
-BoostedID	int*	isLooseElectronBoosted
+# BoostedID	int*	isVetoElectronBoosted
+# BoostedID	int*	isMediumElectronBoosted
+# BoostedID	int*	isTightElectronBoosted
+# BoostedID	int*	isHeepElectronBoosted
+# BoostedID	int*	isLooseElectronBoosted
 
-BoostedIsolation	floatingnumber*	pfRhoCorrRelIso03Boost
-BoostedIsolation	floatingnumber*	pfRhoCorrRelIso04Boost
-BoostedIsolation	floatingnumber*	pfDeltaCorrRelIsoBoost
-BoostedIsolation	floatingnumber*	pfRelIsoBoost
-BoostedIsolation	floatingnumber*	photonIsoBoost
-BoostedIsolation	floatingnumber*	neutralHadIsoBoost
-BoostedIsolation	floatingnumber*	chargedHadIsoBoost
+# BoostedIsolation	floatingnumber*	pfRhoCorrRelIso03Boost
+# BoostedIsolation	floatingnumber*	pfRhoCorrRelIso04Boost
+# BoostedIsolation	floatingnumber*	pfDeltaCorrRelIsoBoost
+# BoostedIsolation	floatingnumber*	pfRelIsoBoost
+# BoostedIsolation	floatingnumber*	photonIsoBoost
+# BoostedIsolation	floatingnumber*	neutralHadIsoBoost
+# BoostedIsolation	floatingnumber*	chargedHadIsoBoost
 BoostedIsolation	floatingnumber*	SemileptonicPFIso
 BoostedIsolation	floatingnumber*	SemileptonicCorrPFIso
 

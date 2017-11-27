@@ -11,14 +11,13 @@
 #include "MissingEtNtupleObject.h"
 
 
-
 namespace Ntuple {
   class MissingEtNtupleObject;
 }
 
 namespace UZH {
   
-  /**
+  /*
    *  @short Class that maps MissingEtNtupleObjects to MissingEt Particle class
    *
    *         This class can be used to map the offline MissingEt information from
@@ -29,25 +28,24 @@ namespace UZH {
    *
    */
   
-  class MissingEt : public Basic 
-  
-  {
-  public:
-  
-    /// default c'tor
+  class MissingEt : public Basic {
+    
+    public:
+    
+    // default constructor
     MissingEt();
-    /// default d'tor
+    
+    // default destructor
     ~MissingEt();
     
-    /// c'tor with index
+    // constructor with index
     MissingEt( const Ntuple::MissingEtNtupleObject* ana, const Int_t idx );
     
-    
+    TLorentzVector* getTLV() const;
+    TLorentzVector tlv() const;
     
     // variable definitions
-    
-    
-        floatingnumber* m_sumEt;
+    floatingnumber* m_sumEt;
     floatingnumber* m_corrPx;
     floatingnumber* m_corrPy;
     floatingnumber* m_significance;
@@ -62,15 +60,9 @@ namespace UZH {
     floatingnumber* m_cov00;
     floatingnumber* m_cov10;
     floatingnumber* m_cov11;
-
     
-    
-
-    
-    
-
-    // check level given here must be consistent with ...NtupleObject.cxx, otherwise you'll get a segfault
-        floatingnumber sumEt() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MissingEtNtupleObject::ksumEt)) std::cout<<"sumEt not connected!"<<std::endl;*/ return *(m_sumEt); } 
+    // there must be consistent with ...NtupleObject.cxx, otherwise you'll get a segfault
+    floatingnumber sumEt() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MissingEtNtupleObject::ksumEt)) std::cout<<"sumEt not connected!"<<std::endl;*/ return *(m_sumEt); } 
     floatingnumber corrPx() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MissingEtNtupleObject::kcorrPx)) std::cout<<"corrPx not connected!"<<std::endl;*/ return *(m_corrPx); } 
     floatingnumber corrPy() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MissingEtNtupleObject::kcorrPy)) std::cout<<"corrPy not connected!"<<std::endl;*/ return *(m_corrPy); } 
     floatingnumber significance() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MissingEtNtupleObject::ksignificance)) std::cout<<"significance not connected!"<<std::endl;*/ return *(m_significance); } 
@@ -85,8 +77,8 @@ namespace UZH {
     floatingnumber cov00() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MissingEtNtupleObject::kcov00)) std::cout<<"cov00 not connected!"<<std::endl;*/ return *(m_cov00); } 
     floatingnumber cov10() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MissingEtNtupleObject::kcov10)) std::cout<<"cov10 not connected!"<<std::endl;*/ return *(m_cov10); } 
     floatingnumber cov11() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MissingEtNtupleObject::kcov11)) std::cout<<"cov11 not connected!"<<std::endl;*/ return *(m_cov11); } 
-    
-        void sumEt( const floatingnumber& val){ *(m_sumEt)=val; } 
+        
+    void sumEt( const floatingnumber& val){ *(m_sumEt)=val; } 
     void corrPx( const floatingnumber& val){ *(m_corrPx)=val; } 
     void corrPy( const floatingnumber& val){ *(m_corrPy)=val; } 
     void significance( const floatingnumber& val){ *(m_significance)=val; } 
@@ -101,24 +93,22 @@ namespace UZH {
     void cov00( const floatingnumber& val){ *(m_cov00)=val; } 
     void cov10( const floatingnumber& val){ *(m_cov10)=val; } 
     void cov11( const floatingnumber& val){ *(m_cov11)=val; } 
+        
     
+    private:
     
-  private:
     const Ntuple::MissingEtNtupleObject* m_ana;
     
   }; // class MissingEt
-
+  
   typedef std::vector< MissingEt > MissingEtVec;
   typedef std::vector< MissingEt >::iterator MissingEtVecIt;
   typedef std::vector< MissingEt >::const_iterator MissingEtVecConstIt;
-
   
-
 } // end of namespace UZH
 
-/// output stream operator overloaded for MissingEt objects
+// output stream operator overloaded for MissingEt objects
 std::ostream& operator<<( std::ostream& out,
                           const UZH::MissingEt& rhs );
-
 
 #endif //__UZH_MissingEt_H__

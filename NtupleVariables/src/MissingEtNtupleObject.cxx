@@ -6,73 +6,69 @@
 #include "../include/MissingEtNtupleObject.h"
 
 namespace Ntuple {
-
-  MissingEtNtupleObject::MissingEtNtupleObject( SCycleBaseNTuple* parent )
-    : SInputVariables< SCycleBaseNTuple >( parent ) {
+  
+  MissingEtNtupleObject::MissingEtNtupleObject( SCycleBaseNTuple* parent ) : SInputVariables< SCycleBaseNTuple >( parent ) {
       m_connectsucceeded.resize(kEnd);
   }
-
+  
   void MissingEtNtupleObject::setConnectSucceeded(const unsigned int index, const bool success) {
     if (m_connectsucceeded.size() < index+1)  m_connectsucceeded.resize(index+1);
     m_connectsucceeded.at(index) = success;
   }
-
+  
   void MissingEtNtupleObject::ConnectVariables( const TString& treeName,
-                                         const TString& prefix,
-                                         const TString& ntupleType ) throw( SError ) {
-   
+                                           const TString& prefix,
+                                           const TString& ntupleType ) throw( SError ) {
      MissingEtNtupleObject::ConnectVariables( treeName, Ntuple::MissingEtAll, prefix, ntupleType);
-                                         
-  }                                         
-
+  }
+  
   void MissingEtNtupleObject::ConnectVariables( const TString& treeName,
-                                         UInt_t detail_level,
-                                         const TString& prefix,
-                                         const TString& ntupleType ) throw( SError ) {
-                                         
+                                           UInt_t detail_level,
+                                           const TString& prefix,
+                                           const TString& ntupleType ) throw( SError ) {
+    
     // get instance of NtupleObjectNames
     NtupleObjectNames m_objectNames(ntupleType);
     
     
     // connect variables that are defined in Particle.cxx
-        
     
-
     // connect object specific variables
-if(  ((detail_level & Ntuple::MissingEtAnalysis) == Ntuple::MissingEtAnalysis)  ) {
-     setConnectSucceeded(3, ConnectVariable( treeName, prefix + m_objectNames.getName("sumEt"), sumEt)); 
-    setConnectSucceeded(4, ConnectVariable( treeName, prefix + m_objectNames.getName("corrPx"), corrPx)); 
-    setConnectSucceeded(5, ConnectVariable( treeName, prefix + m_objectNames.getName("corrPy"), corrPy)); 
-    setConnectSucceeded(6, ConnectVariable( treeName, prefix + m_objectNames.getName("significance"), significance)); 
-} // end of detail level Analysis
-
-if(  ((detail_level & Ntuple::MissingEtAnalysisSyst) == Ntuple::MissingEtAnalysisSyst)  ) {
-     setConnectSucceeded(10, ConnectVariable( treeName, prefix + m_objectNames.getName("JetEnUp"), JetEnUp)); 
-    setConnectSucceeded(11, ConnectVariable( treeName, prefix + m_objectNames.getName("JetEnDown"), JetEnDown)); 
-    setConnectSucceeded(12, ConnectVariable( treeName, prefix + m_objectNames.getName("JetResUp"), JetResUp)); 
-    setConnectSucceeded(13, ConnectVariable( treeName, prefix + m_objectNames.getName("JetResDown"), JetResDown)); 
-    setConnectSucceeded(14, ConnectVariable( treeName, prefix + m_objectNames.getName("UnclusteredEnUp"), UnclusteredEnUp)); 
-    setConnectSucceeded(15, ConnectVariable( treeName, prefix + m_objectNames.getName("UnclusteredEnDown"), UnclusteredEnDown)); 
-} // end of detail level AnalysisSyst
-
-if(  ((detail_level & Ntuple::MissingEtBasic) == Ntuple::MissingEtBasic)  ) {
-     setConnectSucceeded(1, ConnectVariable( treeName, prefix + m_objectNames.getName("et"), et)); 
-    setConnectSucceeded(2, ConnectVariable( treeName, prefix + m_objectNames.getName("phi"), phi)); 
-} // end of detail level Basic
-
-if(  ((detail_level & Ntuple::MissingEtCovAnalysis) == Ntuple::MissingEtCovAnalysis)  ) {
-     setConnectSucceeded(7, ConnectVariable( treeName, prefix + m_objectNames.getName("cov00"), cov00)); 
-    setConnectSucceeded(8, ConnectVariable( treeName, prefix + m_objectNames.getName("cov10"), cov10)); 
-    setConnectSucceeded(9, ConnectVariable( treeName, prefix + m_objectNames.getName("cov11"), cov11)); 
-}
-
-
-        
+    
+    if(  ((detail_level & Ntuple::MissingEtAnalysis) == Ntuple::MissingEtAnalysis)  ) {
+      setConnectSucceeded(3, ConnectVariable( treeName, prefix + m_objectNames.getName("sumEt"), sumEt));
+      setConnectSucceeded(4, ConnectVariable( treeName, prefix + m_objectNames.getName("corrPx"), corrPx));
+      setConnectSucceeded(5, ConnectVariable( treeName, prefix + m_objectNames.getName("corrPy"), corrPy));
+      setConnectSucceeded(6, ConnectVariable( treeName, prefix + m_objectNames.getName("significance"), significance));
+    } // end of detail level Analysis
+    
+    if(  ((detail_level & Ntuple::MissingEtAnalysisSyst) == Ntuple::MissingEtAnalysisSyst)  ) {
+      setConnectSucceeded(10, ConnectVariable( treeName, prefix + m_objectNames.getName("JetEnUp"), JetEnUp));
+      setConnectSucceeded(11, ConnectVariable( treeName, prefix + m_objectNames.getName("JetEnDown"), JetEnDown));
+      setConnectSucceeded(12, ConnectVariable( treeName, prefix + m_objectNames.getName("JetResUp"), JetResUp));
+      setConnectSucceeded(13, ConnectVariable( treeName, prefix + m_objectNames.getName("JetResDown"), JetResDown));
+      setConnectSucceeded(14, ConnectVariable( treeName, prefix + m_objectNames.getName("UnclusteredEnUp"), UnclusteredEnUp));
+      setConnectSucceeded(15, ConnectVariable( treeName, prefix + m_objectNames.getName("UnclusteredEnDown"), UnclusteredEnDown));
+    } // end of detail level AnalysisSyst
+    
+    if(  ((detail_level & Ntuple::MissingEtBasic) == Ntuple::MissingEtBasic)  ) {
+      setConnectSucceeded(1, ConnectVariable( treeName, prefix + m_objectNames.getName("et"), et));
+      setConnectSucceeded(2, ConnectVariable( treeName, prefix + m_objectNames.getName("phi"), phi));
+    } // end of detail level Basic
+    
+    if(  ((detail_level & Ntuple::MissingEtCovAnalysis) == Ntuple::MissingEtCovAnalysis)  ) {
+      setConnectSucceeded(7, ConnectVariable( treeName, prefix + m_objectNames.getName("cov00"), cov00));
+      setConnectSucceeded(8, ConnectVariable( treeName, prefix + m_objectNames.getName("cov10"), cov10));
+      setConnectSucceeded(9, ConnectVariable( treeName, prefix + m_objectNames.getName("cov11"), cov11));
+    } // end of detail level CovAnalysis
+    
+    
     // save actual detail_level
     detailLevel = detail_level;
-
+    
     return;
-
+    
   }
 
 } // namespace Ntuple
+

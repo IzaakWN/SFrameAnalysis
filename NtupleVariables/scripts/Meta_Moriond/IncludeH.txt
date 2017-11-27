@@ -20,7 +20,7 @@ namespace Ntuple {
 
 namespace UZH {
   
-  /**
+  /*
    *  @short Class that maps ${Object}NtupleObjects to ${Object} Particle class
    *
    *         This class can be used to map the offline ${Object} information from
@@ -31,79 +31,69 @@ namespace UZH {
    *
    */
   
-  class ${Object} : public Basic 
-  ${{Only:Jet,Muon,Electron,Tau,TruthJet,GenParticle: , public Particle }}
-  {
-  public:
-  
-    /// default c'tor
+  class ${Object} : public Basic ${{Only:Jet,Muon,Electron,Tau,TruthJet,GenParticle:, public Particle }} {
+    
+    public:
+    
+    // default constructor
     ${Object}();
-    /// default d'tor
+    
+    // default destructor
     ~${Object}();
     
-    /// c'tor with index
+    // constructor with index
     ${Object}( const Ntuple::${Object}NtupleObject* ana, const Int_t idx );
-    ${{Only:Muon,Electron,Tau,Jet,TruthJet,GenParticle:
+    ${{Only:Muon,Electron,Tau,Jet,TruthJet,GenParticle,MissingEt:
     TLorentzVector* getTLV() const;
     TLorentzVector tlv() const;
     }}
-    ${{Only:GenParticle: floatingnumber DeltaR(const ${Object}& p) const; }}
-    
+    ${{Only:GenParticle:floatingnumber DeltaR(const ${Object}& p) const;
+    }}
     // variable definitions
-    ${{Only:Jet,TruthJet:
-    bool            m_isTagged; ///< user-level flag to indicate b-tag
-    }}
-    ${{Only:Jet:
-    floatingnumber  m_scalefactor; ///< scale factor for JES shifts (0 for nominal JES)
-    }}
-    ${{AllVars:    #type# m_#name#;}}
-    
+    ${{Only:Jet,TruthJet:bool m_isTagged; ///< user-level flag to indicate b-tag}}
+    ${{Only:Jet:floatingnumber  m_scalefactor; ///< scale factor for JES shifts (0 for nominal JES)}}
+    ${{AllVars:#type# m_#name#;}}
     ${{Only:Electron:
-    /// delta(R) function using the cluster eta/phi position of the electrons
-    // floatingnumber DeltaRcluster( const Particle* p ) const;
-    
-    /// delta(R) function using the track eta/phi position of the electrons
-    // floatingnumber DeltaRtrack( const Particle* p ) const;
+    // delta(R) function using the cluster eta/phi position of the electrons
+    //floatingnumber DeltaRcluster( const Particle* p ) const;
+    // delta(R) function using the track eta/phi position of the electrons
+    //floatingnumber DeltaRtrack( const Particle* p ) const;
     }}
-
     ${{Only:Jet,TruthJet:
     void           setTagged( const bool isTagged = true ) { m_isTagged = isTagged; }
     bool           isTagged() const { return m_isTagged; }
     }}
     ${{Only:Jet:
-      floatingnumber getJetSF() const { return m_scalefactor; }
-      void           scaleJES( const floatingnumber scale);
+    floatingnumber getJetSF() const { return m_scalefactor; }
+    void           scaleJES(  const floatingnumber scale);
     }}
-
-    // check level given here must be consistent with ...NtupleObject.cxx, otherwise you'll get a segfault
-    ${{AllVars:    #type# #name#() const { /*if(!m_ana->getConnectSucceeded(Ntuple::${Object}NtupleObject::k#name#)) std::cout<<"#name# not connected!"<<std::endl;*/ return *(m_#name#);NOPOINTER } }}    
-    ${{AllVars:    void #name#( const #type#& val){ *(m_#name#)=val;NOPOINTER } }}    
+    // there must be consistent with ...NtupleObject.cxx, otherwise you'll get a segfault
+    ${{AllVars:#type# #name#() const { /*if(!m_ana->getConnectSucceeded(Ntuple::${Object}NtupleObject::k#name#)) std::cout<<"#name# not connected!"<<std::endl;*/ return *(m_#name#);NOPOINTER } }}    
+    ${{AllVars:void #name#( const #type#& val){ *(m_#name#)=val;NOPOINTER } }}    
     
-  private:
+    private:
+    
     const Ntuple::${Object}NtupleObject* m_ana;
     
   }; // class ${Object}
-
+  
   typedef std::vector< ${Object} > ${Object}Vec;
   typedef std::vector< ${Object} >::iterator ${Object}VecIt;
   typedef std::vector< ${Object} >::const_iterator ${Object}VecConstIt;
-
   ${{Only:Muon,Electron,Tau,Jet:
-  /// sort ${Object}s by pT
+  // sort ${Object}s by pT
   bool operator<( const ${Object}& e1, const ${Object}& e2 );
-
-  /// function class to sort ${Object} vector contents by pT
+  
+  // function class to sort ${Object} vector contents by pT
   class sort${Object}Pt {
     public:
       bool operator()( const ${Object}& e1, const ${Object}& e2 );
-  };
-  }}
-
+  };}}
+  
 } // end of namespace UZH
 
-/// output stream operator overloaded for ${Object} objects
+// output stream operator overloaded for ${Object} objects
 std::ostream& operator<<( std::ostream& out,
                           const UZH::${Object}& rhs );
-
 
 #endif //__UZH_${Object}_H__

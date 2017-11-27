@@ -20,7 +20,7 @@ namespace Ntuple {
 
 namespace UZH {
   
-  /**
+  /*
    *  @short Class that maps MuonNtupleObjects to Muon Particle class
    *
    *         This class can be used to map the offline Muon information from
@@ -31,36 +31,25 @@ namespace UZH {
    *
    */
   
-  class Muon : public Basic 
-   , public Particle 
-  {
-  public:
-  
-    /// default c'tor
+  class Muon : public Basic , public Particle  {
+    
+    public:
+    
+    // default constructor
     Muon();
-    /// default d'tor
+    
+    // default destructor
     ~Muon();
     
-    /// c'tor with index
+    // constructor with index
     Muon( const Ntuple::MuonNtupleObject* ana, const Int_t idx );
     
     TLorentzVector* getTLV() const;
     TLorentzVector tlv() const;
     
-    
-    
     // variable definitions
-    
-    
-        floatingnumber* m_charge;
+    floatingnumber* m_charge;
     int* m_pdgId;
-    floatingnumber* m_pfRhoCorrRelIso03Boost;
-    floatingnumber* m_pfRhoCorrRelIso04Boost;
-    floatingnumber* m_pfDeltaCorrRelIsoBoost;
-    floatingnumber* m_pfRelIsoBoost;
-    floatingnumber* m_photonIsoBoost;
-    floatingnumber* m_neutralHadIsoBoost;
-    floatingnumber* m_chargedHadIsoBoost;
     floatingnumber* m_SemileptonicPFIso;
     floatingnumber* m_SemileptonicCorrPFIso;
     int* m_isHighPtMuon;
@@ -91,23 +80,10 @@ namespace UZH {
     int* m_pixelHits;
     int* m_globalHits;
     floatingnumber* m_normChi2;
-
     
-    
-
-    
-    
-
-    // check level given here must be consistent with ...NtupleObject.cxx, otherwise you'll get a segfault
-        floatingnumber charge() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MuonNtupleObject::kcharge)) std::cout<<"charge not connected!"<<std::endl;*/ return *(m_charge); } 
+    // there must be consistent with ...NtupleObject.cxx, otherwise you'll get a segfault
+    floatingnumber charge() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MuonNtupleObject::kcharge)) std::cout<<"charge not connected!"<<std::endl;*/ return *(m_charge); } 
     int pdgId() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MuonNtupleObject::kpdgId)) std::cout<<"pdgId not connected!"<<std::endl;*/ return *(m_pdgId); } 
-    floatingnumber pfRhoCorrRelIso03Boost() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MuonNtupleObject::kpfRhoCorrRelIso03Boost)) std::cout<<"pfRhoCorrRelIso03Boost not connected!"<<std::endl;*/ return *(m_pfRhoCorrRelIso03Boost); } 
-    floatingnumber pfRhoCorrRelIso04Boost() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MuonNtupleObject::kpfRhoCorrRelIso04Boost)) std::cout<<"pfRhoCorrRelIso04Boost not connected!"<<std::endl;*/ return *(m_pfRhoCorrRelIso04Boost); } 
-    floatingnumber pfDeltaCorrRelIsoBoost() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MuonNtupleObject::kpfDeltaCorrRelIsoBoost)) std::cout<<"pfDeltaCorrRelIsoBoost not connected!"<<std::endl;*/ return *(m_pfDeltaCorrRelIsoBoost); } 
-    floatingnumber pfRelIsoBoost() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MuonNtupleObject::kpfRelIsoBoost)) std::cout<<"pfRelIsoBoost not connected!"<<std::endl;*/ return *(m_pfRelIsoBoost); } 
-    floatingnumber photonIsoBoost() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MuonNtupleObject::kphotonIsoBoost)) std::cout<<"photonIsoBoost not connected!"<<std::endl;*/ return *(m_photonIsoBoost); } 
-    floatingnumber neutralHadIsoBoost() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MuonNtupleObject::kneutralHadIsoBoost)) std::cout<<"neutralHadIsoBoost not connected!"<<std::endl;*/ return *(m_neutralHadIsoBoost); } 
-    floatingnumber chargedHadIsoBoost() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MuonNtupleObject::kchargedHadIsoBoost)) std::cout<<"chargedHadIsoBoost not connected!"<<std::endl;*/ return *(m_chargedHadIsoBoost); } 
     floatingnumber SemileptonicPFIso() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MuonNtupleObject::kSemileptonicPFIso)) std::cout<<"SemileptonicPFIso not connected!"<<std::endl;*/ return *(m_SemileptonicPFIso); } 
     floatingnumber SemileptonicCorrPFIso() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MuonNtupleObject::kSemileptonicCorrPFIso)) std::cout<<"SemileptonicCorrPFIso not connected!"<<std::endl;*/ return *(m_SemileptonicCorrPFIso); } 
     int isHighPtMuon() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MuonNtupleObject::kisHighPtMuon)) std::cout<<"isHighPtMuon not connected!"<<std::endl;*/ return *(m_isHighPtMuon); } 
@@ -138,16 +114,9 @@ namespace UZH {
     int pixelHits() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MuonNtupleObject::kpixelHits)) std::cout<<"pixelHits not connected!"<<std::endl;*/ return *(m_pixelHits); } 
     int globalHits() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MuonNtupleObject::kglobalHits)) std::cout<<"globalHits not connected!"<<std::endl;*/ return *(m_globalHits); } 
     floatingnumber normChi2() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MuonNtupleObject::knormChi2)) std::cout<<"normChi2 not connected!"<<std::endl;*/ return *(m_normChi2); } 
-    
-        void charge( const floatingnumber& val){ *(m_charge)=val; } 
+        
+    void charge( const floatingnumber& val){ *(m_charge)=val; } 
     void pdgId( const int& val){ *(m_pdgId)=val; } 
-    void pfRhoCorrRelIso03Boost( const floatingnumber& val){ *(m_pfRhoCorrRelIso03Boost)=val; } 
-    void pfRhoCorrRelIso04Boost( const floatingnumber& val){ *(m_pfRhoCorrRelIso04Boost)=val; } 
-    void pfDeltaCorrRelIsoBoost( const floatingnumber& val){ *(m_pfDeltaCorrRelIsoBoost)=val; } 
-    void pfRelIsoBoost( const floatingnumber& val){ *(m_pfRelIsoBoost)=val; } 
-    void photonIsoBoost( const floatingnumber& val){ *(m_photonIsoBoost)=val; } 
-    void neutralHadIsoBoost( const floatingnumber& val){ *(m_neutralHadIsoBoost)=val; } 
-    void chargedHadIsoBoost( const floatingnumber& val){ *(m_chargedHadIsoBoost)=val; } 
     void SemileptonicPFIso( const floatingnumber& val){ *(m_SemileptonicPFIso)=val; } 
     void SemileptonicCorrPFIso( const floatingnumber& val){ *(m_SemileptonicCorrPFIso)=val; } 
     void isHighPtMuon( const int& val){ *(m_isHighPtMuon)=val; } 
@@ -178,34 +147,31 @@ namespace UZH {
     void pixelHits( const int& val){ *(m_pixelHits)=val; } 
     void globalHits( const int& val){ *(m_globalHits)=val; } 
     void normChi2( const floatingnumber& val){ *(m_normChi2)=val; } 
+        
     
+    private:
     
-  private:
     const Ntuple::MuonNtupleObject* m_ana;
     
   }; // class Muon
-
+  
   typedef std::vector< Muon > MuonVec;
   typedef std::vector< Muon >::iterator MuonVecIt;
   typedef std::vector< Muon >::const_iterator MuonVecConstIt;
-
   
-  /// sort Muons by pT
+  // sort Muons by pT
   bool operator<( const Muon& e1, const Muon& e2 );
-
-  /// function class to sort Muon vector contents by pT
+  
+  // function class to sort Muon vector contents by pT
   class sortMuonPt {
     public:
-      bool operator()( const Muon& e1,
-                       const Muon& e2 );
+      bool operator()( const Muon& e1, const Muon& e2 );
   };
   
-
 } // end of namespace UZH
 
-/// output stream operator overloaded for Muon objects
+// output stream operator overloaded for Muon objects
 std::ostream& operator<<( std::ostream& out,
                           const UZH::Muon& rhs );
-
 
 #endif //__UZH_Muon_H__

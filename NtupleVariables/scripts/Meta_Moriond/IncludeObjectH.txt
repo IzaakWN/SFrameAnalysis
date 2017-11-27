@@ -24,68 +24,64 @@
 #include "plug-ins/include/SInputVariables.h"
 
 namespace Ntuple {
-
-  /**
-  *  @short Class that can read the variables produced by ${Object}NtupleObject
-  *
-  *         This class can be used to read the offline muon information from
-  *         an ntuple produced by the SingleTopDPDMaker code.
-  *
-  * @author ${Program}  
-  *
-  */
+  
+  /*
+   *  @short Class that can read the variables produced by ${Object}NtupleObject
+   *
+   *         This class can be used to read the offline muon information from
+   *         an ntuple produced by the SingleTopDPDMaker code.
+   *
+   * @author ${Program}  
+   *
+   */
   
   enum ${Object}Details {
-${{Enums: }}
+    ${{Enums:}}
   };
   
   // forward declaration of NtupleObjectNames
   class NtupleObjectNames;
   class ${Object}NtupleObject : public SInputVariables< SCycleBaseNTuple > {
-
+    
     public:
-    /// Constructor specifying the parent of the object
+    
+    // constructor specifying the parent of the object
     ${Object}NtupleObject( SCycleBaseNTuple* parent );
-
-    /// remember if connect succeeded
+    
+    // remember if connect succeeded
     void setConnectSucceeded(const unsigned int index, const bool success);
     bool getConnectSucceeded(const unsigned int index) const {return m_connectsucceeded.at(index);}  
-
-    /// Connect the variables to the input branches
+    
+    // connect the variables to the input branches
     void ConnectVariables( const TString& treeName,
                            UInt_t detail_level = 0,
                            const TString& prefix = "${Object}_",
                            const TString& ntupleType = "NtupleMakerNtuple" ) throw( SError );
-
+    
     void ConnectVariables( const TString& treeName,
                            const TString& prefix = "${Object}_",
                            const TString& ntupleType = "NtupleMakerNtuple" ) throw( SError );
-
-    int getDetailLevel() const {return detailLevel;}   
-
-${{Only:Muon,Electron,Tau,Jet,TruthJet,GenParticle:
-    // particle vector size
-    Int_t                   N;
-}}   
-    enum ConnectionIndex { 
-${{AllVars:     k#usename#=#index#, }} 
-      kEnd 
-    }; 
-
-
-    // vectors of properties defined in Particle.h
-${{AllBasics:    std::vector< floatingnumber >  *#name#;}}    
-
     
+    int getDetailLevel() const { return detailLevel; }
+    ${{Only:Muon,Electron,Tau,Jet,TruthJet,GenParticle:
+    // particle vector size
+    Int_t N;
+    }}
+    enum ConnectionIndex { 
+      ${{AllVars:k#usename# = #index#,}}kEnd
+    }; 
+    
+    
+    // vectors of properties defined in Particle.h
+    ${{AllBasics:std::vector< floatingnumber >  *#name#;}} 
     // vectors of object specific variables
-${{AllVars:    std::vector< #type# >  *#name#;NOPOINTER}}
-
+    ${{AllVars:std::vector< #type# >  *#name#;NOPOINTER}}
     std::vector<int> m_connectsucceeded;
-
+    
     // save actual detail level and group
     Int_t detailLevel;
     std::string detailGroup;
-
+    
   }; // class ${Object}NtupleObject
 
 } // namespace Ntuple

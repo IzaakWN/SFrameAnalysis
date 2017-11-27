@@ -24,82 +24,78 @@
 #include "plug-ins/include/SInputVariables.h"
 
 namespace Ntuple {
-
-  /**
-  *  @short Class that can read the variables produced by GenParticleNtupleObject
-  *
-  *         This class can be used to read the offline muon information from
-  *         an ntuple produced by the SingleTopDPDMaker code.
-  *
-  * @author Code produced by Id: CodeIt.py 494 2010-07-30 13:41:32Z svn   
-  *
-  */
+  
+  /*
+   *  @short Class that can read the variables produced by GenParticleNtupleObject
+   *
+   *         This class can be used to read the offline muon information from
+   *         an ntuple produced by the SingleTopDPDMaker code.
+   *
+   * @author Code produced by Id: CodeIt.py 494 2010-07-30 13:41:32Z svn   
+   *
+   */
   
   enum GenParticleDetails {
     GenParticleTauDecayAnalysis = 1,
     GenParticleBasic = 2,
     GenParticleAll = 3,
-
   };
   
   // forward declaration of NtupleObjectNames
   class NtupleObjectNames;
   class GenParticleNtupleObject : public SInputVariables< SCycleBaseNTuple > {
-
+    
     public:
-    /// Constructor specifying the parent of the object
+    
+    // constructor specifying the parent of the object
     GenParticleNtupleObject( SCycleBaseNTuple* parent );
-
-    /// remember if connect succeeded
+    
+    // remember if connect succeeded
     void setConnectSucceeded(const unsigned int index, const bool success);
     bool getConnectSucceeded(const unsigned int index) const {return m_connectsucceeded.at(index);}  
-
-    /// Connect the variables to the input branches
+    
+    // connect the variables to the input branches
     void ConnectVariables( const TString& treeName,
                            UInt_t detail_level = 0,
                            const TString& prefix = "GenParticle_",
                            const TString& ntupleType = "NtupleMakerNtuple" ) throw( SError );
-
+    
     void ConnectVariables( const TString& treeName,
                            const TString& prefix = "GenParticle_",
                            const TString& ntupleType = "NtupleMakerNtuple" ) throw( SError );
-
-    int getDetailLevel() const {return detailLevel;}   
-
-
+    
+    int getDetailLevel() const { return detailLevel; }
+    
     // particle vector size
-    Int_t                   N;
-   
+    Int_t N;
+    
     enum ConnectionIndex { 
-     kpdgId=1, 
-     kstatus=2, 
-     kmother=3, 
-     knMoth=4, 
-     knDau=5, 
-     kdau=6, 
-     kisPrompt=7, 
-     kisDirectPromptTauDecayProduct=8, 
-     kfromHardProcessFinalState=9, 
-     kisDirectHardProcessTauDecayProductFinalState=10, 
-     ktauvispt=11, 
-     ktauviseta=12, 
-     ktauvisphi=13, 
-     ktauvismass=14, 
-     ktaudecay=15, 
- 
-      kEnd 
+      kpdgId = 1,
+      kstatus = 2,
+      kmother = 3,
+      knMoth = 4,
+      knDau = 5,
+      kdau = 6,
+      kisPrompt = 7,
+      kisDirectPromptTauDecayProduct = 8,
+      kfromHardProcessFinalState = 9,
+      kisDirectHardProcessTauDecayProductFinalState = 10,
+      ktauvispt = 11,
+      ktauviseta = 12,
+      ktauvisphi = 13,
+      ktauvismass = 14,
+      ktaudecay = 15,
+      kEnd
     }; 
-
-
+    
+    
     // vectors of properties defined in Particle.h
-    std::vector< floatingnumber >  *e;
     std::vector< floatingnumber >  *pt;
     std::vector< floatingnumber >  *eta;
     std::vector< floatingnumber >  *phi;
     std::vector< floatingnumber >  *m;
-    
-
-    
+    std::vector< floatingnumber >  *e;
+     
     // vectors of object specific variables
     std::vector< int >  *pdgId;
     std::vector< int >  *status;
@@ -116,14 +112,13 @@ namespace Ntuple {
     std::vector< floatingnumber >  *tauvisphi;
     std::vector< floatingnumber >  *tauvismass;
     std::vector< int >  *taudecay;
-
-
+    
     std::vector<int> m_connectsucceeded;
-
+    
     // save actual detail level and group
     Int_t detailLevel;
     std::string detailGroup;
-
+    
   }; // class GenParticleNtupleObject
 
 } // namespace Ntuple

@@ -11,14 +11,13 @@
 #include "TauNtupleObject.h"
 
 
-
 namespace Ntuple {
   class TauNtupleObject;
 }
 
 namespace UZH {
   
-  /**
+  /*
    *  @short Class that maps TauNtupleObjects to Tau Particle class
    *
    *         This class can be used to map the offline Tau information from
@@ -29,28 +28,24 @@ namespace UZH {
    *
    */
   
-  class Tau : public Basic 
-   , public Particle 
-  {
-  public:
-  
-    /// default c'tor
+  class Tau : public Basic , public Particle  {
+    
+    public:
+    
+    // default constructor
     Tau();
-    /// default d'tor
+    
+    // default destructor
     ~Tau();
     
-    /// c'tor with index
+    // constructor with index
     Tau( const Ntuple::TauNtupleObject* ana, const Int_t idx );
     
     TLorentzVector* getTLV() const;
     TLorentzVector tlv() const;
     
-    
-    
     // variable definitions
-    
-    
-        floatingnumber* m_decayModeFindingNewDMs;
+    floatingnumber* m_decayModeFindingNewDMs;
     floatingnumber* m_decayModeFinding;
     floatingnumber* m_byLooseCombinedIsolationDeltaBetaCorr3Hits;
     floatingnumber* m_byMediumCombinedIsolationDeltaBetaCorr3Hits;
@@ -126,15 +121,9 @@ namespace UZH {
     floatingnumber* m_dz;
     int* m_TauType;
     int* m_decayMode;
-
     
-    
-
-    
-    
-
-    // check level given here must be consistent with ...NtupleObject.cxx, otherwise you'll get a segfault
-        floatingnumber decayModeFindingNewDMs() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kdecayModeFindingNewDMs)) std::cout<<"decayModeFindingNewDMs not connected!"<<std::endl;*/ return *(m_decayModeFindingNewDMs); } 
+    // there must be consistent with ...NtupleObject.cxx, otherwise you'll get a segfault
+    floatingnumber decayModeFindingNewDMs() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kdecayModeFindingNewDMs)) std::cout<<"decayModeFindingNewDMs not connected!"<<std::endl;*/ return *(m_decayModeFindingNewDMs); } 
     floatingnumber decayModeFinding() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kdecayModeFinding)) std::cout<<"decayModeFinding not connected!"<<std::endl;*/ return *(m_decayModeFinding); } 
     floatingnumber byLooseCombinedIsolationDeltaBetaCorr3Hits() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyLooseCombinedIsolationDeltaBetaCorr3Hits)) std::cout<<"byLooseCombinedIsolationDeltaBetaCorr3Hits not connected!"<<std::endl;*/ return *(m_byLooseCombinedIsolationDeltaBetaCorr3Hits); } 
     floatingnumber byMediumCombinedIsolationDeltaBetaCorr3Hits() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyMediumCombinedIsolationDeltaBetaCorr3Hits)) std::cout<<"byMediumCombinedIsolationDeltaBetaCorr3Hits not connected!"<<std::endl;*/ return *(m_byMediumCombinedIsolationDeltaBetaCorr3Hits); } 
@@ -210,8 +199,8 @@ namespace UZH {
     floatingnumber dz() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kdz)) std::cout<<"dz not connected!"<<std::endl;*/ return *(m_dz); } 
     int TauType() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kTauType)) std::cout<<"TauType not connected!"<<std::endl;*/ return *(m_TauType); } 
     int decayMode() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kdecayMode)) std::cout<<"decayMode not connected!"<<std::endl;*/ return *(m_decayMode); } 
-    
-        void decayModeFindingNewDMs( const floatingnumber& val){ *(m_decayModeFindingNewDMs)=val; } 
+        
+    void decayModeFindingNewDMs( const floatingnumber& val){ *(m_decayModeFindingNewDMs)=val; } 
     void decayModeFinding( const floatingnumber& val){ *(m_decayModeFinding)=val; } 
     void byLooseCombinedIsolationDeltaBetaCorr3Hits( const floatingnumber& val){ *(m_byLooseCombinedIsolationDeltaBetaCorr3Hits)=val; } 
     void byMediumCombinedIsolationDeltaBetaCorr3Hits( const floatingnumber& val){ *(m_byMediumCombinedIsolationDeltaBetaCorr3Hits)=val; } 
@@ -287,34 +276,31 @@ namespace UZH {
     void dz( const floatingnumber& val){ *(m_dz)=val; } 
     void TauType( const int& val){ *(m_TauType)=val; } 
     void decayMode( const int& val){ *(m_decayMode)=val; } 
+        
     
+    private:
     
-  private:
     const Ntuple::TauNtupleObject* m_ana;
     
   }; // class Tau
-
+  
   typedef std::vector< Tau > TauVec;
   typedef std::vector< Tau >::iterator TauVecIt;
   typedef std::vector< Tau >::const_iterator TauVecConstIt;
-
   
-  /// sort Taus by pT
+  // sort Taus by pT
   bool operator<( const Tau& e1, const Tau& e2 );
-
-  /// function class to sort Tau vector contents by pT
+  
+  // function class to sort Tau vector contents by pT
   class sortTauPt {
     public:
-      bool operator()( const Tau& e1,
-                       const Tau& e2 );
+      bool operator()( const Tau& e1, const Tau& e2 );
   };
   
-
 } // end of namespace UZH
 
-/// output stream operator overloaded for Tau objects
+// output stream operator overloaded for Tau objects
 std::ostream& operator<<( std::ostream& out,
                           const UZH::Tau& rhs );
-
 
 #endif //__UZH_Tau_H__

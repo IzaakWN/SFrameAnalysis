@@ -43,7 +43,7 @@ namespace UZH {
     
     // constructor with index
     ${Object}( const Ntuple::${Object}NtupleObject* ana, const Int_t idx );
-    ${{Only:Muon,Electron,Tau,Jet,TruthJet,GenParticle:
+    ${{Only:Muon,Electron,Tau,Jet,TruthJet,GenParticle,MissingEt:
     TLorentzVector* getTLV() const;
     TLorentzVector tlv() const;
     }}
@@ -53,6 +53,9 @@ namespace UZH {
     ${{Only:Jet,TruthJet:bool m_isTagged; ///< user-level flag to indicate b-tag}}
     ${{Only:Jet:floatingnumber  m_scalefactor; ///< scale factor for JES shifts (0 for nominal JES)}}
     ${{AllVars:#type# m_#name#;}}
+    ${{Only:Tau,GenParticle:
+    floatingnumber m_e_; // for m_e pointer
+    }}
     ${{Only:Electron:
     // delta(R) function using the cluster eta/phi position of the electrons
     //floatingnumber DeltaRcluster( const Particle* p ) const;

@@ -20,7 +20,8 @@ Tau::Tau( const Ntuple::TauNtupleObject* ana, const Int_t idx ) : Basic( idx ), 
   m_phi = &((*ana->phi)[idx]);
   m_m = &((*ana->m)[idx]);
   
-  calculateE(); // sets m_e in Particle.cxx
+  m_e_ = calculateE();
+  m_e = &(m_e_);
   
   m_lvl = ana->detailLevel;
   
@@ -187,13 +188,13 @@ bool operator<<( const Tau& e1, const Tau& e2 ) {
 
 TLorentzVector* Tau::getTLV() const {
   TLorentzVector* tlv = new TLorentzVector();
-  tlv->SetPtEtaPhiE(*(m_pt), *(m_eta), *(m_phi), *(m_e));
+  tlv->SetPtEtaPhiM(*(m_pt), *(m_eta), *(m_phi), *(m_m));
   return tlv;
 }
 
 TLorentzVector Tau::tlv() const {
   TLorentzVector tlv;
-  tlv.SetPtEtaPhiE(*(m_pt), *(m_eta), *(m_phi), *(m_e));
+  tlv.SetPtEtaPhiM(*(m_pt), *(m_eta), *(m_phi), *(m_m));
   return tlv;
 }
 

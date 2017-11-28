@@ -104,6 +104,9 @@ namespace UZH {
     int* m_TauType;
     int* m_decayMode;
     
+    
+    floatingnumber m_e_; // for m_e pointer
+    
     // there must be consistent with ...NtupleObject.cxx, otherwise you'll get a segfault
     bool decayModeFindingNewDMs() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kdecayModeFindingNewDMs)) std::cout<<"decayModeFindingNewDMs not connected!"<<std::endl;*/ return (m_decayModeFindingNewDMs); } 
     bool decayModeFinding() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kdecayModeFinding)) std::cout<<"decayModeFinding not connected!"<<std::endl;*/ return (m_decayModeFinding); } 

@@ -40,6 +40,10 @@ namespace UZH {
     
     // constructor with index
     MissingEt( const Ntuple::MissingEtNtupleObject* ana, const Int_t idx );
+    
+    TLorentzVector* getTLV() const;
+    TLorentzVector tlv() const;
+    
     // variable definitions
     floatingnumber* m_sumEt;
     floatingnumber* m_corrPx;

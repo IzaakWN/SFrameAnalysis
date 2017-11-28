@@ -76,7 +76,7 @@ class Templater:
     print "\n\tAborting code generation due to error, code is not complete.\n"
     sys.exit(1)
     
-    
+  
   def AddSubst(self, addsubst):
     """Put additional entries into the substitution dictonary."""
     self.subst_table.update(addsubst)
@@ -85,7 +85,7 @@ class Templater:
   def Use_DL(self, use_dl):
     self.use_dl = use_dl
     
-    
+  
   def CodeIt(self, input_template, output_name):
     """Main part, opening files, calling generator functions."""
     print "Starting code generation into", output_name
@@ -117,7 +117,7 @@ class Templater:
     s = string.Template(inline)
     return s.safe_substitute(self.subst_table)
     
-    
+  
   def CodeInserter(self, inserter):
     """More sophisticated parts with code generation, this function
     only passes on to the actual code generations functions."""
@@ -145,7 +145,7 @@ class Templater:
       else:      return "" # reduce unnecessary empty lines
     else:
       return indent+creators[name](indent=indent.replace('\n',''))
-      
+    
   
   def Only(self, args, **kwargs):
     """${{Only:xx: ...}} marks parts which should be included only for certain objects
@@ -159,8 +159,8 @@ class Templater:
       return args[1]
     else: 
       return ''
-      
-      
+    
+  
   def Except(self, args, **kwargs):
     """${{Except:xx: ...}} marks parts which should be excluded for certain objects
     xx is a comma-seperated list of object names."""
@@ -178,7 +178,7 @@ class Templater:
   def AllBasics(self, args, **kwargs):
     """Replicates lines for the basic variables."""
     return self.AllBasicsForVars(args,['pt', 'eta', 'phi', 'm', 'e'], **kwargs)
-  
+    
   
   def AllBasicsExceptE(self, args, **kwargs):
     """Replicates lines for the basic variables. It also
@@ -186,8 +186,8 @@ class Templater:
     if 'NoE' in self.subst_table:
       return self.AllBasicsForVars(args,['pt', 'eta', 'phi', 'm'], **kwargs)
     return self.AllBasics(args, **kwargs)
-  
     
+  
   def AllBasicsForVars(self, args, basicvars, **kwargs):
     """Help function to AllBasics and AllBasicsExceptE."""
     if 'NoBasics' in self.subst_table:
@@ -200,7 +200,7 @@ class Templater:
       line = line.replace("#name#", name)
       result = result + line + "\n"
     return result.replace('\n','\n'+indent)
-  
+    
   
   def AllVars(self, args, **kwargs):
     """Replicates a line for all variables."""
@@ -218,7 +218,7 @@ class Templater:
         line = line.replace("NOPOINTER",'')
       result = result + line + "\n"
     return result.replace('\n','\n'+indent)
-  
+    
   
   def AllVarsDL(self, args, **kwargs):
     """Like AllVars, but with surrounding if statements."""
@@ -261,8 +261,8 @@ class Templater:
     if lastdl > 0:
       result = result + "} // end of detail level %s\n" % lastdl
     return result.replace('\n','\n'+indent)
-
-
+    
+  
   def PrintAllVarsDL(self, args, **kwargs):
     """Like AllVars, but with surrounding if statements."""
     indent = kwargs.get('indent',"")
@@ -314,8 +314,8 @@ class Templater:
     if lastdl == 0:
       result = result + "\n"
     return result.replace('\n','\n'+indent)
-
-
+    
+  
   # for stupid bool variables we need two special functions
   def AllNoBools(self, args, **kwargs):
     """Replicates a line for all variables but bools."""
@@ -328,7 +328,7 @@ class Templater:
         line = line.replace("#%s#" % key, vars[key])
       result = result + line + "\n"
     return result
-
+    
   
   def AllBools(self, args, **kwargs):
     """Replicates a line for all boolean variables."""
@@ -341,8 +341,8 @@ class Templater:
         line = line.replace("#%s#" % key, vars[key])
       result = result + line + "\n"
     return result
+    
   
-
   def Enums(self, **kwargs):
     """Replicates a line for all enums."""
     indent  = kwargs.get('indent',"")
@@ -360,7 +360,7 @@ class Templater:
       lastdl = dl
     result = result + "%sAll = %d," % (objectname, pow(2, counter)-1)
     return result.replace('\n','\n'+indent)
-  
+    
 
 ### Configuration
 os.environ.keys( )

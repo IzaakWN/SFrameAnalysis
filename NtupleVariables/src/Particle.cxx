@@ -6,25 +6,26 @@ using namespace std;
 using namespace UZH;
 
 Particle::Particle() :
-  m_e( 0 ),
-  m_pt( 0 ),
+  m_e(   0 ),
+  m_pt(  0 ),
   m_eta( 0 ),
   m_phi( 0 ),
-  m_m( 0 )
+  m_m(   0 )
 { }
 
 Particle::~Particle() { }
 
-void Particle::calculateE() {
+floatingnumber Particle::calculateE() {
   // TODO: double check validity
   // TLorentzVector::SetXYZM https://root.cern.ch/doc/master/TLorentzVector_8h_source.html#l00342
   // TLorentzVector::SetXYZT https://root.cern.ch/doc/master/TLorentzVector_8h_source.html#l00335
-  floatingnumber e = 0.0;
+  floatingnumber e_ = 0.0;
   if (*(m_m)>=0)
-    e =     sqrt(pow(*(m_pt),2)*(1+pow(sinh(*(m_eta)),2)) + pow(*(m_m),2));
+    e_ = sqrt(     pow(*(m_pt),2)*(1+pow(sinh(*(m_eta)),2)) + pow(*(m_m),2)      );
   else
-    e = max(sqrt(pow(*(m_pt),2)*(1+pow(sinh(*(m_eta)),2)) - pow(*(m_m),2)),0.0);
-  m_e = &(e); // set m_e
+    e_ = sqrt(max( pow(*(m_pt),2)*(1+pow(sinh(*(m_eta)),2)) - pow(*(m_m),2), 0.0 ));
+  
+  return e_;
 }
 
 floatingnumber Particle::DeltaR(const Particle* p) const {

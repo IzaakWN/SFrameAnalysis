@@ -35,12 +35,12 @@ namespace UZH {
     floatingnumber eta() const;
     floatingnumber phi() const;
     floatingnumber m()   const;
-    void e(   floatingnumber val ){ *(m_e)   = val;  }
-    void pt(  floatingnumber val ){ *(m_pt)  = val;  }
-    void eta( floatingnumber val ){ *(m_eta) = val;  }
-    void phi( floatingnumber val ){ *(m_phi) = val;  }
-    void m(   floatingnumber val ){ *(m_m)   = val;  }
-    void calculateE();
+    void e(   floatingnumber val ){ *(m_e)   = val; }
+    void pt(  floatingnumber val ){ *(m_pt)  = val; }
+    void eta( floatingnumber val ){ *(m_eta) = val; }
+    void phi( floatingnumber val ){ *(m_phi) = val; }
+    void m(   floatingnumber val ){ *(m_m)   = val; }
+    floatingnumber calculateE();
     
     TLorentzVector* getTLV() const;
     floatingnumber DeltaR(const Particle* p) const;

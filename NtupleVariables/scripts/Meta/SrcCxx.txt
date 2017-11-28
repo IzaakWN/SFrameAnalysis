@@ -16,7 +16,8 @@ ${Object}::${Object}( const Ntuple::${Object}NtupleObject* ana, const Int_t idx 
   
   // copy variables defined in Particle.h
   ${{AllBasicsExceptE:m_#name# = &((*ana->#name#)[idx]);}}
-  ${{Only:Tau,GenParticle:calculateE(); // sets m_e in Particle.cxx
+  ${{Only:Tau,GenParticle:m_e_ = calculateE();
+  m_e = &(m_e_);
   }}
   m_lvl = ana->detailLevel;
   ${{Only:Jet:m_scalefactor = 0;}}
@@ -60,7 +61,7 @@ bool operator<<( const ${Object}& e1, const ${Object}& e2 ) {
   return sort( e1, e2 );
 }
 }}
-${{Only:Muon,Jet,TruthJet,Electron,Tau:
+${{Only:Muon,Jet,TruthJet,Electron:
 TLorentzVector* ${Object}::getTLV() const {
   TLorentzVector* tlv = new TLorentzVector();
   tlv->SetPtEtaPhiE(*(m_pt), *(m_eta), *(m_phi), *(m_e));
@@ -73,7 +74,7 @@ TLorentzVector ${Object}::tlv() const {
   return tlv;
 }
 }}
-${{Only:GenParticle:
+${{Only:GenParticle,Tau:
 TLorentzVector* ${Object}::getTLV() const {
   TLorentzVector* tlv = new TLorentzVector();
   tlv->SetPtEtaPhiM(*(m_pt), *(m_eta), *(m_phi), *(m_m));
@@ -83,6 +84,20 @@ TLorentzVector* ${Object}::getTLV() const {
 TLorentzVector ${Object}::tlv() const {
   TLorentzVector tlv;
   tlv.SetPtEtaPhiM(*(m_pt), *(m_eta), *(m_phi), *(m_m));
+  return tlv;
+}
+}}
+${{Only:MissingEt:
+TLorentzVector* ${Object}::getTLV() const {
+  TLorentzVector* tlv = new TLorentzVector();
+  tlv->SetPxPyPzE(*(m_et)*cos(*(m_phi)), *(m_et)*sin(*(m_phi)), 0, *(m_et));
+  return tlv;
+}
+
+TLorentzVector ${Object}::tlv() const {
+  TLorentzVector tlv;
+  //tlv.SetPtEtaPhiE(*(m_et), 0.0, *(m_phi), *(m_et));
+  tlv.SetPxPyPzE(*(m_et)*cos(*(m_phi)), *(m_et)*sin(*(m_phi)), 0, *(m_et));
   return tlv;
 }
 }}

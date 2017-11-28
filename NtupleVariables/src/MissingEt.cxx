@@ -87,3 +87,17 @@ ostream& operator<<( ostream& out, const MissingEt& rhs ) {
   return out;
 }
 
+
+TLorentzVector* MissingEt::getTLV() const {
+  TLorentzVector* tlv = new TLorentzVector();
+  tlv->SetPxPyPzE(*(m_et)*cos(*(m_phi)), *(m_et)*sin(*(m_phi)), 0, *(m_et));
+  return tlv;
+}
+
+TLorentzVector MissingEt::tlv() const {
+  TLorentzVector tlv;
+  //tlv.SetPtEtaPhiE(*(m_et), 0.0, *(m_phi), *(m_et));
+  tlv.SetPxPyPzE(*(m_et)*cos(*(m_phi)), *(m_et)*sin(*(m_phi)), 0, *(m_et));
+  return tlv;
+}
+

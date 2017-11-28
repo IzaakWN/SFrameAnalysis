@@ -63,6 +63,9 @@ namespace UZH {
     floatingnumber* m_tauvismass;
     int* m_taudecay;
     
+    
+    floatingnumber m_e_; // for m_e pointer
+    
     // there must be consistent with ...NtupleObject.cxx, otherwise you'll get a segfault
     int pdgId() const { /*if(!m_ana->getConnectSucceeded(Ntuple::GenParticleNtupleObject::kpdgId)) std::cout<<"pdgId not connected!"<<std::endl;*/ return *(m_pdgId); } 
     int status() const { /*if(!m_ana->getConnectSucceeded(Ntuple::GenParticleNtupleObject::kstatus)) std::cout<<"status not connected!"<<std::endl;*/ return *(m_status); } 

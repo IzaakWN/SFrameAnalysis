@@ -20,7 +20,8 @@ GenParticle::GenParticle( const Ntuple::GenParticleNtupleObject* ana, const Int_
   m_phi = &((*ana->phi)[idx]);
   m_m = &((*ana->m)[idx]);
   
-  calculateE(); // sets m_e in Particle.cxx
+  m_e_ = calculateE();
+  m_e = &(m_e_);
   
   m_lvl = ana->detailLevel;
   

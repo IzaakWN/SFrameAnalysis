@@ -1,7 +1,7 @@
-path2xml="$SFRAME_DIR/../BatchSubmission/xmls_postMoriond_T2"
+path2xml="/shome/ineuteli/shared/xml/xmls_MC2017_V1_small"
 path2tmp="$SFRAME_DIR/../AnalysisTemp"
 jobName="WZ"
-outDir="/scratch/$USER/SFrameAnalysis_ltau2017/AnalysisOutput/"+jobName #"$SFRAME_DIR/../AnalysisOutput/"+jobName
+outDir="/scratch/$USER/SFrameAnalysis/AnalysisOutput_ltau2017/"+jobName
 cycleName="TauTauAnalysis"
 nEventsMax=-1
 #nEventsMax=200
@@ -11,29 +11,17 @@ hCPU="04:30:00"
 hVMEM="5000M"
 postFix="_2017"
 dataSets = [
-
-       [ "WZTo3LNu_TuneCUETP8M1_13TeV_nlo",
-        [   "WZTo1L3Nu_13TeV_amcatnloFXFX_madspin_pythia8_0000.xml", ]],
-                          
-       [ "WZTo1L1Nu2Q_13TeV_nlo",
-        [   "WZTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8_0000_0.xml",
-            "WZTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8_0000_1.xml", ]],
-                          
-       [ "WZTo2L2Q_13TeV_nlo",
-        [   "WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8_0000_0.xml",
-            "WZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8_0000_1.xml", ]],
-        
-       [ "WZJToLLLNu_nlo",
-        [   "WZJToLLLNu_TuneCUETP8M1_13TeV-amcnlo-pythia8_0000.xml", ]],
+    
+   [ "WZ_TuneCUETP8M1",
+    [   "WZ_TuneCUETP8M1_13TeV-pythia8_0000.xml", ]],
         
 ]
 
 userItems = [ 
-        ["IsData","false"],
-        ["IsSignal","false"],
-        ["doRecoilCorr","false"],
-        ["doEES","false"],
-        ["EESshift","0.00"],
+    ["IsData","false"],
+    ["IsSignal","false"],
+    ["doRecoilCorr","false"],
+    ["EESshift","0.00"],
 ]
 
 jobOptionsFile2=open("AnalysisOptions.py", 'r')

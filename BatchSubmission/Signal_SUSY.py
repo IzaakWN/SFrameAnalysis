@@ -1,7 +1,7 @@
-path2xml="$SFRAME_DIR/../BatchSubmission/xmls_SUSY" #xmls_postMoriond_T2"
+path2xml="/shome/ineuteli/shared/xml/xmls_MC2017_V1_small"
 path2tmp="$SFRAME_DIR/../AnalysisTemp"
 jobName="SUSY"
-outDir="/scratch/$USER/SFrameAnalysis_ltau2017/AnalysisOutput/"+jobName #"$SFRAME_DIR/../AnalysisOutput/"+jobName
+outDir="/scratch/$USER/SFrameAnalysis/AnalysisOutput_ltau2017/"+jobName #"$SFRAME_DIR/../AnalysisOutput/"+jobName
 cycleName="TauTauAnalysis"
 nEventsMax=-1
 #nEventsMax=200
@@ -86,15 +86,14 @@ dataSets = [
    ["SUSYVBFToHToAA_AToBB_AToTauTau_M-60",
     [   "SUSYVBFToHToAA_AToBB_AToTauTau_M-60_TuneCUETP8M1_13TeV_madgraph_pythia8_0000.xml", ]],
     
-            ]
+]
 
 userItems = [ 
-                ["IsData","false"],
-                ["IsSignal","true"],
-                ["doRecoilCorr","false"],
-                ["doEES","false"],
-                ["EESshift","0.00"],
-             ]
+    ["IsData","false"],
+    ["IsSignal","true"],
+    ["doRecoilCorr","false"],
+    ["EESshift","0.00"],
+]
 
 jobOptionsFile2=open("AnalysisOptions.py", 'r')
 command2=""

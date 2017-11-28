@@ -1,7 +1,7 @@
-path2xml="$SFRAME_DIR/../BatchSubmission/xmls_postMoriond_T2"
+path2xml="/shome/ineuteli/shared/xml/xmls_MC2017_V1_small"
 path2tmp="$SFRAME_DIR/../AnalysisTemp"
 jobName="TT"
-outDir="/scratch/$USER/SFrameAnalysis_ltau2017/AnalysisOutput/"+jobName #"$SFRAME_DIR/../AnalysisOutput/"+jobName
+outDir="/scratch/$USER/SFrameAnalysis/AnalysisOutput_ltau2017/"+jobName
 cycleName="TauTauAnalysis"
 nEventsMax=-1
 #nEventsMax=200
@@ -11,27 +11,22 @@ hCPU="07:00:00"
 hVMEM="5000M"
 postFix="_2017"
 dataSets = [
-
-       ["TT_TuneCUETP8M1",
-        [   "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_0000_0.xml",
-            "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_0000_1.xml",
-            "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_0000_2.xml",
-            "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_additional_0000_0.xml",
-            "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_additional_0000_1.xml",
-            "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_additional_0000_2.xml",
-            "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_additional_0001.xml", ]],
-            
+    
+   [ "TT_TuneCUETP8M1",
+    [   "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_0000_0.xml",
+        "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_0000_1.xml",
+        "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_ext_0000_0.xml",
+        "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_ext_0000_1.xml", ]],
+    
 ]
 
 userItems = [ 
-        ["IsData","false"],
-        ["IsSignal","false"],
-        ["doRecoilCorr","false"],
-        ["doTTpt","true"],
-        ["doTES","false"],
-        ["TESshift","0.00"],
-        ["doEES","false"],
-        ["EESshift","0.00"],
+    ["IsData","false"],
+    ["IsSignal","false"],
+    ["doRecoilCorr","false"],
+    ["doTTpt","true"],
+    ["TESshift","0.00"],
+    ["EESshift","0.00"],
 ]
 
 jobOptionsFile2=open("AnalysisOptions.py", 'r')

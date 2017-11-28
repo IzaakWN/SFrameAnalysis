@@ -1,7 +1,7 @@
-path2xml="$SFRAME_DIR/../BatchSubmission/xmls_postMoriond"
+path2xml="/shome/ineuteli/shared/xml/xmls_MC2017_V1_small"
 path2tmp="$SFRAME_DIR/../AnalysisTemp"
 jobName="SingleElectron"
-outDir="/scratch/$USER/SFrameAnalysis_ltau2017/AnalysisOutput/"+jobName #"$SFRAME_DIR/../AnalysisOutput/"+jobName
+outDir="/scratch/$USER/SFrameAnalysis/AnalysisOutput_ltau2017/"+jobName #"$SFRAME_DIR/../AnalysisOutput/"+jobName
 cycleName="TauTauAnalysis"
 nEventsMax=-1
 #nEventsMax=200
@@ -12,62 +12,64 @@ hVMEM="5000M"
 postFix="_2017"
 dataSets = [
     
-   ["SingleElectron_1_Run2016",
-    [   "SingleElectron_Run2016B-03Feb2017_ver2-v2SingleElectron_BCD_03Feb2017_0000_0.xml",
-        "SingleElectron_Run2016B-03Feb2017_ver2-v2SingleElectron_BCD_03Feb2017_0000_1.xml",
-        "SingleElectron_Run2016B-03Feb2017_ver2-v2SingleElectron_BCD_03Feb2017_0000_2.xml",
-        "SingleElectron_Run2016B-03Feb2017_ver2-v2SingleElectron_BCD_03Feb2017_0001_0.xml",
-        "SingleElectron_Run2016B-03Feb2017_ver2-v2SingleElectron_BCD_03Feb2017_0001_1.xml",
-        "SingleElectron_Run2016B-03Feb2017_ver2-v2SingleElectron_BCD_03Feb2017_0001_2.xml",
-        "SingleElectron_Run2016B-03Feb2017_ver2-v2SingleElectron_BCD_03Feb2017_0002_0.xml",
-        "SingleElectron_Run2016B-03Feb2017_ver2-v2SingleElectron_BCD_03Feb2017_0002_1.xml", ]],
-        
-   ["SingleElectron_2_Run2016",
-    [   "SingleElectron_Run2016C-03Feb2017-v1SingleElectron_BCD_03Feb2017_0000_0.xml",
-        "SingleElectron_Run2016C-03Feb2017-v1SingleElectron_BCD_03Feb2017_0000_1.xml",
-        "SingleElectron_Run2016C-03Feb2017-v1SingleElectron_BCD_03Feb2017_0000_2.xml",
-        "SingleElectron_Run2016D-03Feb2017-v1SingleElectron_BCD_03Feb2017_0000_0.xml",
-        "SingleElectron_Run2016D-03Feb2017-v1SingleElectron_BCD_03Feb2017_0000_1.xml",
-        "SingleElectron_Run2016D-03Feb2017-v1SingleElectron_BCD_03Feb2017_0000_2.xml",
-        "SingleElectron_Run2016D-03Feb2017-v1SingleElectron_BCD_03Feb2017_0001_0.xml",
-        "SingleElectron_Run2016D-03Feb2017-v1SingleElectron_BCD_03Feb2017_0001_1.xml", ]],
-        
-   ["SingleElectron_3_Run2016",
-    [   "SingleElectron_Run2016E-03Feb2017-v1SingleElectron_EF_03Feb2017_0000_0.xml",
-        "SingleElectron_Run2016E-03Feb2017-v1SingleElectron_EF_03Feb2017_0000_1.xml",
-        "SingleElectron_Run2016E-03Feb2017-v1SingleElectron_EF_03Feb2017_0000_2.xml",
-        "SingleElectron_Run2016E-03Feb2017-v1SingleElectron_EF_03Feb2017_0001.xml",
-        "SingleElectron_Run2016F-03Feb2017-v1SingleElectron_EF_03Feb2017_0000_0.xml",
-        "SingleElectron_Run2016F-03Feb2017-v1SingleElectron_EF_03Feb2017_0000_1.xml",
-        "SingleElectron_Run2016F-03Feb2017-v1SingleElectron_EF_03Feb2017_0000_2.xml",    ]],
-        
-   ["SingleElectron_4_Run2016",
-    [   "SingleElectron_Run2016F-03Feb2017-v1SingleElectron_G_03Feb2017_0000.xml",
-        "SingleElectron_Run2016G-03Feb2017-v1SingleElectron_G_03Feb2017_0000_0.xml",
-        "SingleElectron_Run2016G-03Feb2017-v1SingleElectron_G_03Feb2017_0000_1.xml",
-        "SingleElectron_Run2016G-03Feb2017-v1SingleElectron_G_03Feb2017_0000_2.xml",
-        "SingleElectron_Run2016G-03Feb2017-v1SingleElectron_G_03Feb2017_0001_0.xml",
-        "SingleElectron_Run2016G-03Feb2017-v1SingleElectron_G_03Feb2017_0001_1.xml",
-        "SingleElectron_Run2016G-03Feb2017-v1SingleElectron_G_03Feb2017_0001_2.xml",
-        "SingleElectron_Run2016G-03Feb2017-v1SingleElectron_G_03Feb2017_0002.xml",   ]],
-        
-   ["SingleElectron_5_Run2016",
-    [   "SingleElectron_Run2016H-03Feb2017_ver2-v1SingleElectron_H_03Feb2017_0000_0.xml",
-        "SingleElectron_Run2016H-03Feb2017_ver2-v1SingleElectron_H_03Feb2017_0000_1.xml",
-        "SingleElectron_Run2016H-03Feb2017_ver2-v1SingleElectron_H_03Feb2017_0000_2.xml",
-        "SingleElectron_Run2016H-03Feb2017_ver2-v1SingleElectron_H_03Feb2017_0001_0.xml",
-        "SingleElectron_Run2016H-03Feb2017_ver2-v1SingleElectron_H_03Feb2017_0001_1.xml",
-        "SingleElectron_Run2016H-03Feb2017_ver2-v1SingleElectron_H_03Feb2017_0001_2.xml",
-        "SingleElectron_Run2016H-03Feb2017_ver2-v1SingleElectron_H_03Feb2017_0002.xml",
-        "SingleElectron_Run2016H-03Feb2017_ver3-v1SingleElectron_H_03Feb2017_0000.xml",   ]],
+   ["SingleElectron_Run2017B",
+    [   "SingleMuon_Run2017B-12Sep2017-v1_0000_0.xml",
+        "SingleMuon_Run2017B-12Sep2017-v1_0000_1.xml",
+        "SingleMuon_Run2017B-12Sep2017-v1_0001_0.xml",
+        "SingleMuon_Run2017B-12Sep2017-v1_0001_1.xml",
+        "SingleMuon_Run2017B-12Sep2017-v1_0002_0.xml",
+        "SingleMuon_Run2017B-12Sep2017-v1_0002_1.xml", ]],
     
-           ]
+   ["SingleElectron_Run2017C",
+    [   "SingleMuon_Run2017C-12Sep2017-v1_0000_0.xml",
+        "SingleMuon_Run2017C-12Sep2017-v1_0000_1.xml",
+        "SingleMuon_Run2017C-12Sep2017-v1_0001_0.xml",
+        "SingleMuon_Run2017C-12Sep2017-v1_0001_1.xml",
+        "SingleMuon_Run2017C-12Sep2017-v1_0002_0.xml",
+        "SingleMuon_Run2017C-12Sep2017-v1_0002_1.xml", ]],
+    
+   ["SingleElectron_Run2017D",
+    [   "SingleMuon_Run2017D-PromptReco-v1_GTv11_0000_0.xml",
+        "SingleMuon_Run2017D-PromptReco-v1_GTv11_0000_1.xml",
+        "SingleMuon_Run2017D-PromptReco-v1_GTv11_0001_0.xml",
+        "SingleMuon_Run2017D-PromptReco-v1_GTv11_0001_1.xml",
+        "SingleMuon_Run2017D-PromptReco-v1_GTv11_0002_0.xml",
+        "SingleMuon_Run2017D-PromptReco-v1_GTv11_0002_1.xml", ]],
+    
+   ["SingleElectron_Run2017E",
+    [   "SingleMuon_Run2017E-PromptReco-v1_GTv11_0000_0.xml",
+        "SingleMuon_Run2017E-PromptReco-v1_GTv11_0000_1.xml",
+        "SingleMuon_Run2017E-PromptReco-v1_GTv11_0001_0.xml",
+        "SingleMuon_Run2017E-PromptReco-v1_GTv11_0001_1.xml",
+        "SingleMuon_Run2017E-PromptReco-v1_GTv11_0002_0.xml",
+        "SingleMuon_Run2017E-PromptReco-v1_GTv11_0002_1.xml",
+        "SingleMuon_Run2017E-PromptReco-v1_GTv11_0003_0.xml",
+        "SingleMuon_Run2017E-PromptReco-v1_GTv11_0003_1.xml",
+        "SingleMuon_Run2017E-PromptReco-v1_GTv11_0004_0.xml",
+        "SingleMuon_Run2017E-PromptReco-v1_GTv11_0004_1.xml", ]],
+    
+   ["SingleElectron_5_Run2017F",
+    [   "SingleMuon_Run2017F-PromptReco-v1_GTv11_0000_0.xml",
+        "SingleMuon_Run2017F-PromptReco-v1_GTv11_0000_1.xml",
+        "SingleMuon_Run2017F-PromptReco-v1_GTv11_0001_0.xml",
+        "SingleMuon_Run2017F-PromptReco-v1_GTv11_0001_1.xml",
+        "SingleMuon_Run2017F-PromptReco-v1_GTv11_0002_0.xml",
+        "SingleMuon_Run2017F-PromptReco-v1_GTv11_0002_1.xml",
+        "SingleMuon_Run2017F-PromptReco-v1_GTv11_0003_0.xml",
+        "SingleMuon_Run2017F-PromptReco-v1_GTv11_0003_1.xml",
+        "SingleMuon_Run2017F-PromptReco-v1_GTv11_0004_0.xml",
+        "SingleMuon_Run2017F-PromptReco-v1_GTv11_0004_1.xml",
+        "SingleMuon_Run2017F-PromptReco-v1_GTv11_0005_0.xml",
+        "SingleMuon_Run2017F-PromptReco-v1_GTv11_0005_1.xml",
+        "SingleMuon_Run2017F-PromptReco-v1_GTv11_0006.xml",   ]],
+    
+]
 
 userItems = [ 
-                ["IsData","true"],
-                ["IsSignal","false"],
-                ["doRecoilCorr","false"],
-             ]
+    ["IsData","true"],
+    ["IsSignal","false"],
+    ["doRecoilCorr","false"],
+]
 
 jobOptionsFile2=open("AnalysisOptions.py", 'r')
 command2=""

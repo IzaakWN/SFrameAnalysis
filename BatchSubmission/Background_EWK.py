@@ -1,7 +1,7 @@
-path2xml="$SFRAME_DIR/../BatchSubmission/xmls_2017"
+path2xml="/shome/ineuteli/shared/xml/xmls_MC2017_V1_small"
 path2tmp="$SFRAME_DIR/../AnalysisTemp"
 jobName="EWK"
-outDir="/scratch/$USER/SFrameAnalysis_ltau2017/AnalysisOutput/"+jobName #"$SFRAME_DIR/../AnalysisOutput/"+jobName
+outDir="/scratch/$USER/SFrameAnalysis/AnalysisOutput_ltau2017/"+jobName #"$SFRAME_DIR/../AnalysisOutput/"+jobName
 cycleName="TauTauAnalysis"
 nEventsMax=-1
 #nEventsMax=200
@@ -13,24 +13,25 @@ postFix="_2017"
 dataSets = [ ]
                             
 if "Moriond" in postFix: dataSets = [
-        
-       [ "EWKWMinus2Jets_WToLNu_M-50",
-        [   "EWKWMinus2Jets_WToLNu_M-50_13TeV-madgraph-pythia8_0000.xml", ]],
-        
-       [ "EWKWPlus2Jets_WToLNu_M-50",
-        [   "EWKWPlus2Jets_WToLNu_M-50_13TeV-madgraph-pythia8_0000.xml", ]],
-        
-       [ "EWKZ2Jets_ZToLL_M-50",
-        [   "EWKZ2Jets_ZToLL_M-50_13TeV-madgraph-pythia8_0000.xml", ]],
-            ]
+    
+   [ "EWKWMinus2Jets_WToLNu_M-50",
+    [   "EWKWMinus2Jets_WToLNu_M-50_13TeV-madgraph-pythia8_0000.xml", ]],
+    
+   [ "EWKWPlus2Jets_WToLNu_M-50",
+    [   "EWKWPlus2Jets_WToLNu_M-50_13TeV-madgraph-pythia8_0000.xml", ]],
+    
+   [ "EWKZ2Jets_ZToLL_M-50",
+    [   "EWKZ2Jets_ZToLL_M-50_13TeV-madgraph-pythia8_0000.xml", ]],
+
+]
 
 userItems = [ 
-                ["IsData","false"],
-                ["IsSignal","false"],
-                #["doSVFit","true"],
-                ["doRecoilCorr","false"],
-                ["doEES","false"],
-                ["EESshift","0.00"],
+    ["IsData","false"],
+    ["IsSignal","false"],
+    #["doSVFit","true"],
+    ["doRecoilCorr","false"],
+    ["doEES","false"],
+    ["EESshift","0.00"],
              ]
 
 jobOptionsFile2=open("AnalysisOptions.py", 'r')

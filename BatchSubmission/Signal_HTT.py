@@ -1,7 +1,7 @@
-path2xml="$SFRAME_DIR/../BatchSubmission/xmls_2017"
+path2xml="/shome/ineuteli/shared/xml/xmls_MC2017_V1_small"
 path2tmp="$SFRAME_DIR/../AnalysisTemp"
 jobName="HTT"
-outDir="/scratch/$USER/SFrameAnalysis_ltau2017/AnalysisOutput/"+jobName #"$SFRAME_DIR/../AnalysisOutput/"+jobName
+outDir="/scratch/$USER/SFrameAnalysis/AnalysisOutput_ltau2017/"+jobName #"$SFRAME_DIR/../AnalysisOutput/"+jobName
 cycleName="TauTauAnalysis"
 nEventsMax=-1
 #nEventsMax=200
@@ -9,30 +9,23 @@ nProcesses=1
 nFiles=3
 hCPU="03:00:00"
 hVMEM="5000M"
-postFix="_2017" #"_ICHEP" #_Moriond"
+postFix="_2017"
 dataSets = [
-        [ "GluGluHToTauTau_M125",
-         [  "GluGluHToTauTau_M125_13TeV_powheg_pythia8_reHLT_v7_0000_0.xml",
-            "GluGluHToTauTau_M125_13TeV_powheg_pythia8_reHLT_v7_0000_1.xml",
-            "GluGluHToTauTau_M125_13TeV_powheg_pythia8_reHLT_v7_0000_2.xml", ]],
-            ]
-                
-if "Moriond" in postFix: dataSets = [
-        [ "GluGluHToTauTau_M125",
-         [  "GluGluHToTauTau_M125_13TeV_powheg_pythia8_v1_0000_0.xml",
-            "GluGluHToTauTau_M125_13TeV_powheg_pythia8_v1_0000_1.xml",
-            "GluGluHToTauTau_M125_13TeV_powheg_pythia8_v1_0000_2.xml", ]],
-            ]
+    
+    [ "GluGluHToTauTau_M125",
+     [  "GluGluHToTauTau_M125_13TeV_powheg_pythia8_reHLT_v7_0000_0.xml",
+        "GluGluHToTauTau_M125_13TeV_powheg_pythia8_reHLT_v7_0000_1.xml",
+        "GluGluHToTauTau_M125_13TeV_powheg_pythia8_reHLT_v7_0000_2.xml", ]],
+    
+]
 
 userItems = [ 
-                ["IsData","false"],
-                ["IsSignal","true"],
-                ["doRecoilCorr","true"],
-                ["doTES","false"],
-                ["TESshift","0.00"],
-                ["doEES","false"],
-                ["EESshift","0.00"],
-             ]
+    ["IsData","false"],
+    ["IsSignal","true"],
+    ["doRecoilCorr","true"],
+    ["TESshift","0.00"],
+    ["EESshift","0.00"],
+]
 
 jobOptionsFile2=open("AnalysisOptions.py", 'r')
 command2=""

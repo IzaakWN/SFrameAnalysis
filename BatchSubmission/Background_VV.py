@@ -1,7 +1,7 @@
-path2xml="$SFRAME_DIR/../BatchSubmission/xmls_postMoriond_T2"
+path2xml="/shome/ineuteli/shared/xml/xmls_MC2017_V1_small"
 path2tmp="$SFRAME_DIR/../AnalysisTemp"
 jobName="VV"
-outDir="/scratch/$USER/SFrameAnalysis_ltau2017/AnalysisOutput/"+jobName
+outDir="/scratch/$USER/SFrameAnalysis/AnalysisOutput_ltau2017/"+jobName
 cycleName="TauTauAnalysis"
 nEventsMax=-1
 #nEventsMax=200
@@ -15,16 +15,16 @@ dataSets = [
    [ "VVTo2L2Nu_13TeV_nlo",
     [   "VVTo2L2Nu_13TeV_amcatnloFXFX_madspin_pythia8_0000.xml", ]],
     
-            ]
+]
 
 
 userItems = [ 
-                ["IsData","false"],
-                ["IsSignal","false"],
-                ["doRecoilCorr","false"],
-                ["doEES","false"],
-                ["EESshift","0.00"],
-             ]
+    ["IsData","false"],
+    ["IsSignal","false"],
+    ["doRecoilCorr","false"],
+    ["doEES","false"],
+    ["EESshift","0.00"],
+]
 
 jobOptionsFile2=open("AnalysisOptions.py", 'r')
 command2=""

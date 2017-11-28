@@ -1,7 +1,7 @@
-path2xml="$SFRAME_DIR/../BatchSubmission/xmls_postMoriond_T2"
+path2xml="/shome/ineuteli/shared/xml/xmls_MC2017_V1_small"
 path2tmp="$SFRAME_DIR/../AnalysisTemp"
 jobName="WW"
-outDir="/scratch/$USER/SFrameAnalysis_ltau2017/AnalysisOutput/"+jobName #"$SFRAME_DIR/../AnalysisOutput/"+jobName
+outDir="/scratch/$USER/SFrameAnalysis/AnalysisOutput_ltau2017/"+jobName
 cycleName="TauTauAnalysis"
 nEventsMax=-1
 #nEventsMax=200
@@ -11,22 +11,18 @@ hCPU="03:30:00"
 hVMEM="5000M"
 postFix="_2017"
 dataSets = [
-   
-       [ "WWTo1L1Nu2Q_13TeV_nlo",
-        [   "WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8_0000.xml", ]],
-   
-#        [ "WW_TuneCUETP8M1",
-#         [   "WW_TuneCUETP8M1_13TeV-pythia8_0000.xml", ]],
-        
-            ]
+    
+   [ "WW_TuneCUETP8M1",
+    [   "WW_TuneCUETP8M1_13TeV-pythia8_0000.xml", ]],
+    
+]
 
 userItems = [ 
-                ["IsData","false"],
-                ["IsSignal","false"],
-                ["doRecoilCorr","false"],
-                ["doEES","false"],
-                ["EESshift","0.00"],
-             ]
+    ["IsData","false"],
+    ["IsSignal","false"],
+    ["doRecoilCorr","false"],
+    ["EESshift","0.00"],
+]
 
 jobOptionsFile2=open("AnalysisOptions.py", 'r')
 command2=""

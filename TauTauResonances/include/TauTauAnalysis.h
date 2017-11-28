@@ -208,8 +208,7 @@ class TauTauAnalysis : public SCycleBase {
     virtual void FillJetBranches(     const char* ch, std::vector<UZH::Jet>& Jets,   UZH::MissingEt& met,
                                                 const TLorentzVector& tau_tlv, const TLorentzVector& lep_tlv );
     virtual void FillJetBranches_JEC( double& jpt, double& jeta, const TLorentzVector& jet, bool save=true );
-    virtual void FillJetBranches_JEC( double& jpt_1, double& jeta_1, double& jpt_2, double& jeta_2, const TLorentzVector& jet1, const TLorentzVector& jet2 ); //, bool swap = false
-    virtual void countJets(  const TLorentzVector& jet_tlv, Int_t& ncjets, Int_t& nfjets, Int_t& ncbtags, TLorentzVector& bjet_tlv, TLorentzVector& jet2_tlv, const bool isBTagged );
+    virtual void countJets( const TLorentzVector& jet_tlv, Int_t& ncjets, Int_t& nfjets, Int_t& ncbtags, TLorentzVector& bjet_tlv, TLorentzVector& jet2_tlv, const bool isBTagged );
     
     // check pass of triggers / MET filters
     virtual TString passTrigger( int runNumber = -1 );
@@ -377,10 +376,8 @@ class TauTauAnalysis : public SCycleBase {
     std::string m_trigger_Flags;
     std::vector<Trigger*> m_triggers_mutau;
     std::vector<Trigger*> m_triggers_etau;
-    std::vector<Trigger*> m_triggers_emu;
     std::vector<Trigger*> m_firedTriggers_mutau;
     std::vector<Trigger*> m_firedTriggers_etau;
-    std::vector<Trigger*> m_firedTriggers_emu;
     
     
     

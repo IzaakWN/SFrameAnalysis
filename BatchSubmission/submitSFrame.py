@@ -285,6 +285,8 @@ def checkCompletion(dataSets, listOfJobs, outDir, cycleName, postFix,keepTemp):
         mergeFiles+=fileBaseNameRoot+l[3]+".root "
         fileToMerge=fileBaseNameRoot.partition("pythia8")[0]+fileBaseNameRoot.partition("pythia8")[1]+'*'
         fileToMerge=fileToMerge.partition("Run2016")[0]+fileToMerge.partition("Run2016")[1]+'*'
+        fileToMerge=fileToMerge.partition("Run2017")[0]+fileToMerge.partition("Run2017")[1]+'*'
+        fileToMerge=fileToMerge.partition("Run2018")[0]+fileToMerge.partition("Run2018")[1]+'*'
         fileToMerge=fileToMerge.partition("madgraph")[0]+fileToMerge.partition("madgraph")[1]+'*'
         
         # print "l[6] %s ,l[1] %s, l[2] %s ,l[3] %s , fileBaseNameRoot %s ," %(l[6],l[1],l[2],l[3],fileBaseNameRoot)
@@ -300,6 +302,8 @@ def checkCompletion(dataSets, listOfJobs, outDir, cycleName, postFix,keepTemp):
         #mergeCmd="hadd -f %s.root %s && rm -rf %s" %(mergeFileBaseName, mergeFiles, mergeFiles)
         fileToMerge=fileBaseNameRoot.partition("pythia8")[0]+fileBaseNameRoot.partition("pythia8")[1]+'*'
         fileToMerge=fileToMerge.partition("Run2016")[0]+fileToMerge.partition("Run2016")[1]+'*'
+        fileToMerge=fileToMerge.partition("Run2017")[0]+fileToMerge.partition("Run2017")[1]+'*'
+        fileToMerge=fileToMerge.partition("Run2018")[0]+fileToMerge.partition("Run2018")[1]+'*'
         fileToMerge=fileToMerge.partition("madgraph")[0]+fileToMerge.partition("madgraph")[1]+'*'
         mergeCmd='hadd -f %s.root %s.root && rm -rf %s.root'  %(mergeFileBaseName,  fileToMerge,  fileToMerge)
         #mergeCmd_mt = 'hadd -f %s/%s_mutau.root %s/%s_mutau*.root && rm -rf %s/%s_mutau*.root'  %(outDir, d[0], fileBaseName, d[0], fileBaseName, d[0])
@@ -664,8 +668,7 @@ def main():
   if not "nProcesses" in dir():
     nProcesses="3"
   print "%-30s : nProcesses=%s" %("number of parallel processes", nProcesses)
-
-
+  
   # using sandbox
   if not "useSandbox" in dir():
     useSandbox=False
@@ -686,22 +689,22 @@ def main():
   if options.batchCompile:
     batchCompile=options.batchCompile
   print "%-30s : batchCompile=%s" % ("batch compile", str(batchCompile))
-
+  
   # additional compile commands
   if not "compilePacks" in dir():
     compilePacks=[]
   print "%-30s : compilePacks=%s" % ("additional packages to compile", compilePacks)
-
+  
   # set hard CPU limit
   if not "hCPU" in dir():
     hCPU="00:30:00"
   print "%-30s : hCPU=%s" %("hard CPU limit", hCPU)
-
+  
   # set hard VMEM limit
   if not "hVMEM" in dir():
     hVMEM="1500M"
   print "%-30s : hVMEM=%s" %("hard VMEM limit", hVMEM)
-
+  
   # set job submission destination host
   if not "useHost" in dir():
     useHost=""
@@ -717,6 +720,7 @@ def main():
   if not "dataSets" in dir():
     print "FATAL: data sets not set"
     sys.exit()
+  print "%-30s : %s" % ("dataSets", [d[0] for d in dataSets])
 
   # set delay for process check
   if not "timeCheck" in dir():

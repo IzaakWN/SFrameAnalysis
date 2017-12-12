@@ -25,13 +25,13 @@
 
 namespace Ntuple {
   
-  /*
+  /**
    *  @short Class that can read the variables produced by ${Object}NtupleObject
    *
-   *         This class can be used to read the offline muon information from
-   *         an ntuple produced by the SingleTopDPDMaker code.
+   *        This class can be used to read the offline muon information from
+   *        an ntuple produced by the SingleTopDPDMaker code.
    *
-   * @author ${Program}  
+   *  @author ${Program}  
    *
    */
   

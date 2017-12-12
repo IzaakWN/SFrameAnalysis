@@ -20,14 +20,14 @@ namespace Ntuple {
 
 namespace UZH {
   
-  /*
+  /**
    *  @short Class that maps ${Object}NtupleObjects to ${Object} Particle class
    *
-   *         This class can be used to map the offline ${Object} information from
-   *         ${Object}NtupleObjects to UZH::${Object} class. All particles inherit 
-   *         from UZH::Particle.
+   *        This class can be used to map the offline ${Object} information from
+   *        ${Object}NtupleObjects to UZH::${Object} class. All particles inherit 
+   *        from UZH::Particle.
    *
-   * @author ${Program}
+   *  @author ${Program}
    *
    */
   
@@ -54,7 +54,7 @@ namespace UZH {
     ${{Only:Jet:floatingnumber  m_scalefactor; ///< scale factor for JES shifts (0 for nominal JES)}}
     ${{AllVars:#type# m_#name#;}}
     ${{Only:Tau,GenParticle:
-    floatingnumber m_e_; // for m_e pointer
+    floatingnumber m_e_; // reference value for m_e pointer
     }}
     ${{Only:Electron:
     // delta(R) function using the cluster eta/phi position of the electrons
@@ -72,7 +72,7 @@ namespace UZH {
     }}
     // there must be consistent with ...NtupleObject.cxx, otherwise you'll get a segfault
     ${{AllVars:#type# #name#() const { /*if(!m_ana->getConnectSucceeded(Ntuple::${Object}NtupleObject::k#name#)) std::cout<<"#name# not connected!"<<std::endl;*/ return *(m_#name#);NOPOINTER } }}    
-    ${{AllVars:void #name#( const #type#& val){ *(m_#name#)=val;NOPOINTER } }}    
+    ${{AllVars:void #name#( const #type#& val){ *(m_#name#)=val;NOPOINTER } }}
     
     private:
     

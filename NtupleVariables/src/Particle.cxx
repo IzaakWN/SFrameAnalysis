@@ -11,12 +11,10 @@ Particle::Particle() :
   m_eta( 0 ),
   m_phi( 0 ),
   m_m( 0 )
-{
-}
+{ }
 
 Particle::~Particle()
-{
-}
+{ }
 
 floatingnumber Particle::DeltaR(const Particle* p) const {
   Double_t deta = *(m_eta) - p->eta();

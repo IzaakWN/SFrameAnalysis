@@ -15,7 +15,7 @@ ${Object}::${Object}( const Ntuple::${Object}NtupleObject* ana, const Int_t idx 
   m_ana = ana;
   
   // copy variables defined in Particle.h
-  ${{AllBasics: m_#name# = &((*ana->#name#)[idx]); }}
+  ${{AllBasics:m_#name# = &((*ana->#name#)[idx]); }}
   m_lvl = ana->detailLevel;
   ${{Only:Jet:m_scalefactor = 0;}}
   

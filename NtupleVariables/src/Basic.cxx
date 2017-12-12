@@ -9,12 +9,10 @@ Basic::Basic( int idx ) :
   ContainerBase(),
   m_isGood( false ),
   m_idx( idx )
-{
-}
+{ }
 
 Basic::~Basic()
-{
-}
+{ }
 
 void Basic::checkLevel(int detailLvl) const {
   if (m_lvl < detailLvl) {
@@ -31,8 +29,7 @@ void Basic::checkLevel(int detailLvl, const char*property) const {
   }
 }
         
-ostream& operator<<( ostream& out,
-                     const Basic& rhs ) {
+ostream& operator<<( ostream& out, const Basic& rhs ) {
 
   out << " idx:" << rhs.idx()
       //<< " lvl:" << rhs.lvl()

@@ -15,11 +15,11 @@ Tau::Tau( const Ntuple::TauNtupleObject* ana, const Int_t idx ) : Basic( idx ), 
   m_ana = ana;
   
   // copy variables defined in Particle.h
-   m_pt = &((*ana->pt)[idx]); 
-   m_eta = &((*ana->eta)[idx]); 
-   m_phi = &((*ana->phi)[idx]); 
-   m_m = &((*ana->m)[idx]); 
-   m_e = &((*ana->e)[idx]); 
+  m_pt = &((*ana->pt)[idx]); 
+  m_eta = &((*ana->eta)[idx]); 
+  m_phi = &((*ana->phi)[idx]); 
+  m_m = &((*ana->m)[idx]); 
+  m_e = &((*ana->e)[idx]); 
   
   m_lvl = ana->detailLevel;
   

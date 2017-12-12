@@ -16,14 +16,14 @@ void TauTauAnalysis::makeHistogramsForChecks(){
     TString dirname = "histogram_" + ch;
     TString tch = ch;
     
-    if(m_isData){
-      int  nperiods=7*2-1;
-      float periods[7*2] = { 272007-1, 275376+1,   275657-1, 276283+1,   276315-1, 276811+1,
-                             276831-1, 277420+1,   277772-1, 278808+1,   278820-1, 280385+1,   280919-1, 284044+1  };
-      Book( TH1F("runnumber", "runnumber", nperiods, periods ), dirname );
-    }
+//     if(m_isData){
+//       int  nperiods=7*2-1;
+//       float periods[7*2] = { 272007-1, 275376+1,   275657-1, 276283+1,   276315-1, 276811+1,
+//                              276831-1, 277420+1,   277772-1, 278808+1,   278820-1, 280385+1,   280919-1, 284044+1  };
+//       Book( TH1F("runnumber", "runnumber", nperiods, periods ), dirname );
+//     }
     
-    Book( TH1F("triggers",          "triggers",          10,   0, 10  ), dirname);
+//     Book( TH1F("triggers",          "triggers",          10,   0, 10  ), dirname);
     
   }
     

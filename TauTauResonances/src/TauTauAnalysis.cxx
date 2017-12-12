@@ -86,7 +86,7 @@ TauTauAnalysis::TauTauAnalysis() : SCycleBase(),
   DeclareProperty( "TauDzCut",              m_tauDzCut              = 0.2               );
   
   // Moriond: /afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-  DeclareProperty( "JSONName",              m_jsonName              = "$SFRAME_DIR/../GoodRunsLists/JSON/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt" ); // Cert_271036-284044_13TeV_PromptReco_Collisions16_JSON.txt
+  DeclareProperty( "JSONName",              m_jsonName              = std::string (std::getenv("SFRAME_DIR"))+"/../GoodRunsLists/JSON/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt" ); // Cert_271036-284044_13TeV_PromptReco_Collisions16_JSON.txt
   
 }
 
@@ -292,6 +292,74 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
     DeclareVariable( b_NUP[ch],                 "NUP",                  treeName);
     DeclareVariable( b_rho[ch],                 "rho",                  treeName);
     
+    DeclareVariable( b_pt_1[ch],                "pt_1",                 treeName);
+    DeclareVariable( b_eta_1[ch],               "eta_1",                treeName);
+    DeclareVariable( b_phi_1[ch],               "phi_1",                treeName);
+    DeclareVariable( b_m_1[ch],                 "m_1",                  treeName);
+    DeclareVariable( b_q_1[ch],                 "q_1",                  treeName);
+    DeclareVariable( b_d0_1[ch],                "d0_1",                 treeName);
+    DeclareVariable( b_dz_1[ch],                "dz_1",                 treeName);
+    //DeclareVariable( b_mt_1[ch],                "mt_1",                 treeName);
+    DeclareVariable( b_pfmt_1[ch],              "pfmt_1",               treeName);
+    DeclareVariable( b_puppimt_1[ch],           "puppimt_1",            treeName);
+    DeclareVariable( b_iso_1[ch],               "iso_1",                treeName);
+    DeclareVariable( b_id_e_mva_nt_loose_1[ch], "id_e_mva_nt_loose_1",  treeName);
+    DeclareVariable( b_gen_match_1[ch],         "gen_match_1",          treeName);
+    
+    DeclareVariable( b_pt_2[ch],                "pt_2",                 treeName);
+    DeclareVariable( b_eta_2[ch],               "eta_2",                treeName);
+    DeclareVariable( b_phi_2[ch],               "phi_2",                treeName);
+    DeclareVariable( b_m_2[ch],                 "m_2",                  treeName);
+    DeclareVariable( b_q_2[ch],                 "q_2",                  treeName);
+    DeclareVariable( b_d0_2[ch],                "d0_2",                 treeName);
+    DeclareVariable( b_dz_2[ch],                "dz_2",                 treeName);
+    //DeclareVariable( b_mt_2[ch],                "mt_2",                 treeName);
+    DeclareVariable( b_pfmt_2[ch],              "pfmt_2",               treeName);
+    DeclareVariable( b_puppimt_2[ch],           "puppimt_2",            treeName);
+    DeclareVariable( b_iso_2[ch],               "iso_2",                treeName);
+    DeclareVariable( b_iso_2_medium[ch],        "iso_2_medium",         treeName);
+    DeclareVariable( b_gen_match_2[ch],         "gen_match_2",          treeName);
+    DeclareVariable( b_pol_2[ch],               "pol_2",                treeName);
+    
+    DeclareVariable( b_againstElectronVLooseMVA6_2[ch],  "againstElectronVLooseMVA6_2",  treeName);
+    DeclareVariable( b_againstElectronLooseMVA6_2[ch],   "againstElectronLooseMVA6_2",   treeName);
+    DeclareVariable( b_againstElectronMediumMVA6_2[ch],  "againstElectronMediumMVA6_2",  treeName);
+    DeclareVariable( b_againstElectronTightMVA6_2[ch],   "againstElectronTightMVA6_2",   treeName);
+    DeclareVariable( b_againstElectronVTightMVA6_2[ch],  "againstElectronVTightMVA6_2",  treeName);
+    DeclareVariable( b_againstMuonLoose3_2[ch],          "againstMuonLoose3_2",          treeName);
+    DeclareVariable( b_againstMuonTight3_2[ch],          "againstMuonTight3_2",          treeName);
+    DeclareVariable( b_byCombinedIsolationDeltaBetaCorrRaw3Hits_2[ch], "byCombinedIsolationDeltaBetaCorrRaw3Hits_2", treeName);
+    DeclareVariable( b_byIsolationMVA3newDMwLTraw_2[ch], "byIsolationMVA3newDMwLTraw_2", treeName);
+    DeclareVariable( b_byIsolationMVA3oldDMwLTraw_2[ch], "byIsolationMVA3oldDMwLTraw_2", treeName);
+    DeclareVariable( b_chargedIsoPtSum_2[ch],            "chargedIsoPtSum_2",            treeName);
+    DeclareVariable( b_neutralIsoPtSum_2[ch],            "neutralIsoPtSum_2",            treeName);
+    DeclareVariable( b_puCorrPtSum_2[ch],                "puCorrPtSum_2",                treeName);
+    DeclareVariable( b_decayModeFindingOldDMs_2[ch],     "decayModeFindingOldDMs_2",     treeName);
+    DeclareVariable( b_decayMode_2[ch],                  "decayMode_2",                  treeName);
+    
+    DeclareVariable( b_dilepton_veto[ch],       "dilepton_veto",        treeName);
+    DeclareVariable( b_extraelec_veto[ch],      "extraelec_veto",       treeName);
+    DeclareVariable( b_extramuon_veto[ch],      "extramuon_veto",       treeName);
+    DeclareVariable( b_lepton_vetos[ch],        "lepton_vetos",         treeName);
+    DeclareVariable( b_iso_cuts[ch],            "iso_cuts",             treeName);
+    DeclareVariable( b_trigger_cuts[ch],        "trigger_cuts",         treeName);
+    
+    DeclareVariable( b_jpt_1[ch],               "jpt_1",                treeName);
+    DeclareVariable( b_jeta_1[ch],              "jeta_1",               treeName);
+    DeclareVariable( b_jphi_1[ch],              "jphi_1",               treeName);
+    DeclareVariable( b_jpt_2[ch],               "jpt_2",                treeName);
+    DeclareVariable( b_jeta_2[ch],              "jeta_2",               treeName);
+    DeclareVariable( b_jphi_2[ch],              "jphi_2",               treeName);
+    
+    DeclareVariable( b_bpt_1[ch],               "bpt_1",                treeName);
+    DeclareVariable( b_beta_1[ch],              "beta_1",               treeName);
+    DeclareVariable( b_bphi_1[ch],              "bphi_1",               treeName);
+    DeclareVariable( b_bcsv_1[ch],              "bcsv_1",               treeName);
+    DeclareVariable( b_bpt_2[ch],               "bpt_2",                treeName);
+    DeclareVariable( b_beta_2[ch],              "beta_2",               treeName);
+    DeclareVariable( b_bphi_2[ch],              "bphi_2",               treeName);
+    DeclareVariable( b_bcsv_2[ch],              "bcsv_2",               treeName);
+    
     DeclareVariable( b_njets[ch],               "njets",                treeName);
     DeclareVariable( b_nfjets[ch],              "nfjets",               treeName);
     DeclareVariable( b_ncjets[ch],              "ncjets",               treeName);
@@ -302,6 +370,33 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
     DeclareVariable( b_ncjets20[ch],            "ncjets20",             treeName);
     DeclareVariable( b_nbtag20[ch],             "nbtag20",              treeName);
     DeclareVariable( b_ncbtag20[ch],            "ncbtag20",             treeName);
+    
+    DeclareVariable( b_met[ch],                 "met",                  treeName);
+    DeclareVariable( b_metphi[ch],              "metphi",               treeName);
+    DeclareVariable( b_puppimet[ch],            "puppimet",             treeName);
+    DeclareVariable( b_puppimetphi[ch],         "puppimetphi",          treeName);
+    //DeclareVariable( b_mvamet[ch],          "mvamet",                   treeName);
+    //DeclareVariable( b_mvamet_old[ch],      "mvamet_old",               treeName);
+    //DeclareVariable( b_mvametphi[ch],       "mvametphi",                treeName);
+    
+    DeclareVariable( b_metcov00[ch],            "metcov00",             treeName);
+    DeclareVariable( b_metcov01[ch],            "metcov01",             treeName);
+    DeclareVariable( b_metcov10[ch],            "metcov10",             treeName);
+    DeclareVariable( b_metcov11[ch],            "metcov11",             treeName);
+    //DeclareVariable( b_mvacov00[ch],        "mvacov00",                 treeName);
+    //DeclareVariable( b_mvacov01[ch],        "mvacov01",                 treeName);
+    //DeclareVariable( b_mvacov10[ch],        "mvacov10",                 treeName);
+    //DeclareVariable( b_mvacov11[ch],        "mvacov11",                 treeName);
+    
+    DeclareVariable( b_fjpt_1[ch],              "fjpt_1",               treeName);
+    DeclareVariable( b_fjeta_1[ch],             "fjeta_1",              treeName);
+    DeclareVariable( b_fjpt_2[ch],              "fjpt_2",               treeName);
+    DeclareVariable( b_fjeta_2[ch],             "fjeta_2",              treeName);
+    
+    DeclareVariable( b_jpt_1_nom[ch],           "jpt_1_nom",            treeName);
+    DeclareVariable( b_jeta_1_nom[ch],          "jeta_1_nom",           treeName);
+    DeclareVariable( b_jpt_2_nom[ch],           "jpt_2_nom",            treeName);
+    DeclareVariable( b_jeta_2_nom[ch],          "jeta_2_nom",           treeName);
     
     DeclareVariable( b_njets_nom[ch],           "njets_nom",            treeName);
     DeclareVariable( b_njets20_nom[ch],         "njets20_nom",          treeName);
@@ -376,101 +471,6 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
       DeclareVariable( b_weightbtag_udsgDown[ch],   "weightbtag_udsgDown",  treeName);
     }
     
-    DeclareVariable( b_pt_1[ch],                "pt_1",                 treeName);
-    DeclareVariable( b_eta_1[ch],               "eta_1",                treeName);
-    DeclareVariable( b_phi_1[ch],               "phi_1",                treeName);
-    DeclareVariable( b_m_1[ch],                 "m_1",                  treeName);
-    DeclareVariable( b_q_1[ch],                 "q_1",                  treeName);
-    DeclareVariable( b_d0_1[ch],                "d0_1",                 treeName);
-    DeclareVariable( b_dz_1[ch],                "dz_1",                 treeName);
-    //DeclareVariable( b_mt_1[ch],                "mt_1",                 treeName);
-    DeclareVariable( b_pfmt_1[ch],              "pfmt_1",               treeName);
-    DeclareVariable( b_puppimt_1[ch],           "puppimt_1",            treeName);
-    DeclareVariable( b_iso_1[ch],               "iso_1",                treeName);
-    DeclareVariable( b_id_e_mva_nt_loose_1[ch], "id_e_mva_nt_loose_1",  treeName);
-    DeclareVariable( b_gen_match_1[ch],         "gen_match_1",          treeName);
-    
-    DeclareVariable( b_pt_2[ch],                "pt_2",                 treeName);
-    DeclareVariable( b_eta_2[ch],               "eta_2",                treeName);
-    DeclareVariable( b_phi_2[ch],               "phi_2",                treeName);
-    DeclareVariable( b_m_2[ch],                 "m_2",                  treeName);
-    DeclareVariable( b_q_2[ch],                 "q_2",                  treeName);
-    DeclareVariable( b_d0_2[ch],                "d0_2",                 treeName);
-    DeclareVariable( b_dz_2[ch],                "dz_2",                 treeName);
-    //DeclareVariable( b_mt_2[ch],                "mt_2",                 treeName);
-    DeclareVariable( b_pfmt_2[ch],              "pfmt_2",               treeName);
-    DeclareVariable( b_puppimt_2[ch],           "puppimt_2",            treeName);
-    DeclareVariable( b_iso_2[ch],               "iso_2",                treeName);
-    DeclareVariable( b_iso_2_medium[ch],        "iso_2_medium",         treeName);
-    DeclareVariable( b_gen_match_2[ch],         "gen_match_2",          treeName);
-    DeclareVariable( b_pol_2[ch],               "pol_2",                treeName);
-    
-    DeclareVariable( b_againstElectronVLooseMVA6_2[ch],  "againstElectronVLooseMVA6_2",  treeName);
-    DeclareVariable( b_againstElectronLooseMVA6_2[ch],   "againstElectronLooseMVA6_2",   treeName);
-    DeclareVariable( b_againstElectronMediumMVA6_2[ch],  "againstElectronMediumMVA6_2",  treeName);
-    DeclareVariable( b_againstElectronTightMVA6_2[ch],   "againstElectronTightMVA6_2",   treeName);
-    DeclareVariable( b_againstElectronVTightMVA6_2[ch],  "againstElectronVTightMVA6_2",  treeName);
-    DeclareVariable( b_againstMuonLoose3_2[ch],          "againstMuonLoose3_2",          treeName);
-    DeclareVariable( b_againstMuonTight3_2[ch],          "againstMuonTight3_2",          treeName);
-    DeclareVariable( b_byCombinedIsolationDeltaBetaCorrRaw3Hits_2[ch], "byCombinedIsolationDeltaBetaCorrRaw3Hits_2", treeName);
-    DeclareVariable( b_byIsolationMVA3newDMwLTraw_2[ch], "byIsolationMVA3newDMwLTraw_2", treeName);
-    DeclareVariable( b_byIsolationMVA3oldDMwLTraw_2[ch], "byIsolationMVA3oldDMwLTraw_2", treeName);
-    DeclareVariable( b_chargedIsoPtSum_2[ch],            "chargedIsoPtSum_2",            treeName);
-    DeclareVariable( b_neutralIsoPtSum_2[ch],            "neutralIsoPtSum_2",            treeName);
-    DeclareVariable( b_puCorrPtSum_2[ch],                "puCorrPtSum_2",                treeName);
-    DeclareVariable( b_decayModeFindingOldDMs_2[ch],     "decayModeFindingOldDMs_2",     treeName);
-    DeclareVariable( b_decayMode_2[ch],                  "decayMode_2",                  treeName);
-    
-    DeclareVariable( b_dilepton_veto[ch],       "dilepton_veto",        treeName);
-    DeclareVariable( b_extraelec_veto[ch],      "extraelec_veto",       treeName);
-    DeclareVariable( b_extramuon_veto[ch],      "extramuon_veto",       treeName);
-    DeclareVariable( b_lepton_vetos[ch],        "lepton_vetos",         treeName);
-    DeclareVariable( b_iso_cuts[ch],            "iso_cuts",             treeName);
-    DeclareVariable( b_trigger_cuts[ch],        "trigger_cuts",         treeName);
-    
-    DeclareVariable( b_jpt_1[ch],               "jpt_1",                treeName);
-    DeclareVariable( b_jeta_1[ch],              "jeta_1",               treeName);
-    DeclareVariable( b_jphi_1[ch],              "jphi_1",               treeName);
-    DeclareVariable( b_jpt_2[ch],               "jpt_2",                treeName);
-    DeclareVariable( b_jeta_2[ch],              "jeta_2",               treeName);
-    DeclareVariable( b_jphi_2[ch],              "jphi_2",               treeName);
-    
-    DeclareVariable( b_jpt_1_nom[ch],           "jpt_1_nom",            treeName);
-    DeclareVariable( b_jeta_1_nom[ch],          "jeta_1_nom",           treeName);
-    DeclareVariable( b_jpt_2_nom[ch],           "jpt_2_nom",            treeName);
-    DeclareVariable( b_jeta_2_nom[ch],          "jeta_2_nom",           treeName);
-    
-    //DeclareVariable( b_fjpt_1[ch],              "fjpt_1",               treeName);
-    //DeclareVariable( b_fjet_1[ch],              "fjet_1",               treeName);
-    //DeclareVariable( b_fjeta_1[ch],             "fjeta_1",              treeName);
-    //DeclareVariable( b_fjphi_1[ch],             "fjphi_1",              treeName);
-    
-    DeclareVariable( b_bpt_1[ch],               "bpt_1",                treeName);
-    DeclareVariable( b_beta_1[ch],              "beta_1",               treeName);
-    DeclareVariable( b_bphi_1[ch],              "bphi_1",               treeName);
-    DeclareVariable( b_bcsv_1[ch],              "bcsv_1",               treeName);
-    DeclareVariable( b_bpt_2[ch],               "bpt_2",                treeName);
-    DeclareVariable( b_beta_2[ch],              "beta_2",               treeName);
-    DeclareVariable( b_bphi_2[ch],              "bphi_2",               treeName);
-    DeclareVariable( b_bcsv_2[ch],              "bcsv_2",               treeName);
-    
-    DeclareVariable( b_met[ch],                 "met",                  treeName);
-    DeclareVariable( b_metphi[ch],              "metphi",               treeName);
-    DeclareVariable( b_puppimet[ch],            "puppimet",             treeName);
-    DeclareVariable( b_puppimetphi[ch],         "puppimetphi",          treeName);
-    //DeclareVariable( b_mvamet[ch],          "mvamet",                   treeName);
-    //DeclareVariable( b_mvamet_old[ch],      "mvamet_old",               treeName);
-    //DeclareVariable( b_mvametphi[ch],       "mvametphi",                treeName);
-    
-    DeclareVariable( b_metcov00[ch],            "metcov00",             treeName);
-    DeclareVariable( b_metcov01[ch],            "metcov01",             treeName);
-    DeclareVariable( b_metcov10[ch],            "metcov10",             treeName);
-    DeclareVariable( b_metcov11[ch],            "metcov11",             treeName);
-    //DeclareVariable( b_mvacov00[ch],        "mvacov00",                 treeName);
-    //DeclareVariable( b_mvacov01[ch],        "mvacov01",                 treeName);
-    //DeclareVariable( b_mvacov10[ch],        "mvacov10",                 treeName);
-    //DeclareVariable( b_mvacov11[ch],        "mvacov11",                 treeName);
-    
     DeclareVariable( b_m_vis[ch],               "m_vis",                treeName);
     DeclareVariable( b_pt_tt[ch],               "pt_tt",                treeName);
     DeclareVariable( b_pt_tt_vis[ch],           "pt_tt_vis",            treeName);
@@ -514,7 +514,7 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
     TString hname = "cutflow_" + ch;
     TString dirname = "histogram_" + ch;
     TString tch = ch;
-    Book( TH1F(hname, hname, 20, 0.5, 20.5 ), dirname);
+    Book( TH1F(hname, hname, 10, 0.5, 10.5 ), dirname);
     //Book( TH1F("btagweight", "btagweight", 6, 0, 6), dirname);
   }
   
@@ -554,6 +554,8 @@ void TauTauAnalysis::EndInputData( const SInputData& ) throw( SError ) {
     TString hname = "cutflow_" + ch;
     TString dirname = "histogram_" + ch;
     Double_t ntot = Hist(hname, dirname)->GetBinContent( 1 );
+    Hist(hname, dirname)->GetXaxis()->SetBinLabel(1,kCutName[0].c_str());
+    Hist(hname, dirname)->GetXaxis()->SetLabelSize(0.044);
     m_logger << INFO << Form( "\t%25.25s\t%6.0f", "start", ntot ) << SLogger::endmsg;
     for( Int_t ibin = 1; ibin < kNumCuts; ++ibin ) {
       Int_t    icut    = ibin;
@@ -561,6 +563,7 @@ void TauTauAnalysis::EndInputData( const SInputData& ) throw( SError ) {
       Double_t releff  = 100. * nevents / Hist(hname, dirname)->GetBinContent( ibin );
       Double_t abseff  = 100. * nevents / ntot;
       m_logger << INFO  << Form( "C%d\t%25.25s\t%6.0f\t%6.2f\t%6.2f", icut-1, kCutName[icut].c_str(), nevents, releff, abseff ) << SLogger::endmsg;
+      Hist(hname, dirname)->GetXaxis()->SetBinLabel(ibin+1, kCutName[icut].c_str());
     }
     
     // if(m_isSignal and ch == "mutau"){
@@ -1456,9 +1459,9 @@ void TauTauAnalysis::FillBranches(const std::string& channel, const UZH::Tau& ta
   bool doSVFit = m_doSVFit and b_isolated_;
   if(m_doTight) doSVFit = doSVFit && b_ncbtag[ch]>0;
   
-  double m_sv = -1;
-  double pt_tt_sv = -1;
-  double R_pt_m_sv = -1;
+  double m_sv       = -1;
+  double pt_tt_sv   = -1;
+  double R_pt_m_sv  = -1;
   if ( doSVFit ){
     //std::cout << ">>> SVFit...";
     m_SVFitTool.addMeasuredLeptonTau(channel,lep_tlv, tau_tlv, tau.decayMode());
@@ -1482,12 +1485,12 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
   //std::cout << "FillJetBranches " << ch << std::endl;
   
   // jet multiplicities
-  Int_t njets   =  0;   Int_t njets20    =  0;
-  Int_t nfjets  =  0;   Int_t nfjets20   =  0;
-  Int_t ncjets  =  0;   Int_t ncjets20   =  0;
-  Int_t nbtag   =  0;   Int_t nbtag20    =  0;
-  Int_t nfbtag  =  0;   Int_t nfbtag20   =  0;
-  Int_t ncbtag  =  0;   Int_t ncbtag20   =  0;
+  Int_t njets  = 0;    Int_t njets20  = 0;
+  Int_t nfjets = 0;    Int_t nfjets20 = 0;
+  Int_t ncjets = 0;    Int_t ncjets20 = 0;
+  Int_t nbtag  = 0;    Int_t nbtag20  = 0;
+  Int_t nfbtag = 0;    Int_t nfbtag20 = 0;
+  Int_t ncbtag = 0;    Int_t ncbtag20 = 0;
   
   // JEC variables
   Int_t nfjets_nom     = 0;  Int_t ncjets_nom     = 0;  Int_t ncbtag_nom     = 0;  Int_t njets20_nom     = 0;
@@ -1497,15 +1500,20 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
   Int_t nfjets_jerDown = 0;  Int_t ncjets_jerDown = 0;  Int_t ncbtag_jerDown = 0;  Int_t njets20_jerDown = 0;
   
   // to compare to uncorrected "nominal" jets
-  TLorentzVector jet1,         jet2,
-                 jet1_nom,     jet2_nom,     // nominal jets
+  TLorentzVector jet1,         jet2,         // default jets (JER on top of JES)
+                 jet1_nom,     jet2_nom,     // nominal jets (JES, no JER)
                  jet1_jesUp,   jet2_jesUp,
                  jet1_jesDown, jet2_jesDown,
                  jet1_jerUp,   jet2_jerUp,
-                 jet1_jerDown, jet2_jerDown;
+                 jet1_jerDown, jet2_jerDown,
+                 fjet1,        fjet2,        // two leading forward jets
+                 bjet1,        bjet2;        // two leading b tagged jets
+  double bcsv1 = 0;
+  double bcsv2 = 0;
   
   // for dphi_ll_bj: get two leading central jets, one of which b tagged
-  TLorentzVector bjet_dphi_nom,     jet2_dphi_nom,
+  TLorentzVector                    jet2_dphi,
+                 bjet_dphi_nom,     jet2_dphi_nom,
                  bjet_dphi_jesUp,   jet2_dphi_jesUp,
                  bjet_dphi_jesDown, jet2_dphi_jesDown,
                  bjet_dphi_jerUp,   jet2_dphi_jerUp,
@@ -1514,11 +1522,7 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
   // doJEC
   bool doJEC = m_doJEC; //and;
   TLorentzVector dtlv_jer; // difference in pt after smearing, to propagate to met
-  
-  Int_t ibjet1  = -1; //    leading b jet
-  Int_t ibjet2  = -1; // subleading b jet
-  Int_t icjet1  = -1; // central jet that is not the same as leading b jet (ibjet1) for dphi_ll_bj
-  
+    
   Float_t phi_ll = (lep_tlv + tau_tlv).Phi(); // for dphi_ll_bj
   Float_t ht     = lep_tlv.E() + tau_tlv.E(); // total scalar energy HT
   
@@ -1578,7 +1582,7 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
           
           // reorder pt and save nominal & shifts
           if(pt > jet1.Pt()){
-            if(jet1.Pt()<20){ // jet1 is unset
+            if(jet1.Pt()<20){ // set jet1 for first time
               jet1         = jet_jer;       jet1_nom     = jet;
               jet1_jerUp   = jet_jerUp;     jet1_jesUp   = jet_jesUp;
               jet1_jerDown = jet_jerDown;   jet1_jesDown = jet_jesDown;
@@ -1602,7 +1606,7 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
           countJets( jet_jerUp,   ncjets_jerUp,   nfjets_jerUp,   ncbtag_jerUp,   bjet_dphi_jerUp,   jet2_dphi_jerUp,   isBTagged );
           countJets( jet_jerDown, ncjets_jerDown, nfjets_jerDown, ncbtag_jerDown, bjet_dphi_jerDown, jet2_dphi_jerDown, isBTagged );
         }else{ // do SMEARING only
-
+          
           // b tag weight before smearing  
           if(pt>m_AK4jetPtCut)
             b_weightbtag_ *= m_BTaggingScaleTool.getScaleFactor(Jets.at(ijet));
@@ -1612,9 +1616,9 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
           
           // reorder pt
           if(pt > jet1.Pt()){
-            if(jet1.Pt()<20){ // jet1 unset
+            if(jet1.Pt()<20){ // set jet1 for first time
               jet1 = jet_jer; jet1_nom = jet;
-            }else{ // jet1 already set - reorder
+            }else{ // jet1 is already set - reorder
               jet2 = jet1;    jet2_nom = jet1_nom; // reorder
               jet1 = jet_jer; jet1_nom = jet;
             }
@@ -1630,36 +1634,45 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
         }
         Jets.at(ijet).pt(pt);         // correct UZH::Jet object's pt
         Jets.at(ijet).e(jet_jer.E()); // correct UZH::Jet object's e
-        dtlv_jer = jet - jet_jer; // tlv difference
+        dtlv_jer = jet - jet_jer;     // tlv difference
         jet = jet_jer;
       }
       ht += Jets.at(ijet).e();
       
       // count jets
-      if(abseta < 2.4 and isBTagged){  // CENTRAL 20 GeV b jet
-        nbtag++;
-        if     (ibjet1 < 0)             ibjet1 = ijet;
-        else if(ibjet2 < 0){
-          if (Jets.at(ibjet1).pt()>pt){ ibjet2 = ijet; }
-          else{        ibjet2 = ibjet1; ibjet1 = ijet; }
+      if(abseta < 2.4){             // CENTRAL 20 GeV
+        ncjets20++;                 //  jets
+        if(pt > 30){                // CENTRAL 30 GeV
+          if(isBTagged) ncbtag++;   //  btag
+          ncjets++;                 //  jets
         }
+        if(isBTagged){              // CENTRAL 20 GeV b jet
+          ncbtag20++;               //  btag
+          if(pt>bjet1.Pt()){ // bjet TLorentzVectors
+            if(bjet1.Pt()<20){
+              bjet1 = jet; // set bjet1 for first time
+              bcsv1 = Jets.at(ijet).csv();
+            }else{ // bjet1 is already set - reorder
+              bjet2 = bjet1; bjet1 = jet;
+              bcsv2 = bcsv1; bcsv1 = Jets.at(ijet).csv(); }
+          }else if(pt>bjet2.Pt()){
+              bjet2 = jet;
+              bcsv2 = Jets.at(ijet).csv();
+          }
+        }
+        if(pt>jet2_dphi.Pt() and bjet1!=jet){ jet2_dphi = jet; }
       }
-      if(abseta < 2.4){               // CENTRAL 20 GeV
-        if(isBTagged) ncbtag20++;     //  btag
-        ncjets20++;                   //  jets
-        if(icjet1 < 0 and (icjet1 != ibjet1 or ibjet1 < 0 )) icjet1 = ijet;
-        if(pt > 30){                  // CENTRAL 30 GeV
-          if(isBTagged) ncbtag++;     //  btag
-          ncjets++;                   //  jets
+      else if(abseta > 2.4){        // FORWARD 20 GeV
+        if(isBTagged) nfbtag20++;   //  btag
+        nfjets20++;                 //  jets
+        if(pt > 30){                // FORWARD 30 GeV
+          if(isBTagged) nfbtag++;   //  btag
+          nfjets++;                 //  jets
         }
-      }
-      else if(abseta > 2.4){          // FORWARD 20 GeV
-        if(isBTagged) nfbtag20++;     //  btag
-        nfjets20++;                   //  jets
-        if(pt > 30){                  // FORWARD 30 GeV
-          if(isBTagged) nfbtag++;     //  btag
-          nfjets++;                   //  jets
-        }
+        if(pt>fjet1.Pt()){ // fjet TLorentzVectors
+          if(jet1.Pt()<20){      fjet1 = jet; } // set fjet1 for first time
+          else{   fjet2 = fjet1; fjet1 = jet; } // reorder
+        }else if(pt>fjet2.Pt()){ fjet2 = jet; }
       }
   }
   
@@ -1667,14 +1680,14 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
   if(!m_isData) shiftMET(dtlv_jer,met);
   
   // jet multiplicities
-  njets             = ncjets + nfjets;      njets20         = ncjets20 + nfjets20;
-  nbtag             = ncbtag + nfbtag;      nbtag20         = ncbtag20 + nfbtag20;
-  b_njets[ch]       = njets;                b_njets20[ch]   = njets20;
-  b_nfjets[ch]      = nfjets;               b_nfjets20[ch]  = nfjets20;
-  b_ncjets[ch]      = ncjets;               b_ncjets20[ch]  = ncjets20;
-  b_nbtag[ch]       = nbtag;                b_nbtag20[ch]   = nbtag20;
-  b_ncbtag[ch]      = ncbtag;               b_ncbtag20[ch]  = ncbtag20;
-  b_ht[ch] = ht;
+  njets         = ncjets + nfjets;    njets20         = ncjets20 + nfjets20;
+  nbtag         = ncbtag + nfbtag;    nbtag20         = ncbtag20 + nfbtag20;
+  b_njets[ch]   = njets;              b_njets20[ch]   = njets20;
+  b_nfjets[ch]  = nfjets;             b_nfjets20[ch]  = nfjets20;
+  b_ncjets[ch]  = ncjets;             b_ncjets20[ch]  = ncjets20;
+  b_nbtag[ch]   = nbtag;              b_nbtag20[ch]   = nbtag20;
+  b_ncbtag[ch]  = ncbtag;             b_ncbtag20[ch]  = ncbtag20;
+  b_ht[ch]      = ht;
   
   // jet kinematics
   if(njets20 > 1){
@@ -1690,11 +1703,11 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
   
   // JEC
   if(doJEC){
-    b_nfjets_jesUp[ch]   = nfjets_jesUp;      b_ncjets_jesUp[ch]   = ncjets_jesUp;     b_ncbtag_jesUp[ch]   = ncbtag_jesUp;  
-    b_nfjets_jesDown[ch] = nfjets_jesDown;    b_ncjets_jesDown[ch] = ncjets_jesDown;   b_ncbtag_jesDown[ch] = ncbtag_jesDown;
-    b_nfjets_nom[ch]     = nfjets_nom;        b_ncjets_nom[ch]     = ncjets_nom;       b_ncbtag_nom[ch]     = ncbtag_nom;    
-    b_nfjets_jerUp[ch]   = nfjets_jerUp;      b_ncjets_jerUp[ch]   = ncjets_jerUp;     b_ncbtag_jerUp[ch]   = ncbtag_jerUp;  
-    b_nfjets_jerDown[ch] = nfjets_jerDown;    b_ncjets_jerDown[ch] = ncjets_jerDown;   b_ncbtag_jerDown[ch] = ncbtag_jerDown;
+    b_nfjets_jesUp[ch]   = nfjets_jesUp;      b_ncjets_jesUp[ch]   = ncjets_jesUp;      b_ncbtag_jesUp[ch]   = ncbtag_jesUp;  
+    b_nfjets_jesDown[ch] = nfjets_jesDown;    b_ncjets_jesDown[ch] = ncjets_jesDown;    b_ncbtag_jesDown[ch] = ncbtag_jesDown;
+    b_nfjets_nom[ch]     = nfjets_nom;        b_ncjets_nom[ch]     = ncjets_nom;        b_ncbtag_nom[ch]     = ncbtag_nom;    
+    b_nfjets_jerUp[ch]   = nfjets_jerUp;      b_ncjets_jerUp[ch]   = ncjets_jerUp;      b_ncbtag_jerUp[ch]   = ncbtag_jerUp;  
+    b_nfjets_jerDown[ch] = nfjets_jerDown;    b_ncjets_jerDown[ch] = ncjets_jerDown;    b_ncbtag_jerDown[ch] = ncbtag_jerDown;
     b_njets_jesUp[ch]    = nfjets_jesUp   + ncjets_jesUp;           //b_njets20_jesUp[ch]   = njets20_jesUp;
     b_njets_jesDown[ch]  = nfjets_jesDown + ncjets_jesDown;         //b_njets20_jesDown[ch] = njets20_jesDown;
     b_njets_nom[ch]      = nfjets_nom     + ncjets_nom;             //b_njets20_nom[ch]     = njets20_jer;
@@ -1712,28 +1725,44 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
     FillJetBranches_JEC( b_jpt_2_jerDown[ch], b_jeta_2_jerDown[ch], jet2_jerDown, jet2_jerDown.Pt()>m_AK4jetPtCut);
   }
   
+  // forward jets
+  if(fjet1.Pt() > m_AK4jetPtCut){
+    b_fjpt_1[ch]    = fjet1.Pt();
+    b_fjeta_1[ch]   = fjet1.Eta();
+  }else{
+    b_fjpt_1[ch]    = -1;
+    b_fjeta_1[ch]   = -9;
+  }
+  if(fjet2.Pt() > m_AK4jetPtCut){
+    b_fjpt_2[ch]    = fjet2.Pt();
+    b_fjeta_2[ch]   = fjet2.Eta();
+  }else{
+    b_fjpt_2[ch]    = -1;
+    b_fjeta_2[ch]   = -9;
+  }
+  
   // b jets
-  if(ibjet1 < 0){
+  if(bjet1.Pt() > m_AK4jetPtCut){
+    b_bpt_1[ch]     = bjet1.Pt();
+    b_beta_1[ch]    = bjet1.Eta();
+    b_bphi_1[ch]    = bjet1.Phi();
+    b_bcsv_1[ch]    = bcsv1;
+  }else{
     b_bpt_1[ch]     = -1;
     b_beta_1[ch]    = -9;
     b_bphi_1[ch]    = -9;
     b_bcsv_1[ch]    = -1;
-  }else{
-    b_bpt_1[ch]     = Jets.at(ibjet1).pt();
-    b_beta_1[ch]    = Jets.at(ibjet1).eta();
-    b_bphi_1[ch]    = Jets.at(ibjet1).phi();
-    b_bcsv_1[ch]    = Jets.at(ibjet1).csv();
   }
-  if (ibjet2 < 0){
+  if(bjet2.Pt() > m_AK4jetPtCut){
+    b_bpt_2[ch]     = bjet2.Pt();
+    b_beta_2[ch]    = bjet2.Eta();
+    b_bphi_2[ch]    = bjet2.Phi();
+    b_bcsv_2[ch]    = bcsv2;
+  }else{
     b_bpt_2[ch]     = -1;
     b_beta_2[ch]    = -9;
     b_bphi_2[ch]    = -9;
     b_bcsv_2[ch]    = -1;
-  }else{
-    b_bpt_2[ch]     = Jets.at(ibjet2).pt();
-    b_beta_2[ch]    = Jets.at(ibjet2).eta();
-    b_bphi_2[ch]    = Jets.at(ibjet2).phi();
-    b_bcsv_2[ch]    = Jets.at(ibjet2).csv();
   }
   
   // VBF
@@ -1767,38 +1796,45 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
     b_vbf_ncentral20[ch] = -1;
   }
   
-  if(ibjet1 != -1){
-    b_m_taub[ch]    = (tau_tlv + Jets.at(ibjet1).tlv()).M();
-    b_m_taumub[ch]  = (lep_tlv + tau_tlv + Jets.at(ibjet1).tlv()).M();
-    b_m_mub[ch]     = (lep_tlv + Jets.at(ibjet1).tlv()).M();
+  if(bjet1.Pt() > m_AK4jetPtCut){
+    b_m_taub[ch]    = (tau_tlv + bjet1).M();
+    b_m_taumub[ch]  = (lep_tlv + tau_tlv + bjet1).M();
+    b_m_mub[ch]     = (lep_tlv + bjet1).M();
   }else{
     b_m_taub[ch]    = -1;
     b_m_taumub[ch]  = -1;
     b_m_mub[ch]     = -1;
   }
   
-  // Delta phi( lep+tau, bj+j ) if there is one central b jet and on central jet
-  // icjet1 = index of central jet that is not the same as leading b jet
-  if(icjet1 != -1 && ibjet1 != -1)
-    b_dphi_ll_bj[ch] = fabs(deltaPhi( (lep_tlv+tau_tlv).Phi(), (Jets.at(ibjet1).tlv()+Jets.at(icjet1).tlv()).Phi() ));
+  // Delta phi( lep+tau, bj+cj ) if there is one central b jet and one central jet
+  // jet2_dphi = central jet that is not the same as leading b jet
+  if(bjet1.Pt() > m_AK4jetPtCut and jet2_dphi.Pt() > m_AK4jetPtCut)
+    b_dphi_ll_bj[ch] = fabs(deltaPhi( phi_ll, (bjet1+jet2_dphi).Phi() ));
   else
     b_dphi_ll_bj[ch] = -1;
   
   // Delta phi JEC
   if(doJEC){
-    if( bjet_dphi_jesDown.Pt() > 12 and jet2_dphi_jesDown.Pt() > 12 ){
-      b_dphi_ll_bj_nom[ch]      = fabs(deltaPhi( phi_ll, (bjet_dphi_nom    +jet2_dphi_nom    ).Phi() ));
-      b_dphi_ll_bj_jesUp[ch]    = fabs(deltaPhi( phi_ll, (bjet_dphi_jesUp  +jet2_dphi_jesUp  ).Phi() ));
-      b_dphi_ll_bj_jesDown[ch]  = fabs(deltaPhi( phi_ll, (bjet_dphi_jesDown+jet2_dphi_jesDown).Phi() ));
-      b_dphi_ll_bj_jerUp[ch]    = fabs(deltaPhi( phi_ll, (bjet_dphi_jerUp  +jet2_dphi_jerUp  ).Phi() ));
-      b_dphi_ll_bj_jerDown[ch]  = fabs(deltaPhi( phi_ll, (bjet_dphi_jerDown+jet2_dphi_jerDown).Phi() ));
-    }else{
-      b_dphi_ll_bj_nom[ch]      = -9;
-      b_dphi_ll_bj_jesUp[ch]    = -9;
-      b_dphi_ll_bj_jesDown[ch]  = -9;
-      b_dphi_ll_bj_jerUp[ch]    = -9;
-      b_dphi_ll_bj_jerDown[ch]  = -9;
-    }
+    if( bjet_dphi_nom.Pt() > m_AK4jetPtCut and jet2_dphi_jesDown.Pt() > m_AK4jetPtCut )
+      b_dphi_ll_bj_nom[ch] = fabs(deltaPhi( phi_ll, (bjet_dphi_nom + jet2_dphi_nom).Phi() ));
+    else
+      b_dphi_ll_bj_nom[ch] = -1;
+    if( bjet_dphi_jesUp.Pt() > m_AK4jetPtCut and jet2_dphi_jesUp.Pt() > m_AK4jetPtCut )
+      b_dphi_ll_bj_jesUp[ch] = fabs(deltaPhi( phi_ll, (bjet_dphi_jesUp + jet2_dphi_jesUp).Phi() ));
+    else
+      b_dphi_ll_bj_jesUp[ch] = -1;
+    if( bjet_dphi_jesDown.Pt() > m_AK4jetPtCut and jet2_dphi_jesDown.Pt() > m_AK4jetPtCut )
+      b_dphi_ll_bj_jesDown[ch] = fabs(deltaPhi( phi_ll, (bjet_dphi_jesDown + jet2_dphi_jesDown).Phi() ));
+    else
+      b_dphi_ll_bj_jesDown[ch] = -1;
+    if( bjet_dphi_jerUp.Pt() > m_AK4jetPtCut and jet2_dphi_jerUp.Pt() > m_AK4jetPtCut )
+      b_dphi_ll_bj_jerUp[ch] = fabs(deltaPhi( phi_ll, (bjet_dphi_jerUp + jet2_dphi_jerUp).Phi() ));
+    else
+      b_dphi_ll_bj_jerUp[ch] = -1;
+    if( bjet_dphi_jerDown.Pt() > m_AK4jetPtCut and jet2_dphi_jerDown.Pt() > m_AK4jetPtCut )
+      b_dphi_ll_bj_jerDown[ch] = fabs(deltaPhi( phi_ll, (bjet_dphi_jerDown + jet2_dphi_jerDown).Phi() ));
+    else
+      b_dphi_ll_bj_jerDown[ch] = -1;
   }
   
   // data
@@ -1819,7 +1855,7 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
 
 
 
-void TauTauAnalysis::countJets(const TLorentzVector& jet_tlv, Int_t& ncjets, Int_t& nfjets, Int_t& ncbtags, TLorentzVector& bjet_dphi_tlv, TLorentzVector& jet2_dphi_tlv, const bool isBTagged){ //, const int ijet , Int_t& icjet1, Int_t& ibjet1
+void TauTauAnalysis::countJets(const TLorentzVector& jet_tlv, Int_t& ncjets, Int_t& nfjets, Int_t& ncbtags, TLorentzVector& bjet_dphi_tlv, TLorentzVector& jet2_dphi_tlv, const bool isBTagged){
   //std::cout << "countJets" << std::endl;
   if(jet_tlv.Pt()<30) return;
   Float_t abseta = fabs(jet_tlv.Eta());
@@ -2005,28 +2041,30 @@ void TauTauAnalysis::printRow(const std::vector<std::string> svec, const std::ve
 
 
 
-bool TauTauAnalysis::LooseJetID(const UZH::Jet& jet){
-// https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetID#Recommendations_for_13_TeV_data
-  Float_t eta = fabs(jet.eta());
+bool TauTauAnalysis::LooseJetID(const UZH::Jet& jet) {
+  // https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetID#Recommendations_for_13_TeV_data
+  // https://twiki.cern.ch/twiki/bin/view/CMS/JetID13TeVRun2016
+  Float_t eta  = fabs(jet.eta());
   Float_t NHF  = jet.nhf();  //neutralHadronEnergyFraction();
   Float_t NEMF = jet.nemf(); //neutralEmEnergyFraction();
   Float_t NM   = jet.nm();   //neutralMultiplicity();
   Float_t CM   = jet.cm();   //chargedMultiplicity();
   
-  if(eta <= 2.4){      // eta < 2.4
+  if(eta <= 2.4){
     Float_t CHF  = jet.chf();  //chargedHadronEnergyFraction();
     Float_t CEMF = jet.cemf(); //chargedEmEnergyFraction();
-    return NHF < 0.99 && NEMF < 0.99 && NM+CM > 1 &&
-           CHF > 0    && CEMF < 0.99 &&    CM > 0;
+    return NHF < 0.99 and NEMF < 0.99 and NM+CM > 1 and
+           CHF > 0    and CEMF < 0.99 and    CM > 0;
   }
-  else if(eta <= 2.7){ // eta < 2.7  
-    return NHF < 0.99 && NEMF < 0.99 && NM+CM > 1;
+  else if(eta <= 2.7){
+    return NHF < 0.99 and NEMF < 0.99 and NM+CM > 1;
   }
-  else if(eta <= 3.0){ // eta < 3.0  
-    return NEMF < 0.90 && NM > 2;
+  else if(eta <= 3.0){
+    //return NEMF < 0.90 && NM > 2;
+    return NEMF > 0.01 and NHF < 0.98 and NM > 2;
   }
-  else if(eta  < 4.7){ // eta < 4.7 = m_AK4jetEtaCut  
-    return NEMF < 0.90 && NM > 10;
+  else if(eta  < 4.7){
+    return NEMF < 0.90 and NM > 10;
   }
   return false;
 }

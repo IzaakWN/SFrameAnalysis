@@ -17,14 +17,14 @@ namespace Ntuple {
 
 namespace UZH {
   
-  /*
+  /**
    *  @short Class that maps TauNtupleObjects to Tau Particle class
    *
-   *         This class can be used to map the offline Tau information from
-   *         TauNtupleObjects to UZH::Tau class. All particles inherit 
-   *         from UZH::Particle.
+   *        This class can be used to map the offline Tau information from
+   *        TauNtupleObjects to UZH::Tau class. All particles inherit 
+   *        from UZH::Particle.
    *
-   * @author Code produced by Id: CodeIt.py 494 2010-07-30 13:41:32Z svn 
+   *  @author Code produced by Id: CodeIt.py 494 2010-07-30 13:41:32Z svn 
    *
    */
   
@@ -105,7 +105,7 @@ namespace UZH {
     int* m_decayMode;
     
     
-    floatingnumber m_e_; // for m_e pointer
+    floatingnumber m_e_; // reference value for m_e pointer
     
     // there must be consistent with ...NtupleObject.cxx, otherwise you'll get a segfault
     bool decayModeFindingNewDMs() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kdecayModeFindingNewDMs)) std::cout<<"decayModeFindingNewDMs not connected!"<<std::endl;*/ return (m_decayModeFindingNewDMs); } 
@@ -225,7 +225,7 @@ namespace UZH {
     void dz( const floatingnumber& val){ *(m_dz)=val; } 
     void TauType( const int& val){ *(m_TauType)=val; } 
     void decayMode( const int& val){ *(m_decayMode)=val; } 
-        
+    
     
     private:
     

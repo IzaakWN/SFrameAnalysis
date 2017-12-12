@@ -25,13 +25,13 @@
 
 namespace Ntuple {
   
-  /*
+  /**
    *  @short Class that can read the variables produced by TauNtupleObject
    *
-   *         This class can be used to read the offline muon information from
-   *         an ntuple produced by the SingleTopDPDMaker code.
+   *        This class can be used to read the offline muon information from
+   *        an ntuple produced by the SingleTopDPDMaker code.
    *
-   * @author Code produced by Id: CodeIt.py 494 2010-07-30 13:41:32Z svn   
+   *  @author Code produced by Id: CodeIt.py 494 2010-07-30 13:41:32Z svn   
    *
    */
   

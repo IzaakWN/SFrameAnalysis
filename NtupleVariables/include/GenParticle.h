@@ -17,14 +17,14 @@ namespace Ntuple {
 
 namespace UZH {
   
-  /*
+  /**
    *  @short Class that maps GenParticleNtupleObjects to GenParticle Particle class
    *
-   *         This class can be used to map the offline GenParticle information from
-   *         GenParticleNtupleObjects to UZH::GenParticle class. All particles inherit 
-   *         from UZH::Particle.
+   *        This class can be used to map the offline GenParticle information from
+   *        GenParticleNtupleObjects to UZH::GenParticle class. All particles inherit 
+   *        from UZH::Particle.
    *
-   * @author Code produced by Id: CodeIt.py 494 2010-07-30 13:41:32Z svn 
+   *  @author Code produced by Id: CodeIt.py 494 2010-07-30 13:41:32Z svn 
    *
    */
   
@@ -64,7 +64,7 @@ namespace UZH {
     int* m_taudecay;
     
     
-    floatingnumber m_e_; // for m_e pointer
+    floatingnumber m_e_; // reference value for m_e pointer
     
     // there must be consistent with ...NtupleObject.cxx, otherwise you'll get a segfault
     int pdgId() const { /*if(!m_ana->getConnectSucceeded(Ntuple::GenParticleNtupleObject::kpdgId)) std::cout<<"pdgId not connected!"<<std::endl;*/ return *(m_pdgId); } 
@@ -98,7 +98,7 @@ namespace UZH {
     void tauvisphi( const floatingnumber& val){ *(m_tauvisphi)=val; } 
     void tauvismass( const floatingnumber& val){ *(m_tauvismass)=val; } 
     void taudecay( const int& val){ *(m_taudecay)=val; } 
-        
+    
     
     private:
     

@@ -20,14 +20,14 @@ namespace Ntuple {
 
 namespace UZH {
   
-  /*
+  /**
    *  @short Class that maps MuonNtupleObjects to Muon Particle class
    *
-   *         This class can be used to map the offline Muon information from
-   *         MuonNtupleObjects to UZH::Muon class. All particles inherit 
-   *         from UZH::Particle.
+   *        This class can be used to map the offline Muon information from
+   *        MuonNtupleObjects to UZH::Muon class. All particles inherit 
+   *        from UZH::Particle.
    *
-   * @author Code produced by Id: CodeIt.py 494 2010-07-30 13:41:32Z svn 
+   *  @author Code produced by Id: CodeIt.py 494 2010-07-30 13:41:32Z svn 
    *
    */
   
@@ -138,7 +138,7 @@ namespace UZH {
     void pixelHits( const int& val){ *(m_pixelHits)=val; } 
     void globalHits( const int& val){ *(m_globalHits)=val; } 
     void normChi2( const floatingnumber& val){ *(m_normChi2)=val; } 
-        
+    
     
     private:
     

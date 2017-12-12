@@ -1,7 +1,7 @@
 #ifndef __UZH_CONTAINERBASE_H__
 #define __UZH_CONTAINERBASE_H__
 
- /**
+/**
  *  @short Extension for basic particle class to store additional variables
  *
  *         This class can be used to store additional variables in map.
@@ -11,7 +11,7 @@
  *
  * $Rev: 39970 $
  * $Date: 2013-04-06 18:23:39 +0200 (Sat, 06 Apr 2013) $
-  */
+ */
 
 // STL include(s):
 #include <map>

@@ -17,14 +17,14 @@ namespace Ntuple {
 
 namespace UZH {
   
-  /*
+  /**
    *  @short Class that maps MissingEtNtupleObjects to MissingEt Particle class
    *
-   *         This class can be used to map the offline MissingEt information from
-   *         MissingEtNtupleObjects to UZH::MissingEt class. All particles inherit 
-   *         from UZH::Particle.
+   *        This class can be used to map the offline MissingEt information from
+   *        MissingEtNtupleObjects to UZH::MissingEt class. All particles inherit 
+   *        from UZH::Particle.
    *
-   * @author Code produced by Id: CodeIt.py 494 2010-07-30 13:41:32Z svn 
+   *  @author Code produced by Id: CodeIt.py 494 2010-07-30 13:41:32Z svn 
    *
    */
   
@@ -93,7 +93,7 @@ namespace UZH {
     void cov00( const floatingnumber& val){ *(m_cov00)=val; } 
     void cov10( const floatingnumber& val){ *(m_cov10)=val; } 
     void cov11( const floatingnumber& val){ *(m_cov11)=val; } 
-        
+    
     
     private:
     

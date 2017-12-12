@@ -17,14 +17,14 @@ namespace Ntuple {
 
 namespace UZH {
   
-  /*
+  /**
    *  @short Class that maps JetNtupleObjects to Jet Particle class
    *
-   *         This class can be used to map the offline Jet information from
-   *         JetNtupleObjects to UZH::Jet class. All particles inherit 
-   *         from UZH::Particle.
+   *        This class can be used to map the offline Jet information from
+   *        JetNtupleObjects to UZH::Jet class. All particles inherit 
+   *        from UZH::Particle.
    *
-   * @author Code produced by Id: CodeIt.py 494 2010-07-30 13:41:32Z svn 
+   *  @author Code produced by Id: CodeIt.py 494 2010-07-30 13:41:32Z svn 
    *
    */
   
@@ -160,7 +160,7 @@ namespace UZH {
     void genParton_pdgID( const int& val){ *(m_genParton_pdgID)=val; } 
     void nbHadrons( const int& val){ *(m_nbHadrons)=val; } 
     void ncHadrons( const int& val){ *(m_ncHadrons)=val; } 
-        
+    
     
     private:
     

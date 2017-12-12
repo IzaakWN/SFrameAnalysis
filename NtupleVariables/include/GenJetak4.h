@@ -17,14 +17,14 @@ namespace Ntuple {
 
 namespace UZH {
   
-  /*
+  /**
    *  @short Class that maps GenJetak4NtupleObjects to GenJetak4 Particle class
    *
-   *         This class can be used to map the offline GenJetak4 information from
-   *         GenJetak4NtupleObjects to UZH::GenJetak4 class. All particles inherit 
-   *         from UZH::Particle.
+   *        This class can be used to map the offline GenJetak4 information from
+   *        GenJetak4NtupleObjects to UZH::GenJetak4 class. All particles inherit 
+   *        from UZH::Particle.
    *
-   * @author Code produced by Id: CodeIt.py 494 2010-07-30 13:41:32Z svn 
+   *  @author Code produced by Id: CodeIt.py 494 2010-07-30 13:41:32Z svn 
    *
    */
   
@@ -56,7 +56,7 @@ namespace UZH {
     void genJetAK4_phi( const float& val){ *(m_genJetAK4_phi)=val; } 
     void genJetAK4_eta( const float& val){ *(m_genJetAK4_eta)=val; } 
     void genJetAK4_e( const float& val){ *(m_genJetAK4_e)=val; } 
-        
+    
     
     private:
     

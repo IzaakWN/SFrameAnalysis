@@ -17,14 +17,14 @@ namespace Ntuple {
 
 namespace UZH {
   
-  /*
+  /**
    *  @short Class that maps ElectronNtupleObjects to Electron Particle class
    *
-   *         This class can be used to map the offline Electron information from
-   *         ElectronNtupleObjects to UZH::Electron class. All particles inherit 
-   *         from UZH::Particle.
+   *        This class can be used to map the offline Electron information from
+   *        ElectronNtupleObjects to UZH::Electron class. All particles inherit 
+   *        from UZH::Particle.
    *
-   * @author Code produced by Id: CodeIt.py 494 2010-07-30 13:41:32Z svn 
+   *  @author Code produced by Id: CodeIt.py 494 2010-07-30 13:41:32Z svn 
    *
    */
   
@@ -201,7 +201,7 @@ namespace UZH {
     void trackIso( const floatingnumber& val){ *(m_trackIso)=val; } 
     void superCluster_eta( const floatingnumber& val){ *(m_superCluster_eta)=val; } 
     void superCluster_e( const floatingnumber& val){ *(m_superCluster_e)=val; } 
-        
+    
     
     private:
     

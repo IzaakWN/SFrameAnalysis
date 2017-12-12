@@ -8,8 +8,8 @@ PileupReweightingTool::PileupReweightingTool( SCycleBase* parent, const char* na
 
   SetLogName( name );
   
-  DeclareProperty( m_name + "_HistoPath",        m_histoPath = "$SFRAME_DIR/../PileupReweightingTool/histograms/" );
-  DeclareProperty( m_name + "_DataRootFileName", m_dataRootFileName = "Data_Pileup_2016_271036-284044_80bins.root" );
+  DeclareProperty( m_name + "_HistoPath",        m_histoPath = "$SFRAME_DIR/../PileupReweightingTool/histograms" );
+  DeclareProperty( m_name + "_DataRootFileName", m_dataRootFileName = "Data_PileUp_2017_69200.root" );
   DeclareProperty( m_name + "_DataRootHistName", m_dataRootHistName = "pileup" );
   DeclareProperty( m_name + "_MCScenario",       m_mcScenario = "Winter17_25ns" );
 
@@ -36,6 +36,5 @@ void PileupReweightingTool::BeginInputData( const SInputData& ) throw( SError ) 
 
 // get the weight
 double PileupReweightingTool::getPileUpweight(float  mu ){
-  return weight = m_puWeight.getPUWeight( mu );
-  return weight;
+  return m_puWeight.getPUWeight( mu );
 }

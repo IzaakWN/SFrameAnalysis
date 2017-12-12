@@ -23,7 +23,7 @@
   <Package Name="SVFitTool.par" />
 
   <Cycle Name="TauTauAnalysis" OutputDirectory="./" PostFix="" ProofServer="lite" ProofWorkDir="" RunMode="LOCAL" TargetLumi="1.0">
-    <InputData Lumi="0.0" NEventsMax="10000" Type="TT_TuneCUETP8M1" Version="UZH" SkipValid="False">
+    <InputData Lumi="0.0" NEventsMax="100000" Type="TT_TuneCUETP8M1" Version="UZH" SkipValid="False">
 
 <In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_v1/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/171114_104206/0000/flatTuple_68.root" Lumi="1.0" />
 <In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_v1/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/171114_104206/0000/flatTuple_37.root" Lumi="1.0" />
@@ -51,6 +51,7 @@
 <In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_v1/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/171114_104206/0000/flatTuple_135.root" Lumi="1.0" />
 <In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_v1/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/171114_104206/0000/flatTuple_530.root" Lumi="1.0" />
 <In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_v1/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/171114_104206/0000/flatTuple_97.root" Lumi="1.0" />
+<!-- 
 <In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_v1/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/171114_104206/0000/flatTuple_472.root" Lumi="1.0" />
 <In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_v1/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/171114_104206/0000/flatTuple_267.root" Lumi="1.0" />
 <In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_v1/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/171114_104206/0000/flatTuple_455.root" Lumi="1.0" />
@@ -80,6 +81,7 @@
 <In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_v1/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/171114_104206/0000/flatTuple_512.root" Lumi="1.0" />
 <In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_v1/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/171114_104206/0000/flatTuple_385.root" Lumi="1.0" />
 <In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_v1/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/171114_104206/0000/flatTuple_224.root" Lumi="1.0" />
+ -->
 
       <InputTree Name="ntuplizer/tree" />
       <OutputTree Name="tree_mutau" />

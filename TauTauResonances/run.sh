@@ -6,9 +6,9 @@ FILES=(
 #    DYJets_M-10to50.xml
     DYJets_M-50.xml
 #    VBF.xml
-#    TT_TuneCUETP8M1.xml
+    #TT_TuneCUETP8M1.xml
 #    WJetsToLNu.xml
-#    SingleMuon.xml
+    #SingleMuon.xml
 )
 
 RUN_ONLY=0

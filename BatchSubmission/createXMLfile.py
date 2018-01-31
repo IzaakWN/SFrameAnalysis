@@ -62,7 +62,7 @@ parser.add_option("-t", "--tree", action="store",
                 dest="treeName", default="ntuplizer/tree",
                 help="Tree to be scanned by SFrame for number of input events [default = %default]")
 parser.add_option("-m", "--maxFiles", action="store",
-                dest="maxFiles", default="350",
+                dest="maxFiles", default="500",
                 help="Maximum number of files [default = %default]")
 parser.add_option("-o", "--outDir", action="store",
                 dest="outDir", default="xmls_Summer2016",
@@ -70,6 +70,9 @@ parser.add_option("-o", "--outDir", action="store",
 parser.add_option("-f", "--no-failed", action="store_false",
                 dest="writeFailed", default=True,
                 help="Do not write corrupt root files to a txt file")
+parser.add_option("-d", "--split", action="store",
+                dest="nSplit", default="1",
+                help="Number of parts a given file needs to be split into [default = %default]")
 (options, args) = parser.parse_args()
 if options.example or len(args) is not 1:
   parser.print_help()
@@ -85,6 +88,7 @@ verbose=options.verbose
 useXrootd=options.useXrootd
 treeName=options.treeName
 maxFiles_original=int(options.maxFiles)
+nSplit=int(options.nSplit)
 outDir=options.outDir
 writeFailed=options.writeFailed
 if verbose:
@@ -104,11 +108,15 @@ if site not in dCacheInstances:
 
 
 def main():
-
+  
+  if nSplit>1:
+    splitSampleListFile(sampleListName,nChunks=nSplit)
+    return
+  
   nSamples = 0
   with open(sampleListName) as sampleList:
     nSamples = len([l for l in sampleList if not (l.startswith("#") or l.isspace())])
-
+  
   with open(sampleListName) as sampleList:
     
     print "  Creating XML files in         %s," % (outDir)
@@ -302,6 +310,25 @@ def writeFailedRootFiles(failedRootFiles,i,outDir,outName):
     file.write("<!-- Warning! Ignored %s corrupted file%s, see %s.txt -->\n\n" % (len(failedRootFiles),plural(failedRootFiles),outNameFailed))
   print "  \033[1mWarning! File %s: Written %s corrupt root file%s to %s.txt in %s\033[0m" % (i+1, len(failedRootFiles),plural(failedRootFiles),outNameFailed,outDirFailed)
   
+  
+
+
+def splitSampleListFile(filename,nChunks=2):
+  '''Split txt file into some number of file with an equal number of lines.'''
+  if not os.path.exists(filename):
+    print "%s does not exist!"%(filename)
+    exit(1)
+  list = [ ]
+  with open(filename,'r') as file:
+    list  = [ s for s in file if not s.startswith("#") and not s.isspace() ]
+  nChunks = min(len(list),nChunks)
+  length  = int(len(list)/nChunks)
+  k, m    = divmod(len(list), nChunks)
+  for i in xrange(nChunks):
+    subfilename = filename.replace(".txt","_split%d.txt"%(i+1))
+    with open(subfilename,'w') as subfile:
+      print "Made \"%s\""%(subfilename)
+      for s in list[i*k+min(i,m):(i+1)*k+min(i+1,m)]: subfile.write(s)
 
 
 def plural(list,y=False):

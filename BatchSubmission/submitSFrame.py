@@ -215,6 +215,9 @@ def getJobFromId(runningJob, listOfJobs):
 # build in an automated resubmit for Eqw jobs at some point
 def waitForBatchJobs(runningJobs, listOfJobs, userName, timeCheck):
   print "waiting for %d job(s) in the queue" %(len(runningJobs))
+  nJobs = len(runningJobs)
+  skip  = 5 if nJobs<400 else 10
+  skip2 = 5 if nJobs>400 else 1
   while not len(runningJobs)==0:
     time.sleep(float(timeCheck))
     queryString="qstat -u %s | grep %s | awk {\'print $1\'}" %(userName, userName)
@@ -232,7 +235,10 @@ def waitForBatchJobs(runningJobs, listOfJobs, userName, timeCheck):
           if j[1]==(l[2]+l[3]):
             l[4]="."
         runningJobs.remove(j)
-        print "waiting for %d job(s) in the queue" %(len(runningJobs))
+        nRunningJobs = len(runningJobs)
+        if ((nRunningJobs%skip )==0 or not(nJobs*0.25<nRunningJobs<nJobs*0.75)) and\
+           ((nRunningJobs%skip2)==0 or not(nJobs*0.07<nRunningJobs<nJobs*0.93)):
+          print "waiting for %d job(s) in the queue" %(len(runningJobs))
       #else:
       #  #store job usage info in seperate file, dump into log at the end
       #  queryString   = "qstat -j " + jobId + " | grep usage"
@@ -283,12 +289,13 @@ def checkCompletion(dataSets, listOfJobs, outDir, cycleName, postFix,keepTemp):
         #  mergeDebug+=open(usageFile).read()
         #  os.system("rm -f " +usageFile)
         mergeFiles+=fileBaseNameRoot+l[3]+".root "
-        fileToMerge=fileBaseNameRoot.partition("pythia8")[0]+fileBaseNameRoot.partition("pythia8")[1]+'*'
-        fileToMerge=fileToMerge.partition("Run2016")[0]+fileToMerge.partition("Run2016")[1]+'*'
-        fileToMerge=fileToMerge.partition("Run2017")[0]+fileToMerge.partition("Run2017")[1]+'*'
-        fileToMerge=fileToMerge.partition("Run2018")[0]+fileToMerge.partition("Run2018")[1]+'*'
-        fileToMerge=fileToMerge.partition("madgraph")[0]+fileToMerge.partition("madgraph")[1]+'*'
-        
+        # fileToMerge=fileBaseNameRoot.partition("pythia8")[0]+fileBaseNameRoot.partition("pythia8")[1]+'*'
+        # fileToMerge=fileToMerge.partition("Run2016")[0]+fileToMerge.partition("Run2016")[1]+'*'
+        # fileToMerge=fileToMerge.partition("Run2017")[0]+fileToMerge.partition("Run2017")[1]+'*'
+        # fileToMerge=fileToMerge.partition("Run2018")[0]+fileToMerge.partition("Run2018")[1]+'*'
+        # fileToMerge=fileToMerge.partition("madgraph")[0]+fileToMerge.partition("madgraph")[1]+'*'
+        # while "**" in fileToMerge: fileToMerge=fileToMerge.replace("**",'*')
+        fileToMerge=partitionFileNames(fileBaseNameRoot)
         # print "l[6] %s ,l[1] %s, l[2] %s ,l[3] %s , fileBaseNameRoot %s ," %(l[6],l[1],l[2],l[3],fileBaseNameRoot)
       elif l[0]==d[0] and l[4]=="":
         checkReady=False
@@ -300,18 +307,19 @@ def checkCompletion(dataSets, listOfJobs, outDir, cycleName, postFix,keepTemp):
         mergeCmd="hadd -f %s.root %s " %(mergeFileBaseName, mergeFiles)
       else:
         #mergeCmd="hadd -f %s.root %s && rm -rf %s" %(mergeFileBaseName, mergeFiles, mergeFiles)
-        fileToMerge=fileBaseNameRoot.partition("pythia8")[0]+fileBaseNameRoot.partition("pythia8")[1]+'*'
-        fileToMerge=fileToMerge.partition("Run2016")[0]+fileToMerge.partition("Run2016")[1]+'*'
-        fileToMerge=fileToMerge.partition("Run2017")[0]+fileToMerge.partition("Run2017")[1]+'*'
-        fileToMerge=fileToMerge.partition("Run2018")[0]+fileToMerge.partition("Run2018")[1]+'*'
-        fileToMerge=fileToMerge.partition("madgraph")[0]+fileToMerge.partition("madgraph")[1]+'*'
+        # fileToMerge=fileBaseNameRoot.partition("pythia8")[0]+fileBaseNameRoot.partition("pythia8")[1]+'*'
+        # fileToMerge=fileToMerge.partition("Run2016")[0]+fileToMerge.partition("Run2016")[1]+'*'
+        # fileToMerge=fileToMerge.partition("Run2017")[0]+fileToMerge.partition("Run2017")[1]+'*'
+        # fileToMerge=fileToMerge.partition("Run2018")[0]+fileToMerge.partition("Run2018")[1]+'*'
+        # fileToMerge=fileToMerge.partition("madgraph")[0]+fileToMerge.partition("madgraph")[1]+'*'
+        # while "**" in fileToMerge: fileToMerge=fileToMerge.replace("**",'*')
+        fileToMerge=partitionFileNames(fileBaseNameRoot)
         mergeCmd='hadd -f %s.root %s.root && rm -rf %s.root'  %(mergeFileBaseName,  fileToMerge,  fileToMerge)
         #mergeCmd_mt = 'hadd -f %s/%s_mutau.root %s/%s_mutau*.root && rm -rf %s/%s_mutau*.root'  %(outDir, d[0], fileBaseName, d[0], fileBaseName, d[0])
         #mergeCmd_et = 'hadd -f %s/%s_eletau.root %s/%s_eletau*.root && rm -rf %s/%s_eletau*.root'  %(outDir, d[0], fileBaseName, d[0], fileBaseName, d[0])
         print "mergeCmd is\n%s \n" %mergeCmd
         #print "mergeCmd_private_mt is %s " %mergeCmd_mt
         #print "mergeCmd_private_et is %s " %mergeCmd_et
-      while "**" in fileToMerge: fileToMerge=fileToMerge.replace("**",'*')
       
       # LS
       lock=thread.allocate_lock()
@@ -695,6 +703,11 @@ def main():
     compilePacks=[]
   print "%-30s : compilePacks=%s" % ("additional packages to compile", compilePacks)
   
+  # set batch queue
+  if not "queue" in dir():
+    queue="all.q"
+  print "%-30s : queue=%s" %("queue", queue)
+  
   # set hard CPU limit
   if not "hCPU" in dir():
     hCPU="00:30:00"
@@ -771,7 +784,7 @@ def main():
     os.system( "tar czf SFrameSandbox.tar.gz SFrame" )
     os.system( "mv SFrameSandbox.tar.gz %s" %(tempDirSh) )
     print "sandbox creation finished!"
-
+  
   print "using temporary directories\n  %s (scripts)\n  %s (root)\n  %s (log)" %(tempDirSh,tempDirRoot,tempDirLog)
   os.chdir(tempDirSh)
 
@@ -941,7 +954,7 @@ def main():
       lock.acquire()
       nameOfJob=j[2]+j[3]
       nameOfJob=nameOfJob.split('.')[1]+nameOfJob.split('.')[2]
-      runProcess=subprocess.Popen("qsub -q all.q -notify -N %s %s.sh" %(nameOfJob, j[2]+j[3]), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+      runProcess=subprocess.Popen("qsub -q %s -notify -N %s %s.sh" %(queue, nameOfJob, j[2]+j[3]), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
       runProcess.wait()
       #runningJobs.append(j[2]+j[3])
       runProcessStatus=runProcess.poll()
@@ -954,7 +967,7 @@ def main():
         submitOut = runProcess.stdout.read()
         runningJobs.append([submitOut.split(" ")[2], j[2]+j[3]])
       if not (iJobs%skip):
-        print "submitting job %d of %d: "%(iJobs,nJobs),
+        print "submitting job %d of %d"%(iJobs,nJobs),
         while runningJobsLimit>0:
           #subProcess=subprocess.Popen('qstat -u $USER | awk \'{print $5}\' | grep r |wc -l' , stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
           #nRunning=int(subProcess.stdout.read())
@@ -1017,13 +1030,51 @@ def main():
   
 
 
+def partitionFileNames(fileBaseNameRoot):
+  """Help function to convert root file basename to a file name pattern for merging with hadd."""
+  
+  # fileToMerge=fileBaseNameRoot.partition("pythia8")[0]+fileBaseNameRoot.partition("pythia8")[1]+'*'
+  # fileToMerge=fileToMerge.partition("Run2016")[0]+fileToMerge.partition("Run2016")[1]+'*'
+  # fileToMerge=fileToMerge.partition("Run2017")[0]+fileToMerge.partition("Run2017")[1]+'*'
+  # fileToMerge=fileToMerge.partition("Run2018")[0]+fileToMerge.partition("Run2018")[1]+'*'
+  # fileToMerge=fileToMerge.partition("madgraph")[0]+fileToMerge.partition("madgraph")[1]+'*'
+  
+  fileToMerge = fileBaseNameRoot
+  for token in [ "pythia8", "madgraph", "Run2016", "Run2017", "Run2018" ]:
+    part        = fileToMerge.partition(token)
+    letters     = dataSetLetters(part[2])
+    fileToMerge = part[0]+part[1]+letters+'*'
+  
+  while "**" in fileToMerge: fileToMerge=fileToMerge.replace("**",'*')
+  return fileToMerge
+  
+
+
+def dataSetLetters(string):
+  """"Help function to find dataset letter(s) (ABCDE) at the beginning of a string"""
+  letters = ""
+  dataSetLetters = [ 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'H', 'I', 'J', 'K' ]
+  if len(string)>0:
+    for character in string:
+      #print "%s <-> %s"%(character,dataSetLetters)
+      if len(dataSetLetters)==0: break
+      for i, letter in enumerate(dataSetLetters):
+        if character == letter:
+          letters += letter
+          dataSetLetters = dataSetLetters[i+1:]
+          break
+      else: break # stop once no other letter was found
+  return letters
+  
+
+
 def accountTime(jobOptions,jobName,nJobs):
   """Append summary to a log file."""
   
-  logdir="nohup"
+  logdir   = "nohup"
+  filepath = "%s/submitSFrame.log"%logdir
+  new      = not os.path.exists(filepath)
   makeDirectory(logdir)
-  filepath="%s/submitSFrame.log"%logdir
-  new = not os.path.exists(filepath)
   
   global succesRates, starttime, startdate
   succesRates = "succes rate(s):\n" + '\n'.join(sorted(succesRates)) + '\n'

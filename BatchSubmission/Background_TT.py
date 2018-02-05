@@ -1,4 +1,4 @@
-path2xml="/shome/ineuteli/shared/xml/xmls_MC2017_V1_small"
+path2xml="/shome/ineuteli/shared/xml/xmls_MC2017_V2"
 path2tmp="$SFRAME_DIR/../AnalysisTemp"
 jobName="TT"
 outDir="/scratch/$USER/SFrameAnalysis/AnalysisOutput_ltau2017/"+jobName
@@ -6,17 +6,37 @@ cycleName="TauTauAnalysis"
 nEventsMax=-1
 #nEventsMax=200
 nProcesses=1
-nFiles=5
-hCPU="07:00:00"
+queue="short.q"
+nFiles=1
+hCPU="00:30:00"
 hVMEM="5000M"
-postFix="_2017"
+postFix="_2017_V2"
 dataSets = [
     
-   [ "TT_TuneCUETP8M1",
-    [   "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_0000_0.xml",
-        "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_0000_1.xml",
-        "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_ext_0000_0.xml",
-        "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_ext_0000_1.xml", ]],
+   [ "TTTo2L2Nu",
+    [   "TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8_0000_0.xml",
+        "TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8_0000_1.xml",
+        "TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8_0001.xml", ]],
+    
+   [ "TTToHadronic",
+    [   "TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8_0000_0.xml",
+        "TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8_0000_1.xml",
+        "TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8_0001_0.xml",
+        "TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8_0001_1.xml",
+        "TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8_0002.xml", ]],
+    
+   [ "TTToSemiLeptonic",
+    [   "TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8_0000_0.xml",
+        "TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8_0000_1.xml",
+        "TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8_0001_0.xml",
+        "TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8_0001_1.xml",
+        "TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8_0002.xml", ]],
+   
+#    [ "TT_TuneCUETP8M2T4",
+#     [   "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_0000_0.xml",
+#         "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_0000_1.xml",
+#         "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_ext_0000_0.xml",
+#         "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_ext_0000_1.xml", ]],
     
 ]
 

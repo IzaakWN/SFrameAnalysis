@@ -1,4 +1,4 @@
-path2xml="/shome/ineuteli/shared/xml/xmls_MC2017_V1_small"
+path2xml="/shome/ineuteli/shared/xml/xmls_MC2017_V2"
 path2tmp="$SFRAME_DIR/../AnalysisTemp"
 jobName="WW"
 outDir="/scratch/$USER/SFrameAnalysis/AnalysisOutput_ltau2017/"+jobName
@@ -6,14 +6,17 @@ cycleName="TauTauAnalysis"
 nEventsMax=-1
 #nEventsMax=200
 nProcesses=1
-nFiles=5
-hCPU="03:30:00"
+queue="short.q"
+nFiles=1
+hCPU="00:40:00"
 hVMEM="5000M"
-postFix="_2017"
+postFix="_2017_V2"
 dataSets = [
     
-   [ "WW_TuneCUETP8M1",
-    [   "WW_TuneCUETP8M1_13TeV-pythia8_0000.xml", ]],
+   [ "WW_TuneCP5",
+    [   "WW_TuneCP5_13TeV-pythia8_0000.xml", ]],    
+#    [ "WW_TuneCUETP8M1",
+#     [   "WW_TuneCUETP8M1_13TeV-pythia8_0000.xml", ]],
     
 ]
 

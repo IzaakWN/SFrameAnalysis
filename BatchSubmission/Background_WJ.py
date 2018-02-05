@@ -1,4 +1,4 @@
-path2xml="/shome/ineuteli/shared/xml/xmls_MC2017_V1_small"
+path2xml="/shome/ineuteli/shared/xml/xmls_MC2017_V2"
 path2tmp="$SFRAME_DIR/../AnalysisTemp"
 jobName="WJ"
 outDir="/scratch/$USER/SFrameAnalysis/AnalysisOutput_ltau2017/"+jobName
@@ -6,28 +6,27 @@ cycleName="TauTauAnalysis"
 nEventsMax=-1
 #nEventsMax=200
 nProcesses=1
-nFiles=17
-hCPU="04:45:00"
+queue="short.q"
+nFiles=1
+hCPU="00:30:00"
 hVMEM="5000M"
-postFix="_2017"
+postFix="_2017_V2"
 dataSets = [
     
-   [ "WJetsToLNu_TuneCUETP8M1",
-    [   #"WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_0000.xml",
-        "WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_0000.xml", ]],
-
-    [ "W1JetsToLNu_TuneCUETP8M1",
-     [  "W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_0000_0.xml",
+   [ "WJetsToLNu",
+    [   "WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_0000.xml", ]],
+     
+   [ "W1JetsToLNu",
+    [   "W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_0000_0.xml",
         "W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_0000_1.xml", ]],
 
-    [ "W2JetsToLNu_TuneCUETP8M1",
-     [  "W2JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_0000_0.xml",
-        "W2JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_0000_1.xml", ]],
-
-    [ "W3JetsToLNu_TuneCUETP8M1",
+    [ "W2JetsToLNu",
+     [  "W2JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_0000.xml", ]],
+     
+    [ "W3JetsToLNu",
      [  "W3JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_0000.xml", ]],
-
-    [ "W4JetsToLNu_TuneCUETP8M1",
+     
+    [ "W4JetsToLNu",
      [  "W4JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_0000.xml", ]],
     
 ]
@@ -35,7 +34,7 @@ dataSets = [
 userItems = [ 
     ["IsData","false"],
     ["IsSignal","false"],
-    ["doRecoilCorr","true"],
+    ["doRecoilCorr","false"],
     ["EESshift","0.00"],
 ]
 

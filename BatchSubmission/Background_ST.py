@@ -1,4 +1,4 @@
-path2xml="/shome/ineuteli/shared/xml/xmls_MC2017_V1_small"
+path2xml="/shome/ineuteli/shared/xml/xmls_MC2017_V2"
 path2tmp="$SFRAME_DIR/../AnalysisTemp"
 jobName="ST"
 outDir="/scratch/$USER/SFrameAnalysis/AnalysisOutput_ltau2017/"+jobName
@@ -6,36 +6,31 @@ cycleName="TauTauAnalysis"
 nEventsMax=-1
 #nEventsMax=200
 nProcesses=1
-nFiles=3
-hCPU="04:30:00"
+queue="short.q"
+nFiles=1
+hCPU="00:30:00"
 hVMEM="5000M"
-postFix="_2017"
+postFix="_2017_V2"
 dataSets = [
     
+   [ "ST_t-channel_top_4f_inclusiveDecays",
+    [   "ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8_0000.xml", ]],
+    
+   [ "ST_t-channel_antitop_4f_inclusiveDecays",
+    [   "ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8_0000.xml", ]],
+    
    [ "ST_tW_top_5f_inclusiveDecays",
-    [   "ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1_0000.xml", ]],
+    [   "ST_tW_top_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8_0000.xml", ]],
     
    [ "ST_tW_antitop_5f_inclusiveDecays",
-    [   "ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1_0000.xml", ]],
+    [   "ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_0000.xml", ]],
     
-     # [ "ST_tW_top_5f_NoFullyHadronicDecays",
-     #  [   "ST_tW_top_5f_NoFullyHadronicDecays_13TeV-powheg_TuneCUETP8M1_0000.xml", ]],
-     # 
-     # [ "ST_tW_antitop_5f_NoFullyHadronicDecays",
-     #  [   "ST_tW_antitop_5f_NoFullyHadronicDecays_13TeV-powheg_TuneCUETP8M1_0000.xml", ]],
-     # 
-     # [ "ST_s-channel_4f_leptonDecays",
-     #  [   "ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1_0000.xml", ]],
-        
-#        [ "ST_t-channel_antitop_4f_inclusiveDecays",
-#         [   "ST_t-channel_antitop_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1_0000_0.xml",
-#             "ST_t-channel_antitop_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1_0000_1.xml", ]],
-#         
-#        [ "ST_t-channel_top_4f_inclusiveDecays",
-#         [   "ST_t-channel_top_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1_0000_0.xml",
-#             "ST_t-channel_top_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1_0000_1.xml",
-#             "ST_t-channel_top_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1_0000_2.xml", ]],
-        
+#    [ "ST_s-channel_4f_leptonDecays",
+#     [   "ST_s-channel_4f_leptonDecays_TuneCP5_PSweights_13TeV-amcatnlo-pythia8_0000.xml", ]],
+#     
+#    [ "ST_s-channel_4f_leptonDecays",
+#     [   "ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8_0000.xml", ]],
+    
 ]
 
 userItems = [ 

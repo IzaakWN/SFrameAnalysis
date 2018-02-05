@@ -16,7 +16,7 @@ ${Object}::${Object}( const Ntuple::${Object}NtupleObject* ana, const Int_t idx 
   
   // copy variables defined in Particle.h
   ${{AllBasicsExceptE:m_#name# = &((*ana->#name#)[idx]);}}
-  ${{Only:Tau,GenParticle:m_e_ = calculateE();
+  ${{Only:GenParticle:m_e_ = calculateE();
   m_e = &(m_e_);
   }}
   m_lvl = ana->detailLevel;
@@ -61,7 +61,7 @@ bool operator<<( const ${Object}& e1, const ${Object}& e2 ) {
   return sort( e1, e2 );
 }
 }}
-${{Only:Muon,Jet,TruthJet,Electron:
+${{Only:Muon,Electron,Tau,Jet,TruthJet:
 TLorentzVector* ${Object}::getTLV() const {
   TLorentzVector* tlv = new TLorentzVector();
   tlv->SetPtEtaPhiE(*(m_pt), *(m_eta), *(m_phi), *(m_e));
@@ -74,7 +74,7 @@ TLorentzVector ${Object}::tlv() const {
   return tlv;
 }
 }}
-${{Only:GenParticle,Tau:
+${{Only:GenParticle:
 TLorentzVector* ${Object}::getTLV() const {
   TLorentzVector* tlv = new TLorentzVector();
   tlv->SetPtEtaPhiM(*(m_pt), *(m_eta), *(m_phi), *(m_m));

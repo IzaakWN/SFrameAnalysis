@@ -16,10 +16,6 @@ ID	int*	decayMode
 
 AdvancedID	bool	decayModeFindingNewDMs
 AdvancedID	bool	decayModeFinding
-AdvancedID	bool	byLooseCombinedIsolationDeltaBetaCorr3Hits
-AdvancedID	bool	byMediumCombinedIsolationDeltaBetaCorr3Hits
-AdvancedID	bool	byTightCombinedIsolationDeltaBetaCorr3Hits
-AdvancedID	bool	byCombinedIsolationDeltaBetaCorrRaw3Hits
 
 AdvancedID	floatingnumber*	chargedIsoPtSum
 AdvancedID	floatingnumber*	neutralIsoPtSum
@@ -33,6 +29,11 @@ AdvancedID	floatingnumber*	byIsolationMVArun2v1DBdR03oldDMwLTraw
 AdvancedID	floatingnumber*	byIsolationMVArun2v1DBnewDMwLTraw
 AdvancedID	floatingnumber*	byIsolationMVArun2v1DBoldDMwLTraw
 AdvancedID	floatingnumber*	byIsolationMVArun2v1PWnewDMwLTraw
+
+AdvancedID	bool	byLooseCombinedIsolationDeltaBetaCorr3Hits
+AdvancedID	bool	byMediumCombinedIsolationDeltaBetaCorr3Hits
+AdvancedID	bool	byTightCombinedIsolationDeltaBetaCorr3Hits
+AdvancedID	bool	byCombinedIsolationDeltaBetaCorrRaw3Hits
 
 AdvancedID	bool	byLooseIsolationMVArun2v1DBdR03oldDMwLT
 AdvancedID	bool	byLooseIsolationMVArun2v1DBnewDMwLT

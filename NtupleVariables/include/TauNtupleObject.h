@@ -73,22 +73,22 @@ namespace Ntuple {
     enum ConnectionIndex { 
       kdecayModeFindingNewDMs = 7,
       kdecayModeFinding = 8,
-      kbyLooseCombinedIsolationDeltaBetaCorr3Hits = 9,
-      kbyMediumCombinedIsolationDeltaBetaCorr3Hits = 10,
-      kbyTightCombinedIsolationDeltaBetaCorr3Hits = 11,
-      kbyCombinedIsolationDeltaBetaCorrRaw3Hits = 12,
-      kchargedIsoPtSum = 13,
-      kneutralIsoPtSum = 14,
-      kpuCorrPtSum = 15,
-      kchargedIsoPtSumdR03 = 16,
-      kneutralIsoPtSumdR03 = 17,
-      kphotonPtSumOutsideSignalConedR03 = 18,
-      kchargedPionPt = 19,
-      kneutralPionPt = 20,
-      kbyIsolationMVArun2v1DBdR03oldDMwLTraw = 21,
-      kbyIsolationMVArun2v1DBnewDMwLTraw = 22,
-      kbyIsolationMVArun2v1DBoldDMwLTraw = 23,
-      kbyIsolationMVArun2v1PWnewDMwLTraw = 24,
+      kchargedIsoPtSum = 9,
+      kneutralIsoPtSum = 10,
+      kpuCorrPtSum = 11,
+      kchargedIsoPtSumdR03 = 12,
+      kneutralIsoPtSumdR03 = 13,
+      kphotonPtSumOutsideSignalConedR03 = 14,
+      kchargedPionPt = 15,
+      kneutralPionPt = 16,
+      kbyIsolationMVArun2v1DBdR03oldDMwLTraw = 17,
+      kbyIsolationMVArun2v1DBnewDMwLTraw = 18,
+      kbyIsolationMVArun2v1DBoldDMwLTraw = 19,
+      kbyIsolationMVArun2v1PWnewDMwLTraw = 20,
+      kbyLooseCombinedIsolationDeltaBetaCorr3Hits = 21,
+      kbyMediumCombinedIsolationDeltaBetaCorr3Hits = 22,
+      kbyTightCombinedIsolationDeltaBetaCorr3Hits = 23,
+      kbyCombinedIsolationDeltaBetaCorrRaw3Hits = 24,
       kbyLooseIsolationMVArun2v1DBdR03oldDMwLT = 25,
       kbyLooseIsolationMVArun2v1DBnewDMwLT = 26,
       kbyLooseIsolationMVArun2v1DBoldDMwLT = 27,
@@ -138,14 +138,11 @@ namespace Ntuple {
     std::vector< floatingnumber >  *eta;
     std::vector< floatingnumber >  *phi;
     std::vector< floatingnumber >  *m;
+    std::vector< floatingnumber >  *e;
     
     // vectors of object specific variables
     std::vector< bool >  *decayModeFindingNewDMs;
     std::vector< bool >  *decayModeFinding;
-    std::vector< bool >  *byLooseCombinedIsolationDeltaBetaCorr3Hits;
-    std::vector< bool >  *byMediumCombinedIsolationDeltaBetaCorr3Hits;
-    std::vector< bool >  *byTightCombinedIsolationDeltaBetaCorr3Hits;
-    std::vector< bool >  *byCombinedIsolationDeltaBetaCorrRaw3Hits;
     std::vector< floatingnumber >  *chargedIsoPtSum;
     std::vector< floatingnumber >  *neutralIsoPtSum;
     std::vector< floatingnumber >  *puCorrPtSum;
@@ -158,6 +155,10 @@ namespace Ntuple {
     std::vector< floatingnumber >  *byIsolationMVArun2v1DBnewDMwLTraw;
     std::vector< floatingnumber >  *byIsolationMVArun2v1DBoldDMwLTraw;
     std::vector< floatingnumber >  *byIsolationMVArun2v1PWnewDMwLTraw;
+    std::vector< bool >  *byLooseCombinedIsolationDeltaBetaCorr3Hits;
+    std::vector< bool >  *byMediumCombinedIsolationDeltaBetaCorr3Hits;
+    std::vector< bool >  *byTightCombinedIsolationDeltaBetaCorr3Hits;
+    std::vector< bool >  *byCombinedIsolationDeltaBetaCorrRaw3Hits;
     std::vector< bool >  *byLooseIsolationMVArun2v1DBdR03oldDMwLT;
     std::vector< bool >  *byLooseIsolationMVArun2v1DBnewDMwLT;
     std::vector< bool >  *byLooseIsolationMVArun2v1DBoldDMwLT;

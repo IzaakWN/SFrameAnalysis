@@ -47,10 +47,6 @@ namespace UZH {
     // variable definitions
     bool m_decayModeFindingNewDMs;
     bool m_decayModeFinding;
-    bool m_byLooseCombinedIsolationDeltaBetaCorr3Hits;
-    bool m_byMediumCombinedIsolationDeltaBetaCorr3Hits;
-    bool m_byTightCombinedIsolationDeltaBetaCorr3Hits;
-    bool m_byCombinedIsolationDeltaBetaCorrRaw3Hits;
     floatingnumber* m_chargedIsoPtSum;
     floatingnumber* m_neutralIsoPtSum;
     floatingnumber* m_puCorrPtSum;
@@ -63,6 +59,10 @@ namespace UZH {
     floatingnumber* m_byIsolationMVArun2v1DBnewDMwLTraw;
     floatingnumber* m_byIsolationMVArun2v1DBoldDMwLTraw;
     floatingnumber* m_byIsolationMVArun2v1PWnewDMwLTraw;
+    bool m_byLooseCombinedIsolationDeltaBetaCorr3Hits;
+    bool m_byMediumCombinedIsolationDeltaBetaCorr3Hits;
+    bool m_byTightCombinedIsolationDeltaBetaCorr3Hits;
+    bool m_byCombinedIsolationDeltaBetaCorrRaw3Hits;
     bool m_byLooseIsolationMVArun2v1DBdR03oldDMwLT;
     bool m_byLooseIsolationMVArun2v1DBnewDMwLT;
     bool m_byLooseIsolationMVArun2v1DBoldDMwLT;
@@ -104,16 +104,9 @@ namespace UZH {
     int* m_TauType;
     int* m_decayMode;
     
-    
-    floatingnumber m_e_; // reference value for m_e pointer
-    
     // there must be consistent with ...NtupleObject.cxx, otherwise you'll get a segfault
     bool decayModeFindingNewDMs() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kdecayModeFindingNewDMs)) std::cout<<"decayModeFindingNewDMs not connected!"<<std::endl;*/ return (m_decayModeFindingNewDMs); } 
     bool decayModeFinding() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kdecayModeFinding)) std::cout<<"decayModeFinding not connected!"<<std::endl;*/ return (m_decayModeFinding); } 
-    bool byLooseCombinedIsolationDeltaBetaCorr3Hits() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyLooseCombinedIsolationDeltaBetaCorr3Hits)) std::cout<<"byLooseCombinedIsolationDeltaBetaCorr3Hits not connected!"<<std::endl;*/ return (m_byLooseCombinedIsolationDeltaBetaCorr3Hits); } 
-    bool byMediumCombinedIsolationDeltaBetaCorr3Hits() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyMediumCombinedIsolationDeltaBetaCorr3Hits)) std::cout<<"byMediumCombinedIsolationDeltaBetaCorr3Hits not connected!"<<std::endl;*/ return (m_byMediumCombinedIsolationDeltaBetaCorr3Hits); } 
-    bool byTightCombinedIsolationDeltaBetaCorr3Hits() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyTightCombinedIsolationDeltaBetaCorr3Hits)) std::cout<<"byTightCombinedIsolationDeltaBetaCorr3Hits not connected!"<<std::endl;*/ return (m_byTightCombinedIsolationDeltaBetaCorr3Hits); } 
-    bool byCombinedIsolationDeltaBetaCorrRaw3Hits() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyCombinedIsolationDeltaBetaCorrRaw3Hits)) std::cout<<"byCombinedIsolationDeltaBetaCorrRaw3Hits not connected!"<<std::endl;*/ return (m_byCombinedIsolationDeltaBetaCorrRaw3Hits); } 
     floatingnumber chargedIsoPtSum() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kchargedIsoPtSum)) std::cout<<"chargedIsoPtSum not connected!"<<std::endl;*/ return *(m_chargedIsoPtSum); } 
     floatingnumber neutralIsoPtSum() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kneutralIsoPtSum)) std::cout<<"neutralIsoPtSum not connected!"<<std::endl;*/ return *(m_neutralIsoPtSum); } 
     floatingnumber puCorrPtSum() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kpuCorrPtSum)) std::cout<<"puCorrPtSum not connected!"<<std::endl;*/ return *(m_puCorrPtSum); } 
@@ -126,6 +119,10 @@ namespace UZH {
     floatingnumber byIsolationMVArun2v1DBnewDMwLTraw() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyIsolationMVArun2v1DBnewDMwLTraw)) std::cout<<"byIsolationMVArun2v1DBnewDMwLTraw not connected!"<<std::endl;*/ return *(m_byIsolationMVArun2v1DBnewDMwLTraw); } 
     floatingnumber byIsolationMVArun2v1DBoldDMwLTraw() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyIsolationMVArun2v1DBoldDMwLTraw)) std::cout<<"byIsolationMVArun2v1DBoldDMwLTraw not connected!"<<std::endl;*/ return *(m_byIsolationMVArun2v1DBoldDMwLTraw); } 
     floatingnumber byIsolationMVArun2v1PWnewDMwLTraw() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyIsolationMVArun2v1PWnewDMwLTraw)) std::cout<<"byIsolationMVArun2v1PWnewDMwLTraw not connected!"<<std::endl;*/ return *(m_byIsolationMVArun2v1PWnewDMwLTraw); } 
+    bool byLooseCombinedIsolationDeltaBetaCorr3Hits() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyLooseCombinedIsolationDeltaBetaCorr3Hits)) std::cout<<"byLooseCombinedIsolationDeltaBetaCorr3Hits not connected!"<<std::endl;*/ return (m_byLooseCombinedIsolationDeltaBetaCorr3Hits); } 
+    bool byMediumCombinedIsolationDeltaBetaCorr3Hits() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyMediumCombinedIsolationDeltaBetaCorr3Hits)) std::cout<<"byMediumCombinedIsolationDeltaBetaCorr3Hits not connected!"<<std::endl;*/ return (m_byMediumCombinedIsolationDeltaBetaCorr3Hits); } 
+    bool byTightCombinedIsolationDeltaBetaCorr3Hits() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyTightCombinedIsolationDeltaBetaCorr3Hits)) std::cout<<"byTightCombinedIsolationDeltaBetaCorr3Hits not connected!"<<std::endl;*/ return (m_byTightCombinedIsolationDeltaBetaCorr3Hits); } 
+    bool byCombinedIsolationDeltaBetaCorrRaw3Hits() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyCombinedIsolationDeltaBetaCorrRaw3Hits)) std::cout<<"byCombinedIsolationDeltaBetaCorrRaw3Hits not connected!"<<std::endl;*/ return (m_byCombinedIsolationDeltaBetaCorrRaw3Hits); } 
     bool byLooseIsolationMVArun2v1DBdR03oldDMwLT() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyLooseIsolationMVArun2v1DBdR03oldDMwLT)) std::cout<<"byLooseIsolationMVArun2v1DBdR03oldDMwLT not connected!"<<std::endl;*/ return (m_byLooseIsolationMVArun2v1DBdR03oldDMwLT); } 
     bool byLooseIsolationMVArun2v1DBnewDMwLT() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyLooseIsolationMVArun2v1DBnewDMwLT)) std::cout<<"byLooseIsolationMVArun2v1DBnewDMwLT not connected!"<<std::endl;*/ return (m_byLooseIsolationMVArun2v1DBnewDMwLT); } 
     bool byLooseIsolationMVArun2v1DBoldDMwLT() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyLooseIsolationMVArun2v1DBoldDMwLT)) std::cout<<"byLooseIsolationMVArun2v1DBoldDMwLT not connected!"<<std::endl;*/ return (m_byLooseIsolationMVArun2v1DBoldDMwLT); } 
@@ -169,10 +166,6 @@ namespace UZH {
         
     void decayModeFindingNewDMs( const bool& val){ (m_decayModeFindingNewDMs)=val; } 
     void decayModeFinding( const bool& val){ (m_decayModeFinding)=val; } 
-    void byLooseCombinedIsolationDeltaBetaCorr3Hits( const bool& val){ (m_byLooseCombinedIsolationDeltaBetaCorr3Hits)=val; } 
-    void byMediumCombinedIsolationDeltaBetaCorr3Hits( const bool& val){ (m_byMediumCombinedIsolationDeltaBetaCorr3Hits)=val; } 
-    void byTightCombinedIsolationDeltaBetaCorr3Hits( const bool& val){ (m_byTightCombinedIsolationDeltaBetaCorr3Hits)=val; } 
-    void byCombinedIsolationDeltaBetaCorrRaw3Hits( const bool& val){ (m_byCombinedIsolationDeltaBetaCorrRaw3Hits)=val; } 
     void chargedIsoPtSum( const floatingnumber& val){ *(m_chargedIsoPtSum)=val; } 
     void neutralIsoPtSum( const floatingnumber& val){ *(m_neutralIsoPtSum)=val; } 
     void puCorrPtSum( const floatingnumber& val){ *(m_puCorrPtSum)=val; } 
@@ -185,6 +178,10 @@ namespace UZH {
     void byIsolationMVArun2v1DBnewDMwLTraw( const floatingnumber& val){ *(m_byIsolationMVArun2v1DBnewDMwLTraw)=val; } 
     void byIsolationMVArun2v1DBoldDMwLTraw( const floatingnumber& val){ *(m_byIsolationMVArun2v1DBoldDMwLTraw)=val; } 
     void byIsolationMVArun2v1PWnewDMwLTraw( const floatingnumber& val){ *(m_byIsolationMVArun2v1PWnewDMwLTraw)=val; } 
+    void byLooseCombinedIsolationDeltaBetaCorr3Hits( const bool& val){ (m_byLooseCombinedIsolationDeltaBetaCorr3Hits)=val; } 
+    void byMediumCombinedIsolationDeltaBetaCorr3Hits( const bool& val){ (m_byMediumCombinedIsolationDeltaBetaCorr3Hits)=val; } 
+    void byTightCombinedIsolationDeltaBetaCorr3Hits( const bool& val){ (m_byTightCombinedIsolationDeltaBetaCorr3Hits)=val; } 
+    void byCombinedIsolationDeltaBetaCorrRaw3Hits( const bool& val){ (m_byCombinedIsolationDeltaBetaCorrRaw3Hits)=val; } 
     void byLooseIsolationMVArun2v1DBdR03oldDMwLT( const bool& val){ (m_byLooseIsolationMVArun2v1DBdR03oldDMwLT)=val; } 
     void byLooseIsolationMVArun2v1DBnewDMwLT( const bool& val){ (m_byLooseIsolationMVArun2v1DBnewDMwLT)=val; } 
     void byLooseIsolationMVArun2v1DBoldDMwLT( const bool& val){ (m_byLooseIsolationMVArun2v1DBoldDMwLT)=val; } 

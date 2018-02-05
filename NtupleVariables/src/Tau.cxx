@@ -19,9 +19,7 @@ Tau::Tau( const Ntuple::TauNtupleObject* ana, const Int_t idx ) : Basic( idx ), 
   m_eta = &((*ana->eta)[idx]);
   m_phi = &((*ana->phi)[idx]);
   m_m = &((*ana->m)[idx]);
-  
-  m_e_ = calculateE();
-  m_e = &(m_e_);
+  m_e = &((*ana->e)[idx]);
   
   m_lvl = ana->detailLevel;
   
@@ -34,22 +32,22 @@ Tau::Tau( const Ntuple::TauNtupleObject* ana, const Int_t idx ) : Basic( idx ), 
   if(  ((ana->detailLevel & Ntuple::TauAdvancedID) == Ntuple::TauAdvancedID)  ) {
     if (ana->m_connectsucceeded[7]) m_decayModeFindingNewDMs = ((*ana->decayModeFindingNewDMs)[idx]); else m_decayModeFindingNewDMs = 0; 
     if (ana->m_connectsucceeded[8]) m_decayModeFinding = ((*ana->decayModeFinding)[idx]); else m_decayModeFinding = 0; 
-    if (ana->m_connectsucceeded[9]) m_byLooseCombinedIsolationDeltaBetaCorr3Hits = ((*ana->byLooseCombinedIsolationDeltaBetaCorr3Hits)[idx]); else m_byLooseCombinedIsolationDeltaBetaCorr3Hits = 0; 
-    if (ana->m_connectsucceeded[10]) m_byMediumCombinedIsolationDeltaBetaCorr3Hits = ((*ana->byMediumCombinedIsolationDeltaBetaCorr3Hits)[idx]); else m_byMediumCombinedIsolationDeltaBetaCorr3Hits = 0; 
-    if (ana->m_connectsucceeded[11]) m_byTightCombinedIsolationDeltaBetaCorr3Hits = ((*ana->byTightCombinedIsolationDeltaBetaCorr3Hits)[idx]); else m_byTightCombinedIsolationDeltaBetaCorr3Hits = 0; 
-    if (ana->m_connectsucceeded[12]) m_byCombinedIsolationDeltaBetaCorrRaw3Hits = ((*ana->byCombinedIsolationDeltaBetaCorrRaw3Hits)[idx]); else m_byCombinedIsolationDeltaBetaCorrRaw3Hits = 0; 
-    if (ana->m_connectsucceeded[13]) m_chargedIsoPtSum = &((*ana->chargedIsoPtSum)[idx]); else m_chargedIsoPtSum = 0; 
-    if (ana->m_connectsucceeded[14]) m_neutralIsoPtSum = &((*ana->neutralIsoPtSum)[idx]); else m_neutralIsoPtSum = 0; 
-    if (ana->m_connectsucceeded[15]) m_puCorrPtSum = &((*ana->puCorrPtSum)[idx]); else m_puCorrPtSum = 0; 
-    if (ana->m_connectsucceeded[16]) m_chargedIsoPtSumdR03 = &((*ana->chargedIsoPtSumdR03)[idx]); else m_chargedIsoPtSumdR03 = 0; 
-    if (ana->m_connectsucceeded[17]) m_neutralIsoPtSumdR03 = &((*ana->neutralIsoPtSumdR03)[idx]); else m_neutralIsoPtSumdR03 = 0; 
-    if (ana->m_connectsucceeded[18]) m_photonPtSumOutsideSignalConedR03 = &((*ana->photonPtSumOutsideSignalConedR03)[idx]); else m_photonPtSumOutsideSignalConedR03 = 0; 
-    if (ana->m_connectsucceeded[19]) m_chargedPionPt = &((*ana->chargedPionPt)[idx]); else m_chargedPionPt = 0; 
-    if (ana->m_connectsucceeded[20]) m_neutralPionPt = &((*ana->neutralPionPt)[idx]); else m_neutralPionPt = 0; 
-    if (ana->m_connectsucceeded[21]) m_byIsolationMVArun2v1DBdR03oldDMwLTraw = &((*ana->byIsolationMVArun2v1DBdR03oldDMwLTraw)[idx]); else m_byIsolationMVArun2v1DBdR03oldDMwLTraw = 0; 
-    if (ana->m_connectsucceeded[22]) m_byIsolationMVArun2v1DBnewDMwLTraw = &((*ana->byIsolationMVArun2v1DBnewDMwLTraw)[idx]); else m_byIsolationMVArun2v1DBnewDMwLTraw = 0; 
-    if (ana->m_connectsucceeded[23]) m_byIsolationMVArun2v1DBoldDMwLTraw = &((*ana->byIsolationMVArun2v1DBoldDMwLTraw)[idx]); else m_byIsolationMVArun2v1DBoldDMwLTraw = 0; 
-    if (ana->m_connectsucceeded[24]) m_byIsolationMVArun2v1PWnewDMwLTraw = &((*ana->byIsolationMVArun2v1PWnewDMwLTraw)[idx]); else m_byIsolationMVArun2v1PWnewDMwLTraw = 0; 
+    if (ana->m_connectsucceeded[9]) m_chargedIsoPtSum = &((*ana->chargedIsoPtSum)[idx]); else m_chargedIsoPtSum = 0; 
+    if (ana->m_connectsucceeded[10]) m_neutralIsoPtSum = &((*ana->neutralIsoPtSum)[idx]); else m_neutralIsoPtSum = 0; 
+    if (ana->m_connectsucceeded[11]) m_puCorrPtSum = &((*ana->puCorrPtSum)[idx]); else m_puCorrPtSum = 0; 
+    if (ana->m_connectsucceeded[12]) m_chargedIsoPtSumdR03 = &((*ana->chargedIsoPtSumdR03)[idx]); else m_chargedIsoPtSumdR03 = 0; 
+    if (ana->m_connectsucceeded[13]) m_neutralIsoPtSumdR03 = &((*ana->neutralIsoPtSumdR03)[idx]); else m_neutralIsoPtSumdR03 = 0; 
+    if (ana->m_connectsucceeded[14]) m_photonPtSumOutsideSignalConedR03 = &((*ana->photonPtSumOutsideSignalConedR03)[idx]); else m_photonPtSumOutsideSignalConedR03 = 0; 
+    if (ana->m_connectsucceeded[15]) m_chargedPionPt = &((*ana->chargedPionPt)[idx]); else m_chargedPionPt = 0; 
+    if (ana->m_connectsucceeded[16]) m_neutralPionPt = &((*ana->neutralPionPt)[idx]); else m_neutralPionPt = 0; 
+    if (ana->m_connectsucceeded[17]) m_byIsolationMVArun2v1DBdR03oldDMwLTraw = &((*ana->byIsolationMVArun2v1DBdR03oldDMwLTraw)[idx]); else m_byIsolationMVArun2v1DBdR03oldDMwLTraw = 0; 
+    if (ana->m_connectsucceeded[18]) m_byIsolationMVArun2v1DBnewDMwLTraw = &((*ana->byIsolationMVArun2v1DBnewDMwLTraw)[idx]); else m_byIsolationMVArun2v1DBnewDMwLTraw = 0; 
+    if (ana->m_connectsucceeded[19]) m_byIsolationMVArun2v1DBoldDMwLTraw = &((*ana->byIsolationMVArun2v1DBoldDMwLTraw)[idx]); else m_byIsolationMVArun2v1DBoldDMwLTraw = 0; 
+    if (ana->m_connectsucceeded[20]) m_byIsolationMVArun2v1PWnewDMwLTraw = &((*ana->byIsolationMVArun2v1PWnewDMwLTraw)[idx]); else m_byIsolationMVArun2v1PWnewDMwLTraw = 0; 
+    if (ana->m_connectsucceeded[21]) m_byLooseCombinedIsolationDeltaBetaCorr3Hits = ((*ana->byLooseCombinedIsolationDeltaBetaCorr3Hits)[idx]); else m_byLooseCombinedIsolationDeltaBetaCorr3Hits = 0; 
+    if (ana->m_connectsucceeded[22]) m_byMediumCombinedIsolationDeltaBetaCorr3Hits = ((*ana->byMediumCombinedIsolationDeltaBetaCorr3Hits)[idx]); else m_byMediumCombinedIsolationDeltaBetaCorr3Hits = 0; 
+    if (ana->m_connectsucceeded[23]) m_byTightCombinedIsolationDeltaBetaCorr3Hits = ((*ana->byTightCombinedIsolationDeltaBetaCorr3Hits)[idx]); else m_byTightCombinedIsolationDeltaBetaCorr3Hits = 0; 
+    if (ana->m_connectsucceeded[24]) m_byCombinedIsolationDeltaBetaCorrRaw3Hits = ((*ana->byCombinedIsolationDeltaBetaCorrRaw3Hits)[idx]); else m_byCombinedIsolationDeltaBetaCorrRaw3Hits = 0; 
     if (ana->m_connectsucceeded[25]) m_byLooseIsolationMVArun2v1DBdR03oldDMwLT = ((*ana->byLooseIsolationMVArun2v1DBdR03oldDMwLT)[idx]); else m_byLooseIsolationMVArun2v1DBdR03oldDMwLT = 0; 
     if (ana->m_connectsucceeded[26]) m_byLooseIsolationMVArun2v1DBnewDMwLT = ((*ana->byLooseIsolationMVArun2v1DBnewDMwLT)[idx]); else m_byLooseIsolationMVArun2v1DBnewDMwLT = 0; 
     if (ana->m_connectsucceeded[27]) m_byLooseIsolationMVArun2v1DBoldDMwLT = ((*ana->byLooseIsolationMVArun2v1DBoldDMwLT)[idx]); else m_byLooseIsolationMVArun2v1DBoldDMwLT = 0; 
@@ -108,10 +106,6 @@ ostream& operator<<( ostream& out, const Tau& rhs ) {
   if( ((rhs.getLvl() & Ntuple::TauAdvancedID) == Ntuple::TauAdvancedID) ) {
     out << " decayModeFindingNewDMs " << rhs.decayModeFindingNewDMs(); 
     out << " decayModeFinding " << rhs.decayModeFinding(); 
-    out << " byLooseCombinedIsolationDeltaBetaCorr3Hits " << rhs.byLooseCombinedIsolationDeltaBetaCorr3Hits(); 
-    out << " byMediumCombinedIsolationDeltaBetaCorr3Hits " << rhs.byMediumCombinedIsolationDeltaBetaCorr3Hits(); 
-    out << " byTightCombinedIsolationDeltaBetaCorr3Hits " << rhs.byTightCombinedIsolationDeltaBetaCorr3Hits(); 
-    out << " byCombinedIsolationDeltaBetaCorrRaw3Hits " << rhs.byCombinedIsolationDeltaBetaCorrRaw3Hits(); 
     out << " chargedIsoPtSum " << rhs.chargedIsoPtSum(); 
     out << " neutralIsoPtSum " << rhs.neutralIsoPtSum(); 
     out << " puCorrPtSum " << rhs.puCorrPtSum(); 
@@ -124,6 +118,10 @@ ostream& operator<<( ostream& out, const Tau& rhs ) {
     out << " byIsolationMVArun2v1DBnewDMwLTraw " << rhs.byIsolationMVArun2v1DBnewDMwLTraw(); 
     out << " byIsolationMVArun2v1DBoldDMwLTraw " << rhs.byIsolationMVArun2v1DBoldDMwLTraw(); 
     out << " byIsolationMVArun2v1PWnewDMwLTraw " << rhs.byIsolationMVArun2v1PWnewDMwLTraw(); 
+    out << " byLooseCombinedIsolationDeltaBetaCorr3Hits " << rhs.byLooseCombinedIsolationDeltaBetaCorr3Hits(); 
+    out << " byMediumCombinedIsolationDeltaBetaCorr3Hits " << rhs.byMediumCombinedIsolationDeltaBetaCorr3Hits(); 
+    out << " byTightCombinedIsolationDeltaBetaCorr3Hits " << rhs.byTightCombinedIsolationDeltaBetaCorr3Hits(); 
+    out << " byCombinedIsolationDeltaBetaCorrRaw3Hits " << rhs.byCombinedIsolationDeltaBetaCorrRaw3Hits(); 
     out << " byLooseIsolationMVArun2v1DBdR03oldDMwLT " << rhs.byLooseIsolationMVArun2v1DBdR03oldDMwLT(); 
     out << " byLooseIsolationMVArun2v1DBnewDMwLT " << rhs.byLooseIsolationMVArun2v1DBnewDMwLT(); 
     out << " byLooseIsolationMVArun2v1DBoldDMwLT " << rhs.byLooseIsolationMVArun2v1DBoldDMwLT(); 
@@ -188,13 +186,13 @@ bool operator<<( const Tau& e1, const Tau& e2 ) {
 
 TLorentzVector* Tau::getTLV() const {
   TLorentzVector* tlv = new TLorentzVector();
-  tlv->SetPtEtaPhiM(*(m_pt), *(m_eta), *(m_phi), *(m_m));
+  tlv->SetPtEtaPhiE(*(m_pt), *(m_eta), *(m_phi), *(m_e));
   return tlv;
 }
 
 TLorentzVector Tau::tlv() const {
   TLorentzVector tlv;
-  tlv.SetPtEtaPhiM(*(m_pt), *(m_eta), *(m_phi), *(m_m));
+  tlv.SetPtEtaPhiE(*(m_pt), *(m_eta), *(m_phi), *(m_e));
   return tlv;
 }
 

@@ -375,7 +375,7 @@ objects = {
   'GenJetak4'     : {'NoBasics': ''},
   'Muon'          : {},
   'Electron'      : {},
-  'Tau'           : {'NoE': ''},
+  'Tau'           : {},
   # 'Vertex'        : {'NoBasics': ''},
   # 'TrackParticle' : {'NoBasics': ''},
   # 'TruthJet'      : {},

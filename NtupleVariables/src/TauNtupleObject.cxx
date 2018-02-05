@@ -39,6 +39,7 @@ namespace Ntuple {
     ConnectVariable( treeName, prefix + m_objectNames.getName("eta"), eta );
     ConnectVariable( treeName, prefix + m_objectNames.getName("phi"), phi );
     ConnectVariable( treeName, prefix + m_objectNames.getName("m"), m );
+    ConnectVariable( treeName, prefix + m_objectNames.getName("e"), e );
     
     
     // connect object specific variables
@@ -46,22 +47,22 @@ namespace Ntuple {
     if(  ((detail_level & Ntuple::TauAdvancedID) == Ntuple::TauAdvancedID)  ) {
       setConnectSucceeded(7, ConnectVariable( treeName, prefix + m_objectNames.getName("decayModeFindingNewDMs"), decayModeFindingNewDMs));
       setConnectSucceeded(8, ConnectVariable( treeName, prefix + m_objectNames.getName("decayModeFinding"), decayModeFinding));
-      setConnectSucceeded(9, ConnectVariable( treeName, prefix + m_objectNames.getName("byLooseCombinedIsolationDeltaBetaCorr3Hits"), byLooseCombinedIsolationDeltaBetaCorr3Hits));
-      setConnectSucceeded(10, ConnectVariable( treeName, prefix + m_objectNames.getName("byMediumCombinedIsolationDeltaBetaCorr3Hits"), byMediumCombinedIsolationDeltaBetaCorr3Hits));
-      setConnectSucceeded(11, ConnectVariable( treeName, prefix + m_objectNames.getName("byTightCombinedIsolationDeltaBetaCorr3Hits"), byTightCombinedIsolationDeltaBetaCorr3Hits));
-      setConnectSucceeded(12, ConnectVariable( treeName, prefix + m_objectNames.getName("byCombinedIsolationDeltaBetaCorrRaw3Hits"), byCombinedIsolationDeltaBetaCorrRaw3Hits));
-      setConnectSucceeded(13, ConnectVariable( treeName, prefix + m_objectNames.getName("chargedIsoPtSum"), chargedIsoPtSum));
-      setConnectSucceeded(14, ConnectVariable( treeName, prefix + m_objectNames.getName("neutralIsoPtSum"), neutralIsoPtSum));
-      setConnectSucceeded(15, ConnectVariable( treeName, prefix + m_objectNames.getName("puCorrPtSum"), puCorrPtSum));
-      setConnectSucceeded(16, ConnectVariable( treeName, prefix + m_objectNames.getName("chargedIsoPtSumdR03"), chargedIsoPtSumdR03));
-      setConnectSucceeded(17, ConnectVariable( treeName, prefix + m_objectNames.getName("neutralIsoPtSumdR03"), neutralIsoPtSumdR03));
-      setConnectSucceeded(18, ConnectVariable( treeName, prefix + m_objectNames.getName("photonPtSumOutsideSignalConedR03"), photonPtSumOutsideSignalConedR03));
-      setConnectSucceeded(19, ConnectVariable( treeName, prefix + m_objectNames.getName("chargedPionPt"), chargedPionPt));
-      setConnectSucceeded(20, ConnectVariable( treeName, prefix + m_objectNames.getName("neutralPionPt"), neutralPionPt));
-      setConnectSucceeded(21, ConnectVariable( treeName, prefix + m_objectNames.getName("byIsolationMVArun2v1DBdR03oldDMwLTraw"), byIsolationMVArun2v1DBdR03oldDMwLTraw));
-      setConnectSucceeded(22, ConnectVariable( treeName, prefix + m_objectNames.getName("byIsolationMVArun2v1DBnewDMwLTraw"), byIsolationMVArun2v1DBnewDMwLTraw));
-      setConnectSucceeded(23, ConnectVariable( treeName, prefix + m_objectNames.getName("byIsolationMVArun2v1DBoldDMwLTraw"), byIsolationMVArun2v1DBoldDMwLTraw));
-      setConnectSucceeded(24, ConnectVariable( treeName, prefix + m_objectNames.getName("byIsolationMVArun2v1PWnewDMwLTraw"), byIsolationMVArun2v1PWnewDMwLTraw));
+      setConnectSucceeded(9, ConnectVariable( treeName, prefix + m_objectNames.getName("chargedIsoPtSum"), chargedIsoPtSum));
+      setConnectSucceeded(10, ConnectVariable( treeName, prefix + m_objectNames.getName("neutralIsoPtSum"), neutralIsoPtSum));
+      setConnectSucceeded(11, ConnectVariable( treeName, prefix + m_objectNames.getName("puCorrPtSum"), puCorrPtSum));
+      setConnectSucceeded(12, ConnectVariable( treeName, prefix + m_objectNames.getName("chargedIsoPtSumdR03"), chargedIsoPtSumdR03));
+      setConnectSucceeded(13, ConnectVariable( treeName, prefix + m_objectNames.getName("neutralIsoPtSumdR03"), neutralIsoPtSumdR03));
+      setConnectSucceeded(14, ConnectVariable( treeName, prefix + m_objectNames.getName("photonPtSumOutsideSignalConedR03"), photonPtSumOutsideSignalConedR03));
+      setConnectSucceeded(15, ConnectVariable( treeName, prefix + m_objectNames.getName("chargedPionPt"), chargedPionPt));
+      setConnectSucceeded(16, ConnectVariable( treeName, prefix + m_objectNames.getName("neutralPionPt"), neutralPionPt));
+      setConnectSucceeded(17, ConnectVariable( treeName, prefix + m_objectNames.getName("byIsolationMVArun2v1DBdR03oldDMwLTraw"), byIsolationMVArun2v1DBdR03oldDMwLTraw));
+      setConnectSucceeded(18, ConnectVariable( treeName, prefix + m_objectNames.getName("byIsolationMVArun2v1DBnewDMwLTraw"), byIsolationMVArun2v1DBnewDMwLTraw));
+      setConnectSucceeded(19, ConnectVariable( treeName, prefix + m_objectNames.getName("byIsolationMVArun2v1DBoldDMwLTraw"), byIsolationMVArun2v1DBoldDMwLTraw));
+      setConnectSucceeded(20, ConnectVariable( treeName, prefix + m_objectNames.getName("byIsolationMVArun2v1PWnewDMwLTraw"), byIsolationMVArun2v1PWnewDMwLTraw));
+      setConnectSucceeded(21, ConnectVariable( treeName, prefix + m_objectNames.getName("byLooseCombinedIsolationDeltaBetaCorr3Hits"), byLooseCombinedIsolationDeltaBetaCorr3Hits));
+      setConnectSucceeded(22, ConnectVariable( treeName, prefix + m_objectNames.getName("byMediumCombinedIsolationDeltaBetaCorr3Hits"), byMediumCombinedIsolationDeltaBetaCorr3Hits));
+      setConnectSucceeded(23, ConnectVariable( treeName, prefix + m_objectNames.getName("byTightCombinedIsolationDeltaBetaCorr3Hits"), byTightCombinedIsolationDeltaBetaCorr3Hits));
+      setConnectSucceeded(24, ConnectVariable( treeName, prefix + m_objectNames.getName("byCombinedIsolationDeltaBetaCorrRaw3Hits"), byCombinedIsolationDeltaBetaCorrRaw3Hits));
       setConnectSucceeded(25, ConnectVariable( treeName, prefix + m_objectNames.getName("byLooseIsolationMVArun2v1DBdR03oldDMwLT"), byLooseIsolationMVArun2v1DBdR03oldDMwLT));
       setConnectSucceeded(26, ConnectVariable( treeName, prefix + m_objectNames.getName("byLooseIsolationMVArun2v1DBnewDMwLT"), byLooseIsolationMVArun2v1DBnewDMwLT));
       setConnectSucceeded(27, ConnectVariable( treeName, prefix + m_objectNames.getName("byLooseIsolationMVArun2v1DBoldDMwLT"), byLooseIsolationMVArun2v1DBoldDMwLT));

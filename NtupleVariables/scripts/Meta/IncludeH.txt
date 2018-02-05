@@ -53,7 +53,7 @@ namespace UZH {
     ${{Only:Jet,TruthJet:bool m_isTagged; ///< user-level flag to indicate b-tag}}
     ${{Only:Jet:floatingnumber  m_scalefactor; ///< scale factor for JES shifts (0 for nominal JES)}}
     ${{AllVars:#type# m_#name#;}}
-    ${{Only:Tau,GenParticle:
+    ${{Only:GenParticle:
     floatingnumber m_e_; // reference value for m_e pointer
     }}
     ${{Only:Electron:

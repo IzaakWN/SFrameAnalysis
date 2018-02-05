@@ -215,6 +215,9 @@ def getJobFromId(runningJob, listOfJobs):
 # build in an automated resubmit for Eqw jobs at some point
 def waitForBatchJobs(runningJobs, listOfJobs, userName, timeCheck):
   print "waiting for %d job(s) in the queue" %(len(runningJobs))
+  nJobs = len(runningJobs)
+  skip  = 5 if nJobs<400 else 10
+  skip2 = 5 if nJobs>400 else 1
   while not len(runningJobs)==0:
     time.sleep(float(timeCheck))
     queryString="qstat -u %s | grep %s | awk {\'print $1\'}" %(userName, userName)
@@ -232,7 +235,10 @@ def waitForBatchJobs(runningJobs, listOfJobs, userName, timeCheck):
           if j[1]==(l[2]+l[3]):
             l[4]="."
         runningJobs.remove(j)
-        print "waiting for %d job(s) in the queue" %(len(runningJobs))
+        nRunningJobs = len(runningJobs)
+        if ((nRunningJobs%skip )==0 or not(nJobs*0.25<nRunningJobs<nJobs*0.75)) and\
+           ((nRunningJobs%skip2)==0 or not(nJobs*0.07<nRunningJobs<nJobs*0.93)):
+          print "waiting for %d job(s) in the queue" %(len(runningJobs))
       #else:
       #  #store job usage info in seperate file, dump into log at the end
       #  queryString   = "qstat -j " + jobId + " | grep usage"
@@ -286,7 +292,7 @@ def checkCompletion(dataSets, listOfJobs, outDir, cycleName, postFix,keepTemp):
         fileToMerge=fileBaseNameRoot.partition("pythia8")[0]+fileBaseNameRoot.partition("pythia8")[1]+'*'
         fileToMerge=fileToMerge.partition("Run2016")[0]+fileToMerge.partition("Run2016")[1]+'*'
         fileToMerge=fileToMerge.partition("madgraph")[0]+fileToMerge.partition("madgraph")[1]+'*'
-
+        
         # print "l[6] %s ,l[1] %s, l[2] %s ,l[3] %s , fileBaseNameRoot %s ," %(l[6],l[1],l[2],l[3],fileBaseNameRoot)
       elif l[0]==d[0] and l[4]=="":
         checkReady=False
@@ -329,13 +335,13 @@ def checkCompletion(dataSets, listOfJobs, outDir, cycleName, postFix,keepTemp):
       nMergeJobs=len([ j for j in listOfJobs if j[0]==d[0] ])
       nFiles=len(glob.glob("%s/*.root"%l[6]))
       nJobs=len(listOfJobs)
-      countCmd ="number of files to merge / number of jobs:     %3d/%d\n(%s.root)" % (nMergeFiles,nMergeJobs,'/'.join((fileToMerge.split('/')[-2:])))
-      countCmd+="\nnumber of all root files / number of all jobs: %3d/%d\n(%s/*.root)" % (nFiles,   nJobs,     '/'.join((l[6].split('/')[-1:])))
+      countCmd ="number of files to merge / number of jobs: %3d/%3d (%.1f%%)\n(%s.root)" % (nMergeFiles,nMergeJobs,100.0*nMergeFiles/nMergeJobs,'/'.join((fileToMerge.split('/')[-2:])))
+      #countCmd+="\nnumber of all root files / number of all jobs: %3d/%d\n(%s/*.root)" % (nFiles,   nJobs,     '/'.join((l[6].split('/')[-1:])))
       countDebug="" if os.path.exists(l[6]) else "Warning! %s does not exist!"%l[6]
       lsDebug+="\n"+countCmd+"\n"+countDebug
       mergeDebug+="\n"+lsDebug
       mergeDebug+="\n"+mergeCmd
-      succesRates.append("  %4d /%3d %s"%(nMergeFiles,nMergeJobs,d[0])) # global list
+      succesRates.append("  %4d /%3d (%.1f%%) %s"%(nMergeFiles,nMergeJobs,100.0*nMergeFiles/nMergeJobs,d[0])) # global list
       print WARNING+countCmd+END
       print WARNING+countDebug+END
       
@@ -950,7 +956,7 @@ def main():
         submitOut = runProcess.stdout.read()
         runningJobs.append([submitOut.split(" ")[2], j[2]+j[3]])
       if not (iJobs%skip):
-        print "submitting job %d of %d: "%(iJobs,nJobs),
+        print "submitting job %d of %d"%(iJobs,nJobs),
         while runningJobsLimit>0:
           #subProcess=subprocess.Popen('qstat -u $USER | awk \'{print $5}\' | grep r |wc -l' , stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
           #nRunning=int(subProcess.stdout.read())
@@ -1013,16 +1019,54 @@ def main():
   
 
 
+def partitionFileNames(fileBaseNameRoot):
+  """Help function to convert root file basename to a file name pattern for merging with hadd."""
+  
+  # fileToMerge=fileBaseNameRoot.partition("pythia8")[0]+fileBaseNameRoot.partition("pythia8")[1]+'*'
+  # fileToMerge=fileToMerge.partition("Run2016")[0]+fileToMerge.partition("Run2016")[1]+'*'
+  # fileToMerge=fileToMerge.partition("Run2017")[0]+fileToMerge.partition("Run2017")[1]+'*'
+  # fileToMerge=fileToMerge.partition("Run2018")[0]+fileToMerge.partition("Run2018")[1]+'*'
+  # fileToMerge=fileToMerge.partition("madgraph")[0]+fileToMerge.partition("madgraph")[1]+'*'
+  
+  fileToMerge = fileBaseNameRoot
+  for token in [ "pythia8", "madgraph", "Run2016", "Run2017", "Run2018" ]:
+    part        = fileToMerge.partition(token)
+    letters     = dataSetLetters(part[2])
+    fileToMerge = part[0]+part[1]+letters+'*'
+  
+  while "**" in fileToMerge: fileToMerge=fileToMerge.replace("**",'*')
+  return fileToMerge
+  
+
+
+def dataSetLetters(string):
+  """"Help function to find dataset letter(s) (ABCDE) at the beginning of a string"""
+  letters = ""
+  dataSetLetters = [ 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'H', 'I', 'J', 'K' ]
+  if len(string)>0:
+    for character in string:
+      #print "%s <-> %s"%(character,dataSetLetters)
+      if len(dataSetLetters)==0: break
+      for i, letter in enumerate(dataSetLetters):
+        if character == letter:
+          letters += letter
+          dataSetLetters = dataSetLetters[i+1:]
+          break
+      else: break # stop once no other letter was found
+  return letters
+  
+
+
 def accountTime(jobOptions,jobName,nJobs):
   """Append summary to a log file."""
   
   logdir="nohup"
-  makeDirectory(logdir)
   filepath="%s/submitSFrame.log"%logdir
   new = not os.path.exists(filepath)
+  makeDirectory(logdir)
   
   global succesRates, starttime, startdate
-  succesRates = "succes rate(s):\n" + '\n'.join(sorted(succesRates))
+  succesRates = "succes rate(s):\n" + '\n'.join(sorted(succesRates)) + '\n'
   minutes, seconds = divmod(time.time()-starttime,60)
   hours, minutes   = divmod(minutes,60)
   
@@ -1033,9 +1077,9 @@ def accountTime(jobOptions,jobName,nJobs):
     file.write(succesRates)
     file.write("start: %s\n" % (startdate))
     file.write("done:  %s\n" % (time.strftime("%a %d/%m/%Y %H:%M:%S",time.gmtime())))
-    file.write("took:  %s hours, %s minutes and %.1f seconds\n" % (hours,minutes,seconds))
+    file.write("took:  %d hours, %d minutes and %.1f seconds\n" % (hours,minutes,seconds))
     file.write("\n")
-  print "\nDone after %s hours, %s minutes and %.1f seconds." % (hours,minutes,seconds)  
+  print "\nDone after %d hours, %d minutes and %.1f seconds." % (hours,minutes,seconds)
   
 
 

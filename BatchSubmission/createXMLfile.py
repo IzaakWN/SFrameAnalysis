@@ -15,25 +15,26 @@ Examples:
  
  \033[1mTier 3 PNFS\033[0m:
    PNFS="/pnfs/psi.ch/cms/trivcat/store/t3groups/uniz-higgs/Summer16/Ntuple_80_20170206"
-   ls -d $PNFS/DYJ*/*/*/* > dirs_DYJ.txt
+   ls -d $PNFS/DY*/*/*/* > dirs_DY.txt
    ls -d $PNFS/*/*/*/* > dirs.txt
    ./createXMLfile.py dirs.txt -o xmls_Moriond
  
  \033[1mTier 2 PNFS\033[0m:
    PNFS="gsiftp://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/ytakahas/Ntuple_Moriond17"
-   uberftp -ls $PNFS/DY1J*/*/* | awk '{print $8}' > dirs_T2_DY1J.txt
+   uberftp -ls $PNFS/DY*/*/* | awk '{print $8}' > dirs_T2_DY.txt
    uberftp -ls $PNFS/*/*/* | awk '{print $8}' > dirs_T2.txt
    ./createXMLfile.py dirs_T2.txt -o xmls_Moriond_T2 -s PSI-T2
  
  \033[1mSplit files\033[0m (to run in parallel):
    cat dirs.txt | wc -l
-   split -l 200 dirs.txt dirs_split -d
+   ./createXMLfile.py dirs.txt --split 2
  
  \033[1mPrint out xml file names\033[0m formatted for copy-pasting into job options files:
    cd xmls_Moriond/
    ls *.xml | xargs -I@ echo \\"@\\",
 """
-
+#cat dirs.txt | wc -l
+#split -l 200 dirs.txt dirs_split -d
 
 import os
 import sys
@@ -42,7 +43,6 @@ import optparse
 import thread
 import subprocess
 import math
-
 
 # parse the command line
 parser=optparse.OptionParser(usage="%prog SAMPLELISTFILE") #epilog
@@ -65,7 +65,7 @@ parser.add_option("-m", "--maxFiles", action="store",
                 dest="maxFiles", default="500",
                 help="Maximum number of files [default = %default]")
 parser.add_option("-o", "--outDir", action="store",
-                dest="outDir", default="xmls_Summer2016",
+                dest="outDir", default="xmls",
                 help="Output directory for xml files [default = %default]")
 parser.add_option("-f", "--no-failed", action="store_false",
                 dest="writeFailed", default=True,
@@ -310,7 +310,6 @@ def writeFailedRootFiles(failedRootFiles,i,outDir,outName):
     file.write("<!-- Warning! Ignored %s corrupted file%s, see %s.txt -->\n\n" % (len(failedRootFiles),plural(failedRootFiles),outNameFailed))
   print "  \033[1mWarning! File %s: Written %s corrupt root file%s to %s.txt in %s\033[0m" % (i+1, len(failedRootFiles),plural(failedRootFiles),outNameFailed,outDirFailed)
   
-  
 
 
 def splitSampleListFile(filename,nChunks=2):
@@ -329,6 +328,7 @@ def splitSampleListFile(filename,nChunks=2):
     with open(subfilename,'w') as subfile:
       print "Made \"%s\""%(subfilename)
       for s in list[i*k+min(i,m):(i+1)*k+min(i+1,m)]: subfile.write(s)
+  
 
 
 def plural(list,y=False):
@@ -345,4 +345,5 @@ def plural(list,y=False):
 if __name__ == "__main__":
   main()
   print
+  
 

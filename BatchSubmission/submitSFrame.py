@@ -341,13 +341,13 @@ def checkCompletion(dataSets, listOfJobs, outDir, cycleName, postFix,keepTemp):
       nMergeJobs=len([ j for j in listOfJobs if j[0]==d[0] ])
       nFiles=len(glob.glob("%s/*.root"%l[6]))
       nJobs=len(listOfJobs)
-      countCmd ="number of files to merge / number of jobs: %3d/%3d\n(%s.root)" % (nMergeFiles,nMergeJobs,'/'.join((fileToMerge.split('/')[-2:])))
+      countCmd ="number of files to merge / number of jobs: %3d/%3d (%.1f%%)\n(%s.root)" % (nMergeFiles,nMergeJobs,100.0*nMergeFiles/nMergeJobs,'/'.join((fileToMerge.split('/')[-2:])))
       #countCmd+="\nnumber of all root files / number of all jobs: %3d/%d\n(%s/*.root)" % (nFiles,   nJobs,     '/'.join((l[6].split('/')[-1:])))
       countDebug="" if os.path.exists(l[6]) else "Warning! %s does not exist!"%l[6]
       lsDebug+="\n"+countCmd+"\n"+countDebug
       mergeDebug+="\n"+lsDebug
       mergeDebug+="\n"+mergeCmd
-      succesRates.append("  %4d /%3d %s"%(nMergeFiles,nMergeJobs,d[0])) # global list
+      succesRates.append("  %4d /%3d (%.1f%%) %s"%(nMergeFiles,nMergeJobs,100.0*nMergeFiles/nMergeJobs,d[0])) # global list
       print WARNING+countCmd+END
       print WARNING+countDebug+END
       

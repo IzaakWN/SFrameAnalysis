@@ -3,12 +3,17 @@
 echo
 BASEDIR="." #"/shome/$USER/analysis/SFrameAnalysis/BatchSubmission"
 cd $BASEDIR
-TESFILES="Signal_LowMass.py \
-          Background_DY.py \
-          Background_TT.py"
+TESFILES="Signal_SUSY.py Signal_LowMass.py"
+# TESFILES="Signal_LowMass.py \
+#           Signal_SUSY.py \
+#           Background_DY.py \
+#           Background_TT.py"
 LTFFILES="Background_DY.py"
-EESFILES=`ls Background_*.py Signal_*.py | grep -v TES | grep -v LTF | grep -v EES | grep -v SUSY | grep -v EWK | grep -v VBF | grep -v Data`
+EESFILES="Signal_SUSY.py Signal_LowMass.py"
+#EESFILES=`ls Background_*.py Signal_*.py | grep -v TES | grep -v LTF | grep -v EES | grep -v EWK | grep -v VBF | grep -v Data`
 FILEND=".py"
+GREY="\e[37m"
+BOLD="\e[1m"
 WARNING="\e[31m\e[1mWARNING!"
 S="\e[0m"
 
@@ -23,10 +28,12 @@ FILES=(     "$TESFILES"  "$LTFFILES"  "$EESFILES" )
 UP=(         "TES1p03"     "LTF1p03"    "EES1p01" )
 DOWN=(       "TES0p97"     "LTF0p97"    "EES0p99" )
 
-for ((i=0;i<${#DO_VAR[@]};++i)); do
+for ((i=0;i<${#SHIFT_VAR[@]};++i)); do
     
-    DO_LINE="\[\"${DO_VAR[i]}\",\"false\"\]"
-    DO_LINE_TRUE=`echo $DO_LINE | sed "s/false/true/"`
+    [ -z "${FILES[i]}" ] && continue
+    
+    #DO_LINE="\[\"${DO_VAR[i]}\",\"false\"\]"
+    #DO_LINE_TRUE=`echo $DO_LINE | sed "s/false/true/"`
     
     SHIFT_LINE="\[\"${SHIFT_VAR[i]}\",\"0.00\"\]"
     SHIFT_LINE_UP=`echo $SHIFT_LINE | sed "s/0.00/${SHIFT[i]}/"`
@@ -37,29 +44,31 @@ for ((i=0;i<${#DO_VAR[@]};++i)); do
     LABEL_LINE_DOWN="${LABEL_LINE}_${DOWN[i]}"
     
     echo ">>> "
-    echo ">>> replacing \"${SHIFT_LINE}\" with: "
-    echo ">>>    \"${SHIFT_LINE_UP}\"           "
-    echo ">>>    \"${SHIFT_LINE_DOWN}\"         "
-    echo ">>> "
-    echo ">>> replacing \"${DO_LINE}\" with:    "
-    echo ">>>    \"${DO_LINE_TRUE}\"            "
+    echo -e ">>> ${BOLD}${GREY}${SHIFT_VAR[i]}${S}"
     echo ">>> "
     echo ">>> replacing \"${LABEL_LINE}\" with: "
     echo ">>>    \"${LABEL_LINE_UP}\"           "
     echo ">>>    \"${LABEL_LINE_DOWN}\"         "
+    echo ">>> "
+    echo ">>> replacing \"${SHIFT_LINE}\" with: "
+    echo ">>>    \"${SHIFT_LINE_UP}\"           "
+    echo ">>>    \"${SHIFT_LINE_DOWN}\"         "
+    #echo ">>> "
+    #echo ">>> replacing \"${DO_LINE}\" with:    "
+    #echo ">>>    \"${DO_LINE_TRUE}\"            "
     
     for f in ${FILES[i]}; do
         echo ">>> "
-        echo ">>> making shifts for $f"
-        if grep -q "${DO_LINE}" $f; then
+        echo -e ">>> making shifts for ${BOLD}${GREY}${f}${S}"
+        if grep -q "${SHIFT_LINE}" $f; then
             FUP=`  echo $f | sed "s/${FILEND}/_${UP[i]}${FILEND}/"`
             FDOWN=`echo $f | sed "s/${FILEND}/_${DOWN[i]}${FILEND}/"`
-            echo ">>>   creating file: $FUP"
-            echo ">>>   creating file: $FDOWN"
+            echo -e ">>>   creating file: ${GREY}${FUP}${S}"
+            echo -e ">>>   creating file: ${GREY}${FDOWN}${S}"
             cp $f $FUP
             cp $f $FDOWN
-            sed -i "s/${DO_LINE}/${DO_LINE_TRUE}/" $FUP
-            sed -i "s/${DO_LINE}/${DO_LINE_TRUE}/" $FDOWN
+            #sed -i "s/${DO_LINE}/${DO_LINE_TRUE}/" $FUP
+            #sed -i "s/${DO_LINE}/${DO_LINE_TRUE}/" $FDOWN
             if grep -q "${SHIFT_LINE}" $f; then
                 sed -i "s/${SHIFT_LINE}/${SHIFT_LINE_UP}/"   $FUP
                 sed -i "s/${SHIFT_LINE}/${SHIFT_LINE_DOWN}/" $FDOWN
@@ -73,6 +82,8 @@ for ((i=0;i<${#DO_VAR[@]};++i)); do
         else echo -e ">>> ${WARNING} Could not find \"${DO_LINE}\" line${S}"
         fi
     done
+    
+    echo ">>> "
 done
 
 

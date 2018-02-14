@@ -148,9 +148,6 @@ class TauTauAnalysis : public SCycleBase {
     // obtain event weights for MC
     virtual void getEventWeight();
     
-    // GenFilter to select Z to tautau events
-    virtual void genFilterZtautau();
-    
     // set tlv of generator boson for recoil corrections
     virtual void setGenBosonTLVs();
     virtual double getGenBosonPt();
@@ -257,6 +254,7 @@ class TauTauAnalysis : public SCycleBase {
     bool    m_doLTF;
     double  m_LTFshift;
     bool    m_doTight;
+    bool      m_MC_V1;
 
     ///
     /// CUTS
@@ -285,10 +283,6 @@ class TauTauAnalysis : public SCycleBase {
     double    m_muonD0Cut;
     double    m_muonDzCut;
     double    m_muonIsoCut;
-    
-    // leptons = muons and electrons
-    double    m_leptonPtCut;
-    double    m_leptonEtaCut;
     
     // taus
     double    m_tauPtCut;
@@ -340,7 +334,6 @@ class TauTauAnalysis : public SCycleBase {
     
     TLorentzVector boson_tlv;
     TLorentzVector boson_tlv_vis;
-    
     
     // synchronisation:
     // https://twiki.cern.ch/twiki/bin/view/CMS/HiggsToTauTauWorking2017#Synchronisation_Ntuple
@@ -437,26 +430,32 @@ class TauTauAnalysis : public SCycleBase {
     std::map<std::string,Float_t> b_mt_2;
     std::map<std::string,Float_t> b_pfmt_2;
     std::map<std::string,Float_t> b_puppimt_2;
-    std::map<std::string,Float_t> b_iso_2;
-    std::map<std::string,Float_t> b_iso_2_medium;
+    std::map<std::string,Int_t>   b_iso_2_loose;
+    std::map<std::string,Int_t>   b_iso_2_medium;
+    std::map<std::string,Int_t>   b_iso_2;
+    std::map<std::string,Int_t>   b_iso_2_vtight;
+    std::map<std::string,Int_t>   b_iso_2_vvtight;
     std::map<std::string,Int_t>   b_gen_match_2;
     std::map<std::string,Float_t> b_pol_2;
     
-    std::map<std::string,Float_t> b_againstElectronVLooseMVA6_2;
-    std::map<std::string,Float_t> b_againstElectronLooseMVA6_2;
-    std::map<std::string,Float_t> b_againstElectronMediumMVA6_2;
-    std::map<std::string,Float_t> b_againstElectronTightMVA6_2;
-    std::map<std::string,Float_t> b_againstElectronVTightMVA6_2;
-    std::map<std::string,Float_t> b_againstMuonLoose3_2;
-    std::map<std::string,Float_t> b_againstMuonTight3_2;
-    std::map<std::string,Float_t> b_byCombinedIsolationDeltaBetaCorrRaw3Hits_2;
     std::map<std::string,Float_t> b_byIsolationMVA3newDMwLTraw_2;
     std::map<std::string,Float_t> b_byIsolationMVA3oldDMwLTraw_2;
+    std::map<std::string,Int_t>   b_againstElectronVLooseMVA6_2;
+    std::map<std::string,Int_t>   b_againstElectronLooseMVA6_2;
+    std::map<std::string,Int_t>   b_againstElectronMediumMVA6_2;
+    std::map<std::string,Int_t>   b_againstElectronTightMVA6_2;
+    std::map<std::string,Int_t>   b_againstElectronVTightMVA6_2;
+    std::map<std::string,Int_t>   b_againstMuonLoose3_2;
+    std::map<std::string,Int_t>   b_againstMuonTight3_2;
+    std::map<std::string,Int_t>   b_byLooseCombinedIsolationDeltaBetaCorr3Hits_2;
+    std::map<std::string,Int_t>   b_byMediumCombinedIsolationDeltaBetaCorr3Hits_2;
+    std::map<std::string,Int_t>   b_byTightCombinedIsolationDeltaBetaCorr3Hits_2;
+    std::map<std::string,Int_t>   b_byCombinedIsolationDeltaBetaCorrRaw3Hits_2;
     std::map<std::string,Float_t> b_chargedIsoPtSum_2;
     std::map<std::string,Float_t> b_neutralIsoPtSum_2;
     std::map<std::string,Float_t> b_puCorrPtSum_2;
     std::map<std::string,Float_t> b_decayModeFindingOldDMs_2;
-    std::map<std::string,Float_t> b_decayMode_2;
+    std::map<std::string,Int_t>   b_decayMode_2;
     
     std::map<std::string,Int_t>   b_dilepton_veto;
     std::map<std::string,Int_t>   b_extraelec_veto;

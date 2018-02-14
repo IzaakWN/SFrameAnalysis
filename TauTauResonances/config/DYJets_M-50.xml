@@ -10,7 +10,7 @@
   <Library Name="libRecoilCorrector" />
   <Library Name="libJetCorrectionTool" />
   <Library Name="libSVFitTool" />
-
+  
   <Package Name="SFrameCore.par" />
   <Package Name="NtupleVariables.par" />
   <Package Name="GoodRunsLists.par" />
@@ -20,15 +20,16 @@
   <Package Name="ScaleFactorTool.par" />
   <Package Name="RecoilCorrector.par" />
   <Package Name="SVFitTool.par" />
-
+  
   <Cycle Name="TauTauAnalysis" OutputDirectory="./" PostFix="" ProofServer="lite" ProofWorkDir="" RunMode="LOCAL" TargetLumi="1.0">
-    <InputData Lumi="0.0" NEventsMax="100000" Type="DYJets_M-50" Version="UZH" SkipValid="False">
-
-<In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_v1/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/171114_103508/0000/flatTuple_136.root" Lumi="1.0" />
+    <InputData Lumi="0.0" NEventsMax="-1" Type="DYJets_M-50" Version="UZH" SkipValid="False">
+  
+<In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_v1/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/171114_103508/0000/flatTuple_136.root" Lumi="1.0" /> 
 <In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_v1/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/171114_103508/0000/flatTuple_144.root" Lumi="1.0" />
 <In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_v1/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/171114_103508/0000/flatTuple_161.root" Lumi="1.0" />
 <In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_v1/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/171114_103508/0000/flatTuple_167.root" Lumi="1.0" />
 <In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_v1/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/171114_103508/0000/flatTuple_172.root" Lumi="1.0" />
+<!--
 <In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_v1/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/171114_103508/0000/flatTuple_173.root" Lumi="1.0" />
 <In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_v1/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/171114_103508/0000/flatTuple_175.root" Lumi="1.0" />
 <In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_v1/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/171114_103508/0000/flatTuple_176.root" Lumi="1.0" />
@@ -42,6 +43,7 @@
 <In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_v1/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/171114_103508/0000/flatTuple_271.root" Lumi="1.0" />
 <In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_v1/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/171114_103508/0000/flatTuple_281.root" Lumi="1.0" />
 <In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_v1/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/171114_103508/0000/flatTuple_304.root" Lumi="1.0" />
+ -->
 <!--
 <In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_v1/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/171114_103508/0000/flatTuple_306.root" Lumi="1.0" />
 <In FileName="root://storage01.lcg.cscs.ch//pnfs/lcg.cscs.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_v1/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/171114_103508/0000/flatTuple_309.root" Lumi="1.0" />

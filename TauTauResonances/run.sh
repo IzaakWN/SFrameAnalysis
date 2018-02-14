@@ -1,14 +1,13 @@
 #! /bin/bash
 
 FILES=(
-#    Signal.xml
-#    SUSY.xml
 #    DYJets_M-10to50.xml
-    DYJets_M-50.xml
+#    DYJets_M-50.xml
+   DYJets_M-50_v2.xml
 #    VBF.xml
-    #TT_TuneCUETP8M1.xml
-#    WJetsToLNu.xml
-    #SingleMuon.xml
+#    TT_TuneCUETP8M1.xml
+#    WJets_v2.xml
+#    SingleMuon_v2.xml
 )
 
 RUN_ONLY=0
@@ -18,8 +17,9 @@ done
 
    [[ $RUN_ONLY > 0 ]] || printf "\n\n\n\n\n\n\n"
 if [[ $RUN_ONLY > 0 ]] || ( make distclean && make ); then
-    for f in ${FILES[@]}; do
-        printf "\n\n\n>>> %s%s%s\n\n" "$(tput bold)$(tput setaf 2)" $f "$(tput sgr0)"
-        sframe_main config/$f
-    done
+  for f in ${FILES[@]}; do
+    CMD="sframe_main config/$f"
+    printf "\n\n\n>>> %s%s%s\n\n" "$(tput bold)$(tput setaf 2)" "$CMD" "$(tput sgr0)"
+    $CMD
+  done
 fi

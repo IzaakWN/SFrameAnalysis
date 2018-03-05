@@ -72,25 +72,31 @@ class TauTauAnalysis : public SCycleBase {
   
     // enumeration of all cut flags
     typedef enum {
-      kBeforeCuts,              // C0
-      kJSON,                    // C1
-      kTrigger,                 // C2
-      kLepton,                  // C3
-      kLepTau,                  // C4
-      kTriggerMatched,          // C5
-      kBeforeCutsWeighted,      // C6
-      kNumCuts                  // last!
+      kBeforeCuts,                      // C0
+      kJSON,                            // C1
+      kTrigger,                         // C2
+      kLepton,                          // C3
+      kLepTau,                          // C4
+      kTriggerMatched,                  // C5
+      kBeforeCutsUnweighted,            // C6
+      kNo0PUUnweighted,                 // C7
+      kBeforeCutsWeighted,              // C8
+      kNo0PUWeighted,                   // C9
+      kNumCuts                          // last!
     } SelectionCuts;
   
     // static array of all cut names
     const std::string kCutName[ kNumCuts ] = {
-      "BeforeCuts",             // C0
-      "JSON",                   // C1
-      "Trigger",                // C2
-      "Lepton",                 // C3
-      "LepTau",                 // C4
-      "TriggerMatched",         // C5
-      "BeforeCutsWeighted",     // C6
+      "BeforeCuts",                     // C0
+      "JSON",                           // C1
+      "Trigger",                        // C2
+      "Lepton",                         // C3
+      "LepTau",                         // C4
+      "TriggerMatched",                 // C5
+      "BeforeCutsUnweighted",           // C6
+      "No0PUUnweighted",                // C7
+      "BeforeCutsWeighted",             // C8
+      "No0PUWeighted",                  // C9
     };
     
 
@@ -142,7 +148,7 @@ class TauTauAnalysis : public SCycleBase {
     virtual void countJets( const TLorentzVector& jet_tlv, Int_t& ncjets, Int_t& nfjets, Int_t& ncbtags, TLorentzVector& bjet_tlv, TLorentzVector& jet2_tlv, const bool isBTagged );
     
     // check pass of triggers / MET filters
-    virtual TString passTrigger( int runNumber = -1 );
+    virtual TString passTrigger();
     virtual bool passMETFilters();
     
     // obtain event weights for MC
@@ -254,7 +260,7 @@ class TauTauAnalysis : public SCycleBase {
     bool    m_doLTF;
     double  m_LTFshift;
     bool    m_doTight;
-    bool      m_MC_V1;
+    bool    m_MC_V1;
 
     ///
     /// CUTS
@@ -430,6 +436,7 @@ class TauTauAnalysis : public SCycleBase {
     std::map<std::string,Float_t> b_mt_2;
     std::map<std::string,Float_t> b_pfmt_2;
     std::map<std::string,Float_t> b_puppimt_2;
+    std::map<std::string,Int_t>   b_iso_2_vloose;
     std::map<std::string,Int_t>   b_iso_2_loose;
     std::map<std::string,Int_t>   b_iso_2_medium;
     std::map<std::string,Int_t>   b_iso_2;
@@ -440,13 +447,13 @@ class TauTauAnalysis : public SCycleBase {
     
     std::map<std::string,Float_t> b_byIsolationMVA3newDMwLTraw_2;
     std::map<std::string,Float_t> b_byIsolationMVA3oldDMwLTraw_2;
-    std::map<std::string,Int_t>   b_againstElectronVLooseMVA6_2;
     std::map<std::string,Int_t>   b_againstElectronLooseMVA6_2;
     std::map<std::string,Int_t>   b_againstElectronMediumMVA6_2;
     std::map<std::string,Int_t>   b_againstElectronTightMVA6_2;
     std::map<std::string,Int_t>   b_againstElectronVTightMVA6_2;
     std::map<std::string,Int_t>   b_againstMuonLoose3_2;
     std::map<std::string,Int_t>   b_againstMuonTight3_2;
+    std::map<std::string,Int_t>   b_byVLooseCombinedIsolationDeltaBetaCorr3Hits_2;
     std::map<std::string,Int_t>   b_byLooseCombinedIsolationDeltaBetaCorr3Hits_2;
     std::map<std::string,Int_t>   b_byMediumCombinedIsolationDeltaBetaCorr3Hits_2;
     std::map<std::string,Int_t>   b_byTightCombinedIsolationDeltaBetaCorr3Hits_2;

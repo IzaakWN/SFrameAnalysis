@@ -71,14 +71,14 @@ TauTauAnalysis::TauTauAnalysis() : SCycleBase(),
   // https://twiki.cern.ch/twiki/bin/view/CMS/BtagRecommendation80XReReco
   DeclareProperty( "CSVWorkingPoint",       m_CSVWorkingPoint       = 0.8484            );
   
-  DeclareProperty( "ElectronPtCut",         m_electronPtCut         = 28.               ); // 
-  DeclareProperty( "ElectronEtaCut",        m_electronEtaCut        = 2.1               );
+  DeclareProperty( "ElectronPtCut",         m_electronPtCut         = 28.               );
+  DeclareProperty( "ElectronEtaCut",        m_electronEtaCut        = 2.4               );
   DeclareProperty( "ElectronD0Cut",         m_electronD0Cut         = 0.045             );
   DeclareProperty( "ElectronDzCut",         m_electronDzCut         = 0.2               );
   DeclareProperty( "ElectronIsoCut",        m_electronIsoCut        = 0.1               );
   
-  DeclareProperty( "MuonPtCut",             m_muonPtCut             = 28.               ); // 
-  DeclareProperty( "MuonEtaCut",            m_muonEtaCut            = 2.1               );
+  DeclareProperty( "MuonPtCut",             m_muonPtCut             = 28.               );
+  DeclareProperty( "MuonEtaCut",            m_muonEtaCut            = 2.4               );
   DeclareProperty( "MuonD0Cut",             m_muonD0Cut             = 0.045             );
   DeclareProperty( "MuonDzCut",             m_muonDzCut             = 0.2               );
   DeclareProperty( "MuonIsoCut",            m_muonIsoCut            = 0.15              );
@@ -286,6 +286,7 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
     //DeclareVariable( b_mt_2[ch],                "mt_2",                 treeName);
     DeclareVariable( b_pfmt_2[ch],              "pfmt_2",               treeName);
     DeclareVariable( b_puppimt_2[ch],           "puppimt_2",            treeName);
+    DeclareVariable( b_iso_2_vloose[ch],        "iso_2_vloose",         treeName);
     DeclareVariable( b_iso_2_loose[ch],         "iso_2_loose",          treeName);
     DeclareVariable( b_iso_2_medium[ch],        "iso_2_medium",         treeName);
     DeclareVariable( b_iso_2[ch],               "iso_2",                treeName);
@@ -295,7 +296,6 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
     DeclareVariable( b_gen_match_2[ch],         "gen_match_2",          treeName);
     DeclareVariable( b_pol_2[ch],               "pol_2",                treeName);
     
-    DeclareVariable( b_againstElectronVLooseMVA6_2[ch],  "againstElectronVLooseMVA6_2",  treeName);
     DeclareVariable( b_againstElectronLooseMVA6_2[ch],   "againstElectronLooseMVA6_2",   treeName);
     DeclareVariable( b_againstElectronMediumMVA6_2[ch],  "againstElectronMediumMVA6_2",  treeName);
     DeclareVariable( b_againstElectronTightMVA6_2[ch],   "againstElectronTightMVA6_2",   treeName);
@@ -484,12 +484,13 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
     TString hname = "cutflow_" + ch;
     TString dirname = "histogram_" + ch;
     TString tch = ch;
-    Book( TH1F(hname, hname, 10, 0.5, 10.5 ), dirname);
+    Book( TH1F(hname, hname, 12, 0.5, 12.5 ), dirname);
   }
-  Book( TH1F("npu", "npu", 100, 0, 100 ), "checks");
-  Book( TH1F("puweight", "puweight", 100, 0, 20 ), "checks");
+  Book( TH1F("npu",             "npu",              110, -10, 100 ), "checks");
+  Book( TH1F("npu_no0PU",       "npu_no0PU",        110, -10, 100 ), "checks");
+  Book( TH1F("puweight",        "puweight",         100,   0,  10 ), "checks");
   
-  if (!m_isData) m_PileupReweightingTool.BeginInputData( id );
+  if (!m_isData) m_PileupReweightingTool.BeginInputData( id, m_MC_V1 );
   else{
     TObject* grl;
     if( ! ( grl = GetConfigObject( "MyGoodRunsList" ) ) ) {
@@ -576,12 +577,12 @@ void TauTauAnalysis::BeginInputFile( const SInputData& ) throw( SError ) {
   
   if (m_isData) {
     m_jetAK4.ConnectVariables(      m_recoTreeName.c_str(), Ntuple::JetBasic|Ntuple::JetAnalysis, (m_jetAK4Name + "_").c_str() );
-    m_eventInfo.ConnectVariables(   m_recoTreeName.c_str(), Ntuple::EventInfoTrigger|Ntuple::EventInfoMETFilters, "" );
+    m_eventInfo.ConnectVariables(   m_recoTreeName.c_str(), Ntuple::EventInfoBasic|Ntuple::EventInfoTrigger, "" );
   }
   else {
     m_jetAK4.ConnectVariables(      m_recoTreeName.c_str(), Ntuple::JetBasic|Ntuple::JetAnalysis|Ntuple::JetTruth|Ntuple::JetJER, (m_jetAK4Name + "_").c_str() );
     m_genJetAK4.ConnectVariables(   m_recoTreeName.c_str(), Ntuple::GenJetak4Truth,"");
-    m_eventInfo.ConnectVariables(   m_recoTreeName.c_str(), Ntuple::EventInfoBasic|Ntuple::EventInfoTrigger|Ntuple::EventInfoMETFilters|Ntuple::EventInfoTruth, "" );
+    m_eventInfo.ConnectVariables(   m_recoTreeName.c_str(), Ntuple::EventInfoBasic|Ntuple::EventInfoTrigger|Ntuple::EventInfoTruth, "" );
     m_genParticle.ConnectVariables( m_recoTreeName.c_str(), Ntuple::GenParticleBasic|Ntuple::GenParticleTauDecayAnalysis, (m_genParticleName + "_").c_str() );
   }
   m_electron.ConnectVariables(      m_recoTreeName.c_str(), Ntuple::ElectronBasic|Ntuple::ElectronID|Ntuple::ElectronAdvancedID|Ntuple::ElectronBoostedIsolation|Ntuple::ElectronSuperCluster, (m_electronName + "_").c_str() );
@@ -607,45 +608,43 @@ void TauTauAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
   //m_logger << VERBOSE << "ExecuteEvent" << SLogger::endmsg;
   
   b_weight_     =  1.;
-  b_puweight_   =  1.; 
-  b_genweight_  =  1.;
+  b_puweight_   =  1.;
+  b_genweight_  = (m_isData) ? 1 : m_eventInfo.genEventWeight;
   b_npu_        = -1.;
-  
-  UZH::MissingEt met(      &m_missingEt, 0 );
-  UZH::MissingEt puppiMet( &m_puppimissingEt, 0 );
   
   
   // Cut 0: no cuts
   for (auto ch: channels_){
     fillCutflow("cutflow_" + ch, "histogram_" + ch, kBeforeCuts, 1);
+    fillCutflow("cutflow_" + ch, "histogram_" + ch, kJSON, 1);
+    fillCutflow("cutflow_" + ch, "histogram_" + ch, kBeforeCutsUnweighted, 1 );
+    fillCutflow("cutflow_" + ch, "histogram_" + ch, kBeforeCutsWeighted, b_genweight_);
     b_channel[ch] = 0;
   }
-  //if (m_isSignal) signalChecks();
-  //countBTaggedTaus();
+  if (m_isData){
+    Hist("npu", "checks")->Fill(m_eventInfo.PV_N);
+    if(m_eventInfo.PV_N<=0) throw SError( SError::SkipEvent );
+  }else{
+    getEventWeight();
+  }
+  for (auto ch: channels_){
+    fillCutflow("cutflow_" + ch, "histogram_" + ch, kNo0PUUnweighted, 1);
+    fillCutflow("cutflow_" + ch, "histogram_" + ch, kNo0PUWeighted, b_genweight_);
+  }
   
   
   // Cut 1: check for data if run/lumiblock in JSON
-  if (!m_isData){
-    getEventWeight();
-    Hist("npu", "checks")->Fill(b_npu_);
-    Hist("puweight", "checks")->Fill(b_puweight_);
-    for (auto ch: channels_){
-      fillCutflow("cutflow_" + ch, "histogram_" + ch, kJSON, 1);
-      fillCutflow("cutflow_" + ch, "histogram_" + ch, kBeforeCutsWeighted, b_genweight_);
-    }
-  }
-  else{
-    for (auto ch: channels_){
-      fillCutflow("cutflow_" + ch, "histogram_" + ch, kJSON, 1);
-      fillCutflow("cutflow_" + ch, "histogram_" + ch, kBeforeCutsWeighted, 1);
-    }
+  if (m_isData){
     if(!(isGoodEvent(m_eventInfo.runNumber, m_eventInfo.lumiBlock))) throw SError( SError::SkipEvent );
+    for (auto ch: channels_){
+      fillCutflow("cutflow_" + ch, "histogram_" + ch, kJSON, 1);
+    }
   }
   
   
   // Cut 2: pass trigger
   //std::cout << ">>> ExecuteEvent - Cut 2" << std::endl;
-  m_trigger_Flags = passTrigger(m_eventInfo.runNumber); //"mt22-et25";
+  m_trigger_Flags = passTrigger();
   if(m_trigger_Flags == "none"){
     throw SError( SError::SkipEvent );
   }
@@ -715,6 +714,8 @@ void TauTauAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
   
   // For tau
   //std::cout << ">>> ExecuteEvent - Cut 5 - tau" << std::endl;
+  UZH::MissingEt met(      &m_missingEt, 0 );
+  UZH::MissingEt puppiMet( &m_puppimissingEt, 0 );
   std::vector<UZH::Tau> goodTaus;
   std::vector<int> goodTausGen;
   
@@ -936,7 +937,7 @@ bool TauTauAnalysis::isGoodEvent(int runNumber, int lumiSection) {
 
 
 
-TString TauTauAnalysis::passTrigger(int runNumber) {
+TString TauTauAnalysis::passTrigger() {
   //std::cout << "TauTauAnalysis::passTrigger" << std::endl;
   
   // triggerFlag = mt22-mt24-mtx-mt-et25-et45-etx-et-e12mu23-e23mu8-em-
@@ -1030,12 +1031,26 @@ void TauTauAnalysis::getEventWeight() {
   for( unsigned int v = 0; v < (m_eventInfo.actualIntPerXing)->size(); ++v ){
     if ( (*m_eventInfo.bunchCrossing)[v] == 0 ) {
       b_npu_ = (*m_eventInfo.actualIntPerXing)[v]; // averageIntPerXing
-      if(b_npu_<0){ std::cout<<"Warning!!! b_npu_"<<b_npu_<<"<0"<<std::endl; break; }
+      
+      if(b_npu_<0){
+        Hist("npu", "checks")->Fill(-9);
+        //std::cout<<"Warning!!! b_npu_ = "<<b_npu_<<" < 0"<<std::endl;
+        throw SError( SError::SkipEvent );
+      }else if(b_npu_==0){
+        Hist("npu", "checks")->Fill(0);
+        //std::cout<<"Warning!!! b_npu_ = "<<b_npu_<<" == 0"<<std::endl;
+        throw SError( SError::SkipEvent );      
+      }else{
+        Hist("npu", "checks")->Fill(b_npu_);
+      }
+      
       b_puweight_ = m_PileupReweightingTool.getPileUpweight( b_npu_ );
       //if(m_doJEC){
       //  b_puweight_Up_   = m_PileupReweightingTool.getPileUpweight( b_npu_, +1 );
       //  b_puweight_Down_ = m_PileupReweightingTool.getPileUpweight( b_npu_, -1 );
       //}
+      Hist("npu_no0PU", "checks")->Fill(b_npu_);
+      Hist("puweight",  "checks")->Fill(b_puweight_);
       break;
     }
   }
@@ -1093,6 +1108,7 @@ void TauTauAnalysis::FillBranches(const std::string& channel, const UZH::Tau& ta
   b_q_2[ch]         = tau.charge();
   b_d0_2[ch]        = tau.d0();
   b_dz_2[ch]        = tau.dz();
+  b_iso_2_vloose[ch]  = tau.byVLooseIsolationMVArun2v1DBoldDMwLT();
   b_iso_2_loose[ch]   = tau.byLooseIsolationMVArun2v1DBoldDMwLT();
   b_iso_2_medium[ch]  = tau.byMediumIsolationMVArun2v1DBoldDMwLT();
   b_iso_2[ch]         = tau.byTightIsolationMVArun2v1DBoldDMwLT();
@@ -1103,7 +1119,6 @@ void TauTauAnalysis::FillBranches(const std::string& channel, const UZH::Tau& ta
   if (tau.chargedPionPt() > 0 && tau.neutralPionPt() > 0)
     b_pol_2[ch]     = (tau.chargedPionPt() - tau.neutralPionPt()) / (tau.chargedPionPt() + tau.neutralPionPt());
   
-  b_againstElectronVLooseMVA6_2[ch]     = tau.againstElectronVLooseMVA6();
   b_againstElectronLooseMVA6_2[ch]      = tau.againstElectronLooseMVA6();
   b_againstElectronMediumMVA6_2[ch]     = tau.againstElectronMediumMVA6();
   b_againstElectronTightMVA6_2[ch]      = tau.againstElectronTightMVA6();

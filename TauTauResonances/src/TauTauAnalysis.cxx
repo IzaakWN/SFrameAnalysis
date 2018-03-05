@@ -303,6 +303,7 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
     DeclareVariable( b_againstMuonLoose3_2[ch],          "againstMuonLoose3_2",          treeName);
     DeclareVariable( b_againstMuonTight3_2[ch],          "againstMuonTight3_2",          treeName);
     
+    //DeclareVariable( b_byVLooseCombinedIsolationDeltaBetaCorr3Hits_2[ch], "byVLooseCombinedIsolationDeltaBetaCorr3Hits_2", treeName);
     DeclareVariable( b_byLooseCombinedIsolationDeltaBetaCorr3Hits_2[ch],  "byLooseCombinedIsolationDeltaBetaCorr3Hits_2",  treeName);
     DeclareVariable( b_byMediumCombinedIsolationDeltaBetaCorr3Hits_2[ch], "byMediumCombinedIsolationDeltaBetaCorr3Hits_2", treeName);
     DeclareVariable( b_byTightCombinedIsolationDeltaBetaCorr3Hits_2[ch],  "byTightCombinedIsolationDeltaBetaCorr3Hits_2",  treeName);
@@ -624,7 +625,8 @@ void TauTauAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
     Hist("npu", "checks")->Fill(m_eventInfo.PV_N);
     if(m_eventInfo.PV_N<=0) throw SError( SError::SkipEvent );
   }else{
-    fillCutflow("cutflow_" + ch, "histogram_" + ch, kJSON, 1);
+    for (auto ch: channels_)
+      fillCutflow("cutflow_" + ch, "histogram_" + ch, kJSON, 1);
     getEventWeight();
   }
   for (auto ch: channels_){

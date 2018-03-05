@@ -24,10 +24,9 @@ namespace Ntuple {
     ConnectVariable( treeName, m_objectNames.getName("lumiBlock"  ), lumiBlock  );
 
     if( ( (detail_level & Ntuple::EventInfoBasic) == Ntuple::EventInfoBasic) ) {
-      ConnectVariable( treeName, m_objectNames.getName("averageIntPerXing"), averageIntPerXing);
-      ConnectVariable( treeName, m_objectNames.getName("actualIntPerXing" ), actualIntPerXing );
-      ConnectVariable( treeName, m_objectNames.getName("bunchCrossing"    ), bunchCrossing    );
-      ConnectVariable( treeName, m_objectNames.getName("rho"              ), rho              );
+      ConnectVariable( treeName, m_objectNames.getName("rho"          ), rho          );
+      ConnectVariable( treeName, m_objectNames.getName("PV_filter"    ), PV_filter    );
+      ConnectVariable( treeName, m_objectNames.getName("PV_N"         ), PV_N         );
     }
     if( (detail_level & Ntuple::EventInfoTrigger) == Ntuple::EventInfoTrigger ) {
       ConnectVariable( treeName, m_objectNames.getName("trigDecision"), trigDecision );
@@ -38,12 +37,15 @@ namespace Ntuple {
       //ConnectVariable( treeName, m_objectNames.getName("trigObject_filterLabels"), trigObject_filterLabels  );
 
     }
-    if( (detail_level & Ntuple::EventInfoTruth) == Ntuple::EventInfoTruth ) {
-      ConnectVariable( treeName, m_objectNames.getName("genEventWeight"), genEventWeight);
-      ConnectVariable( treeName, m_objectNames.getName("lheV_pt"       ), lheV_pt       );
-      ConnectVariable( treeName, m_objectNames.getName("lheV_mass"     ), lheV_mass     );
-      ConnectVariable( treeName, m_objectNames.getName("lheHT"         ), lheHT         );
-      ConnectVariable( treeName, m_objectNames.getName("lheNj"         ), lheNj         );
+    if( (detail_level & Ntuple::EventInfoTruth) == Ntuple::EventInfoTruth ) {   
+      ConnectVariable( treeName, m_objectNames.getName("genEventWeight"   ), genEventWeight   );
+      ConnectVariable( treeName, m_objectNames.getName("lheV_pt"          ), lheV_pt          );
+      ConnectVariable( treeName, m_objectNames.getName("lheV_mass"        ), lheV_mass        );
+      ConnectVariable( treeName, m_objectNames.getName("lheHT"            ), lheHT            );
+      ConnectVariable( treeName, m_objectNames.getName("lheNj"            ), lheNj            );
+      ConnectVariable( treeName, m_objectNames.getName("averageIntPerXing"), averageIntPerXing);
+      ConnectVariable( treeName, m_objectNames.getName("actualIntPerXing" ), actualIntPerXing );
+      ConnectVariable( treeName, m_objectNames.getName("bunchCrossing"    ), bunchCrossing    );
     }
     if( (detail_level & Ntuple::EventInfoPDF) == Ntuple::EventInfoPDF  ) {
       ConnectVariable( treeName, m_objectNames.getName("pdf_id"   ), pdf_id    );
@@ -67,8 +69,6 @@ namespace Ntuple {
       ConnectVariable( treeName, m_objectNames.getName("passFilter_TrkPOG_toomanystrip"), passFilter_TrkPOG_toomanystrip);
       ConnectVariable( treeName, m_objectNames.getName("passFilter_TrkPOG_logError"    ), passFilter_TrkPOG_logError    );
       ConnectVariable( treeName, m_objectNames.getName("passFilter_METFilters"         ), passFilter_METFilters         );
-      ConnectVariable( treeName, m_objectNames.getName("PV_filter"                     ), PV_filter                     );
-      ConnectVariable( treeName, m_objectNames.getName("PV_N"                          ), PV_N                          );
       ConnectVariable( treeName, m_objectNames.getName("passFilter_globalTightHalo2016"), passFilter_globalTightHalo2016);
       ConnectVariable( treeName, m_objectNames.getName("passFilter_muonBadTrack"       ), passFilter_muonBadTrack       );
       ConnectVariable( treeName, m_objectNames.getName("passFilter_chargedHadronTrackResolution"), passFilter_chargedHadronTrackResolution );

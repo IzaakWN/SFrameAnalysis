@@ -445,8 +445,8 @@ class TauTauAnalysis : public SCycleBase {
     std::map<std::string,Int_t>   b_gen_match_2;
     std::map<std::string,Float_t> b_pol_2;
     
-    std::map<std::string,Float_t> b_byIsolationMVA3newDMwLTraw_2;
-    std::map<std::string,Float_t> b_byIsolationMVA3oldDMwLTraw_2;
+    std::map<std::string,Float_t> b_byIsolationMVArun2v1DBoldDMwLTraw_2;
+    std::map<std::string,Float_t> b_byIsolationMVArun2v1DBnewDMwLTraw_2;
     std::map<std::string,Int_t>   b_againstElectronLooseMVA6_2;
     std::map<std::string,Int_t>   b_againstElectronMediumMVA6_2;
     std::map<std::string,Int_t>   b_againstElectronTightMVA6_2;

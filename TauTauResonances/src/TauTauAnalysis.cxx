@@ -307,8 +307,8 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
     DeclareVariable( b_byMediumCombinedIsolationDeltaBetaCorr3Hits_2[ch], "byMediumCombinedIsolationDeltaBetaCorr3Hits_2", treeName);
     DeclareVariable( b_byTightCombinedIsolationDeltaBetaCorr3Hits_2[ch],  "byTightCombinedIsolationDeltaBetaCorr3Hits_2",  treeName);
     DeclareVariable( b_byCombinedIsolationDeltaBetaCorrRaw3Hits_2[ch],    "byCombinedIsolationDeltaBetaCorrRaw3Hits_2",    treeName);
-    DeclareVariable( b_byIsolationMVA3newDMwLTraw_2[ch], "byIsolationMVA3newDMwLTraw_2", treeName);
-    DeclareVariable( b_byIsolationMVA3oldDMwLTraw_2[ch], "byIsolationMVA3oldDMwLTraw_2", treeName);
+    DeclareVariable( b_byIsolationMVArun2v1DBoldDMwLTraw_2[ch],           "byIsolationMVArun2v1DBoldDMwLTraw_2",           treeName);
+    DeclareVariable( b_byIsolationMVArun2v1DBnewDMwLTraw_2[ch],           "byIsolationMVArun2v1DBnewDMwLTraw_2",           treeName);
     DeclareVariable( b_chargedIsoPtSum_2[ch],            "chargedIsoPtSum_2",            treeName);
     DeclareVariable( b_neutralIsoPtSum_2[ch],            "neutralIsoPtSum_2",            treeName);
     DeclareVariable( b_puCorrPtSum_2[ch],                "puCorrPtSum_2",                treeName);
@@ -616,7 +616,6 @@ void TauTauAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
   // Cut 0: no cuts
   for (auto ch: channels_){
     fillCutflow("cutflow_" + ch, "histogram_" + ch, kBeforeCuts, 1);
-    fillCutflow("cutflow_" + ch, "histogram_" + ch, kJSON, 1);
     fillCutflow("cutflow_" + ch, "histogram_" + ch, kBeforeCutsUnweighted, 1 );
     fillCutflow("cutflow_" + ch, "histogram_" + ch, kBeforeCutsWeighted, b_genweight_);
     b_channel[ch] = 0;
@@ -625,6 +624,7 @@ void TauTauAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
     Hist("npu", "checks")->Fill(m_eventInfo.PV_N);
     if(m_eventInfo.PV_N<=0) throw SError( SError::SkipEvent );
   }else{
+    fillCutflow("cutflow_" + ch, "histogram_" + ch, kJSON, 1);
     getEventWeight();
   }
   for (auto ch: channels_){
@@ -667,9 +667,7 @@ void TauTauAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
     if (fabs(mymuon.eta()) > m_muonEtaCut) continue;
     if (fabs(mymuon.d0_allvertices()) > m_muonD0Cut) continue;
     if (fabs(mymuon.dz_allvertices()) > m_muonDzCut) continue;
-    if(m_isData and m_eventInfo.runNumber < 278820)
-      {  if(mymuon.isMediumMuon()   < 0.5) continue; } // for period B-F
-    else if(mymuon.isMediumMuonGH() < 0.5) continue;   // for period GH and MC (see AN)
+    if(mymuon.isMediumMuonGH() < 0.5) continue;   // for period GH and MC (see AN)
     goodMuons.push_back(mymuon);
   }
   //std::cout << " 5";
@@ -1026,7 +1024,6 @@ bool TauTauAnalysis::passMETFilters() {
 void TauTauAnalysis::getEventWeight() {
   //std::cout << "getEventWeight" << std::endl;
   
-  double weight = 1.;
   b_npu_ = -1.;
   for( unsigned int v = 0; v < (m_eventInfo.actualIntPerXing)->size(); ++v ){
     if ( (*m_eventInfo.bunchCrossing)[v] == 0 ) {
@@ -1055,7 +1052,6 @@ void TauTauAnalysis::getEventWeight() {
     }
   }
   
-  b_genweight_ = (m_eventInfo.genEventWeight < 0) ? -1 : 1; 
   b_weight_ *= b_puweight_*b_genweight_;
   
 }
@@ -1129,13 +1125,13 @@ void TauTauAnalysis::FillBranches(const std::string& channel, const UZH::Tau& ta
   b_byMediumCombinedIsolationDeltaBetaCorr3Hits_2[ch] = tau.byMediumCombinedIsolationDeltaBetaCorr3Hits();
   b_byTightCombinedIsolationDeltaBetaCorr3Hits_2[ch]  = tau.byTightCombinedIsolationDeltaBetaCorr3Hits();
   b_byCombinedIsolationDeltaBetaCorrRaw3Hits_2[ch]    = tau.byCombinedIsolationDeltaBetaCorrRaw3Hits();
-  b_byIsolationMVA3newDMwLTraw_2[ch]    = tau.byIsolationMVArun2v1DBnewDMwLTraw();
-  b_byIsolationMVA3oldDMwLTraw_2[ch]    = tau.byIsolationMVArun2v1DBoldDMwLTraw();
+  b_byIsolationMVArun2v1DBnewDMwLTraw_2[ch] = tau.byIsolationMVArun2v1DBnewDMwLTraw();
+  b_byIsolationMVArun2v1DBoldDMwLTraw_2[ch] = tau.byIsolationMVArun2v1DBoldDMwLTraw();
   b_chargedIsoPtSum_2[ch]               = tau.chargedIsoPtSum();
   b_neutralIsoPtSum_2[ch]               = tau.neutralIsoPtSum();
   b_puCorrPtSum_2[ch]                   = tau.puCorrPtSum();
   b_decayModeFindingOldDMs_2[ch]        = tau.decayModeFinding();
-  b_decayMode_2[ch]                     = tau.decayMode(); // 0, 1, 10
+  b_decayMode_2[ch]                     = tau.decayMode(); // 0, 1, 10, (11)
   
   b_id_e_mva_nt_loose_1[ch]             = -1;
   extraLeptonVetos(channel, muon, electron); // sets global b_dilepton_veto_, b_extraelec_veto_, b_extramuon_veto_

@@ -68,8 +68,8 @@ TauTauAnalysis::TauTauAnalysis() : SCycleBase(),
   DeclareProperty( "AK4JetPtCut",           m_AK4jetPtCut           = 20.               );
   DeclareProperty( "AK4JetEtaCut",          m_AK4jetEtaCut          = 4.7               );
   
-  // https://twiki.cern.ch/twiki/bin/view/CMS/BtagRecommendation80XReReco
-  DeclareProperty( "CSVWorkingPoint",       m_CSVWorkingPoint       = 0.8484            );
+  // https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation94X
+  DeclareProperty( "CSVWorkingPoint",       m_CSVWorkingPoint       = 0.8838            );
   
   DeclareProperty( "ElectronPtCut",         m_electronPtCut         = 28.               );
   DeclareProperty( "ElectronEtaCut",        m_electronEtaCut        = 2.4               );
@@ -665,10 +665,10 @@ void TauTauAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
   for( int i = 0; i < m_muon.N; ++i ){
     UZH::Muon mymuon( &m_muon, i );
     
-    if (mymuon.pt() < m_muonPtCut) continue;
-    if (fabs(mymuon.eta()) > m_muonEtaCut) continue;
-    if (fabs(mymuon.d0_allvertices()) > m_muonD0Cut) continue;
-    if (fabs(mymuon.dz_allvertices()) > m_muonDzCut) continue;
+    if(mymuon.pt() < m_muonPtCut) continue;
+    if(fabs(mymuon.eta()) > m_muonEtaCut) continue;
+    if(fabs(mymuon.d0_allvertices()) > m_muonD0Cut) continue;
+    if(fabs(mymuon.dz_allvertices()) > m_muonDzCut) continue;
     if(mymuon.isMediumMuonGH() < 0.5) continue;   // for period GH and MC (see AN)
     goodMuons.push_back(mymuon);
   }
@@ -836,22 +836,15 @@ void TauTauAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
     
     // For Jets: cut and filter our selected muon and tau
     std::vector<UZH::Jet> goodJetsAK4;
-    for ( int i = 0; i < (m_jetAK4.N); ++i ) {
-      UZH::Jet myjetak4( &m_jetAK4, i );
+    for ( auto& jet: goodJetsAK4 ) {
+            
+      if(fabs(jet.eta()) > m_AK4jetEtaCut) continue;
+      if(jet.pt() < m_AK4jetPtCut*0.5) continue; // loosen pt cut for smearing
+      if(!LooseJetID(jet)) continue; // !jet.IDLoose()
+      if(jet.DeltaR(goodMuons[mutau_pair[0].ilepton]) < 0.5) continue;
+      if(jet.DeltaR(goodTaus[mutau_pair[0].itau]) < 0.5) continue;
       
-      if (fabs(myjetak4.eta()) > m_AK4jetEtaCut) continue;
-      if (myjetak4.pt() < m_AK4jetPtCut*0.5) continue; // loosen pt cut for smearing
-      if (!LooseJetID(myjetak4)) continue; // !myjetak4.IDLoose()
-      
-      Float_t dR_mj = deltaR(myjetak4.eta() - goodMuons[mutau_pair[0].ilepton].eta(), 
-                      deltaPhi(myjetak4.phi(), goodMuons[mutau_pair[0].ilepton].phi()));
-      if(dR_mj < 0.5) continue;
-      
-      Float_t dR_tj = deltaR(myjetak4.eta() - goodTaus[mutau_pair[0].itau].eta(), 
-                      deltaPhi(myjetak4.phi(), goodTaus[mutau_pair[0].itau].phi()));
-      if(dR_tj < 0.5) continue;
-      
-      goodJetsAK4.push_back(myjetak4);
+      goodJetsAK4.push_back(jet);
     }
     
     //std::cout << ">>> ExecuteEvent - FillBranches mutau" << std::endl;
@@ -887,13 +880,8 @@ void TauTauAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
 //       if (fabs(myjetak4.eta()) > m_AK4jetEtaCut) continue;
 //       if (myjetak4.pt() < m_AK4jetPtCut*0.5) continue;
 //       if (!LooseJetID(myjetak4)) continue; // !myjetak4.IDLoose()
-//       
-//       Float_t dR_ej = deltaR(myjetak4.eta() - goodElectrons[eletau_pair[0].ilepton].eta(), 
-//                       deltaPhi(myjetak4.phi(), goodElectrons[eletau_pair[0].ilepton].phi()));
-//       if(dR_ej < 0.5) continue;
-//       Float_t dR_tj = deltaR(myjetak4.eta() - goodTaus[eletau_pair[0].itau].eta(), 
-//                       deltaPhi(myjetak4.phi(), goodTaus[eletau_pair[0].itau].phi()));
-//       if(dR_tj < 0.5) continue;
+//       if(jet.DeltaR(goodElectrons[eletau_pair[0].ilepton]) < 0.5) continue;
+//       if(jet.DeltaR(goodTaus[eletau_pair[0].itau]) < 0.5) continue;
 //       
 //       goodJetsAK4.push_back(myjetak4);
 //     }
@@ -1127,8 +1115,8 @@ void TauTauAnalysis::FillBranches(const std::string& channel, const UZH::Tau& ta
   b_byMediumCombinedIsolationDeltaBetaCorr3Hits_2[ch] = tau.byMediumCombinedIsolationDeltaBetaCorr3Hits();
   b_byTightCombinedIsolationDeltaBetaCorr3Hits_2[ch]  = tau.byTightCombinedIsolationDeltaBetaCorr3Hits();
   b_byCombinedIsolationDeltaBetaCorrRaw3Hits_2[ch]    = tau.byCombinedIsolationDeltaBetaCorrRaw3Hits();
-  b_byIsolationMVArun2v1DBnewDMwLTraw_2[ch] = tau.byIsolationMVArun2v1DBnewDMwLTraw();
-  b_byIsolationMVArun2v1DBoldDMwLTraw_2[ch] = tau.byIsolationMVArun2v1DBoldDMwLTraw();
+  b_byIsolationMVArun2v1DBnewDMwLTraw_2[ch]           = tau.byIsolationMVArun2v1DBnewDMwLTraw();
+  b_byIsolationMVArun2v1DBoldDMwLTraw_2[ch]           = tau.byIsolationMVArun2v1DBoldDMwLTraw();
   b_chargedIsoPtSum_2[ch]               = tau.chargedIsoPtSum();
   b_neutralIsoPtSum_2[ch]               = tau.neutralIsoPtSum();
   b_puCorrPtSum_2[ch]                   = tau.puCorrPtSum();

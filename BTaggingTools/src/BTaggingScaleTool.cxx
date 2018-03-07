@@ -19,7 +19,7 @@ BTaggingScaleTool::BTaggingScaleTool( SCycleBase* parent, const char* name ) :
   DeclareProperty( m_name + "_MeasurementType_bc",   m_measurementType_bc = "mujets" ); // for AK4 jets; for AK8 jets, use "lt"
   
   DeclareProperty( m_name + "_EffHistDirectory", m_effHistDirectory = "bTagEff" );
-  DeclareProperty( m_name + "_EffFile",          m_effFile = sframe_dir + "/../BTaggingTools/efficiencies/bTagEffs_HTT_baseline.root" );
+  DeclareProperty( m_name + "_EffFile",          m_effFile = sframe_dir + "/../BTaggingTools/efficiencies/bTagEffs_HTT_baseline_ltau_2017.root" );
   
   // https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation94X
   CSV_WP.clear();

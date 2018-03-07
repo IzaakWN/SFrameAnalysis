@@ -579,8 +579,7 @@ void TauTauAnalysis::BeginInputFile( const SInputData& ) throw( SError ) {
   if (m_isData) {
     m_jetAK4.ConnectVariables(      m_recoTreeName.c_str(), Ntuple::JetBasic|Ntuple::JetAnalysis, (m_jetAK4Name + "_").c_str() );
     m_eventInfo.ConnectVariables(   m_recoTreeName.c_str(), Ntuple::EventInfoBasic|Ntuple::EventInfoTrigger, "" );
-  }
-  else {
+  }else {
     m_jetAK4.ConnectVariables(      m_recoTreeName.c_str(), Ntuple::JetBasic|Ntuple::JetAnalysis|Ntuple::JetTruth|Ntuple::JetJER, (m_jetAK4Name + "_").c_str() );
     m_genJetAK4.ConnectVariables(   m_recoTreeName.c_str(), Ntuple::GenJetak4Truth,"");
     m_eventInfo.ConnectVariables(   m_recoTreeName.c_str(), Ntuple::EventInfoBasic|Ntuple::EventInfoTrigger|Ntuple::EventInfoTruth, "" );
@@ -589,7 +588,7 @@ void TauTauAnalysis::BeginInputFile( const SInputData& ) throw( SError ) {
   m_electron.ConnectVariables(      m_recoTreeName.c_str(), Ntuple::ElectronBasic|Ntuple::ElectronID|Ntuple::ElectronAdvancedID|Ntuple::ElectronBoostedIsolation|Ntuple::ElectronSuperCluster, (m_electronName + "_").c_str() );
   m_muon.ConnectVariables(          m_recoTreeName.c_str(), Ntuple::MuonBasic|Ntuple::MuonID|Ntuple::MuonIsolation|Ntuple::MuonTrack|Ntuple::MuonBoostedIsolation, (m_muonName + "_").c_str() );
   m_tau.ConnectVariables(           m_recoTreeName.c_str(), Ntuple::TauBasic|Ntuple::TauID|Ntuple::TauAdvancedID, (m_tauName + "_").c_str() );
-
+  
   m_missingEt.ConnectVariables(     m_recoTreeName.c_str(), Ntuple::MissingEtBasic|Ntuple::MissingEtAnalysis|Ntuple::MissingEtAnalysisSyst|Ntuple::MissingEtCovAnalysis, (m_missingEtName + "_").c_str() );
   m_puppimissingEt.ConnectVariables(m_recoTreeName.c_str(), Ntuple::MissingEtBasic, (m_missingEtName + "_puppi_").c_str() );
   //m_mvamissingEt.ConnectVariables(  m_recoTreeName.c_str(), Ntuple::MissingEtBasic|Ntuple::MissingEtMVAAnalysis|Ntuple::MissingEtCovAnalysis, (m_missingEtName + "_mva_").c_str() );
@@ -816,7 +815,7 @@ void TauTauAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
 //         eletau_pair.push_back(pair);
 //   }}}
   
-  if(mutau_pair.size()==0 && eletau_pair.size()==0){
+  if(mutau_pair.size()==0 and eletau_pair.size()==0){
     throw SError( SError::SkipEvent );
   }
   //std::cout << " 8";
@@ -836,14 +835,13 @@ void TauTauAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
     
     // For Jets: cut and filter our selected muon and tau
     std::vector<UZH::Jet> goodJetsAK4;
-    for ( auto& jet: goodJetsAK4 ) {
-            
+    for ( int i = 0; i < (m_jetAK4.N); i++ ) {
+      UZH::Jet jet( &m_jetAK4, i );
       if(fabs(jet.eta()) > m_AK4jetEtaCut) continue;
       if(jet.pt() < m_AK4jetPtCut*0.5) continue; // loosen pt cut for smearing
       if(!LooseJetID(jet)) continue; // !jet.IDLoose()
       if(jet.DeltaR(goodMuons[mutau_pair[0].ilepton]) < 0.5) continue;
       if(jet.DeltaR(goodTaus[mutau_pair[0].itau]) < 0.5) continue;
-      
       goodJetsAK4.push_back(jet);
     }
     
@@ -874,16 +872,16 @@ void TauTauAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
 //     
 //     // For Jets: cut and filter our selected muon and tau
 //     std::vector<UZH::Jet> goodJetsAK4;
-//     for ( int i = 0; i < (m_jetAK4.N); ++i ) {
-//       UZH::Jet myjetak4( &m_jetAK4, i );
+//     for ( int i = 0; i < (m_jetAK4.N); i++ ) {
+//       UZH::Jet jet( &m_jetAK4, i );
 //       
-//       if (fabs(myjetak4.eta()) > m_AK4jetEtaCut) continue;
-//       if (myjetak4.pt() < m_AK4jetPtCut*0.5) continue;
-//       if (!LooseJetID(myjetak4)) continue; // !myjetak4.IDLoose()
+//       if (fabs(jet.eta()) > m_AK4jetEtaCut) continue;
+//       if (jet.pt() < m_AK4jetPtCut*0.5) continue;
+//       if (!LooseJetID(myjetak4)) continue; // !jet.IDLoose()
 //       if(jet.DeltaR(goodElectrons[eletau_pair[0].ilepton]) < 0.5) continue;
 //       if(jet.DeltaR(goodTaus[eletau_pair[0].itau]) < 0.5) continue;
 //       
-//       goodJetsAK4.push_back(myjetak4);
+//       goodJetsAK4.push_back(jet);
 //     }
 //     
 //     //std::cout << ">>> ExecuteEvent - FillBranches eletau" << std::endl;

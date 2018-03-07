@@ -11,16 +11,6 @@ BTaggingScaleTool::BTaggingScaleTool( SCycleBase* parent, const char* name ) :
   SetLogName( name );
   
   std::string sframe_dir = "$SFRAME_DIR"; //(std::getenv("SFRAME_DIR"));
-  
-  // https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation94X
-  CSV_WP.clear();
-  CSV_WP["Loose"]  = 0.5803;
-  CSV_WP["Medium"] = 0.8838;
-  CSV_WP["Tight"]  = 0.9693;
-  
-  currentWorkingPointCut = -1;
-  m_effMaps.clear();
-  
   DeclareProperty( m_name + "_Tagger",       m_tagger = "CSVv2" );
   DeclareProperty( m_name + "_WorkingPoint", m_workingPoint = "Medium" );
   DeclareProperty( m_name + "_CsvFile",      m_csvFile = sframe_dir + "/../BTaggingTools/csv/CSVv2_94XSF_V1_B_F.csv" );
@@ -30,7 +20,16 @@ BTaggingScaleTool::BTaggingScaleTool( SCycleBase* parent, const char* name ) :
   
   DeclareProperty( m_name + "_EffHistDirectory", m_effHistDirectory = "bTagEff" );
   DeclareProperty( m_name + "_EffFile",          m_effFile = sframe_dir + "/../BTaggingTools/efficiencies/bTagEffs_HTT_baseline.root" );
-
+  
+  // https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation94X
+  CSV_WP.clear();
+  CSV_WP["Loose"]  = 0.5803;
+  CSV_WP["Medium"] = 0.8838;
+  CSV_WP["Tight"]  = 0.9693;
+  
+  currentWorkingPointCut = CSV_WP[m_workingPoint];
+  m_effMaps.clear();
+  
 }
 
 
@@ -342,6 +341,7 @@ void BTaggingScaleTool::bookHistograms() {
 
 
 void BTaggingScaleTool::fillEfficiencies( const UZH::JetVec& vJets, std::string channel ) {
+  //std::cout << "BTaggingScaleTool::fillEfficiencies - vJets.size() = " << vJets.size() << std::endl; 
   
   std::string directory = m_effHistDirectory;
   if(channel!="") directory=directory+"_"+channel;
@@ -428,21 +428,13 @@ TString BTaggingScaleTool::flavourToString( const int& flavour ) {
 
 
 bool BTaggingScaleTool::isTagged( const UZH::Jet& jet ) {
-  
-  if (jet.csv() > currentWorkingPointCut) {
-    return true;  
-  }
-  return false;
-  
+  return jet.csv() > currentWorkingPointCut;
 }
 
 
 
-bool BTaggingScaleTool::isTagged( const double& csv ) {
-  
-  if (csv > currentWorkingPointCut) {
-    return true;  
-  }
-  return false;
-  
+bool BTaggingScaleTool::isTagged( const double csv ) {
+  return csv > currentWorkingPointCut;
 }
+
+

@@ -48,7 +48,7 @@ class BTaggingScaleTool : public SToolBase {
   
   /// help functions to check if jet is b-tagged according to chosen csv working point
   bool isTagged( const UZH::Jet& jet );
-  bool isTagged( const double& csv );
+  bool isTagged( const double csv );
 
 
  private:

@@ -13,7 +13,7 @@ void ScaleFactorTau::init_ScaleFactor(TString inputRootFile){
     
 	TFile* fileIn = new TFile(inputRootFile, "read");
 	// if root file not found
-	if (fileIn->IsZombie() ) { std::cout << "ERROR in ScaleFactorTau::init_ScaleFactor(TString inputRootFile) from NTupleMaker/src/ScaleFactor.cc : ‎File " <<inputRootFile << " does not exist. Please check. " <<std::endl; exit(1); };
+	if (fileIn->IsZombie() ) { std::cout << "ERROR in ScaleFactorTau::init_ScaleFactor(TString inputRootFile) from NTupleMaker/src/ScaleFactor.cc : ‎File " <<inputRootFile << " does not exist. Please check.\n"; exit(1); };
 	
 	std::string isoLabel = "LooseIso"; // HLT_IsoMu19_eta2p1_LooseIsoPFTau20_SingleL1_v
 	//std::string graphName;
@@ -27,16 +27,16 @@ void ScaleFactorTau::init_ScaleFactor(TString inputRootFile){
     }
     
     // for(auto const& label: eff_data_realTau)
-    //   std::cout << "ScaleFactorTau::init_ScaleFactor: eff_data_realTau - eta label \"" << label.first << "\"" << std::endl;
+    //   std::cout << "ScaleFactorTau::init_ScaleFactor: eff_data_realTau - eta label \"" << label.first << "\"\n";
     // std::cout << "ScaleFactorTau::init_ScaleFactor: eff_data_realTau.size() = " << eff_data_realTau.size() << std::endl;
     // for(auto const& label: eff_data_fakeTau)
-    //   std::cout << "ScaleFactorTau::init_ScaleFactor: eff_data_fakeTau - eta label \"" << label.first << "\"" << std::endl;
+    //   std::cout << "ScaleFactorTau::init_ScaleFactor: eff_data_fakeTau - eta label \"" << label.first << "\"\n";
     // std::cout << "ScaleFactorTau::init_ScaleFactor: eff_data_fakeTau.size() = " << eff_data_fakeTau.size() << std::endl;
     // for(auto const& label: eff_mc_realTau)
-    //   std::cout << "ScaleFactorTau::init_ScaleFactor: eff_mc_realTau - eta label \"" << label.first << "\"" << std::endl;
+    //   std::cout << "ScaleFactorTau::init_ScaleFactor: eff_mc_realTau - eta label \"" << label.first << "\"\n";
     // std::cout << "ScaleFactorTau::init_ScaleFactor: eff_mc_realTau.size() = " << eff_mc_realTau.size() << std::endl;
     // for(auto const& label: eff_mc_fakeTau)
-    //   std::cout << "ScaleFactorTau::init_ScaleFactor: eff_mc_fakeTau - eta label \"" << label.first << "\"" << std::endl;
+    //   std::cout << "ScaleFactorTau::init_ScaleFactor: eff_mc_fakeTau - eta label \"" << label.first << "\"\n";
     // std::cout << "ScaleFactorTau::init_ScaleFactor: eff_mc_fakeTau.size() = " << eff_mc_fakeTau.size() << std::endl;
 	
 	return;
@@ -56,7 +56,7 @@ void ScaleFactorTau::getGraph(TFile* fileIn, std::map<std::string,TGraphAsymmErr
       SetAxisBins(eff_map[etaLabel]);
       return;
       //foundGraph = true;
-      //std::cout << "ScaleFactorTau::getGraph: found \"" << graphName << "\" saved as \"" << etaLabel << "\"" << std::endl;
+      //std::cout << "ScaleFactorTau::getGraph: found \"" << graphName << "\" saved as \"" << etaLabel << "\"\n";
     }else{
       for(auto const& dm: dmValues){ // check WITH DM
         graphName = graphName0+"_dm"+dm;
@@ -64,23 +64,23 @@ void ScaleFactorTau::getGraph(TFile* fileIn, std::map<std::string,TGraphAsymmErr
         if (fileIn->GetListOfKeys()->Contains(TString(graphName))){
           eff_map[etaLabel] = makeGraph((TGraphAsymmErrors*)fileIn->Get(TString(graphName)));
           SetAxisBins(eff_map[etaLabel]);
-          return;
-          //foundGraph = true;
-          //std::cout << "ScaleFactorTau::getGraph: found \"" << graphName << "\" saved as \"" << etaLabel << "\"" << std::endl;
+          //return;
+          foundGraph = true;
+          //std::cout << "ScaleFactorTau::getGraph: found \"" << graphName << "\" saved as \"" << etaLabel << "\"\n";
         }else{
           foundGraph = false;
-          std::cout << "WARNING! ScaleFactorTau::getGraph: no \"" << etaLabel << "\" for \"" << graphName << "\"" << std::endl;
+          std::cout << "WARNING! ScaleFactorTau::getGraph: no \"" << etaLabel << "\" for \"" << graphName << "\"\n";
         }
       }
     }
     
     if(not foundGraph){
-     std::cout << "WARNING! ScaleFactorTau::getGraph: no \"" << etaLabel0 << "\" for \"" << graphName0 << "\"" << std::endl;
+     std::cout << "WARNING! ScaleFactorTau::getGraph: no \"" << etaLabel0 << "\" for \"" << graphName0 << "\"\n";
      exit(1);
     }
     
     //for(auto const& label: eff_map)
-    //  std::cout << "ScaleFactorTau::getGraph: eff_map - eta label \"" << label.first << "\"" << std::endl;
+    //  std::cout << "ScaleFactorTau::getGraph: eff_map - eta label \"" << label.first << "\"\n";
     //std::cout << "ScaleFactorTau::getGraph: eff_map.size() = " << eff_map.size() << std::endl;
     
 }
@@ -108,7 +108,7 @@ TGraphAsymmErrors* ScaleFactorTau::makeGraph(TGraphAsymmErrors* graph){
 	} 
 	
 	if ( N_new < 2 ){
-      std::cout << "ERROR! ScaleFactorTau::makeGraph: graph only contains zero values " << std::endl; exit(1); }
+      std::cout << "ERROR! ScaleFactorTau::makeGraph: graph only contains zero values\n"; exit(1); }
     
 	TGraphAsymmErrors* newgraph = new TGraphAsymmErrors(N_new, ptBins, effBins);
 	return newgraph;
@@ -156,9 +156,9 @@ std::string ScaleFactorTau::FindEtaLabel(std::map<std::string,TGraphAsymmErrors*
 	else              etaLabel = "endcap";
 	std::map<std::string, TGraphAsymmErrors*>::iterator it;
     
-    // for(auto const& label: eff_map){
-    //   std::cout << "ScaleFactorTau::FindEtaLabel: eta label \""<< label.first << "\"" << std::endl;
-    // }
+    //for(auto const& label: eff_map){
+    //  std::cout << "ScaleFactorTau::FindEtaLabel: eta label \""<< label.first << "\"\n";
+    //}
     
     it = eff_map.find(etaLabel); // look without dm
     if(it == eff_map.end()){     // otherwise look with dm
@@ -167,13 +167,17 @@ std::string ScaleFactorTau::FindEtaLabel(std::map<std::string,TGraphAsymmErrors*
         case  1: etaLabel+="_dm1";  break;
         case 10: etaLabel+="_dm10"; break;
       }
-      it = eff_map.find(etaLabel); // look with dm (cpp.sh/3vxxr§)
+      it = eff_map.find(etaLabel); // look with dm (cpp.sh/3vxxr)
       if(it == eff_map.end()){
-        std::cout << "ERROR in ScaleFactorTau::FindEtaLabel: no object corresponding to eta label \""<< etaLabel << "\"" << std::endl; exit(1);
+        std::cout << "ERROR in ScaleFactorTau::FindEtaLabel: no object corresponding to eta label \""
+                  <<etaLabel<<"\" for eta "<<eta<<" and DM "<<dm<<", available:\n";
+        for (auto const& eff: eff_map)
+          std::cout << "     \"" << eff.first << "\"\n";
+        exit(1);
       }
 	}
 	
-	//std::cout << "ScaleFactorTau::FindEtaLabel: eta="<<eta<<", dm="<<dm<<", found etalabel=\""<<label.first<<"\"" << std::endl;
+	//std::cout << "ScaleFactorTau::FindEtaLabel: eta="<<eta<<", dm="<<dm<<", found etalabel=\""<<label.first<<"\"\n";
     return etaLabel;
 }
 
@@ -188,7 +192,7 @@ int ScaleFactorTau::FindPtBin( std::map<std::string, TGraphAsymmErrors*> eff_map
  	if (Pt >= ptMAX ) return Npoints; 
 	// if pt is underflow, return nonsense number and warning
 	else if (Pt < ptMIN){
- 	  std::cout<< "WARNING in ScaleFactorTau::FindPtBin: pT too low (pt = " << Pt << "), min value is " << ptMIN << ". Returned efficiency =1. Weight will be 1. " << std::endl;
+ 	  std::cout<< "WARNING in ScaleFactorTau::FindPtBin: pT too low (pt = " << Pt << "), min value is " << ptMIN << ". Returned efficiency =1. Weight will be 1.\n";
 	  return -99;}
 	// if pt is in range
 	else {return eff_map[EtaLabel]->GetXaxis()->FindFixBin(Pt);} 
@@ -208,8 +212,8 @@ double ScaleFactorTau::get_EfficiencyData(double pt, double eta, int dm, bool is
 	if (ptbin == -99){eff =1;} // if pt is underflow 
 	else eff = eff_map[label]->GetY()[ptbin-1];
     
-	if (eff>1.){std::cout << "WARNING in ScaleFactorTau::get_EfficiencyData: Efficiency in data > 1. Set eff = 1."      << std::endl; eff=1.;} 
-	if (eff<0.){std::cout << "WARNING in ScaleFactorTau::get_EfficiencyData: Negative efficiency in data. Set eff = 0." << std::endl; eff=0.;}
+	if (eff>1.){std::cout << "WARNING in ScaleFactorTau::get_EfficiencyData: Efficiency in data > 1. Set eff = 1.\n";      eff=1.;} 
+	if (eff<0.){std::cout << "WARNING in ScaleFactorTau::get_EfficiencyData: Negative efficiency in data. Set eff = 0.\n"; eff=0.;}
 
 	return eff;
 }
@@ -228,8 +232,8 @@ double ScaleFactorTau::get_EfficiencyMC(double pt, double eta, int dm, bool isRe
 	if (ptbin == -99){eff =1;} // if pt is underflow 
 	else eff = eff_map[label]->GetY()[ptbin-1];
     
-	if (eff>1.){std::cout << "WARNING in ScaleFactorTau::get_EfficiencyMC: Efficiency in MC > 1. Set eff = 1."      << std::endl; eff=1.;} 		
-	if (eff<0.){std::cout << "WARNING in ScaleFactorTau::get_EfficiencyMC: Negative efficiency in MC. Set eff = 0." << std::endl; eff=0.;}
+	if (eff>1.){std::cout << "WARNING in ScaleFactorTau::get_EfficiencyMC: Efficiency in MC > 1. Set eff = 1.\n";      eff=1.;} 		
+	if (eff<0.){std::cout << "WARNING in ScaleFactorTau::get_EfficiencyMC: Negative efficiency in MC. Set eff = 0.\n"; eff=0.;}
     
 	return eff;
 }
@@ -246,7 +250,7 @@ double ScaleFactorTau::get_ScaleFactor(double pt, double eta, int dm, bool isRea
 	if(efficiency_mc!=0){ SF = efficiency_data/efficiency_mc; }
 	else{
 	  SF=0.;
-	  std::cout << "WARNING in ScaleFactorTau::get_ScaleFactor(pt="<<pt<<", eta="<<eta<<", dm="<<dm<<", isReal="<<isReal<<"): MC efficiency = 0. Scale Factor set to 0." << std::endl;
+	  std::cout << "WARNING in ScaleFactorTau::get_ScaleFactor(pt="<<pt<<", eta="<<eta<<", dm="<<dm<<", isReal="<<isReal<<"): MC efficiency = 0. Scale Factor set to 0.\n";
 	}
     
 	return SF;
@@ -295,10 +299,10 @@ double ScaleFactorTau::get_ScaleFactor(double pt, double eta, int dm, bool isRea
 // 	double errData = get_EfficiencyDataError(pt, eta);
 // 	double errMC =  get_EfficiencyMCError(pt, eta);
 // 
-// 	if (errData == 0) {std::cout<<"WARNING in ScaleFactorTau::get_ScaleFactorError(double pt, double eta) from LepEffInterface/src/ScaleFactor.cc: uncertainty on data point = 0, can not calculate uncertainty on scale factor. Uncertainty set to 0." << std::endl;}
-// 	if (errMC == 0)   {std::cout<<"WARNING in ScaleFactorTau::get_ScaleFactorError(double pt, double eta) from LepEffInterface/src/ScaleFactor.cc: uncertainty on MC = 0, can not calculate uncerttainty on scale factor. Uncertainty set to 0." << std::endl;}
-// 	if (effData == 0) {std::cout<<"WARNING in ScaleFactorTau::get_ScaleFactorError(double pt, double eta) from LepEffInterface/src/ScaleFactor.cc: efficiency in data = 0, can not calculate uncertainty on scale factor. Uncertainty set to 0." << std::endl;}
-// 	if (effMC == 0)   {std::cout<<"WARNING in ScaleFactorTau::get_ScaleFactorError(double pt, double eta) from LepEffInterface/src/ScaleFactor.cc: efficiency in MC = 0, can not calculate uncertainty on scale factor. Uncertainty set to 0." << std::endl;}
+// 	if (errData == 0) {std::cout<<"WARNING in ScaleFactorTau::get_ScaleFactorError(double pt, double eta) from LepEffInterface/src/ScaleFactor.cc: uncertainty on data point = 0, can not calculate uncertainty on scale factor. Uncertainty set to 0.\n";}
+// 	if (errMC == 0)   {std::cout<<"WARNING in ScaleFactorTau::get_ScaleFactorError(double pt, double eta) from LepEffInterface/src/ScaleFactor.cc: uncertainty on MC = 0, can not calculate uncerttainty on scale factor. Uncertainty set to 0.\n";}
+// 	if (effData == 0) {std::cout<<"WARNING in ScaleFactorTau::get_ScaleFactorError(double pt, double eta) from LepEffInterface/src/ScaleFactor.cc: efficiency in data = 0, can not calculate uncertainty on scale factor. Uncertainty set to 0.\n";}
+// 	if (effMC == 0)   {std::cout<<"WARNING in ScaleFactorTau::get_ScaleFactorError(double pt, double eta) from LepEffInterface/src/ScaleFactor.cc: efficiency in MC = 0, can not calculate uncertainty on scale factor. Uncertainty set to 0.\n";}
 // 	else {	
 // 	SF_error = pow((errData/effData),2) + pow((errMC/effMC),2);
 // 	SF_error = pow(SF_error, 0.5)*(effData/effMC);

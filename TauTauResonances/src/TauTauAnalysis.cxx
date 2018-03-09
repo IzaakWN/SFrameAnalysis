@@ -295,13 +295,15 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
     
     DeclareVariable( b_gen_match_2[ch],         "gen_match_2",          treeName);
     DeclareVariable( b_pol_2[ch],               "pol_2",                treeName);
+    DeclareVariable( b_decayModeFindingOldDMs_2[ch],       "decayModeFindingOldDMs_2",          treeName);
+    DeclareVariable( b_decayMode_2[ch],                    "decayMode_2",                       treeName);
     
-    DeclareVariable( b_againstElectronLooseMVA6_2[ch],   "againstElectronLooseMVA6_2",   treeName);
-    DeclareVariable( b_againstElectronMediumMVA6_2[ch],  "againstElectronMediumMVA6_2",  treeName);
-    DeclareVariable( b_againstElectronTightMVA6_2[ch],   "againstElectronTightMVA6_2",   treeName);
-    DeclareVariable( b_againstElectronVTightMVA6_2[ch],  "againstElectronVTightMVA6_2",  treeName);
-    DeclareVariable( b_againstMuonLoose3_2[ch],          "againstMuonLoose3_2",          treeName);
-    DeclareVariable( b_againstMuonTight3_2[ch],          "againstMuonTight3_2",          treeName);
+    DeclareVariable( b_againstElectronLooseMVA6_2[ch],     "againstElectronLooseMVA6_2",        treeName);
+    DeclareVariable( b_againstElectronMediumMVA6_2[ch],    "againstElectronMediumMVA6_2",       treeName);
+    DeclareVariable( b_againstElectronTightMVA6_2[ch],     "againstElectronTightMVA6_2",        treeName);
+    DeclareVariable( b_againstElectronVTightMVA6_2[ch],    "againstElectronVTightMVA6_2",       treeName);
+    DeclareVariable( b_againstMuonLoose3_2[ch],            "againstMuonLoose3_2",               treeName);
+    DeclareVariable( b_againstMuonTight3_2[ch],            "againstMuonTight3_2",               treeName);
     
     //DeclareVariable( b_byVLooseCombinedIsolationDeltaBetaCorr3Hits_2[ch], "byVLooseCombinedIsolationDeltaBetaCorr3Hits_2", treeName);
     DeclareVariable( b_byLooseCombinedIsolationDeltaBetaCorr3Hits_2[ch],  "byLooseCombinedIsolationDeltaBetaCorr3Hits_2",  treeName);
@@ -310,11 +312,32 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
     DeclareVariable( b_byCombinedIsolationDeltaBetaCorrRaw3Hits_2[ch],    "byCombinedIsolationDeltaBetaCorrRaw3Hits_2",    treeName);
     DeclareVariable( b_byIsolationMVArun2v1DBoldDMwLTraw_2[ch],           "byIsolationMVArun2v1DBoldDMwLTraw_2",           treeName);
     DeclareVariable( b_byIsolationMVArun2v1DBnewDMwLTraw_2[ch],           "byIsolationMVArun2v1DBnewDMwLTraw_2",           treeName);
-    DeclareVariable( b_chargedIsoPtSum_2[ch],            "chargedIsoPtSum_2",            treeName);
-    DeclareVariable( b_neutralIsoPtSum_2[ch],            "neutralIsoPtSum_2",            treeName);
-    DeclareVariable( b_puCorrPtSum_2[ch],                "puCorrPtSum_2",                treeName);
-    DeclareVariable( b_decayModeFindingOldDMs_2[ch],     "decayModeFindingOldDMs_2",     treeName);
-    DeclareVariable( b_decayMode_2[ch],                  "decayMode_2",                  treeName);
+    
+    DeclareVariable( b_chargedPionPt_2[ch],                    "chargedPionPt_2",                   treeName);
+    DeclareVariable( b_neutralPionPt_2[ch],                    "neutralPionPt_2",                   treeName);
+    DeclareVariable( b_chargedIsoPtSum_2[ch],                  "chargedIsoPtSum_2",                 treeName);
+    DeclareVariable( b_neutralIsoPtSum_2[ch],                  "neutralIsoPtSum_2",                 treeName);
+    DeclareVariable( b_chargedIsoPtSumdR03_2[ch],              "chargedIsoPtSumdR03_2",             treeName);
+    DeclareVariable( b_neutralIsoPtSumdR03_2[ch],              "neutralIsoPtSumdR03_2",             treeName);
+    DeclareVariable( b_puCorrPtSum_2[ch],                      "puCorrPtSum_2",                     treeName);
+    DeclareVariable( b_photonPtSumOutsideSignalCone_2[ch],     "photonPtSumOutsideSignalCone_2",    treeName);
+    DeclareVariable( b_photonPtSumOutsideSignalConedR03_2[ch], "photonPtSumOutsideSignalConedR03_2",treeName);
+    DeclareVariable( b_byPhotonPtSumOutsideSignalCone_2[ch],   "byPhotonPtSumOutsideSignalCone_2",  treeName);
+    
+    DeclareVariable( b_nPhoton_2[ch],                          "nPhoton_2",                         treeName);
+    DeclareVariable( b_ptWeightedDetaStrip_2[ch],              "ptWeightedDetaStrip_2",             treeName);
+    DeclareVariable( b_ptWeightedDphiStrip_2[ch],              "ptWeightedDphiStrip_2",             treeName);
+    DeclareVariable( b_ptWeightedDrSignal_2[ch],               "ptWeightedDrSignal_2",              treeName);
+    DeclareVariable( b_ptWeightedDrIsolation_2[ch],            "ptWeightedDrIsolation_2",           treeName);
+    DeclareVariable( b_leadingTrackChi2_2[ch],                 "leadingTrackChi2_2",                treeName);
+    DeclareVariable( b_leadingTrackPt_2[ch],                   "leadingTrackPt_2",                  treeName);
+    DeclareVariable( b_eRatio_2[ch],                           "eRatio_2",                          treeName);
+    DeclareVariable( b_dxy_Sig_2[ch],                          "dxy_Sig_2",                         treeName);
+    DeclareVariable( b_ip3d_2[ch],                             "ip3d_2",                            treeName);
+    DeclareVariable( b_ip3d_Sig_2[ch],                         "ip3d_Sig_2",                        treeName);
+    DeclareVariable( b_hasSecondaryVertex_2[ch],               "hasSecondaryVertex_2",              treeName);
+    DeclareVariable( b_decayDistMag_2[ch],                     "decayDistMag_2",                    treeName);
+    DeclareVariable( b_flightLenthSig_2[ch],                   "flightLenthSig_2",                  treeName);
     
     DeclareVariable( b_dilepton_veto[ch],       "dilepton_veto",        treeName);
     DeclareVariable( b_extraelec_veto[ch],      "extraelec_veto",       treeName);
@@ -1092,6 +1115,10 @@ void TauTauAnalysis::FillBranches(const std::string& channel, const UZH::Tau& ta
   b_q_2[ch]         = tau.charge();
   b_d0_2[ch]        = tau.d0();
   b_dz_2[ch]        = tau.dz();
+  
+  b_decayModeFindingOldDMs_2[ch] = tau.decayModeFinding();
+  b_decayMode_2[ch]              = tau.decayMode(); // 0, 1, 10, (11)
+  
   b_iso_2_vloose[ch]  = tau.byVLooseIsolationMVArun2v1DBoldDMwLT();
   b_iso_2_loose[ch]   = tau.byLooseIsolationMVArun2v1DBoldDMwLT();
   b_iso_2_medium[ch]  = tau.byMediumIsolationMVArun2v1DBoldDMwLT();
@@ -1099,34 +1126,54 @@ void TauTauAnalysis::FillBranches(const std::string& channel, const UZH::Tau& ta
   b_iso_2_vtight[ch]  = tau.byVTightIsolationMVArun2v1DBoldDMwLT();
   b_iso_2_vvtight[ch] = tau.byVVTightIsolationMVArun2v1DBoldDMwLT();
   
-  b_pol_2[ch]       = -9;
-  if (tau.chargedPionPt() > 0 && tau.neutralPionPt() > 0)
-    b_pol_2[ch]     = (tau.chargedPionPt() - tau.neutralPionPt()) / (tau.chargedPionPt() + tau.neutralPionPt());
-  
-  b_againstElectronLooseMVA6_2[ch]      = tau.againstElectronLooseMVA6();
-  b_againstElectronMediumMVA6_2[ch]     = tau.againstElectronMediumMVA6();
-  b_againstElectronTightMVA6_2[ch]      = tau.againstElectronTightMVA6();
-  b_againstElectronVTightMVA6_2[ch]     = tau.againstElectronVTightMVA6();
-  b_againstMuonLoose3_2[ch]             = tau.againstMuonLoose3();
-  b_againstMuonTight3_2[ch]             = tau.againstMuonTight3();
+  b_againstElectronLooseMVA6_2[ch]                    = tau.againstElectronLooseMVA6();
+  b_againstElectronMediumMVA6_2[ch]                   = tau.againstElectronMediumMVA6();
+  b_againstElectronTightMVA6_2[ch]                    = tau.againstElectronTightMVA6();
+  b_againstElectronVTightMVA6_2[ch]                   = tau.againstElectronVTightMVA6();
+  b_againstMuonLoose3_2[ch]                           = tau.againstMuonLoose3();
+  b_againstMuonTight3_2[ch]                           = tau.againstMuonTight3();
   b_byLooseCombinedIsolationDeltaBetaCorr3Hits_2[ch]  = tau.byLooseCombinedIsolationDeltaBetaCorr3Hits();
   b_byMediumCombinedIsolationDeltaBetaCorr3Hits_2[ch] = tau.byMediumCombinedIsolationDeltaBetaCorr3Hits();
   b_byTightCombinedIsolationDeltaBetaCorr3Hits_2[ch]  = tau.byTightCombinedIsolationDeltaBetaCorr3Hits();
   b_byCombinedIsolationDeltaBetaCorrRaw3Hits_2[ch]    = tau.byCombinedIsolationDeltaBetaCorrRaw3Hits();
   b_byIsolationMVArun2v1DBnewDMwLTraw_2[ch]           = tau.byIsolationMVArun2v1DBnewDMwLTraw();
   b_byIsolationMVArun2v1DBoldDMwLTraw_2[ch]           = tau.byIsolationMVArun2v1DBoldDMwLTraw();
-  b_chargedIsoPtSum_2[ch]               = tau.chargedIsoPtSum();
-  b_neutralIsoPtSum_2[ch]               = tau.neutralIsoPtSum();
-  b_puCorrPtSum_2[ch]                   = tau.puCorrPtSum();
-  b_decayModeFindingOldDMs_2[ch]        = tau.decayModeFinding();
-  b_decayMode_2[ch]                     = tau.decayMode(); // 0, 1, 10, (11)
   
-  b_id_e_mva_nt_loose_1[ch]             = -1;
+  b_chargedPionPt_2[ch]                               = tau.chargedPionPt();
+  b_neutralPionPt_2[ch]                               = tau.neutralPionPt();
+  b_chargedIsoPtSum_2[ch]                             = tau.chargedIsoPtSum();
+  b_neutralIsoPtSum_2[ch]                             = tau.neutralIsoPtSum();
+  b_chargedIsoPtSumdR03_2[ch]                         = tau.chargedIsoPtSumdR03();
+  b_neutralIsoPtSumdR03_2[ch]                         = tau.neutralIsoPtSumdR03();
+  b_puCorrPtSum_2[ch]                                 = tau.puCorrPtSum();
+  b_photonPtSumOutsideSignalCone_2[ch]                = tau.photonPtSumOutsideSignalCone();
+  b_photonPtSumOutsideSignalConedR03_2[ch]            = tau.photonPtSumOutsideSignalConedR03();
+  b_byPhotonPtSumOutsideSignalCone_2[ch]              = tau.byPhotonPtSumOutsideSignalCone();
+  
+  b_nPhoton_2[ch]                                     = tau.nPhoton();
+  b_ptWeightedDetaStrip_2[ch]                         = tau.ptWeightedDetaStrip();
+  b_ptWeightedDphiStrip_2[ch]                         = tau.ptWeightedDphiStrip();
+  b_ptWeightedDrSignal_2[ch]                          = tau.ptWeightedDrSignal();
+  b_ptWeightedDrIsolation_2[ch]                       = tau.ptWeightedDrIsolation();
+  b_leadingTrackChi2_2[ch]                            = tau.leadingTrackChi2();
+  b_leadingTrackPt_2[ch]                              = tau.leadingTrackPt();
+  b_eRatio_2[ch]                                      = tau.eRatio();
+  b_dxy_Sig_2[ch]                                     = tau.dxy_Sig();
+  b_ip3d_2[ch]                                        = tau.ip3d();
+  b_ip3d_Sig_2[ch]                                    = tau.ip3d_Sig();
+  b_hasSecondaryVertex_2[ch]                          = tau.hasSecondaryVertex();
+  b_decayDistMag_2[ch]                                = tau.decayDistMag();
+  b_flightLenthSig_2[ch]                              = tau.flightLenthSig();
+  
+  b_pol_2[ch]           = -9;
+  if (tau.chargedPionPt() > 0 && tau.neutralPionPt() > 0)
+    b_pol_2[ch]         = (tau.chargedPionPt() - tau.neutralPionPt()) / (tau.chargedPionPt() + tau.neutralPionPt());
+  
   extraLeptonVetos(channel, muon, electron); // sets global b_dilepton_veto_, b_extraelec_veto_, b_extramuon_veto_
-  b_dilepton_veto[ch]                   = b_dilepton_veto_;
-  b_extraelec_veto[ch]                  = b_extraelec_veto_;
-  b_extramuon_veto[ch]                  = b_extramuon_veto_;
-  b_lepton_vetos[ch]                    = ( b_dilepton_veto_ or b_extraelec_veto_ or b_extramuon_veto_ );
+  b_dilepton_veto[ch]   = b_dilepton_veto_;
+  b_extraelec_veto[ch]  = b_extraelec_veto_;
+  b_extramuon_veto[ch]  = b_extramuon_veto_;
+  b_lepton_vetos[ch]    = ( b_dilepton_veto_ or b_extraelec_veto_ or b_extramuon_veto_ );
   
   
   
@@ -1151,16 +1198,15 @@ void TauTauAnalysis::FillBranches(const std::string& channel, const UZH::Tau& ta
     b_q_1[ch]               = muon.charge();
     b_d0_1[ch]              = muon.d0();
     b_dz_1[ch]              = muon.dz();
+    b_id_e_mva_nt_loose_1[ch] = -1;
     b_iso_1[ch]             = muon.SemileptonicPFIso() / muon.pt();
     b_iso_cuts[ch]          = ( b_iso_1[ch]<0.15 and b_iso_2[ch]==1 );
     b_lepton_vetos[ch]      = ( b_lepton_vetos[ch]==1 or tau.againstElectronVLooseMVA6()<0.5 or tau.againstMuonTight3()<0.5 ); // veto if againstLepton == 0
     lep_tlv.SetPtEtaPhiM(b_pt_1[ch], b_eta_1[ch], b_phi_1[ch], b_m_1[ch]);
-    b_triggers[ch]          = m_trigger_Flags.find("mt2")!=std::string::npos;
-    b_trigger_cuts[ch]      = abs(b_eta_1[ch])<2.1 and (b_pt_1[ch]>28 and (m_trigger_Flags.find("mt2")!=std::string::npos));
+    b_triggers[ch]          = 1; //m_trigger_Flags.find("mt2")!=std::string::npos;
+    b_trigger_cuts[ch]      = b_pt_1[ch]>28;
     if(!m_isData){
-      b_trigweight_1[ch]    = m_ScaleFactorTool.get_ScaleFactor_Mu22Trig( b_pt_1[ch],fabs(b_eta_1[ch]));//,b_pt_2[ch],fabs(b_eta_2[ch]),b_decayMode_2[ch],m_trigger_Flags);
-      //b_trigweight_2[ch]    = m_ScaleFactorTool.get_ScaleFactor_MuTauTrig(b_pt_1[ch],fabs(b_eta_1[ch]),b_pt_2[ch],fabs(b_eta_2[ch]),b_decayMode_2[ch],gen_match_2,m_trigger_Flags);
-      //b_trigweight_or_1[ch] = m_ScaleFactorTool.get_ScaleFactor_MuTauTrig_OR(b_pt_1[ch],fabs(b_eta_1[ch]),b_pt_2[ch],fabs(b_eta_2[ch]),b_decayMode_2[ch],gen_match_2,m_trigger_Flags);
+      b_trigweight_1[ch]    = m_ScaleFactorTool.get_ScaleFactor_Mu27Trig( b_pt_1[ch],fabs(b_eta_1[ch]));
       b_idisoweight_1[ch]   = m_ScaleFactorTool.get_ScaleFactor_MuIdIso(  b_pt_1[ch],fabs(b_eta_1[ch]));
     }
   }
@@ -1178,15 +1224,11 @@ void TauTauAnalysis::FillBranches(const std::string& channel, const UZH::Tau& ta
     b_iso_cuts[ch]          = ( b_iso_1[ch]<0.10 and b_iso_2[ch]==1 );
     b_lepton_vetos[ch]      = ( b_lepton_vetos[ch]==1 or tau.againstElectronTightMVA6()<0.5 or tau.againstMuonLoose3()<0.5 );
     lep_tlv.SetPtEtaPhiM(b_pt_1[ch], b_eta_1[ch], b_phi_1[ch], b_m_1[ch]);
-    b_triggers[ch]          = 1*(m_trigger_Flags.find("et2")!=std::string::npos or m_trigger_Flags.find("et4")!=std::string::npos) +
-                              2*(m_trigger_Flags.find("etx")!=std::string::npos);
-    b_trigger_cuts[ch]      = abs(b_eta_1[ch])<2.1 and ( (b_pt_1[ch]> 26 and (b_triggers[ch]==1 or b_triggers[ch]==3))
-                                                      or (b_pt_1[ch]<=26 and  b_triggers[ch]>1) );
+    b_triggers[ch]          = 1;
+    b_trigger_cuts[ch]      = b_pt_1[ch]> 28;
     if(!m_isData){
-      b_trigweight_1[ch]    = m_ScaleFactorTool.get_ScaleFactor_EleTrig(   b_pt_1[ch],fabs(b_eta_1[ch]));//,b_pt_2[ch],fabs(b_eta_2[ch]),b_decayMode_2[ch],m_trigger_Flags);
-      //b_trigweight_2[ch]    = m_ScaleFactorTool.get_ScaleFactor_EleTauTrig(b_pt_1[ch],fabs(b_eta_1[ch]),b_pt_2[ch],fabs(b_eta_2[ch]),b_decayMode_2[ch],gen_match_2,m_trigger_Flags);
-      //b_trigweight_or_1[ch] = m_ScaleFactorTool.get_ScaleFactor_EleTauTrig_OR(b_pt_1[ch],fabs(b_eta_1[ch]),b_pt_2[ch],fabs(b_eta_2[ch]),b_decayMode_2[ch],gen_match_2,m_trigger_Flags);
-      b_idisoweight_1[ch]   = m_ScaleFactorTool.get_ScaleFactor_EleIdIso(  b_pt_1[ch],fabs(b_eta_1[ch]));
+      b_trigweight_1[ch]    = 1.;
+      b_idisoweight_1[ch]   = 1.;
     }
   }
   b_isolated_ = b_isolated_ and b_lepton_vetos[ch]==0 and b_trigger_cuts[ch]==1;

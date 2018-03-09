@@ -458,11 +458,34 @@ class TauTauAnalysis : public SCycleBase {
     std::map<std::string,Int_t>   b_byMediumCombinedIsolationDeltaBetaCorr3Hits_2;
     std::map<std::string,Int_t>   b_byTightCombinedIsolationDeltaBetaCorr3Hits_2;
     std::map<std::string,Int_t>   b_byCombinedIsolationDeltaBetaCorrRaw3Hits_2;
-    std::map<std::string,Float_t> b_chargedIsoPtSum_2;
-    std::map<std::string,Float_t> b_neutralIsoPtSum_2;
-    std::map<std::string,Float_t> b_puCorrPtSum_2;
     std::map<std::string,Float_t> b_decayModeFindingOldDMs_2;
     std::map<std::string,Int_t>   b_decayMode_2;
+    
+    std::map<std::string,Float_t> b_chargedPionPt_2;
+    std::map<std::string,Float_t> b_neutralPionPt_2;
+    std::map<std::string,Float_t> b_chargedIsoPtSum_2;
+    std::map<std::string,Float_t> b_neutralIsoPtSum_2;
+    std::map<std::string,Float_t> b_chargedIsoPtSumdR03_2;
+    std::map<std::string,Float_t> b_neutralIsoPtSumdR03_2;
+    std::map<std::string,Float_t> b_puCorrPtSum_2;
+    std::map<std::string,Float_t> b_photonPtSumOutsideSignalCone_2;
+    std::map<std::string,Float_t> b_photonPtSumOutsideSignalConedR03_2;
+    std::map<std::string,Float_t> b_byPhotonPtSumOutsideSignalCone_2;
+    
+    std::map<std::string,Float_t> b_nPhoton_2;
+    std::map<std::string,Float_t> b_ptWeightedDetaStrip_2;
+    std::map<std::string,Float_t> b_ptWeightedDphiStrip_2;
+    std::map<std::string,Float_t> b_ptWeightedDrSignal_2;
+    std::map<std::string,Float_t> b_ptWeightedDrIsolation_2;
+    std::map<std::string,Float_t> b_leadingTrackChi2_2;
+    std::map<std::string,Float_t> b_leadingTrackPt_2;
+    std::map<std::string,Float_t> b_eRatio_2;
+    std::map<std::string,Float_t> b_dxy_Sig_2;
+    std::map<std::string,Float_t> b_ip3d_2;
+    std::map<std::string,Float_t> b_ip3d_Sig_2;
+    std::map<std::string,Int_t>   b_hasSecondaryVertex_2;
+    std::map<std::string,Float_t> b_decayDistMag_2;
+    std::map<std::string,Float_t> b_flightLenthSig_2;
     
     std::map<std::string,Int_t>   b_dilepton_veto;
     std::map<std::string,Int_t>   b_extraelec_veto;

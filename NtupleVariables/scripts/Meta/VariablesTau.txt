@@ -13,28 +13,29 @@ Basic	floatingnumber*	dz
 
 ID	int*	TauType
 ID	int*	decayMode
+ID	bool	decayModeFindingNewDMs
+ID	bool	decayModeFinding
 
-AdvancedID	bool	decayModeFindingNewDMs
-AdvancedID	bool	decayModeFinding
+AdvancedID	bool	againstElectronVLooseMVA6
+AdvancedID	bool	againstElectronLooseMVA6
+AdvancedID	bool	againstElectronMediumMVA6
+AdvancedID	bool	againstElectronTightMVA6
+AdvancedID	bool	againstElectronVTightMVA6
+AdvancedID	bool	againstMuonLoose3
+AdvancedID	bool	againstMuonTight3
 
-AdvancedID	floatingnumber*	chargedIsoPtSum
-AdvancedID	floatingnumber*	neutralIsoPtSum
-AdvancedID	floatingnumber*	puCorrPtSum
-AdvancedID	floatingnumber*	chargedIsoPtSumdR03
-AdvancedID	floatingnumber*	neutralIsoPtSumdR03
-AdvancedID	floatingnumber*	photonPtSumOutsideSignalConedR03
-AdvancedID	floatingnumber*	chargedPionPt
-AdvancedID	floatingnumber*	neutralPionPt
-AdvancedID	floatingnumber*	byIsolationMVArun2v1DBdR03oldDMwLTraw
-AdvancedID	floatingnumber*	byIsolationMVArun2v1DBnewDMwLTraw
-AdvancedID	floatingnumber*	byIsolationMVArun2v1DBoldDMwLTraw
-AdvancedID	floatingnumber*	byIsolationMVArun2v1PWnewDMwLTraw
+AdvancedID	floatingnumber*	againstElectronMVA6raw
+AdvancedID	floatingnumber*	againstElectronMVA6category
 
 AdvancedID	bool	byLooseCombinedIsolationDeltaBetaCorr3Hits
 AdvancedID	bool	byMediumCombinedIsolationDeltaBetaCorr3Hits
 AdvancedID	bool	byTightCombinedIsolationDeltaBetaCorr3Hits
 AdvancedID	bool	byCombinedIsolationDeltaBetaCorrRaw3Hits
 
+AdvancedID	floatingnumber*	byIsolationMVArun2v1DBdR03oldDMwLTraw
+AdvancedID	floatingnumber*	byIsolationMVArun2v1DBnewDMwLTraw
+AdvancedID	floatingnumber*	byIsolationMVArun2v1DBoldDMwLTraw
+AdvancedID	floatingnumber*	byIsolationMVArun2v1PWnewDMwLTraw
 AdvancedID	bool	byLooseIsolationMVArun2v1DBdR03oldDMwLT
 AdvancedID	bool	byLooseIsolationMVArun2v1DBnewDMwLT
 AdvancedID	bool	byLooseIsolationMVArun2v1DBoldDMwLT
@@ -60,16 +61,28 @@ AdvancedID	bool	byVVTightIsolationMVArun2v1DBnewDMwLT
 AdvancedID	bool	byVVTightIsolationMVArun2v1DBoldDMwLT
 AdvancedID	bool	byVVTightIsolationMVArun2v1PWnewDMwLT
 
-AdvancedID	floatingnumber*	againstElectronMVA6raw
-AdvancedID	floatingnumber*	againstElectronMVA6category
-
-AdvancedID	bool	againstElectronVLooseMVA6
-AdvancedID	bool	againstElectronLooseMVA6
-AdvancedID	bool	againstElectronMediumMVA6
-AdvancedID	bool	againstElectronTightMVA6
-AdvancedID	bool	againstElectronVTightMVA6
-AdvancedID	bool	againstMuonLoose3
-AdvancedID	bool	againstMuonTight3
-
+AdvancedID	floatingnumber*	chargedIsoPtSum
+AdvancedID	floatingnumber*	neutralIsoPtSum
+AdvancedID	floatingnumber*	puCorrPtSum
+AdvancedID	floatingnumber*	chargedIsoPtSumdR03
+AdvancedID	floatingnumber*	neutralIsoPtSumdR03
+AdvancedID	floatingnumber*	photonPtSumOutsideSignalCone
+AdvancedID	floatingnumber*	photonPtSumOutsideSignalConedR03
 AdvancedID	floatingnumber*	byPhotonPtSumOutsideSignalCone
+AdvancedID	floatingnumber*	chargedPionPt
+AdvancedID	floatingnumber*	neutralPionPt
 
+AdvancedID	floatingnumber*	nPhoton
+AdvancedID	floatingnumber*	ptWeightedDetaStrip
+AdvancedID	floatingnumber*	ptWeightedDphiStrip
+AdvancedID	floatingnumber*	ptWeightedDrSignal
+AdvancedID	floatingnumber*	ptWeightedDrIsolation
+AdvancedID	floatingnumber*	leadingTrackChi2
+AdvancedID	floatingnumber*	leadingTrackPt
+AdvancedID	floatingnumber*	eRatio
+AdvancedID	floatingnumber*	dxy_Sig
+AdvancedID	floatingnumber*	ip3d
+AdvancedID	floatingnumber*	ip3d_Sig
+AdvancedID	bool			hasSecondaryVertex
+AdvancedID	floatingnumber*	decayDistMag
+AdvancedID	floatingnumber*	flightLenthSig

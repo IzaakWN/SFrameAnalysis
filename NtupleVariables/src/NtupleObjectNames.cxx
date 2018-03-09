@@ -295,25 +295,14 @@ namespace Ntuple {
     //taus
     m_names["TauType"] = "TauType";
     m_names["decayMode"] = "decayMode";
-    m_names["chargedPionPt"] = "chargedPionPt";
-    m_names["neutralPionPt"] = "neutralPionPt";
-
     m_names["decayModeFindingNewDMs"] = "decayModeFindingNewDMs";
-    m_names["decayModeFinding"] = "decayModeFinding"; 
+    m_names["decayModeFinding"] = "decayModeFinding";
+    
     m_names["byLooseCombinedIsolationDeltaBetaCorr3Hits"] = "byLooseCombinedIsolationDeltaBetaCorr3Hits"; 
     m_names["byMediumCombinedIsolationDeltaBetaCorr3Hits"] = "byMediumCombinedIsolationDeltaBetaCorr3Hits";
     m_names["byTightCombinedIsolationDeltaBetaCorr3Hits"] = "byTightCombinedIsolationDeltaBetaCorr3Hits";
     m_names["byCombinedIsolationDeltaBetaCorrRaw3Hits"] = "byCombinedIsolationDeltaBetaCorrRaw3Hits";
-    m_names["chargedIsoPtSum"] = "chargedIsoPtSum";
-    m_names["neutralIsoPtSum"] = "neutralIsoPtSum"; 
-    m_names["puCorrPtSum"] = "puCorrPtSum";
-    m_names["chargedIsoPtSumdR03"] = "chargedIsoPtSumdR03";
-    m_names["footprintCorrectiondR03"] = "footprintCorrectiondR03"; 
-    m_names["neutralIsoPtSumdR03"] = "neutralIsoPtSumdR03";
-    m_names["neutralIsoPtSumWeight"] = "neutralIsoPtSumWeight";
-    m_names["neutralIsoPtSumWeightdR03"] = "neutralIsoPtSumWeightdR03"; 
-    m_names["photonPtSumOutsideSignalConedR03"] = "photonPtSumOutsideSignalConedR03";
-
+    
     m_names["byIsolationMVArun2v1DBdR03oldDMwLTraw"] = "byIsolationMVArun2v1DBdR03oldDMwLTraw";
     m_names["byIsolationMVArun2v1DBnewDMwLTraw"] = "byIsolationMVArun2v1DBnewDMwLTraw"; 
     m_names["byIsolationMVArun2v1DBoldDMwLTraw"] = "byIsolationMVArun2v1DBoldDMwLTraw";
@@ -325,8 +314,40 @@ namespace Ntuple {
     m_names["byLooseIsolationMVArun2v1DBoldDMwLT"] = "byLooseIsolationMVArun2v1DBoldDMwLT";
     m_names["byLooseIsolationMVArun2v1PWdR03oldDMwLT"] = "byLooseIsolationMVArun2v1PWdR03oldDMwLT"; 
     m_names["byLooseIsolationMVArun2v1PWnewDMwLT"] = "byLooseIsolationMVArun2v1PWnewDMwLT";
-    m_names["byLooseIsolationMVArun2v1PWoldDMwLT"] = "byLooseIsolationMVArun2v1PWoldDMwLT"; 
+    m_names["byLooseIsolationMVArun2v1PWoldDMwLT"] = "byLooseIsolationMVArun2v1PWoldDMwLT";
+    
+    m_names["chargedPionPt"] = "chargedPionPt";
+    m_names["neutralPionPt"] = "neutralPionPt"; 
+    m_names["chargedIsoPtSum"] = "chargedIsoPtSum";
+    m_names["neutralIsoPtSum"] = "neutralIsoPtSum";
+    m_names["chargedIsoPtSumdR03"] = "chargedIsoPtSumdR03"; 
+    m_names["neutralIsoPtSumdR03"] = "neutralIsoPtSumdR03"; 
+    m_names["puCorrPtSum"] = "puCorrPtSum"; 
+    m_names["photonPtSumOutsideSignalCone"] = "photonPtSumOutsideSignalCone"; 
+    m_names["photonPtSumOutsideSignalConedR03"] = "photonPtSumOutsideSignalConedR03"; 
+    m_names["byPhotonPtSumOutsideSignalCone"] = "byPhotonPtSumOutsideSignalCone";
+    
+    m_names["nPhoton"] = "nPhoton"; 
+    m_names["ptWeightedDetaStrip"] = "ptWeightedDetaStrip"; 
+    m_names["ptWeightedDphiStrip"] = "ptWeightedDphiStrip"; 
+    m_names["ptWeightedDrSignal"] = "ptWeightedDrSignal"; 
+    m_names["ptWeightedDrIsolation"] = "ptWeightedDrIsolation"; 
+    m_names["leadingTrackChi2"] = "leadingTrackChi2"; 
+    m_names["leadingTrackPt"] = "leadingTrackPt"; 
+    m_names["eRatio"] = "eRatio"; 
+    m_names["dxy_Sig"] = "dxy_Sig"; 
+    m_names["ip3d"] = "ip3d"; 
+    m_names["ip3d_Sig"] = "ip3d_Sig"; 
+    m_names["hasSecondaryVertex"] = "hasSecondaryVertex"; 
+    m_names["decayDistMag"] = "decayDistMag"; 
+    m_names["flightLenthSig"] = "flightLenthSig"; 
+    
+    m_names["neutralIsoPtSumWeight"] = "neutralIsoPtSumWeight";
+    m_names["neutralIsoPtSumWeightdR03"] = "neutralIsoPtSumWeightdR03"; 
 
+    m_names["footprintCorrection"] = "footprintCorrection";
+    m_names["footprintCorrectiondR03"] = "footprintCorrectiondR03"; 
+    
     m_names["byMediumIsolationMVArun2v1DBdR03oldDMwLT"] = "byMediumIsolationMVArun2v1DBdR03oldDMwLT";
     m_names["byMediumIsolationMVArun2v1DBnewDMwLT"] = "byMediumIsolationMVArun2v1DBnewDMwLT"; 
     m_names["byMediumIsolationMVArun2v1DBoldDMwLT"] = "byMediumIsolationMVArun2v1DBoldDMwLT"; 
@@ -359,10 +380,8 @@ namespace Ntuple {
     m_names["byVVTightIsolationMVArun2v1DBoldDMwLT"] = "byVVTightIsolationMVArun2v1DBoldDMwLT";
     m_names["byVVTightIsolationMVArun2v1PWdR03oldDMwLT"] = "byVVTightIsolationMVArun2v1PWdR03oldDMwLT";
     m_names["byVVTightIsolationMVArun2v1PWnewDMwLT"] = "byVVTightIsolationMVArun2v1PWnewDMwLT";
-
     m_names["byVVTightIsolationMVArun2v1PWoldDMwLT"] = "byVVTightIsolationMVArun2v1PWoldDMwLT";
-
-
+    
     m_names["againstElectronMVA6raw"] = "againstElectronMVA6raw";
     m_names["againstElectronMVA6category"] = "againstElectronMVA6category";
     m_names["againstElectronVLooseMVA6"] = "againstElectronVLooseMVA6";
@@ -370,14 +389,9 @@ namespace Ntuple {
     m_names["againstElectronMediumMVA6"] = "againstElectronMediumMVA6";
     m_names["againstElectronTightMVA6"] = "againstElectronTightMVA6";
     m_names["againstElectronVTightMVA6"] = "againstElectronVTightMVA6";
-      
-
+    
     m_names["againstMuonLoose3"] = "againstMuonLoose3";
     m_names["againstMuonTight3"] = "againstMuonTight3";
-      
- 
-    m_names["byPhotonPtSumOutsideSignalCone"] = "byPhotonPtSumOutsideSignalCone";
-    m_names["footprintCorrection"] = "footprintCorrection";
 
 
 

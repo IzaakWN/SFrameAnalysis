@@ -27,10 +27,10 @@ AdvancedID	bool	againstMuonTight3
 AdvancedID	floatingnumber*	againstElectronMVA6raw
 AdvancedID	floatingnumber*	againstElectronMVA6category
 
+AdvancedID	floatingnumber*	byCombinedIsolationDeltaBetaCorrRaw3Hits
 AdvancedID	bool	byLooseCombinedIsolationDeltaBetaCorr3Hits
 AdvancedID	bool	byMediumCombinedIsolationDeltaBetaCorr3Hits
 AdvancedID	bool	byTightCombinedIsolationDeltaBetaCorr3Hits
-AdvancedID	bool	byCombinedIsolationDeltaBetaCorrRaw3Hits
 
 AdvancedID	floatingnumber*	byIsolationMVArun2v1DBdR03oldDMwLTraw
 AdvancedID	floatingnumber*	byIsolationMVArun2v1DBnewDMwLTraw
@@ -72,7 +72,7 @@ AdvancedID	floatingnumber*	byPhotonPtSumOutsideSignalCone
 AdvancedID	floatingnumber*	chargedPionPt
 AdvancedID	floatingnumber*	neutralPionPt
 
-AdvancedID	floatingnumber*	nPhoton
+AdvancedID	int*			nPhoton
 AdvancedID	floatingnumber*	ptWeightedDetaStrip
 AdvancedID	floatingnumber*	ptWeightedDphiStrip
 AdvancedID	floatingnumber*	ptWeightedDrSignal

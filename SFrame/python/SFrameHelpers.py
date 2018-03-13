@@ -169,7 +169,11 @@ def CreateDataInput( files, output, tree, prefix, real_filenames ):
       continue
     
     # Read the number of events in the file:
-    events = collTree.GetEntries()
+    try:
+      events = collTree.GetEntries()
+    except AttributeError as ex:    
+      print "*ERROR* for file:",file
+      raise ex
     
     # Increment the summary variables:
     totEvents = totEvents + events

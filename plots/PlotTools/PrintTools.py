@@ -1,46 +1,61 @@
-import sys
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+# Author: Izaak Neutelings (2017)
+
+import sys, re
 from math import log
 from cStringIO import StringIO # for stdout capturing
 # TODO http://stackoverflow.com/questions/16571150/how-to-capture-stdout-output-from-a-python-function-call
 
 
 
+text_color_dict = {
+    "black"     : 30,   "red"       : 31,
+    "green"     : 32,   "yellow"    : 33,   "orange" : 33,
+    "blue"      : 34,   "purple"    : 35,
+    "magenta"   : 36,   "grey"      : 37,  }
+
+
+background_color_dict = {
+    "black"     : 40,   "red"       : 41,
+    "green"     : 42,   "yellow"    : 43,   "orange" : 43,
+    "blue"      : 44,   "purple"    : 45,
+    "magenta"   : 46,   "grey"      : 47, }
+
 
 
 def color(string,**kwargs):
     """Color"""
     # http://stackoverflow.com/questions/287871/print-in-terminal-with-colors-using-python
-    text_color_dict = {         "black"     : 30,   "red"       : 31,
-                                "green"     : 32,   "yellow"    : 33,   "orange" : 33,
-                                "blue"      : 34,   "purple"    : 35,
-                                "magenta"   : 36,   "grey"      : 37,  }
-    background_color_dict = {   "black"     : 40,   "red"       : 41,
-                                "green"     : 42,   "yellow"    : 43,   "orange" : 43,
-                                "blue"      : 44,   "purple"    : 45,
-                                "magenta"   : 46,   "grey"      : 47, }
     bold_code  = kwargs.get('bold',False)
     color_code = "%d;%d;%d" % ( bold_code, text_color_dict[kwargs.get('color',"red")], background_color_dict[kwargs.get('background',"black")])
-    return kwargs.get('prepend',"") + "\x1b[%sm%s\033[0m" % (color_code, string )
+    return kwargs.get('pre',"") + "\x1b[%sm%s\033[0m" % (color_code, string )
+    
+
 
 def warning(string,*trigger,**kwargs):
-    if len(trigger)==0 or trigger:
-        return color(kwargs.get('exclamation',"Warning! ")+string, color="yellow", bold=True, prepend=">>> "+kwargs.get('prepend',""))
+    if len(trigger)==0 or trigger[0]:
+        return color(kwargs.get('exclamation',"Warning! ")+string, color="yellow", bold=True, prepend=">>> "+kwargs.get('pre',""))
     
+
+
 def error(string,*trigger,**kwargs):
-    if len(trigger)==0 or trigger:
-        return color(kwargs.get('exclamation',"ERROR! ")+string, color="red", bold=True, prepend=">>> "+kwargs.get('prepend',""))
+    if len(trigger)==0 or trigger[0]:
+        return color(kwargs.get('exclamation',"ERROR! ")+string, color="red", bold=True, prepend=">>> "+kwargs.get('pre',""))
     
-
-
 
 
 def printVerbose(string,verbosity,**kwargs):
     """Print string if verbosity is true or verbosity int is lager than given level."""
     level = kwargs.get('level',False)
     if level:
-        if verbosity>=level: print string
-    elif verbosity: print string
+      if verbosity>=level:
+        print kwargs.get('pre',"") + string
+    elif verbosity:
+      print kwargs.get('pre',"") + string
     
+
+
 def printSameLine(string):
     """Print string without making new line. (Write to stdout and flush.)"""
     #http://stackoverflow.com/questions/3249524/print-in-one-line-dynamically
@@ -48,6 +63,8 @@ def printSameLine(string):
     sys.stdout.write(string)
     sys.stdout.flush()
     
+
+
 def header(header0):
     """Returns formatted header"""
     
@@ -95,20 +112,20 @@ class LoadingBar(object):
 
     def __init__(self, *args, **kwargs):
         '''Constructor for LoadingBar object.'''
-        self.steps = 10
+        self.steps      = 10
         if len(args)>0 and isinstance(args[0],int) and args[0]>0: self.steps = args[0]
-        self.tally   = 0
-        self.position = 0
-        self.steps   = max(kwargs.get('steps',self.steps),1)
-        self.width   = max(kwargs.get('width',self.steps),1)
-        self.counter = kwargs.get('counter',False)
-        self.counterformat = "%%%ii" % (log(self.steps,10)+1)
-        self.remove  = kwargs.get('remove',False)
-        self.symbol  = kwargs.get('symbol',"=")
-        self.prepend = kwargs.get('prepend',">>> ")
-        self.append  = kwargs.get('append',"")
-        self.message_ = kwargs.get('message',"")
-        self.done    = False
+        self.tally      = 0
+        self.position   = 0
+        self.steps      = max(kwargs.get('steps',   self.steps      ),1)
+        self.width      = max(kwargs.get('width',   self.steps      ),1)
+        self.counter    = kwargs.get('counter',     False           )
+        self.counterformat = "%%%ii"%(log(self.steps,10)+1)
+        self.remove     = kwargs.get('remove',      False           )
+        self.symbol     = kwargs.get('symbol',      "="             )
+        self.prepend    = kwargs.get('pre',         ">>> "          )
+        self.append     = kwargs.get('append',      ""              )
+        self.message_   = kwargs.get('message',     ""              )
+        self.done       = False
         if self.counter: self.counter = " %s/%i" % (self.counterformat%self.tally,self.steps)
         else:            self.counter = ""
         sys.stdout.write("%s[%s]" % (self.prepend," "*self.width))
@@ -164,6 +181,7 @@ class LoadingBar(object):
         if moveback: sys.stdout.write("\b"*(self.width+2-self.position+len(self.counter)+len(self.message_)))
     
 
+
 def makeThreshold(n,**kwargs):
     """Help function to find a good stepsize for read out when looping over a large number N.
        In a for loop with index i, you could do a print out like:
@@ -174,6 +192,34 @@ def makeThreshold(n,**kwargs):
     #        min(6,max(0.0,floor(log(N/10.0,10))))      set maximum step size to 10^6 (otherwise one has to wait too long for an update)
     # pow(10,min(6,max(0.0,floor(log(N/10.0,10)))))     make treshold a power of 10
     return pow(10,min(max_digits,max(0.0,floor(log(n/10.0,10)))))
+    
+
+
+def printRow(*values,**kwargs):
+    '''Help function to print bin errors'''
+    widths          = kwargs.get('widths',[14])
+    width           = kwargs.get('width',widths[0])
+    precision       = kwargs.get('precision',3)
+    prefix          = kwargs.get('prepend',"  ")
+    appendix        = kwargs.get('append',"  ")
+    line            = kwargs.get('line',"")
+    row             = ">>> "+prefix
+    pattern_float   = "%%%d.%df"%(width,precision)
+    pattern_int     = "%%%dd"   %(width)
+    pattern_string  = "%%%ds"   %(width)
+    for i, value in enumerate(values):
+        if len(widths)>1:
+            index = min(i,len(widths)-1)
+            pattern_float   = "%%%d.%df"%(widths[index],precision)
+            pattern_int     = "%%%dd"   %(widths[index])
+            pattern_string  = "%%%ds"   %(widths[index])
+        if   isinstance(value,str):   row += pattern_string%(value)
+        elif isinstance(value,int):   row += pattern_int%(value)
+        elif isinstance(value,float): row += pattern_float%(value)
+    if "above" in line: print ">>> "+'-'*(len(row+appendix)+int(width/4))
+    print row + appendix
+    if "below" in line: print ">>> "+'-'*(len(row+appendix)+int(width/4))
+    
 
 
 def printBinError(hist,**kwargs):
@@ -186,5 +232,113 @@ def printBinError(hist,**kwargs):
     print ">>>   %4s  %8s  %8s  %8s" % ("bin","content","error",hist.GetName())
     for i in range(mini,maxi):
         print ">>>   %4s  %8.4f  %8.4f" % (i,hist.GetBinContent(i),hist.GetBinError(i))
+
+
+class Table(object):
+    """Class to print a simple table. Initialize as
+         - Table(str rowformat)
+         - Table(int nColumns)
+         - Table(int nColumns, int width)
+    """
+    
+    def __init__(self, *args, **kwargs):
+        self.rowformat    = ""
+        if len(args)==1 and isinstance(args[0],str):
+          self.rowformat  = args[0]
+        elif len(args)==1 and isinstance(args[0],int):
+          self.rowformat  = " %11s"*args[0]
+        elif len(args)==2 and isinstance(args[0],int) and isinstance(args[1],int):
+          self.rowformat  = (" %%%ds"%args[1])*args[0]
+        else:
+          print warning("Table: unrecognized initialization %s"%(args))
+        self.headerformat = re.sub(r"%(-?\d+)\.?\d*[fgdi]",r"%\1s",self.rowformat).replace('%0','%')
+        self.nColums      = self.rowformat.replace('%%','').count('%')
+        self.rows         = [ ]
+    
+    def __str__(self):
+        return '\n'.join(self.rows)
+        
+    def printTable(self):
+        for r in self.rows: print r
+        
+    def header(self,*args,**kwargs):
+        """Header for table which is assumed to be all strings."""
+        if len(args)!=self.nColums:
+          print error("Table::header: number of argument (%d) != nColumns (%d)"%(len(args),self.nColums))
+          exit(1)
+        if kwargs.get('save',True):
+          self.rows.append(self.headerformat%args)
+        else:
+          print self.headerformat%args
+        
+    def row(self,*args,**kwargs):
+        """Row for table which is assumed to be of the datatype corresponding to the given row format."""
+        if len(args)!=self.nColums:
+          print warning("Table::header: number of argument (%d) != nColumns (%d)"%(len(args),self.nColums))
+          exit(1)
+        if kwargs.get('save',True):
+          self.rows.append(self.headerformat%args)
+        else:
+          print self.headerformat%args
+    
+
+
+class Logger(object):
+    """Class to customly log program."""
+    
+    def __init__(self, *args, **kwargs):
+        self.name   = args[0] if args else "unnamed logger"
+        self.pre    = ">>> "
+        self._table  = None
+        
+    def info(self,string,**kwargs):
+        """Info"""
+        print self.pre+string
+        
+    def color(self,*args,**kwargs):
+        """Color"""
+        print self.pre+color(*args,**kwargs)
+        
+    def warning(self,string,*args,**kwargs):
+        """Warning"""
+        if len(args)==0 or args[0]:
+          print color(kwargs.get('exclamation',"Warning! ")+string, color="yellow", bold=True, pre=self.pre+kwargs.get('pre',""))
+        
+    def title(self,*args,**kwargs):
+        print header(*args,**kwargs)
+        
+    def header(self,*args,**kwargs):
+        print header(*args,**kwargs)
+        
+    def error(self,string,*args,**kwargs):
+        """Error"""
+        if len(args)==0 or args[0]:
+          print color(kwargs.get('exclamation',"ERROR! ")+string, color="red", bold=True, pre=self.pre+kwargs.get('pre',""))
+        
+    def fatal(self,*args,**kwargs):
+        """Fatalerror"""
+        self.error(*args,**kwargs)
+        exit(1)
+        
+    def verbose(self,*args,**kwargs):
+        """Verbose"""
+        kwargs['pre'] = pre=self.pre+kwargs.get('pre',"")
+        printVerbose(*args,**kwargs)
+        
+    def table(self,format,**kwargs):
+        """Initiate new table."""
+        self._table = Table(format)
+        
+    def theader(self,*args):
+        """Print header of table."""
+        self._table.header(*args)
+        
+    def row(self,*args):
+        """Print row of table."""
+        self._table.row(*args)
+        
+    # TODO table with memorized column sizes from header
+
+
 
 

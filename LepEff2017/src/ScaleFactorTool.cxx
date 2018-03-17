@@ -27,7 +27,7 @@ ScaleFactorTool::ScaleFactorTool(SCycleBase* parent, const char* name ):
 //   DeclareProperty( m_name+"_EleTauTrig_EleLeg", m_File_EleTauTrig_EleLeg = "$SFRAME_DIR/../LepEff2017/data/Electron/Run2016BtoH/Electron_Ele24_eff.root"                 );
 //   DeclareProperty( m_name+"_EleTauTrig_TauLeg", m_File_EleTauTrig_TauLeg = "$SFRAME_DIR/../LepEff2017/data/Electron/Run2016BtoH/Electron_TauWPLooseIsoPF.root"           );
   DeclareProperty( m_name+"_File_EleId",        m_File_EleId            = "$SFRAME_DIR/../LepEff2017/data/Electron/Run2017BtoF/EGM2D_runBCDEF_passingMVA94Xwp80noiso.root"    );
-  DeclareProperty( m_name+"_File_EleId",        m_File_EleReco          = "$SFRAME_DIR/../LepEff2017/data/Electron/Run2017BtoF/EGM2D_runBCDEF_passingRECO.root"               );
+  DeclareProperty( m_name+"_File_EleReco",      m_File_EleReco          = "$SFRAME_DIR/../LepEff2017/data/Electron/Run2017BtoF/EGM2D_runBCDEF_passingRECO.root"               );
   DeclareProperty( m_name+"_Hist_EleId",        m_Hist_EleId            = "EGamma_SF2D"                                                                                       );
 }
 
@@ -353,13 +353,13 @@ float ScaleFactorTool::get_ScaleFactor_MuIso(double pt, double eta){
 
 
 float ScaleFactorTool::get_ScaleFactor_EleIdIso(double pt, double eta){
-  return m_ScaleFactor_EleId->get_ScaleFactor(pt,eta)*m_ScaleFactor_EleReco->get_ScaleFactor(pt,eta);;
+  return m_ScaleFactor_EleId->get_ScaleFactor(pt,eta)*m_ScaleFactor_EleReco->get_ScaleFactor(pt,eta);
 }
 
 
 
 float ScaleFactorTool::get_ScaleFactor_EleId(double pt, double eta){
-  return m_ScaleFactor_EleId->get_ScaleFactor(pt,eta);
+  return m_ScaleFactor_EleId->get_ScaleFactor(pt,eta)*m_ScaleFactor_EleReco->get_ScaleFactor(pt,eta);
 }
 
 

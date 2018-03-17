@@ -8,23 +8,26 @@ ScaleFactorTool::ScaleFactorTool(SCycleBase* parent, const char* name ):
   // leptons: https://github.com/CMS-HTT/LeptonEfficiencies
   // tau leg: https://github.com/rmanzoni/triggerSF/tree/moriond17
   // https://twiki.cern.ch/twiki/bin/view/CMS/MuonReferenceEffs2017
+  // https://twiki.cern.ch/twiki/bin/view/CMS/Egamma2017DataRecommendations#Efficiency_Scale_Factors
   
-  DeclareProperty( m_name+"_Mu27Trig",      m_File_Mu27Trig         = "$SFRAME_DIR/../LepEff2016/data/Muon/Run2017BtoF/EfficienciesAndSF_RunBtoF_Nov17Nov2017.root" );
-  DeclareProperty( m_name+"_MuId",          m_File_MuId             = std::string(std::getenv("SFRAME_DIR"))+ "/../LepEff2016/data/Muon/Run2017BtoF/RunBCDEF_SF_ID.json" );
-  DeclareProperty( m_name+"_MuIso",         m_File_MuIso            = std::string(std::getenv("SFRAME_DIR"))+ "/../LepEff2016/data/Muon/Run2017BtoF/RunBCDEF_SF_ISO.json" );
-  DeclareProperty( m_name+"_WP_MuId",       m_WP_MuId               = "NUM_MediumID_DEN_genTracks" );
-  DeclareProperty( m_name+"_WP_MuIso",      m_WP_MuIso              = "NUM_TightRelIso_DEN_MediumID" );
+  DeclareProperty( m_name+"_File_Mu27Trig",     m_File_Mu27Trig         = "$SFRAME_DIR/../LepEff2017/data/Muon/Run2017BtoF/EfficienciesAndSF_RunBtoF_Nov17Nov2017.root"       );
+  DeclareProperty( m_name+"_Hist_Mu27Trig",     m_Hist_Mu27Trig         = "IsoMu27_PtEtaBins/abseta_pt_ratio"                                                                 );
+  DeclareProperty( m_name+"_File_MuId",         m_File_MuId             = std::string(std::getenv("SFRAME_DIR"))+ "/../LepEff2017/data/Muon/Run2017BtoF/RunBCDEF_SF_ID.json"  );
+  DeclareProperty( m_name+"_File_MuIso",        m_File_MuIso            = std::string(std::getenv("SFRAME_DIR"))+ "/../LepEff2017/data/Muon/Run2017BtoF/RunBCDEF_SF_ISO.json" );
+  DeclareProperty( m_name+"_WP_MuId",           m_WP_MuId               = "NUM_MediumID_DEN_genTracks"                                                                        );
+  DeclareProperty( m_name+"_WP_MuIso",          m_WP_MuIso              = "NUM_TightRelIso_DEN_MediumID"                                                                      );
   
-//   DeclareProperty( m_name+"_Mu22Trig",          m_File_Mu22Trig          = "$SFRAME_DIR/../LepEff2016/data/Muon/Run2016BtoH/Muon_Mu22OR_eta2p1_eff.root"                 );
-//   DeclareProperty( m_name+"_Mu24Trig",          m_File_Mu24Trig          = "$SFRAME_DIR/../LepEff2016/data/Muon/Run2016BtoH/Muon_IsoMu24_OR_TkIsoMu24_2016BtoH_eff.root" );
-//   DeclareProperty( m_name+"_MuTauTrig_MuLeg",   m_File_MuTauTrig_MuLeg   = "$SFRAME_DIR/../LepEff2016/data/Muon/Run2016BtoH/Muon_Mu19leg_2016BtoH_eff.root"              );
-//   DeclareProperty( m_name+"_MuTauTrig_TauLeg",  m_File_MuTauTrig_TauLeg  = "$SFRAME_DIR/../LepEff2016/data/Muon/Run2016BtoH/Muon_Tau20LooseIsoPF.root"                   );
-//   DeclareProperty( m_name+"_MuIdIso",           m_File_MuIdIso           = "$SFRAME_DIR/../LepEff2016/data/Muon/Run2016BtoH/Muon_IdIso_IsoLt0p15_2016BtoH_eff.root"      );
-//   
-//   DeclareProperty( m_name+"_EleTrig",           m_File_EleTrig           = "$SFRAME_DIR/../LepEff2016/data/Electron/Run2016BtoH/Electron_Ele25_eta2p1_WPTight_eff.root"  );
-//   DeclareProperty( m_name+"_EleTauTrig_EleLeg", m_File_EleTauTrig_EleLeg = "$SFRAME_DIR/../LepEff2016/data/Electron/Run2016BtoH/Electron_Ele24_eff.root"                 );
-//   DeclareProperty( m_name+"_EleTauTrig_TauLeg", m_File_EleTauTrig_TauLeg = "$SFRAME_DIR/../LepEff2016/data/Electron/Run2016BtoH/Electron_TauWPLooseIsoPF.root"           );
-//   DeclareProperty( m_name+"_EleIdIso",          m_File_EleIdIso          = "$SFRAME_DIR/../LepEff2016/data/Electron/Run2016BtoH/Electron_IdIso_IsoLt0p1_eff.root"        );
+//   DeclareProperty( m_name+"_Mu22Trig",          m_File_Mu22Trig          = "$SFRAME_DIR/../LepEff2017/data/Muon/Run2016BtoH/Muon_Mu22OR_eta2p1_eff.root"                 );
+//   DeclareProperty( m_name+"_Mu24Trig",          m_File_Mu24Trig          = "$SFRAME_DIR/../LepEff2017/data/Muon/Run2016BtoH/Muon_IsoMu24_OR_TkIsoMu24_2016BtoH_eff.root" );
+//   DeclareProperty( m_name+"_MuTauTrig_MuLeg",   m_File_MuTauTrig_MuLeg   = "$SFRAME_DIR/../LepEff2017/data/Muon/Run2016BtoH/Muon_Mu19leg_2016BtoH_eff.root"              );
+//   DeclareProperty( m_name+"_MuTauTrig_TauLeg",  m_File_MuTauTrig_TauLeg  = "$SFRAME_DIR/../LepEff2017/data/Muon/Run2016BtoH/Muon_Tau20LooseIsoPF.root"                   );
+//   DeclareProperty( m_name+"_MuIdIso",           m_File_MuIdIso           = "$SFRAME_DIR/../LepEff2017/data/Muon/Run2016BtoH/Muon_IdIso_IsoLt0p15_2016BtoH_eff.root"      );
+  
+//   DeclareProperty( m_name+"_EleTrig",           m_File_EleTrig           = "$SFRAME_DIR/../LepEff2017/data/Electron/Run2016BtoH/Electron_Ele25_eta2p1_WPTight_eff.root"  );
+//   DeclareProperty( m_name+"_EleTauTrig_EleLeg", m_File_EleTauTrig_EleLeg = "$SFRAME_DIR/../LepEff2017/data/Electron/Run2016BtoH/Electron_Ele24_eff.root"                 );
+//   DeclareProperty( m_name+"_EleTauTrig_TauLeg", m_File_EleTauTrig_TauLeg = "$SFRAME_DIR/../LepEff2017/data/Electron/Run2016BtoH/Electron_TauWPLooseIsoPF.root"           );
+  DeclareProperty( m_name+"_File_EleId",        m_File_EleId            = "$SFRAME_DIR/../LepEff2017/data/Electron/Run2017BtoF/EGM2D_runBCDEF_passingMVA94Xwp80noiso.root"    );
+  DeclareProperty( m_name+"_Hist_EleId",        m_Hist_EleId            = "EGamma_SF2D"                                                                                       );
 }
 
 
@@ -44,7 +47,7 @@ void ScaleFactorTool::BeginInputData( const SInputData& ) throw( SError ) {
   //m_logger << INFO << "Efficiency file EleTau Trig Tau Leg: "   << m_File_EleTauTrig_TauLeg << SLogger::endmsg;
   //m_logger << INFO << "Efficiency file Ele IdIso:      "        << m_File_EleIdIso          << SLogger::endmsg;
   
-  m_ScaleFactor_Mu27Trig        = new ScaleFactor( m_File_Mu27Trig );
+  m_ScaleFactor_Mu27Trig        = new ScaleFactor( m_File_Mu27Trig, m_Hist_Mu27Trig, true );
   m_ScaleFactor_MuId            = new ScaleFactorJSON( m_File_MuId, m_WP_MuId );
   m_ScaleFactor_MuIso           = new ScaleFactorJSON( m_File_MuIso, m_WP_MuIso );
   
@@ -54,6 +57,7 @@ void ScaleFactorTool::BeginInputData( const SInputData& ) throw( SError ) {
   //m_ScaleFactor_MuTauTrig_TauLeg  = new ScaleFactorTau( m_File_MuTauTrig_TauLeg );
   //m_logger << INFO << "Scale factor Mu22, Mu24, MuTau triggers initialised" << SLogger:: endmsg;
   
+  m_ScaleFactor_EleId           = new ScaleFactor( m_File_EleId, m_Hist_EleId );
   //m_ScaleFactor_EleTrig           = new ScaleFactor( m_File_EleTrig );
   //m_ScaleFactor_EleTauTrig_EleLeg = new ScaleFactor(    m_File_EleTauTrig_EleLeg );
   //m_ScaleFactor_EleTauTrig_TauLeg = new ScaleFactorTau( m_File_EleTauTrig_TauLeg );
@@ -341,15 +345,23 @@ float ScaleFactorTool::get_ScaleFactor_MuIso(double pt, double eta){
 //            *m_ScaleFactor_EleTauTrig_TauLeg->get_ScaleFactor(pt2,eta2,dm,genmatch_2==5);
 //   }
 // }
-// 
-// 
-// 
-// float ScaleFactorTool::get_ScaleFactor_EleTrig(double pt1, double eta1){
-//   return m_ScaleFactor_EleTrig->get_ScaleFactor(pt1,eta1);
+
+
+
+float ScaleFactorTool::get_ScaleFactor_EleIdIso(double pt, double eta){
+  return m_ScaleFactor_EleId->get_ScaleFactor(pt,eta); //*m_ScaleFactor_EleIso->get_ScaleFactor(pt,eta);
+}
+
+
+
+float ScaleFactorTool::get_ScaleFactor_EleId(double pt, double eta){
+  return m_ScaleFactor_EleId->get_ScaleFactor(pt,eta);
+}
+
+
+
+// float ScaleFactorTool::get_ScaleFactor_MuIso(double pt, double eta){
+//   return m_ScaleFactor_MuIso->get_ScaleFactor(pt,eta);
 // }
-// 
-// 
-// 
-// float ScaleFactorTool::get_ScaleFactor_EleIdIso(double pt, double eta){
-//   return m_ScaleFactor_EleIdIso->get_ScaleFactor(pt,eta);
-// }
+
+

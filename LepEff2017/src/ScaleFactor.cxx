@@ -2,40 +2,79 @@
 
 
 
-ScaleFactor::ScaleFactor(TString inputRootFile) {
-    m_inputRootFile = inputRootFile;
-    init_ScaleFactor(inputRootFile);
+ScaleFactor::ScaleFactor(TString inputRootFile, TString inputHistName, bool abseta) {
+    m_rootFile = inputRootFile;
+    m_histName = inputHistName;
+    m_abseta   = abseta;
+    init_ScaleFactor(inputRootFile, inputHistName);
 }
 
 
-void ScaleFactor::init_ScaleFactor(TString inputRootFile){
-	TFile * fileIn = new TFile(inputRootFile, "read");
-	if(fileIn->IsZombie()){
-	  std::cout << "ERROR in ScaleFactor::init_ScaleFactor: ‎File " <<inputRootFile << " does not exist. Please check. " <<std::endl; exit(1); };
-	pt_abseta_ratio = (TH2D*)fileIn->Get("IsoMu27_PtEtaBins/pt_abseta_ratio"); 
-	if(!pt_abseta_ratio)
-	  std::cout << "ScaleFactor::init_ScaleFactor: Could not find histogram in "
-	            << inputRootFile << "!"<<std::endl;
-	pt_abseta_ratio ->SetDirectory(0);
-	fileIn->Close();
+void ScaleFactor::init_ScaleFactor(TString inputRootFile, TString inputHistName){
+    TFile * fileIn = new TFile(inputRootFile, "read");
+    if(fileIn->IsZombie()){
+      std::cout << "ERROR in ScaleFactor::init_ScaleFactor: ‎File " <<inputRootFile << " does not exist. Please check. " <<std::endl;
+      exit(1);
+    }
+    m_eta_pt_ratio = (TH2F*)fileIn->Get(inputHistName); 
+    if(!m_eta_pt_ratio){
+      std::cout << "ScaleFactor::init_ScaleFactor: Could not find histogram in "
+                << inputRootFile << "!"<<std::endl;
+      exit(1);
+    }
+    m_eta_pt_ratio->SetDirectory(0);
+    checkEtaPtAxes(m_eta_pt_ratio);
+    fileIn->Close();
 }
 
 
 float ScaleFactor::get_ScaleFactor(double pt, double eta){
-	int binPt  = pt_abseta_ratio->GetXaxis()->FindBin(pt);
-	int binEta = pt_abseta_ratio->GetYaxis()->FindBin(fabs(eta));
-	
-	if(binPt==0) binPt=1;
-	else if(binPt>pt_abseta_ratio->GetXaxis()->GetNbins()) binPt--;
-	if(binEta==0) binEta=1;
-	else if(binEta>pt_abseta_ratio->GetYaxis()->GetNbins()) binEta--;
+    int binPt  = m_eta_pt_ratio->GetYaxis()->FindBin(pt);
+    int binEta;
+    if(m_abseta)
+      binEta = m_eta_pt_ratio->GetXaxis()->FindBin(fabs(eta));
+    else
+      binEta = m_eta_pt_ratio->GetXaxis()->FindBin(eta);
     
-	float SF   = pt_abseta_ratio->GetBinContent(binPt,binEta);
-	//std::cout << "ScaleFactor::get_ScaleFactor: (pt,eta)=("<<pt<<","<<eta
-	//          <<"), (binPt,binEta)=("<<binPt<<","<<binEta<<") SF="<<SF<<std::endl;
-	return SF;
+    if(binPt==0) binPt=1;
+    else if(binPt>m_eta_pt_ratio->GetYaxis()->GetNbins()) binPt--;
+    if(binEta==0) binEta=1;
+    else if(binEta>m_eta_pt_ratio->GetXaxis()->GetNbins()) binEta--;
+    
+    float SF   = m_eta_pt_ratio->GetBinContent(binEta,binPt);
+    //std::cout << "ScaleFactor::get_ScaleFactor: Histogram "<<m_histName<<": (eta,pt)=("<<eta<<","<<pt
+    //          <<"), (binEta,binPt)=("<<binEta<<","<<binPt<<") SF="<<SF<<std::endl;
+    return SF;
 }
 
+
+void ScaleFactor::checkEtaPtAxes(TH2F* eta_pt_hist){
+    // Check whether TH2F has eta vs. pt binning
+    
+    float xmin = eta_pt_hist->GetXaxis()->GetXmin();
+    float xmax = eta_pt_hist->GetXaxis()->GetXmax();
+    float ymin = eta_pt_hist->GetYaxis()->GetXmin();
+    float ymax = eta_pt_hist->GetYaxis()->GetXmax();
+    
+    // Assume eta axis is larger than [-2.0,2.0], but between [-7.0,7.0]
+    if((xmin!=0.0 and fabs(xmin)<2.0) or 7.0<fabs(xmin) or xmax<2.0 or 7.0<xmax){
+      std::cout << "ERROR! ScaleFactor::checkEtaPtAxes: ‎Histogram " << eta_pt_hist->GetName()
+                << " does not seem to have a eta valued x-axis ["<<xmin<<","<<xmax<<"]! Please check." << std::endl;
+      exit(1);
+    }
+    if((xmin<0.0) == m_abseta){
+      std::cout << "ERROR! ScaleFactor::checkEtaPtAxes: ‎Histogram " << eta_pt_hist->GetName()
+                << " has ‎xmin="<<xmin<<", but m_abseta="<<(m_abseta?"true":"false")<<"!" << std::endl;
+      exit(1);
+    }
+    // Assume pt axis is larger than [0.0,30]
+    else if(ymin<0.0 or ymax<30.0){
+      std::cout << "ERROR! ScaleFactor::checkEtaPtAxes: ‎Histogram " << eta_pt_hist->GetName()
+                << " does not seem to have a pt valued y-axis ["<<ymin<<","<<ymax<<"]! Please check." << std::endl;
+      exit(1);
+    }
+    
+}
 
 // void ScaleFactor::init_ScaleFactor(TString inputRootFile){
 // 
@@ -157,8 +196,8 @@ float ScaleFactor::get_ScaleFactor(double pt, double eta){
 //     }
 // 	std::map<std::string, TGraphAsymmErrors*>::iterator it;
 // 	
-//     //std::cout << "ScaleFactor::FindEtaLabel: Eta=" << Eta << ", binNumber=" << binNumber << " - " << m_inputRootFile << std::endl;
-//     // std::cout << "ScaleFactor::FindEtaLabel: " << m_inputRootFile << ": " << std::endl;
+//     //std::cout << "ScaleFactor::FindEtaLabel: Eta=" << Eta << ", binNumber=" << binNumber << " - " << m_rootFile << std::endl;
+//     // std::cout << "ScaleFactor::FindEtaLabel: " << m_rootFile << ": " << std::endl;
 //     // for(auto const& label: eff_data)
 //     //   std::cout << "ScaleFactor::FindEtaLabel:   eff_data - eta label \"" << label.first << "\"" << std::endl;
 //     // std::cout << "ScaleFactor::FindEtaLabel:   eff_data.size() = " << eff_data.size() << std::endl;

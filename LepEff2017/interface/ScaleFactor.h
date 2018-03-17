@@ -20,8 +20,9 @@ class ScaleFactor {
     //std::map<std::string, TGraphAsymmErrors *> eff_mc;
     
     //TH1D* etaBinsH;
-    std::string m_inputRootFile;
-    TH2D* pt_abseta_ratio;
+    std::string m_rootFile;
+    std::string m_histName;
+    TH2F* m_eta_pt_ratio;
     
     //void  SetAxisBins(TGraphAsymmErrors*);
     //bool  check_SameBinning(TGraphAsymmErrors*, TGraphAsymmErrors*);
@@ -30,9 +31,9 @@ class ScaleFactor {
   
   public:
     ScaleFactor(){};
-    ScaleFactor(TString file);
+    ScaleFactor(TString file, TString hist, bool abseta=false);
     ~ ScaleFactor(){};
-    void init_ScaleFactor(TString file);
+    void init_ScaleFactor(TString file, TString hist);
     //void init_ScaleFactor(TString,std::string);
     //double get_EfficiencyData(     double, double); //pt, eta
     //double get_EfficiencyMC(       double, double);
@@ -40,6 +41,8 @@ class ScaleFactor {
     //double get_EfficiencyDataError(double, double);
     //double get_EfficiencyMCError(  double, double);
     //double get_ScaleFactorError(   double, double);
+    void checkEtaPtAxes(TH2F* eta_pt_hist);
+    bool m_abseta;
 
 };
 

@@ -10,7 +10,7 @@ luminosity  = 41.86
 
 # VERBOSITY
 verbosity               = 1
-verbositySampleTools    = 0
+verbositySampleTools    = 2
 verbosityPlotTools      = 0
 verbosityVariableTools  = 0
 verbositySelectionTools = 0
@@ -34,7 +34,7 @@ mergeVV             = True #and False
 
 # SAMPLES
 SFRAME              = "SFrameAnalysis_ltau2017"
-SAMPLE_DIR          = os.path.expandvars("/scratch/ineuteli/SFrameAnalysis/AnalysisOutput_ltau2017")
+SAMPLE_DIR          = os.path.expandvars("/scratch/ineuteli/SFrameAnalysis/AnalysisOutput_emu2017")
 PLOTS_DIR           = os.path.expandvars("/shome/ineuteli/analysis/%s/plots"%SFRAME)
 DATACARDS_DIR       = "%s/%s"%(PLOTS_DIR,"datacards")
 
@@ -42,9 +42,7 @@ DATACARDS_DIR       = "%s/%s"%(PLOTS_DIR,"datacards")
 
 
 channels = [
-    "mutau",
-    #"etau",
-    #"emu",
+    "emu",
 ]
 if not normalizeWJ and "emu" not in channels: plotlabel+="_noWJrenorm"
 
@@ -72,105 +70,89 @@ selections  = [
 #     sel("no cuts",                                ""                                                 ),
 #     sel("baseline, no tau ID",                    "%s"       %(baseline_noIso2)                      ),
 #     sel("baseline, no tau ID, m_T<50GeV",         "%s && %s" %(baseline_noIso2,"pfmt_1<50")          ),
-#     sel("baseline, no tau ID, m_T>80GeV",         "%s && %s" %(baseline_noIso2,"pfmt_1>80")          ),
-#     sel("ZTT enriched, no tau ID",                "%s && %s" %(baseline_noIso2, ZTTregion)           ),
-#     sel("ZTT enriched, no tau ID, DM0",           "%s && %s && decayMode_2==0" %(baseline_noIso2,  ZTTregion) ),
-#     sel("ZTT enriched, no tau ID, DM1",           "%s && %s && decayMode_2==1" %(baseline_noIso2,  ZTTregion) ),
-#     sel("ZTT enriched, no tau ID, DM10",          "%s && %s && decayMode_2==10" %(baseline_noIso2, ZTTregion) ),
-#     sel("ZTT enriched, no tau ID, DM11",          "%s && %s" %(baseline_noIso2.replace('2<11','2==11'), ZTTregion) ),
-#     sel("ZTT enriched, no tau ID, 0 photons",      "%s && %s && nPhoton_2==0" %(baseline_noIso2, ZTTregion)           ),
-#     sel("ZTT enriched, no tau ID, DM0, 0 photons", "%s && %s && decayMode_2==0 && nPhoton_2==0" %(baseline_noIso2,  ZTTregion) ),
-#     sel("ZTT enriched, no tau ID, DM10, 0 photons","%s && %s && decayMode_2==10 && nPhoton_2==0" %(baseline_noIso2, ZTTregion) ),
+#     sel("baseline, no tau ID, m_T>80GeV",         "%s && %s" %(baseline_noIso2,"pfmt_1>80")           ),
+#     sel("ZTT enriched, no tau ID",                "%s && %s" %(baseline, ZTTregion)                   ),
 #     sel("baseline",                               "%s"       %(baseline)                              ),
 #     sel("baseline, tight",                        "%s"       %(baseline)                              ),
 #     sel("baseline, tight, m_T<50GeV",             "%s && %s" %(baseline,"pfmt_1<50")                  ),
 #     sel("baseline, tight, m_T>80GeV",             "%s && %s" %(baseline,"pfmt_1>80")                  ),
-#     sel("ZTT enriched, tight",                    "%s && %s " %(baseline, ZTTregion)                    ),
-#     sel("ZTT enriched, tight, DM0",               "%s && %s && decayMode_2==0" %(baseline, ZTTregion)   ),
-#     sel("ZTT enriched, tight, DM1",               "%s && %s && decayMode_2==1" %(baseline, ZTTregion)   ),
-#     sel("ZTT enriched, tight, DM10",              "%s && %s && decayMode_2==10" %(baseline, ZTTregion)  ),
-#     sel("ZTT enriched, tight",                    "%s && %s && nPhoton_2==0 " %(baseline, ZTTregion)                    ),
-#     sel("ZTT enriched, tight, DM0, 0 photons",    "%s && %s && decayMode_2==0 && nPhoton_2==0" %(baseline, ZTTregion)   ),
-#     sel("ZTT enriched, tight, DM10, 0 photons",   "%s && %s && decayMode_2==10 && nPhoton_2==0" %(baseline, ZTTregion)  ),
+#     sel("ZTT enriched, tight",                    "%s && %s" %(baseline, ZTTregion)                   ),
 #     sel("baseline, m_t<50GeV",                    "%s && %s" %(baseline,"pfmt_1<50")                     ),
 #     sel("baseline, m_t<50GeV, DM0",               "%s && %s" %(baseline,"pfmt_1<50 && decayMode_2==0")   ),
 #     sel("baseline, m_t<50GeV, DM1",               "%s && %s" %(baseline,"pfmt_1<50 && decayMode_2==1")   ),
 #     sel("baseline, m_t<50GeV, DM10",              "%s && %s" %(baseline,"pfmt_1<50 && decayMode_2==10")  ),
 #     sel("baseline, >=1b",                         "%s && %s" %(baseline,"nbtag>0")                       ),
-#     sel("baseline, >=1b, no tau ID",              "%s && %s" %(baseline_noIso2,"nbtag>0")                ),
-#     sel("baseline, >=1b, m_T<100GeV",             "%s && %s" %(baseline,"nbtag>0 && pfmt_1<100")         ),
-    sel("baseline, >=1b, no tau ID, m_T<100GeV",  "%s && %s" %(baseline_noIso2,"nbtag>0 && pfmt_1<100")  ),
 #     sel("baseline, >=1b, 20",                     "%s && %s" %(baseline,"nbtag20>0")                     ),
-#     sel("baseline, >=1b, againstLepton",          "%s && %s" %(baseline,"nbtag>0 && againstLepton_3==1") ),
-#     sel("baseline, >=1b, againstLepton, m_T<100GeV", "%s && %s" %(baseline,"nbtag>0 && againstLepton_3==1 && pfmt_1<100") ),
-#     sel("baseline, >=1b, againstLepton, Tight",      "%s && %s" %(baseline,"nbtag>0 && againstLepton_3==1 && byTightIsolationMVArun2v1DBoldDMwLT_3==1") ),
-#     sel("baseline, >=1b, againstLepton, Tight fail", "%s && %s" %(baseline,"nbtag>0 && againstLepton_3==1 && byTightIsolationMVArun2v1DBoldDMwLT_3!=1") ),
-#     sel("baseline, >=1b, againstLepton, VTight",     "%s && %s" %(baseline,"nbtag>0 && againstLepton_3==1 && byVTightIsolationMVArun2v1DBoldDMwLT_3==1") ),
+    sel("baseline, >=1b, no tau ID", "%s && %s" %(baseline,"ncbtag_noTau>0 && againstLepton_3==1") ),
+#     sel("baseline, >=1b, m_T<100GeV", "%s && %s" %(baseline,"ncbtag_noTau>0 && againstLepton_3==1 && pfmt_1<100") ),
+#     sel("baseline, >=1b, tight",      "%s && %s" %(baseline,"ncbtag_noTau>0 && againstLepton_3==1 && byTightIsolationMVArun2v1DBoldDMwLT_3==1") ),
+#     sel("baseline, >=1b, Tight fail", "%s && %s" %(baseline,"ncbtag_noTau>0 && againstLepton_3==1 && byTightIsolationMVArun2v1DBoldDMwLT_3!=1") ),
+#     sel("baseline, >=1b, VTight",     "%s && %s" %(baseline,"ncbtag_noTau>0 && againstLepton_3==1 && byVTightIsolationMVArun2v1DBoldDMwLT_3==1") ),
 ]
 
 
 # VARIABLES
 variables = [
-    var("m_vis",                                40,     0,  200 ),
-#     var("m_sv",                                 40,     0,  200 ),
-#     var("m_2",                                  50,     0,    2 ),
-#     var("m_2",                                  50,     0,    2, logy=True, filename="m_2_log" ),
-#     var("ht",                                   50,     0,  500 ),
+#     var("m_vis",                                40,     0,  200 ),
+    ##var("m_sv",                                 40,     0,  200 ),
+    ##var("m_2",                                  50,     0,    2 ),
+    ##var("ht",                                   50,     0,  500 ),
 #     var("dR_ll",                                30,     0,    6 ),
-    var("pfmt_1",                               40,     0,  200 ),
-    var("met",                                  40,     0,  200 ),
+#     var("pfmt_1",                               40,     0,  200 ),
+#     var("met",                                  40,     0,  200 ),
 #     var("metphi",                               70,  -3.5,  3.5 ),
-#     var("gen_match_2",                           9,    -1,    8 ),
-#     var("puweight",                            100,     0,  200, logy=True ),
-#     var("npu",                                  40,     0,   80 ),
-    var("npv",                                  40,     0,   80 ),
-    var("rho",                                 60,     0,  60 ),
-    var("njets",                                 8,     0,    8 ),
-    var("nbtag",                                 7,     0,    7 ),
-##     var("nbtag20",                               7,     0,    7 ),
-    var("pt_1",                                 50,     0,  200, title="muon pt",  ctitle={'etau':"electron pt"}  ),
-    var("eta_1",                                26,  -2.6,  2.6, title="muon eta", ctitle={'etau':"electron eta"} ),
-    var("pt_2",                                 30,     0,  150, title="tau pt",   ctitle={'emu': "electron pt"}  ),
-    var("eta_2",                                26,  -2.6,  2.6, title="tau eta",  ctitle={'emu': "electron eta"} ),
-#     var("iso_1",                               100,     0,  0.5 ),
-#     var("decayMode_2",                          14,     0,   14 ),
-    var("byIsolationMVArun2v1DBoldDMwLTraw_2",  50,   0.8,  1.0, filename="byIsolationMVArun2v1DBoldDMwLTraw_2_zoom0p8" ),
-    var("byIsolationMVArun2v1DBoldDMwLTraw_2",  50,  -1.0,  1.0, logy=True ),
-#     ###var("byIsolationMVArun2v1DBoldDMwLTraw_2",  30,  -0.2,  1.0, filename="byIsolationMVArun2v1DBoldDMwLTraw_2_zoom-0p2" ),
-    var("byIsolationMVArun2v1DBnewDMwLTraw_2",  50,   0.8,  1.0, filename="byIsolationMVArun2v1DBnewDMwLTraw_2_zoom0p8" ),
-    var("byIsolationMVArun2v1DBnewDMwLTraw_2",  50,  -1.0,  1.0, logy=True ),
-    var("chargedPionPt_2",                     100,     0,  100 ),
-    var("neutralPionPt_2",                     100,     0,  100 ),
-    var("chargedIsoPtSum_2",                   100,     0,  100, logy=True ),
-    var("neutralIsoPtSum_2",                   100,     0,  100, logy=True ),
-    var("chargedIsoPtSumdR03_2",               100,     0,  100, logy=True ),
-    var("neutralIsoPtSumdR03_2",               100,     0,  100, logy=True ),
-    var("puCorrPtSum_2",                        70,     0,   70 ),
-    var("photonPtSumOutsideSignalCone_2",       60,     0,   30, logy=True ),
-    var("photonPtSumOutsideSignalConedR03_2",   60,     0,   30, logy=True ),
-    var("byPhotonPtSumOutsideSignalCone_2",      4,     0,    4 ),
-    var("nPhoton_2",                            12,     0,   12 ),
-    var("ptWeightedDetaStrip_2",                60,     0,  0.6, logy=True ),
-    var("ptWeightedDphiStrip_2",                60,     0,  0.6, logy=True ),
-    var("ptWeightedDrSignal_2",                 60,     0,  0.6, logy=True ),
-    var("ptWeightedDrIsolation_2",              60,     0,  0.6, logy=True ),
-    var("leadingTrackChi2_2",                   60,     0,    6 ),
-    var("leadingTrackPt_2",                     70,     0,   70 ),
-    var("eRatio_2",                             51, -0.01, 1.01, logy=True ),
-    var("dxy_Sig_2",                           100,    -3,  3.5 ),
-    var("ip3d_2",                               50,  -0.1,  0.1 ),
-    var("ip3d_Sig_2",                           60,    -6,    6 ),
-    var("hasSecondaryVertex_2",                  4,     0,    4 ),
-    var("decayDistMag_2",                       50,     0,  1.5, logy=True ),
-    var("flightLenthSig_2",                     75,     0,   15 ),
+    var("gen_match_2",                           9,    -1,    8 ),
+    ##var("puweight",                            100,     0,  200, logy=True ),
+    ##var("npu",                                  40,     0,   80 ),
+#     var("npv",                                  40,     0,   80 ),
+#     var("rho",                                 100,     0,  100 ),
+#     var("njets",                                 8,     0,    8 ),
+#     var("nbtag",                                 7,     0,    7 ),
+    ##var("nbtag20",                               7,     0,    7 ),
+#     var("pt_1",                                 50,     0,  200, title="muon pt",  context={'etau':"electron pt"}  ),
+#     var("eta_1",                                26,  -2.6,  2.6, title="muon eta", context={'etau':"electron eta"} ),
+#     var("pt_2",                                 30,     0,  150, title="tau pt",   context={'emu': "electron pt"}  ),
+#     var("eta_2",                                26,  -2.6,  2.6, title="tau eta",  context={'emu': "electron eta"} ),
+#     var("pt_3",                                 50,     0,  200, title="tau pt"  ),
+#     var("eta_3",                                26,  -2.6,  2.6, title="tau eta" ),
+#     var("iso_1",                                10,     0,  0.5 ),
+#     var("iso_2",                                10,     0,  0.5 ),
+    var("decayMode_3",                          14,     0,   14 ),
+    var("byIsolationMVArun2v1DBoldDMwLTraw_3",  50,   0.8,  1.0, filename="byIsolationMVArun2v1DBoldDMwLTraw_3_zoom0p8" ),
+    var("byIsolationMVArun2v1DBoldDMwLTraw_3",  30,  -0.2,  1.0, filename="byIsolationMVArun2v1DBoldDMwLTraw_3_zoom-0p2" ),
+    var("byIsolationMVArun2v1DBoldDMwLTraw_3",  40,  -1.0,  1.0, logy=True ),
+#     var("chargedPionPt_3",                     100,     0,  100 ),
+#     var("neutralPionPt_3",                     100,     0,  100 ),
+#     var("chargedIsoPtSum_3",                   100,     0,  100, logy=True ),
+#     var("neutralIsoPtSum_3",                   100,     0,  100, logy=True ),
+#     var("chargedIsoPtSumdR03_3",               100,     0,  100, logy=True ),
+#     var("neutralIsoPtSumdR03_3",               100,     0,  100, logy=True ),
+    var("puCorrPtSum_3",                        70,     0,   70 ),
+#     var("photonPtSumOutsideSignalCone_3",       60,     0,   30, logy=True ),
+#     var("photonPtSumOutsideSignalConedR03_3",   60,     0,   30, logy=True ),
+#     var("byPhotonPtSumOutsideSignalCone_3",      4,     0,    4 ),
+#     var("nPhoton_3",                            12,     0,   12 ),
+#     var("ptWeightedDetaStrip_3",                60,     0,  0.6, logy=True ),
+#     var("ptWeightedDphiStrip_3",                60,     0,  0.6, logy=True ),
+#     var("ptWeightedDrSignal_3",                 60,     0,  0.6, logy=True ),
+#     var("ptWeightedDrIsolation_3",              60,     0,  0.6, logy=True ),
+#     var("leadingTrackChi2_3",                   60,     0,    6 ),
+#     var("leadingTrackPt_3",                     70,     0,   70 ),
+    var("eRatio_3",                             51, -0.01, 1.01 ),
+    var("dxy_Sig_3",                           100,    -3,    3 ),
+#     var("ip3d_3",                               50,  -0.1,  0.1 ),
+#     var("ip3d_Sig_3",                           60,    -6,    6 ),
     var("d0_2",                                 60, -0.05, 0.05, title="tau d_0",  context={'etau':"electron d_0"} ),
     var("dz_2",                                 60,     0, 0.05, title="tau d_z",  context={'etau':"electron d_z"} ),
-#     var("pzeta_disc",                           50,  -150,  100, filename="Dzeta" ),
-#     var("pzetavis",                             50,     0,  200 ),
+#     var("hasSecondaryVertex_3",                  3,     0,    3 ),
+#     var("decayDistMag_3",                       50,     0,  1.5, logy=True ),
+#     var("flightLenthSig_3",                     75,     0,   15 ),
+    ##var("pzeta_disc",                           50,  -150,  100, filename="Dzeta" ),
+    ##var("pzetavis",                             50,     0,  200 ),
 ]
-# for p in [("b",1),("b",2),("j",1),("j",2)]:
-#     variables.append(var( "%spt_%i"  % p,      50,    0,   250  ))
-#     variables.append(var( "%seta_%i" % p,      50, -5.0,   5.0  ))
+for p in [("b",1),("b",2),("j",1),("j",2)]:
+    variables.append(var( "%spt_%i"  % p,      50,    0,   250  ))
+    variables.append(var( "%seta_%i" % p,      50, -5.0,   5.0  ))
 
 samplesB = [
     #("TT", "TT_TuneCUETP8M2T4",                        "ttbar",                   831.76   ), # {'extraweight':_weight+"*ttptweight_runI/ttptweight"}

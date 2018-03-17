@@ -5,11 +5,17 @@
 import re
 from ctypes import c_double
 from math import sqrt, pow
-from ROOT import TFile, TTree, TH1D, TH2D, gDirectory, \
+from ROOT import TFile, TTree, TH1D, TH2D, gDirectory, TColor, \
                  kAzure, kBlack, kBlue, kCyan, kGray, kGreen, kMagenta, kOrange, kPink, kRed, kSpring, kTeal, kWhite, kViolet, kYellow
 
 # for channel in ["mutau","etau","emu","mumu"]:
 #     TTscales[channel] = {"category 1":0, "category 2":0} # so TT renormalization is done once for each category
+
+# QCDcol = TColor.GetColor(250,202,255);   ttcol_v2 = TColor.GetColor(135,206,250)
+# DYcol  = TColor.GetColor(248,206,104);   ZLcol    = TColor.GetColor(100,182,232)
+# WJcol  = TColor.GetColor(222,90,106);    VVcol    = TColor.GetColor(222,140,106)
+# TTcol  = TColor.GetColor(155,152,204);   TTJcol   = TColor.GetColor(100,222,106)
+
 
 colors_sample_dict = {
     "TT":               kRed-2,

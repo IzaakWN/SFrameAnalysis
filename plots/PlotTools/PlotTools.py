@@ -68,13 +68,13 @@ def makeCanvas(**kwargs):
         scalerightmargin = 3.5*scalerightmargin
     elif ratio or residue:
         W = 800; H  = 750
-        scaleleftmargin   = 1.14*scaleleftmargin
-        scalerightmargin  = 0.80*scalerightmargin
-        scaletopmargin    = 0.80*scaletopmargin
-        scalebottommargin = 1.06*scaletopmargin
-        CMS_lumi.cmsTextSize  = 0.55
-        CMS_lumi.lumiTextSize = 0.45
-        CMS_lumi.relPosX      = 0.08
+        scaleleftmargin       *= 1.14
+        scalerightmargin      *= 0.80
+        scaletopmargin        *= 0.80
+        scalebottommargin     *= 1.08
+        CMS_lumi.cmsTextSize   = 0.55
+        CMS_lumi.lumiTextSize  = 0.45
+        CMS_lumi.relPosX       = 0.08
     
     T, B = 0.08*scaletopmargin,  0.12*scalebottommargin
     L, R = 0.12*scaleleftmargin, 0.04*scalerightmargin
@@ -99,7 +99,7 @@ def makeCanvas(**kwargs):
         canvas.cd(2)
         gPad.SetPad("pad2","pad2", 0, 0.05, 1, 0.30)
         gPad.SetLeftMargin(0.125);  gPad.SetRightMargin(0.03)
-        gPad.SetTopMargin(0.00001); gPad.SetBottomMargin(0.20)
+        gPad.SetTopMargin(0.00001); gPad.SetBottomMargin(0.22)
         gPad.SetFillColor(0)
         gPad.SetBorderMode(0)
         gPad.Draw()
@@ -145,15 +145,15 @@ def makeLegend(*hists,**kwargs):
     
     if width==0:  width  = 0.16
     if height==0: height = 1.0*textSize*nLines
-    x2 = 0.90; x1 = x2 - width
+    x2 = 0.86; x1 = x2 - width
     y2 = 0.92; y1 = y2 - height
     
     if position:
-      if   "leftleft"     in position: x1 = 0.15;         x2 = x1 + width
+      if   "leftleft"     in position: x1 = 0.16;         x2 = x1 + width
       elif "rightright"   in position: x2 = 1 - 0.10;     x1 = x2 - width
       elif "centerright"  in position: x1 = 0.60-width/2; x2 = 0.60+width/2
-      elif "centerleft"   in position: x1 = 0.48-width/2; x2 = 0.48+width/2
-      elif "left"         in position: x1 = 0.18;         x2 = x1 + width
+      elif "centerleft"   in position: x1 = 0.46-width/2; x2 = 0.46+width/2
+      elif "left"         in position: x1 = 0.20;         x2 = x1 + width
       elif "right"        in position: x2 = 1 - 0.15;     x1 = x2 - width
       elif "center"       in position: x1 = 0.55-width/2; x2 = 0.55+width/2
       if   "bottombottom" in position: y1 = 0.15;         y2 = y1 + height
@@ -255,18 +255,18 @@ def makeAxes(frame, *args, **kwargs):
         frame.GetYaxis().SetRangeUser(0.4,1.6)
         frame.GetYaxis().SetNdivisions(505)
         frame.GetYaxis().CenterTitle(True)
-        frame.GetYaxis().SetTitleOffset(0.42)
+        frame.GetYaxis().SetTitleOffset(0.40)
     else:
         frame.GetYaxis().SetTitle(ylabel)
         frame.GetYaxis().SetLabelSize(0.056)
         frame.GetYaxis().SetTitleSize(0.068)
-        frame.GetYaxis().SetTitleOffset(1.04)
+        frame.GetYaxis().SetTitleOffset(1.01)
     
     # X axis
     frame.GetXaxis().SetTitle(xlabel)
     frame.GetXaxis().SetLabelSize(0.060*scale)
     frame.GetXaxis().SetTitleSize(0.070*scale)
-    frame.GetXaxis().SetTitleOffset(1.05)
+    frame.GetXaxis().SetTitleOffset(1.02)
     if kwargs.get('noxaxis',False): # e.g. for main plot above a ratio
         frame.GetXaxis().SetLabelSize(0)
         frame.GetXaxis().SetTitleSize(0)  
@@ -920,7 +920,10 @@ class Plot(object):
     def makeLegend(self,*args,**kwargs):
         """Make legend."""
         kwargs['histsD'] = self.histsD
-        kwargs['histsB'] = self.histsB
+        if self.stack:
+          kwargs['histsB'] = self.histsB[::-1]
+        else:
+          kwargs['histsB'] = self.histsB
         kwargs['histsS'] = self.histsS
         #kwargs['x1'],    kwargs['x2']     = self.x1,    self.x2
         #kwargs['y1'],    kwargs['y2']     = self.y1,    self.y2

@@ -40,6 +40,7 @@ class BTaggingScaleTool : public SToolBase {
   void bookHistograms();
   void fillEfficiencies( const UZH::JetVec& vJets, std::string channel="" );
   void readEfficiencies();
+  void fillEfficienciesDeepCSV( const UZH::JetVec& vJets, std::string channel="" );
   double getEfficiency( const double& pt, const double& eta, const int& flavour, const TString& jetCategory = "jet_ak4" );
   double getEfficiency( const UZH::Jet& jet, const TString& jetCategory = "jet_ak4" );
   
@@ -48,7 +49,9 @@ class BTaggingScaleTool : public SToolBase {
   
   /// help functions to check if jet is b-tagged according to chosen csv working point
   bool isTagged( const UZH::Jet& jet );
+  bool isTaggedDeepCSV( const UZH::Jet& jet );
   bool isTagged( const double csv );
+  bool isTaggedDeepCSV( const double deepCSV );
 
 
  private:
@@ -57,14 +60,17 @@ class BTaggingScaleTool : public SToolBase {
   std::string m_tagger;
   std::string m_workingPoint;
   std::string m_csvFile;
+  std::string m_deepCsvFile;
   std::string m_measurementType_udsg;
   std::string m_measurementType_bc;
   std::string m_effHistDirectory;
   std::string m_effFile;
   std::vector<TString> m_jetCategories;
   std::vector<TString> m_flavours;
-  std::map<std::string, double> CSV_WP; // could have a function to set these
-  double currentWorkingPointCut;
+  std::map<std::string, double> CSV_WP;
+  std::map<std::string, double> deepCSV_WP;
+  double m_currentWP_CsvCut;
+  double m_currentWP_deepCsvCut;
   std::map<std::string, TH2F> m_effMaps;
   std::unique_ptr<BTagCalibrationReader> m_reader;
   std::unique_ptr<BTagCalibrationReader> m_reader_up;

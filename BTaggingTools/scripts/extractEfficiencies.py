@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 #python extractEfficiencies.py ../../AnalysisOutput/Nak8_v0/*root -w Loose -p jet_  -r
 #python extractEfficiencies.py ../../AnalysisOutput/prova_justTauIso_LepPairPt_StandardID_EleTight_MuTight_15p9fb_69p2_PW_filters_VetoMediumWP/*root -w Tight -p jet_ak4_
-
 #python extractEfficiencies.py ../../AnalysisOutput/Nak8_v0/*root -w Medium -p jet_ak4_ 
-#python extractEfficiencies.py ../../AnalysisOutput/Nak8_v0/*root -w Loose -p subjet_softdrop_  
+#python extractEfficiencies.py ../../AnalysisOutput/Nak8_v0/*root -w Loose -p subjet_softdrop_
+
 import os
 import sys
 from optparse import OptionParser
@@ -24,13 +24,13 @@ def main():
                     help="replace/overwrite/recreate output ROOT file [default: %default]")
   parser.add_option("-v", "--verbose", dest="verbose", default=False, action="store_true",
                     help="make script verbose")
-
+  
   
   (options, args) = parser.parse_args()
   
   if len(args) < 1:
     parser.error("Please provide at least one ROOT file name")
-
+  
   fileList = args
   outputFile = options.outputFile
   directory = options.directory
@@ -39,7 +39,8 @@ def main():
   replace = options.replace
   verbose = options.verbose
 
-  print "Using file list:", fileList
+  print "Using file list:"
+  for file in fileList: print "  ",file
   print "output ROOT file:", outputFile
   print "Using histogram directory:", directory
   print "Using histogram prefix:", prefix
@@ -86,9 +87,6 @@ def main():
     effHists[flavour].Divide(flavDenomHist)
     nomHists[flavour].SetName("%s%s" %(baseHistNameNoDir, nominator))
     denomHists[flavour].SetName("%s%s" %(baseHistNameNoDir, denominator))
-  
-  #plot histograms
-  
   
   #write out file
   openOptions = "UPDATE"

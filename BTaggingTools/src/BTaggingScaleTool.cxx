@@ -14,6 +14,7 @@ BTaggingScaleTool::BTaggingScaleTool( SCycleBase* parent, const char* name ) :
   DeclareProperty( m_name + "_Tagger",       m_tagger = "CSVv2" );
   DeclareProperty( m_name + "_WorkingPoint", m_workingPoint = "Medium" );
   DeclareProperty( m_name + "_CsvFile",      m_csvFile = sframe_dir + "/../BTaggingTools/csv/CSVv2_94XSF_V1_B_F.csv" );
+  DeclareProperty( m_name + "_deepCsvFile",  m_deepCsvFile = sframe_dir + "/../BTaggingTools/csv/DeepCSV_94XSF_V1_B_F.csv" );
   
   DeclareProperty( m_name + "_MeasurementType_udsg", m_measurementType_udsg = "incl" ); 
   DeclareProperty( m_name + "_MeasurementType_bc",   m_measurementType_bc = "mujets" ); // for AK4 jets; for AK8 jets, use "lt"
@@ -26,8 +27,13 @@ BTaggingScaleTool::BTaggingScaleTool( SCycleBase* parent, const char* name ) :
   CSV_WP["Loose"]  = 0.5803;
   CSV_WP["Medium"] = 0.8838;
   CSV_WP["Tight"]  = 0.9693;
+  deepCSV_WP.clear();
+  deepCSV_WP["Loose"]  = 0.1522;
+  deepCSV_WP["Medium"] = 0.4941;
+  deepCSV_WP["Tight"]  = 0.8001;
   
-  currentWorkingPointCut = CSV_WP[m_workingPoint];
+  m_currentWP_CsvCut     = CSV_WP[m_workingPoint];
+  m_currentWP_deepCsvCut = deepCSV_WP[m_workingPoint];
   m_effMaps.clear();
   
 }
@@ -47,16 +53,16 @@ void BTaggingScaleTool::BeginInputData( const SInputData& ) throw( SError ) {
   BTagEntry::OperatingPoint wp = BTagEntry::OP_LOOSE;
   if (m_workingPoint.find("Loose") != std::string::npos) {
     wp = BTagEntry::OP_LOOSE;
-    currentWorkingPointCut = CSV_WP["Loose"];
+    m_currentWP_CsvCut = CSV_WP["Loose"];
   }
   else if (m_workingPoint.find("Medium") != std::string::npos) {
     //std::cout << " working point medium"<<std::endl;
     wp = BTagEntry::OP_MEDIUM;
-    currentWorkingPointCut = CSV_WP["Medium"];
+    m_currentWP_CsvCut = CSV_WP["Medium"];
   }
   else if (m_workingPoint.find("Tight") != std::string::npos) {
     wp = BTagEntry::OP_TIGHT;
-    currentWorkingPointCut = CSV_WP["Tight"];
+    m_currentWP_CsvCut = CSV_WP["Tight"];
   }
   else {
     throw SError( ("Unknown working point: " + m_workingPoint).c_str(), SError::SkipCycle );
@@ -65,12 +71,14 @@ void BTaggingScaleTool::BeginInputData( const SInputData& ) throw( SError ) {
   m_logger << INFO << SLogger::endmsg;
   m_logger << INFO << "Tagger:                " << m_tagger               << SLogger::endmsg;
   m_logger << INFO << "WorkingPoint:          " << m_workingPoint         << SLogger::endmsg;
-  m_logger << INFO << "WorkingPoint Cut:      " << currentWorkingPointCut << SLogger::endmsg;
+  m_logger << INFO << "CSV WP Cut:            " << m_currentWP_CsvCut     << SLogger::endmsg;
+  m_logger << INFO << "deep CSV WP Cut:       " << m_currentWP_deepCsvCut << SLogger::endmsg;
   m_logger << INFO << "MeasurementType udsg:  " << m_measurementType_udsg << SLogger::endmsg;
   m_logger << INFO << "MeasurementType bc:    " << m_measurementType_bc   << SLogger::endmsg;
   m_logger << INFO << "EffHistDirectory:      " << m_effHistDirectory     << SLogger::endmsg;
   m_logger << INFO << "Efficiency file:       " << m_effFile              << SLogger::endmsg;
   m_logger << INFO << "CSV file:              " << m_csvFile              << SLogger::endmsg;
+  m_logger << INFO << "deep CSV file:         " << m_deepCsvFile          << SLogger::endmsg;
   m_logger << INFO << "Initializing BTagCalibrationStandalone";
   
   // Expand $SFRAME_DIR
@@ -328,7 +336,8 @@ void BTaggingScaleTool::bookHistograms() {
   const int nEtaBins = 4;
   float ptBins[nPtBins+1] = {10, 20, 30, 50, 70, 100, 140, 200, 300, 670, 1000, 1500};
   float etaBins[nEtaBins+1] = {-2.5, -1.5, 0, 1.5, 2.5};
-  std::string directories[3] = {m_effHistDirectory, m_effHistDirectory+"_mutau", m_effHistDirectory+"_etau"};
+  std::string directories[3] = { m_effHistDirectory, m_effHistDirectory+"_mutau", m_effHistDirectory+"_etau",
+                                 m_effHistDirectory+"_DeepCSV", m_effHistDirectory+"_DeepCSV_mutau" };
   
   for(const std::string &directory: directories){
     for(std::vector<TString>::const_iterator flav = m_flavours.begin(); flav != m_flavours.end(); ++flav){
@@ -350,6 +359,23 @@ void BTaggingScaleTool::fillEfficiencies( const UZH::JetVec& vJets, std::string 
     // m_logger << DEBUG << "Looking at jet " << itJet - vJets.begin()
     //      << ", pT=" << (*itJet).pt() << ", eta=" << (*itJet).eta()
     //      << SLogger::endmsg;
+    TString flavourString = flavourToString(itJet->hadronFlavour());
+    if(isTagged(*itJet)){
+      Hist("jet_ak4_"+flavourString+"_"+m_workingPoint, directory.c_str())->Fill(itJet->pt(), itJet->eta());
+    }
+    Hist(  "jet_ak4_"+flavourString+"_all",             directory.c_str())->Fill(itJet->pt(), itJet->eta());
+  }
+  
+}
+
+
+
+void BTaggingScaleTool::fillEfficienciesDeepCSV( const UZH::JetVec& vJets, std::string channel ) {
+  //std::cout << "BTaggingScaleTool::fillEfficienciesDeepCSV - vJets.size() = " << vJets.size() << std::endl; 
+  
+  std::string directory = m_effHistDirectory+"_DeepCSV";
+  if(channel!="") directory=directory+"_"+channel;
+  for(std::vector< UZH::Jet>::const_iterator itJet = vJets.begin(); itJet < vJets.end(); ++itJet){
     TString flavourString = flavourToString(itJet->hadronFlavour());
     if(isTagged(*itJet)){
       Hist("jet_ak4_"+flavourString+"_"+m_workingPoint, directory.c_str())->Fill(itJet->pt(), itJet->eta());
@@ -428,13 +454,19 @@ TString BTaggingScaleTool::flavourToString( const int& flavour ) {
 
 
 bool BTaggingScaleTool::isTagged( const UZH::Jet& jet ) {
-  return jet.csv() > currentWorkingPointCut;
+  return jet.csv() > m_currentWP_CsvCut;
 }
 
-
+bool BTaggingScaleTool::isTaggedDeepCSV( const UZH::Jet& jet ) {
+  return jet.csv() > m_currentWP_deepCsvCut;
+}
 
 bool BTaggingScaleTool::isTagged( const double csv ) {
-  return csv > currentWorkingPointCut;
+  return csv > m_currentWP_CsvCut;
+}
+
+bool BTaggingScaleTool::isTaggedDeepCSV( const double csv ) {
+  return csv > m_currentWP_deepCsvCut;
 }
 
 

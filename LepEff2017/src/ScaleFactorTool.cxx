@@ -27,6 +27,7 @@ ScaleFactorTool::ScaleFactorTool(SCycleBase* parent, const char* name ):
 //   DeclareProperty( m_name+"_EleTauTrig_EleLeg", m_File_EleTauTrig_EleLeg = "$SFRAME_DIR/../LepEff2017/data/Electron/Run2016BtoH/Electron_Ele24_eff.root"                 );
 //   DeclareProperty( m_name+"_EleTauTrig_TauLeg", m_File_EleTauTrig_TauLeg = "$SFRAME_DIR/../LepEff2017/data/Electron/Run2016BtoH/Electron_TauWPLooseIsoPF.root"           );
   DeclareProperty( m_name+"_File_EleId",        m_File_EleId            = "$SFRAME_DIR/../LepEff2017/data/Electron/Run2017BtoF/EGM2D_runBCDEF_passingMVA94Xwp80noiso.root"    );
+  DeclareProperty( m_name+"_File_EleId",        m_File_EleReco          = "$SFRAME_DIR/../LepEff2017/data/Electron/Run2017BtoF/EGM2D_runBCDEF_passingRECO.root"               );
   DeclareProperty( m_name+"_Hist_EleId",        m_Hist_EleId            = "EGamma_SF2D"                                                                                       );
 }
 
@@ -42,13 +43,15 @@ void ScaleFactorTool::BeginInputData( const SInputData& ) throw( SError ) {
   //m_logger << INFO << "Efficiency file MuTau Trig Mu Leg:  "    << m_File_MuTauTrig_MuLeg   << SLogger::endmsg;
   //m_logger << INFO << "Efficiency file MuTau Trig Tau Leg: "    << m_File_MuTauTrig_TauLeg  << SLogger::endmsg;
   //m_logger << INFO << "Efficiency file Mu IdIso:       "        << m_File_MuIdIso           << SLogger::endmsg;
+  m_logger << INFO << "Efficiency file Ele Id:         "        << m_File_EleId             << SLogger::endmsg;
+  m_logger << INFO << "Efficiency file Ele Reco:       "        << m_File_EleReco           << SLogger::endmsg;
   //m_logger << INFO << "Efficiency file Ele Trig:       "        << m_File_EleTrig           << SLogger::endmsg;
   //m_logger << INFO << "Efficiency file EleTau Trig Ele Leg: "   << m_File_EleTauTrig_EleLeg << SLogger::endmsg;
   //m_logger << INFO << "Efficiency file EleTau Trig Tau Leg: "   << m_File_EleTauTrig_TauLeg << SLogger::endmsg;
   //m_logger << INFO << "Efficiency file Ele IdIso:      "        << m_File_EleIdIso          << SLogger::endmsg;
   
-  m_ScaleFactor_Mu27Trig        = new ScaleFactor( m_File_Mu27Trig, m_Hist_Mu27Trig, true );
-  m_ScaleFactor_MuId            = new ScaleFactorJSON( m_File_MuId, m_WP_MuId );
+  m_ScaleFactor_Mu27Trig        = new ScaleFactor( m_File_Mu27Trig,  m_Hist_Mu27Trig, true );
+  m_ScaleFactor_MuId            = new ScaleFactorJSON( m_File_MuId,  m_WP_MuId );
   m_ScaleFactor_MuIso           = new ScaleFactorJSON( m_File_MuIso, m_WP_MuIso );
   
   //m_ScaleFactor_Mu22Trig          = new ScaleFactor( m_File_Mu22Trig );
@@ -57,7 +60,8 @@ void ScaleFactorTool::BeginInputData( const SInputData& ) throw( SError ) {
   //m_ScaleFactor_MuTauTrig_TauLeg  = new ScaleFactorTau( m_File_MuTauTrig_TauLeg );
   //m_logger << INFO << "Scale factor Mu22, Mu24, MuTau triggers initialised" << SLogger:: endmsg;
   
-  m_ScaleFactor_EleId           = new ScaleFactor( m_File_EleId, m_Hist_EleId );
+  m_ScaleFactor_EleId           = new ScaleFactor( m_File_EleId,   m_Hist_EleId );
+  m_ScaleFactor_EleReco         = new ScaleFactor( m_File_EleReco, m_Hist_EleId );
   //m_ScaleFactor_EleTrig           = new ScaleFactor( m_File_EleTrig );
   //m_ScaleFactor_EleTauTrig_EleLeg = new ScaleFactor(    m_File_EleTauTrig_EleLeg );
   //m_ScaleFactor_EleTauTrig_TauLeg = new ScaleFactorTau( m_File_EleTauTrig_TauLeg );
@@ -349,7 +353,7 @@ float ScaleFactorTool::get_ScaleFactor_MuIso(double pt, double eta){
 
 
 float ScaleFactorTool::get_ScaleFactor_EleIdIso(double pt, double eta){
-  return m_ScaleFactor_EleId->get_ScaleFactor(pt,eta); //*m_ScaleFactor_EleIso->get_ScaleFactor(pt,eta);
+  return m_ScaleFactor_EleId->get_ScaleFactor(pt,eta)*m_ScaleFactor_EleReco->get_ScaleFactor(pt,eta);;
 }
 
 

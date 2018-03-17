@@ -37,8 +37,6 @@ class ScaleFactorTool : public SToolBase {
     float get_ScaleFactor_MuIso(    double pt, double eta );
     std::string m_File_Mu27Trig;
     std::string m_Hist_Mu27Trig;
-    std::string m_File_EleId;
-    std::string m_Hist_EleId;
     //float get_Efficiency_MuTauTrig_MC(   double pt1, double eta1, double pt2, double eta2, int dm, bool isRealTau,   std::string triggerFlags="mt" );
     //float get_Efficiency_MuTauTrig_Data( double pt1, double eta1, double pt2, double eta2, int dm, bool isRealTau,   std::string triggerFlags="mt" );
     //float get_ScaleFactor_MuTauTrig(     double pt1, double eta1, double pt2, double eta2, int dm, int genmatch_2=5, std::string triggerFlags="mt" );
@@ -67,6 +65,9 @@ class ScaleFactorTool : public SToolBase {
     //std::string m_File_EleTauTrig_EleLeg;
     //std::string m_File_EleTauTrig_TauLeg;
     //std::string m_File_EleIdIso;
+    std::string m_File_EleId;
+    std::string m_File_EleReco;
+    std::string m_Hist_EleId;
         
     bool verbose = true;
     
@@ -76,7 +77,6 @@ class ScaleFactorTool : public SToolBase {
     
     std::string m_name;
     ScaleFactor* m_ScaleFactor_Mu27Trig;
-    ScaleFactor* m_ScaleFactor_EleId;
     //ScaleFactor* m_ScaleFactor_Mu22Trig;
     //ScaleFactor* m_ScaleFactor_Mu24Trig;
     //ScaleFactor* m_ScaleFactor_MuTauTrig_MuLeg;
@@ -88,6 +88,8 @@ class ScaleFactorTool : public SToolBase {
     //ScaleFactor* m_ScaleFactor_EleTauTrig_EleLeg;
     //ScaleFactorTau* m_ScaleFactor_EleTauTrig_TauLeg;
     //ScaleFactor* m_ScaleFactor_EleIdIso;
+    ScaleFactor* m_ScaleFactor_EleId;
+    ScaleFactor* m_ScaleFactor_EleReco;
      
     
 };

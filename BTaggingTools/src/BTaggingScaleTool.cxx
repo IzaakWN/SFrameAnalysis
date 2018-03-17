@@ -336,7 +336,7 @@ void BTaggingScaleTool::bookHistograms() {
   const int nEtaBins = 4;
   float ptBins[nPtBins+1] = {10, 20, 30, 50, 70, 100, 140, 200, 300, 670, 1000, 1500};
   float etaBins[nEtaBins+1] = {-2.5, -1.5, 0, 1.5, 2.5};
-  std::string directories[3] = { m_effHistDirectory, m_effHistDirectory+"_mutau", m_effHistDirectory+"_etau",
+  std::string directories[4] = { m_effHistDirectory, m_effHistDirectory+"_mutau", //m_effHistDirectory+"_etau",
                                  m_effHistDirectory+"_DeepCSV", m_effHistDirectory+"_DeepCSV_mutau" };
   
   for(const std::string &directory: directories){
@@ -377,7 +377,7 @@ void BTaggingScaleTool::fillEfficienciesDeepCSV( const UZH::JetVec& vJets, std::
   if(channel!="") directory=directory+"_"+channel;
   for(std::vector< UZH::Jet>::const_iterator itJet = vJets.begin(); itJet < vJets.end(); ++itJet){
     TString flavourString = flavourToString(itJet->hadronFlavour());
-    if(isTagged(*itJet)){
+    if(isTaggedDeepCSV(*itJet)){
       Hist("jet_ak4_"+flavourString+"_"+m_workingPoint, directory.c_str())->Fill(itJet->pt(), itJet->eta());
     }
     Hist(  "jet_ak4_"+flavourString+"_all",             directory.c_str())->Fill(itJet->pt(), itJet->eta());

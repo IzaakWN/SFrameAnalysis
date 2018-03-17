@@ -39,10 +39,10 @@ Tau::Tau( const Ntuple::TauNtupleObject* ana, const Int_t idx ) : Basic( idx ), 
     if (ana->m_connectsucceeded[15]) m_againstMuonTight3 = ((*ana->againstMuonTight3)[idx]); else m_againstMuonTight3 = 0; 
     if (ana->m_connectsucceeded[16]) m_againstElectronMVA6raw = &((*ana->againstElectronMVA6raw)[idx]); else m_againstElectronMVA6raw = 0; 
     if (ana->m_connectsucceeded[17]) m_againstElectronMVA6category = &((*ana->againstElectronMVA6category)[idx]); else m_againstElectronMVA6category = 0; 
-    if (ana->m_connectsucceeded[18]) m_byLooseCombinedIsolationDeltaBetaCorr3Hits = ((*ana->byLooseCombinedIsolationDeltaBetaCorr3Hits)[idx]); else m_byLooseCombinedIsolationDeltaBetaCorr3Hits = 0; 
-    if (ana->m_connectsucceeded[19]) m_byMediumCombinedIsolationDeltaBetaCorr3Hits = ((*ana->byMediumCombinedIsolationDeltaBetaCorr3Hits)[idx]); else m_byMediumCombinedIsolationDeltaBetaCorr3Hits = 0; 
-    if (ana->m_connectsucceeded[20]) m_byTightCombinedIsolationDeltaBetaCorr3Hits = ((*ana->byTightCombinedIsolationDeltaBetaCorr3Hits)[idx]); else m_byTightCombinedIsolationDeltaBetaCorr3Hits = 0; 
-    if (ana->m_connectsucceeded[21]) m_byCombinedIsolationDeltaBetaCorrRaw3Hits = ((*ana->byCombinedIsolationDeltaBetaCorrRaw3Hits)[idx]); else m_byCombinedIsolationDeltaBetaCorrRaw3Hits = 0; 
+    if (ana->m_connectsucceeded[18]) m_byCombinedIsolationDeltaBetaCorrRaw3Hits = &((*ana->byCombinedIsolationDeltaBetaCorrRaw3Hits)[idx]); else m_byCombinedIsolationDeltaBetaCorrRaw3Hits = 0; 
+    if (ana->m_connectsucceeded[19]) m_byLooseCombinedIsolationDeltaBetaCorr3Hits = ((*ana->byLooseCombinedIsolationDeltaBetaCorr3Hits)[idx]); else m_byLooseCombinedIsolationDeltaBetaCorr3Hits = 0; 
+    if (ana->m_connectsucceeded[20]) m_byMediumCombinedIsolationDeltaBetaCorr3Hits = ((*ana->byMediumCombinedIsolationDeltaBetaCorr3Hits)[idx]); else m_byMediumCombinedIsolationDeltaBetaCorr3Hits = 0; 
+    if (ana->m_connectsucceeded[21]) m_byTightCombinedIsolationDeltaBetaCorr3Hits = ((*ana->byTightCombinedIsolationDeltaBetaCorr3Hits)[idx]); else m_byTightCombinedIsolationDeltaBetaCorr3Hits = 0; 
     if (ana->m_connectsucceeded[22]) m_byIsolationMVArun2v1DBdR03oldDMwLTraw = &((*ana->byIsolationMVArun2v1DBdR03oldDMwLTraw)[idx]); else m_byIsolationMVArun2v1DBdR03oldDMwLTraw = 0; 
     if (ana->m_connectsucceeded[23]) m_byIsolationMVArun2v1DBnewDMwLTraw = &((*ana->byIsolationMVArun2v1DBnewDMwLTraw)[idx]); else m_byIsolationMVArun2v1DBnewDMwLTraw = 0; 
     if (ana->m_connectsucceeded[24]) m_byIsolationMVArun2v1DBoldDMwLTraw = &((*ana->byIsolationMVArun2v1DBoldDMwLTraw)[idx]); else m_byIsolationMVArun2v1DBoldDMwLTraw = 0; 
@@ -128,10 +128,10 @@ ostream& operator<<( ostream& out, const Tau& rhs ) {
     out << " againstMuonTight3 " << rhs.againstMuonTight3(); 
     out << " againstElectronMVA6raw " << rhs.againstElectronMVA6raw(); 
     out << " againstElectronMVA6category " << rhs.againstElectronMVA6category(); 
+    out << " byCombinedIsolationDeltaBetaCorrRaw3Hits " << rhs.byCombinedIsolationDeltaBetaCorrRaw3Hits(); 
     out << " byLooseCombinedIsolationDeltaBetaCorr3Hits " << rhs.byLooseCombinedIsolationDeltaBetaCorr3Hits(); 
     out << " byMediumCombinedIsolationDeltaBetaCorr3Hits " << rhs.byMediumCombinedIsolationDeltaBetaCorr3Hits(); 
     out << " byTightCombinedIsolationDeltaBetaCorr3Hits " << rhs.byTightCombinedIsolationDeltaBetaCorr3Hits(); 
-    out << " byCombinedIsolationDeltaBetaCorrRaw3Hits " << rhs.byCombinedIsolationDeltaBetaCorrRaw3Hits(); 
     out << " byIsolationMVArun2v1DBdR03oldDMwLTraw " << rhs.byIsolationMVArun2v1DBdR03oldDMwLTraw(); 
     out << " byIsolationMVArun2v1DBnewDMwLTraw " << rhs.byIsolationMVArun2v1DBnewDMwLTraw(); 
     out << " byIsolationMVArun2v1DBoldDMwLTraw " << rhs.byIsolationMVArun2v1DBoldDMwLTraw(); 

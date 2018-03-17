@@ -54,10 +54,10 @@ namespace UZH {
     bool m_againstMuonTight3;
     floatingnumber* m_againstElectronMVA6raw;
     floatingnumber* m_againstElectronMVA6category;
+    floatingnumber* m_byCombinedIsolationDeltaBetaCorrRaw3Hits;
     bool m_byLooseCombinedIsolationDeltaBetaCorr3Hits;
     bool m_byMediumCombinedIsolationDeltaBetaCorr3Hits;
     bool m_byTightCombinedIsolationDeltaBetaCorr3Hits;
-    bool m_byCombinedIsolationDeltaBetaCorrRaw3Hits;
     floatingnumber* m_byIsolationMVArun2v1DBdR03oldDMwLTraw;
     floatingnumber* m_byIsolationMVArun2v1DBnewDMwLTraw;
     floatingnumber* m_byIsolationMVArun2v1DBoldDMwLTraw;
@@ -96,7 +96,7 @@ namespace UZH {
     floatingnumber* m_byPhotonPtSumOutsideSignalCone;
     floatingnumber* m_chargedPionPt;
     floatingnumber* m_neutralPionPt;
-    floatingnumber* m_nPhoton;
+    int* m_nPhoton;
     floatingnumber* m_ptWeightedDetaStrip;
     floatingnumber* m_ptWeightedDphiStrip;
     floatingnumber* m_ptWeightedDrSignal;
@@ -129,10 +129,10 @@ namespace UZH {
     bool againstMuonTight3() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kagainstMuonTight3)) std::cout<<"againstMuonTight3 not connected!"<<std::endl;*/ return (m_againstMuonTight3); } 
     floatingnumber againstElectronMVA6raw() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kagainstElectronMVA6raw)) std::cout<<"againstElectronMVA6raw not connected!"<<std::endl;*/ return *(m_againstElectronMVA6raw); } 
     floatingnumber againstElectronMVA6category() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kagainstElectronMVA6category)) std::cout<<"againstElectronMVA6category not connected!"<<std::endl;*/ return *(m_againstElectronMVA6category); } 
+    floatingnumber byCombinedIsolationDeltaBetaCorrRaw3Hits() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyCombinedIsolationDeltaBetaCorrRaw3Hits)) std::cout<<"byCombinedIsolationDeltaBetaCorrRaw3Hits not connected!"<<std::endl;*/ return *(m_byCombinedIsolationDeltaBetaCorrRaw3Hits); } 
     bool byLooseCombinedIsolationDeltaBetaCorr3Hits() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyLooseCombinedIsolationDeltaBetaCorr3Hits)) std::cout<<"byLooseCombinedIsolationDeltaBetaCorr3Hits not connected!"<<std::endl;*/ return (m_byLooseCombinedIsolationDeltaBetaCorr3Hits); } 
     bool byMediumCombinedIsolationDeltaBetaCorr3Hits() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyMediumCombinedIsolationDeltaBetaCorr3Hits)) std::cout<<"byMediumCombinedIsolationDeltaBetaCorr3Hits not connected!"<<std::endl;*/ return (m_byMediumCombinedIsolationDeltaBetaCorr3Hits); } 
     bool byTightCombinedIsolationDeltaBetaCorr3Hits() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyTightCombinedIsolationDeltaBetaCorr3Hits)) std::cout<<"byTightCombinedIsolationDeltaBetaCorr3Hits not connected!"<<std::endl;*/ return (m_byTightCombinedIsolationDeltaBetaCorr3Hits); } 
-    bool byCombinedIsolationDeltaBetaCorrRaw3Hits() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyCombinedIsolationDeltaBetaCorrRaw3Hits)) std::cout<<"byCombinedIsolationDeltaBetaCorrRaw3Hits not connected!"<<std::endl;*/ return (m_byCombinedIsolationDeltaBetaCorrRaw3Hits); } 
     floatingnumber byIsolationMVArun2v1DBdR03oldDMwLTraw() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyIsolationMVArun2v1DBdR03oldDMwLTraw)) std::cout<<"byIsolationMVArun2v1DBdR03oldDMwLTraw not connected!"<<std::endl;*/ return *(m_byIsolationMVArun2v1DBdR03oldDMwLTraw); } 
     floatingnumber byIsolationMVArun2v1DBnewDMwLTraw() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyIsolationMVArun2v1DBnewDMwLTraw)) std::cout<<"byIsolationMVArun2v1DBnewDMwLTraw not connected!"<<std::endl;*/ return *(m_byIsolationMVArun2v1DBnewDMwLTraw); } 
     floatingnumber byIsolationMVArun2v1DBoldDMwLTraw() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyIsolationMVArun2v1DBoldDMwLTraw)) std::cout<<"byIsolationMVArun2v1DBoldDMwLTraw not connected!"<<std::endl;*/ return *(m_byIsolationMVArun2v1DBoldDMwLTraw); } 
@@ -171,7 +171,7 @@ namespace UZH {
     floatingnumber byPhotonPtSumOutsideSignalCone() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyPhotonPtSumOutsideSignalCone)) std::cout<<"byPhotonPtSumOutsideSignalCone not connected!"<<std::endl;*/ return *(m_byPhotonPtSumOutsideSignalCone); } 
     floatingnumber chargedPionPt() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kchargedPionPt)) std::cout<<"chargedPionPt not connected!"<<std::endl;*/ return *(m_chargedPionPt); } 
     floatingnumber neutralPionPt() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kneutralPionPt)) std::cout<<"neutralPionPt not connected!"<<std::endl;*/ return *(m_neutralPionPt); } 
-    floatingnumber nPhoton() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::knPhoton)) std::cout<<"nPhoton not connected!"<<std::endl;*/ return *(m_nPhoton); } 
+    int nPhoton() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::knPhoton)) std::cout<<"nPhoton not connected!"<<std::endl;*/ return *(m_nPhoton); } 
     floatingnumber ptWeightedDetaStrip() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kptWeightedDetaStrip)) std::cout<<"ptWeightedDetaStrip not connected!"<<std::endl;*/ return *(m_ptWeightedDetaStrip); } 
     floatingnumber ptWeightedDphiStrip() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kptWeightedDphiStrip)) std::cout<<"ptWeightedDphiStrip not connected!"<<std::endl;*/ return *(m_ptWeightedDphiStrip); } 
     floatingnumber ptWeightedDrSignal() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kptWeightedDrSignal)) std::cout<<"ptWeightedDrSignal not connected!"<<std::endl;*/ return *(m_ptWeightedDrSignal); } 
@@ -203,10 +203,10 @@ namespace UZH {
     void againstMuonTight3( const bool& val){ (m_againstMuonTight3)=val; } 
     void againstElectronMVA6raw( const floatingnumber& val){ *(m_againstElectronMVA6raw)=val; } 
     void againstElectronMVA6category( const floatingnumber& val){ *(m_againstElectronMVA6category)=val; } 
+    void byCombinedIsolationDeltaBetaCorrRaw3Hits( const floatingnumber& val){ *(m_byCombinedIsolationDeltaBetaCorrRaw3Hits)=val; } 
     void byLooseCombinedIsolationDeltaBetaCorr3Hits( const bool& val){ (m_byLooseCombinedIsolationDeltaBetaCorr3Hits)=val; } 
     void byMediumCombinedIsolationDeltaBetaCorr3Hits( const bool& val){ (m_byMediumCombinedIsolationDeltaBetaCorr3Hits)=val; } 
     void byTightCombinedIsolationDeltaBetaCorr3Hits( const bool& val){ (m_byTightCombinedIsolationDeltaBetaCorr3Hits)=val; } 
-    void byCombinedIsolationDeltaBetaCorrRaw3Hits( const bool& val){ (m_byCombinedIsolationDeltaBetaCorrRaw3Hits)=val; } 
     void byIsolationMVArun2v1DBdR03oldDMwLTraw( const floatingnumber& val){ *(m_byIsolationMVArun2v1DBdR03oldDMwLTraw)=val; } 
     void byIsolationMVArun2v1DBnewDMwLTraw( const floatingnumber& val){ *(m_byIsolationMVArun2v1DBnewDMwLTraw)=val; } 
     void byIsolationMVArun2v1DBoldDMwLTraw( const floatingnumber& val){ *(m_byIsolationMVArun2v1DBoldDMwLTraw)=val; } 
@@ -245,7 +245,7 @@ namespace UZH {
     void byPhotonPtSumOutsideSignalCone( const floatingnumber& val){ *(m_byPhotonPtSumOutsideSignalCone)=val; } 
     void chargedPionPt( const floatingnumber& val){ *(m_chargedPionPt)=val; } 
     void neutralPionPt( const floatingnumber& val){ *(m_neutralPionPt)=val; } 
-    void nPhoton( const floatingnumber& val){ *(m_nPhoton)=val; } 
+    void nPhoton( const int& val){ *(m_nPhoton)=val; } 
     void ptWeightedDetaStrip( const floatingnumber& val){ *(m_ptWeightedDetaStrip)=val; } 
     void ptWeightedDphiStrip( const floatingnumber& val){ *(m_ptWeightedDphiStrip)=val; } 
     void ptWeightedDrSignal( const floatingnumber& val){ *(m_ptWeightedDrSignal)=val; } 

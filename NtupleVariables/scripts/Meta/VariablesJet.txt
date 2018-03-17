@@ -7,6 +7,8 @@
 #
 
 Basic	floatingnumber*	csv
+Basic	floatingnumber*	deep_csv_b
+Basic	floatingnumber*	deep_csv_bb
 Basic	int*	charge
 
 Analysis	bool	IDLoose

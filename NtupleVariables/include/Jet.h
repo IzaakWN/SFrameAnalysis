@@ -71,6 +71,8 @@ namespace UZH {
     floatingnumber* m_nemf;
     floatingnumber* m_cemf;
     floatingnumber* m_csv;
+    floatingnumber* m_deep_csv_b;
+    floatingnumber* m_deep_csv_bb;
     int* m_charge;
     floatingnumber* m_jer_sf;
     floatingnumber* m_jer_sf_up;
@@ -115,6 +117,8 @@ namespace UZH {
     floatingnumber nemf() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::knemf)) std::cout<<"nemf not connected!"<<std::endl;*/ return *(m_nemf); } 
     floatingnumber cemf() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::kcemf)) std::cout<<"cemf not connected!"<<std::endl;*/ return *(m_cemf); } 
     floatingnumber csv() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::kcsv)) std::cout<<"csv not connected!"<<std::endl;*/ return *(m_csv); } 
+    floatingnumber deep_csv_b() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::kdeep_csv_b)) std::cout<<"deep_csv_b not connected!"<<std::endl;*/ return *(m_deep_csv_b); } 
+    floatingnumber deep_csv_bb() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::kdeep_csv_bb)) std::cout<<"deep_csv_bb not connected!"<<std::endl;*/ return *(m_deep_csv_bb); } 
     int charge() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::kcharge)) std::cout<<"charge not connected!"<<std::endl;*/ return *(m_charge); } 
     floatingnumber jer_sf() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::kjer_sf)) std::cout<<"jer_sf not connected!"<<std::endl;*/ return *(m_jer_sf); } 
     floatingnumber jer_sf_up() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::kjer_sf_up)) std::cout<<"jer_sf_up not connected!"<<std::endl;*/ return *(m_jer_sf_up); } 
@@ -150,6 +154,8 @@ namespace UZH {
     void nemf( const floatingnumber& val){ *(m_nemf)=val; } 
     void cemf( const floatingnumber& val){ *(m_cemf)=val; } 
     void csv( const floatingnumber& val){ *(m_csv)=val; } 
+    void deep_csv_b( const floatingnumber& val){ *(m_deep_csv_b)=val; } 
+    void deep_csv_bb( const floatingnumber& val){ *(m_deep_csv_bb)=val; } 
     void charge( const int& val){ *(m_charge)=val; } 
     void jer_sf( const floatingnumber& val){ *(m_jer_sf)=val; } 
     void jer_sf_up( const floatingnumber& val){ *(m_jer_sf_up)=val; } 

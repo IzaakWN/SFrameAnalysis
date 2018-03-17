@@ -54,10 +54,10 @@ namespace Ntuple {
       setConnectSucceeded(15, ConnectVariable( treeName, prefix + m_objectNames.getName("againstMuonTight3"), againstMuonTight3));
       setConnectSucceeded(16, ConnectVariable( treeName, prefix + m_objectNames.getName("againstElectronMVA6raw"), againstElectronMVA6raw));
       setConnectSucceeded(17, ConnectVariable( treeName, prefix + m_objectNames.getName("againstElectronMVA6category"), againstElectronMVA6category));
-      setConnectSucceeded(18, ConnectVariable( treeName, prefix + m_objectNames.getName("byLooseCombinedIsolationDeltaBetaCorr3Hits"), byLooseCombinedIsolationDeltaBetaCorr3Hits));
-      setConnectSucceeded(19, ConnectVariable( treeName, prefix + m_objectNames.getName("byMediumCombinedIsolationDeltaBetaCorr3Hits"), byMediumCombinedIsolationDeltaBetaCorr3Hits));
-      setConnectSucceeded(20, ConnectVariable( treeName, prefix + m_objectNames.getName("byTightCombinedIsolationDeltaBetaCorr3Hits"), byTightCombinedIsolationDeltaBetaCorr3Hits));
-      setConnectSucceeded(21, ConnectVariable( treeName, prefix + m_objectNames.getName("byCombinedIsolationDeltaBetaCorrRaw3Hits"), byCombinedIsolationDeltaBetaCorrRaw3Hits));
+      setConnectSucceeded(18, ConnectVariable( treeName, prefix + m_objectNames.getName("byCombinedIsolationDeltaBetaCorrRaw3Hits"), byCombinedIsolationDeltaBetaCorrRaw3Hits));
+      setConnectSucceeded(19, ConnectVariable( treeName, prefix + m_objectNames.getName("byLooseCombinedIsolationDeltaBetaCorr3Hits"), byLooseCombinedIsolationDeltaBetaCorr3Hits));
+      setConnectSucceeded(20, ConnectVariable( treeName, prefix + m_objectNames.getName("byMediumCombinedIsolationDeltaBetaCorr3Hits"), byMediumCombinedIsolationDeltaBetaCorr3Hits));
+      setConnectSucceeded(21, ConnectVariable( treeName, prefix + m_objectNames.getName("byTightCombinedIsolationDeltaBetaCorr3Hits"), byTightCombinedIsolationDeltaBetaCorr3Hits));
       setConnectSucceeded(22, ConnectVariable( treeName, prefix + m_objectNames.getName("byIsolationMVArun2v1DBdR03oldDMwLTraw"), byIsolationMVArun2v1DBdR03oldDMwLTraw));
       setConnectSucceeded(23, ConnectVariable( treeName, prefix + m_objectNames.getName("byIsolationMVArun2v1DBnewDMwLTraw"), byIsolationMVArun2v1DBnewDMwLTraw));
       setConnectSucceeded(24, ConnectVariable( treeName, prefix + m_objectNames.getName("byIsolationMVArun2v1DBoldDMwLTraw"), byIsolationMVArun2v1DBoldDMwLTraw));

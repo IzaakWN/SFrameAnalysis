@@ -138,6 +138,8 @@ namespace Ntuple {
     // jets
     // flavour
     m_names["csv"] = "csv";
+    m_names["deep_csv_b"] = "deep_csv_b";
+    m_names["deep_csv_bb"] = "deep_csv_bb";
     m_names["flavour"] = "flavour";
     m_names["partonFlavour"] = "partonFlavour";
     m_names["hadronFlavour"] = "hadronFlavour";

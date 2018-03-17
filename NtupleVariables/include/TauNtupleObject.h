@@ -80,10 +80,10 @@ namespace Ntuple {
       kagainstMuonTight3 = 15,
       kagainstElectronMVA6raw = 16,
       kagainstElectronMVA6category = 17,
-      kbyLooseCombinedIsolationDeltaBetaCorr3Hits = 18,
-      kbyMediumCombinedIsolationDeltaBetaCorr3Hits = 19,
-      kbyTightCombinedIsolationDeltaBetaCorr3Hits = 20,
-      kbyCombinedIsolationDeltaBetaCorrRaw3Hits = 21,
+      kbyCombinedIsolationDeltaBetaCorrRaw3Hits = 18,
+      kbyLooseCombinedIsolationDeltaBetaCorr3Hits = 19,
+      kbyMediumCombinedIsolationDeltaBetaCorr3Hits = 20,
+      kbyTightCombinedIsolationDeltaBetaCorr3Hits = 21,
       kbyIsolationMVArun2v1DBdR03oldDMwLTraw = 22,
       kbyIsolationMVArun2v1DBnewDMwLTraw = 23,
       kbyIsolationMVArun2v1DBoldDMwLTraw = 24,
@@ -165,10 +165,10 @@ namespace Ntuple {
     std::vector< bool >  *againstMuonTight3;
     std::vector< floatingnumber >  *againstElectronMVA6raw;
     std::vector< floatingnumber >  *againstElectronMVA6category;
+    std::vector< floatingnumber >  *byCombinedIsolationDeltaBetaCorrRaw3Hits;
     std::vector< bool >  *byLooseCombinedIsolationDeltaBetaCorr3Hits;
     std::vector< bool >  *byMediumCombinedIsolationDeltaBetaCorr3Hits;
     std::vector< bool >  *byTightCombinedIsolationDeltaBetaCorr3Hits;
-    std::vector< bool >  *byCombinedIsolationDeltaBetaCorrRaw3Hits;
     std::vector< floatingnumber >  *byIsolationMVArun2v1DBdR03oldDMwLTraw;
     std::vector< floatingnumber >  *byIsolationMVArun2v1DBnewDMwLTraw;
     std::vector< floatingnumber >  *byIsolationMVArun2v1DBoldDMwLTraw;
@@ -207,7 +207,7 @@ namespace Ntuple {
     std::vector< floatingnumber >  *byPhotonPtSumOutsideSignalCone;
     std::vector< floatingnumber >  *chargedPionPt;
     std::vector< floatingnumber >  *neutralPionPt;
-    std::vector< floatingnumber >  *nPhoton;
+    std::vector< int >  *nPhoton;
     std::vector< floatingnumber >  *ptWeightedDetaStrip;
     std::vector< floatingnumber >  *ptWeightedDphiStrip;
     std::vector< floatingnumber >  *ptWeightedDrSignal;

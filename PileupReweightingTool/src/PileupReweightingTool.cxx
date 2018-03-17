@@ -49,14 +49,14 @@ void PileupReweightingTool::BeginInputData( const SInputData& ) throw( SError ) 
   }
   else m_logger << WARNING << "‎File " << m_DataRootFileName << " does not exist. Please check." << SLogger::endmsg;
   
-  TFile* DataRootFile80p0 = new TFile(m_DataRootFileName.c_str(), "READ");
+  TFile* DataRootFile80p0 = new TFile(m_DataRootFileName80p0.c_str(), "READ");
   if(DataRootFile80p0) {
       m_DataRootHist80p0 = (TH1F*)DataRootFile80p0->Get(m_DataRootHistName.c_str());
       if(m_DataRootHist) m_DataRootHist80p0->SetDirectory(0);
       else m_logger << WARNING << "‎Hist " << m_DataRootHistName << " does not exist. Please check." << SLogger::endmsg;
       DataRootFile80p0->Close();
   }
-  else m_logger << WARNING << "‎File " << m_DataRootFileName << " does not exist. Please check." << SLogger::endmsg;
+  else m_logger << WARNING << "‎File " << m_DataRootFileName80p0 << " does not exist. Please check." << SLogger::endmsg;
   
   // DataRootFileUp = new TFile(m_DataRootFileNameUp.c_str(), "READ");
   // if(DataRootFileUp) {

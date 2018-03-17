@@ -89,6 +89,7 @@ namespace UZH {
     bool           isTagged() const { return m_isTagged; }
     
     
+    floatingnumber deepCSV( ) const;
     floatingnumber getJetSF() const { return m_scalefactor; }
     void           scaleJES(  const floatingnumber scale);
     

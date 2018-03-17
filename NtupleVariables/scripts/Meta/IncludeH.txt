@@ -67,6 +67,7 @@ namespace UZH {
     bool           isTagged() const { return m_isTagged; }
     }}
     ${{Only:Jet:
+    floatingnumber deepCSV( ) const;
     floatingnumber getJetSF() const { return m_scalefactor; }
     void           scaleJES(  const floatingnumber scale);
     }}

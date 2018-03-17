@@ -163,6 +163,7 @@ TLorentzVector Jet::tlv() const {
 }
 
 
+floatingnumber Jet::deepCSV( ) const { return *(m_deep_csv_b)+*(m_deep_csv_bb); }
 void Jet::scaleJES( const floatingnumber ssigma ) {
   m_scalefactor = ssigma;
   if( fabs( ssigma ) < 1e-6 ) return; 

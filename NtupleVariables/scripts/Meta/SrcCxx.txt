@@ -102,6 +102,7 @@ TLorentzVector ${Object}::tlv() const {
 }
 }}
 ${{Only:Jet:
+floatingnumber ${Object}::deepCSV( ) const { return *(m_deep_csv_b)+*(m_deep_csv_bb); }
 void ${Object}::scaleJES( const floatingnumber ssigma ) {
   m_scalefactor = ssigma;
   if( fabs( ssigma ) < 1e-6 ) return; 

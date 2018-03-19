@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE JobConfiguration PUBLIC "" "JobConfig.dtd">
+<JobConfiguration JobName="TauTauAnalysisJob" OutputLevel="INFO">
+  <Library Name="libNtupleVariables" />
+  <Library Name="libGoodRunsLists" />
+  <Library Name="libPileupReweightingTool" />
+  <Library Name="libBTaggingTools" />
+  <Library Name="libTauTauResonancesEM" />
+  <Library Name="libScaleFactorTool" />
+  <Library Name="libRecoilCorrector" />
+  <Library Name="libJetCorrectionTool" />
+  <Library Name="libSVFitTool" />
+
+  <Package Name="SFrameCore.par" />
+  <Package Name="NtupleVariables.par" />
+  <Package Name="GoodRunsLists.par" />
+  <Package Name="PileupReweightingTool.par" />
+  <Package Name="BTaggingTools.par" />
+  <Package Name="TauTauResonancesEM.par" />
+  <Package Name="ScaleFactorTool.par" />
+  <Package Name="RecoilCorrector.par" />
+  <Package Name="JetCorrectionTool.par" />
+  <Package Name="SVFitTool.par" />
+
+  <Cycle Name="TauTauAnalysis" OutputDirectory="./" PostFix="" ProofServer="lite" ProofWorkDir="" RunMode="LOCAL" TargetLumi="1.0">
+    <InputData Lumi="0.0" NEventsMax="100000" Type="TTTo2L2Nu" Version="UZH" SkipValid="False">
+
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_92v2_preliminary_JEC_V6/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/180304_105813/0000/flatTuple_78.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_92v2_preliminary_JEC_V6/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/180304_105813/0000/flatTuple_224.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_92v2_preliminary_JEC_V6/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/180304_105813/0000/flatTuple_319.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_92v2_preliminary_JEC_V6/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/180304_105813/0000/flatTuple_325.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_92v2_preliminary_JEC_V6/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/180304_105813/0000/flatTuple_335.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_92v2_preliminary_JEC_V6/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/180304_105813/0000/flatTuple_354.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_92v2_preliminary_JEC_V6/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/180304_105813/0000/flatTuple_403.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_92v2_preliminary_JEC_V6/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/180304_105813/0000/flatTuple_470.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_92v2_preliminary_JEC_V6/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/180304_105813/0000/flatTuple_515.root" Lumi="1.0" />
+<!-- 
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_92v2_preliminary_JEC_V6/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/180304_105813/0000/flatTuple_560.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_92v2_preliminary_JEC_V6/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/180304_105813/0000/flatTuple_665.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_92v2_preliminary_JEC_V6/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/180304_105813/0000/flatTuple_762.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_92v2_preliminary_JEC_V6/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/180304_105813/0000/flatTuple_910.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_92v2_preliminary_JEC_V6/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/180304_105813/0001/flatTuple_1014.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_92v2_preliminary_JEC_V6/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/180304_105813/0001/flatTuple_1029.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_92v2_preliminary_JEC_V6/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/180304_105813/0001/flatTuple_1092.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_92v2_preliminary_JEC_V6/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/180304_105813/0001/flatTuple_1126.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_92v2_preliminary_JEC_V6/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/180304_105813/0001/flatTuple_1132.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_92v2_preliminary_JEC_V6/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/180304_105813/0001/flatTuple_1178.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_92v2_preliminary_JEC_V6/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/180304_105813/0001/flatTuple_1188.root" Lumi="1.0" />
+ -->
+
+      <InputTree Name="ntuplizer/tree" />
+      <OutputTree Name="tree_emu" />
+    </InputData>
+  <UserConfig>
+    <Item Name="RecoTreeName"               Value="tree"/>
+    <Item Name="doSVFit"                    Value="False"/>
+    <Item Name="IsSignal"                   Value="False"/>
+    <Item Name="doRecoilCorr"               Value="False"/>
+    <Item Name="doTTpt"                     Value="True"/>
+    <Item Name="doJEC"                      Value="False"/>
+    <Item Name="JTFshift"                   Value="0.15"/>
+  </UserConfig>
+  </Cycle>
+</JobConfiguration>
+
+
+

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE JobConfiguration PUBLIC "" "JOBCONFIG">
+<JobConfiguration JobName="JOBNAME" OutputLevel="OUTPUTLEVEL">
+LIBRARIES
+PACKAGES
+  <Cycle Name="CYCLENAME" RunMode="RUNMODE" UseTreeCache="True" TreeCacheSize="30000000" TreeCacheLearnEntries="10" ProofServer="PROOFSERVER" ProofWorkDir="PROOFWORKDIR" OutputDirectory="OUTPUTDIR" PostFix="POSTFIX" TargetLumi="TARGETLUMI">
+INPUTDATA
+    <UserConfig>
+USERITEMS
+    </UserConfig>
+  </Cycle>
+</JobConfiguration>

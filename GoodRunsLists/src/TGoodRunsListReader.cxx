@@ -1,23 +1,6 @@
 // $Id: TGoodRunsListReader.cxx 45093 2010-08-20 11:58:27Z krasznaa $
 
-// System include(s):
-#include <cstdlib>
-#include <fstream>
-
-// STL include(s):
-#include <string>
-
-// ROOT include(s):
-#include "TDOMParser.h"
-#include "TXMLNode.h"
-#include "TXMLDocument.h"
-#include "TXMLAttr.h"
-#include "TList.h"
-
-// Local include(s):
 #include "../include/TGoodRunsListReader.h"
-#include "../include/TLumiBlockRange.h"
-#include "../include/StrUtil.h"
 
 using namespace std;
 
@@ -31,7 +14,8 @@ namespace Root {
 
    TGoodRunsListReader::TGoodRunsListReader( const TString& dataCardName, Bool_t checkGRLInfo )
       : TObject(), m_logger( "TGoodRunsListReader" ) {
-
+      
+      //m_logger << INFO << "TGoodRunsListReader:1 " << dataCardName << SLogger::endmsg;
       m_dataCardList.push_back( dataCardName );
       m_grlvec.SetCheckGRLInfo( checkGRLInfo );
    }
@@ -48,7 +32,7 @@ namespace Root {
    }
 
    Bool_t TGoodRunsListReader::Interpret() {
-
+      
       Bool_t jsonInterpret( kTRUE );
 
       if( m_dataCardList.empty() && m_xmlstringList.empty() ) {
@@ -64,11 +48,12 @@ namespace Root {
       Json::Value jsonRoot;
 
       //////////////////////////////////////////////////////////////////////
-
+      
       // --------------- xml file read
       for( unsigned int j = 0; j < m_dataCardList.size() && jsonInterpret; ++j ) {
          m_dataCardName = m_dataCardList[ j ];
-
+         //m_logger << INFO << "Interpret: " << dataCardName << SLogger::endmsg;
+         
          if( ! m_dataCardName.IsNull() ) {
             m_logger << DEBUG << "Read xml data-card: \"" << m_dataCardName
                      << "\"" << SLogger::endmsg;

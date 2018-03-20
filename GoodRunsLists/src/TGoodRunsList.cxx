@@ -32,13 +32,13 @@ namespace Root {
         m_prevLB( other.m_prevLB ) {
 
    }
-
+   
    TGoodRunsList& TGoodRunsList::operator=( const TGoodRunsList& other ) {
-
+      
       if( &other == this ) {
          return *this;
       }
-
+      
       std::map< Int_t, TGoodRun >::operator=( other );
       TNamed::operator=( other );
       m_version = other.m_version;
@@ -48,7 +48,7 @@ namespace Root {
       m_hasLB = other.m_hasLB;
       m_prevRun = other.m_prevRun;
       m_prevLB = other.m_prevLB;
-
+      
       return *this ;
    }
 
@@ -66,9 +66,9 @@ namespace Root {
             return;
          }
       }
-
+      
       const TGoodRunsList& diffgrl = this->GetPartOnlyIn( other );
-
+      
       std::map< Int_t, TGoodRun >::const_iterator itr;
       // Store diffgrl goodrunslist
       for( itr = diffgrl.begin(); itr != diffgrl.end(); ++itr ) {

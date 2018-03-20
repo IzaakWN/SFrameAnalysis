@@ -3,6 +3,12 @@
 #ifndef SFRAME_GOODRUNSLISTS_TGoodRunsListReader_H
 #define SFRAME_GOODRUNSLISTS_TGoodRunsListReader_H
 
+// System include(s):
+#include <cstdlib>
+#include <fstream>
+#include <wordexp.h>
+//#include <regex>
+
 // STL include(s):
 #include <vector>
 #include <string>
@@ -10,6 +16,11 @@
 // ROOT include(s):
 #include "TObject.h"
 #include "TString.h"
+#include "TDOMParser.h"
+#include "TXMLNode.h"
+#include "TXMLDocument.h"
+#include "TXMLAttr.h"
+#include "TList.h"
 
 // JSON include(s):
 #include "../include/json.h"
@@ -21,6 +32,11 @@
 #include "TGRLCollection.h"
 #include "TGoodRun.h"
 #include "TGoodRunsList.h"
+#include "../include/TLumiBlockRange.h"
+#include "../include/StrUtil.h"
+
+
+
 
 // Forward declaration(s):
 class TXMLNode;

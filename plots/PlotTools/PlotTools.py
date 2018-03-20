@@ -1057,7 +1057,7 @@ class Plot2D(object):
     
 
 
-def isListOfHists(*args):
+def isListOfHists(args):
     """Help function to test if list of arguments is a list of histograms."""
     if not (isinstance(args,list) or isinstance(args,tuple)): return False
     for arg in args:
@@ -1086,20 +1086,23 @@ def unwrapHistogramLists(*args):
     if not variable and len(binning)>2:
       variable(varname,*binning[:3])
     
-    if isListOfHists(*args):
+    if isListOfHists(args):
         return variable, [ ], args, [ ]
     if len(args)==1:
-      if isListOfHists(*args[0]):
+      if isListOfHists(args[0]):
         return variable, [ ], args[0], [ ]
     if len(args)==2:
-      if isinstance(args[0],TH1) and isListOfHists(*args[1]):
-        return variable, [args[0]], args[1], [ ]
+      args0 = args[0]
+      if isListOfHists(args[0]) and len(args[0])==1:
+        args0 = args0[0]
+      if isinstance(args0,TH1) and isListOfHists(args[1]):
+        return variable, [args0], args[1], [ ]
     if len(args)==3:
-      if isinstance(args[0],TH1) and isListOfHists(*args[1]) and isListOfHists(*args[2]):
+      if isinstance(args[0],TH1) and isListOfHists(args[1]) and isListOfHists(args[2]):
         return variable, [args[0]], args[1], args[2]
-      if isListOfHists(*args[0]) and isListOfHists(*args[1]) and isListOfHists(*args[2]):
+      if isListOfHists(args[0]) and isListOfHists(args[1]) and isListOfHists(args[2]):
         return variable, args[0], args[1], args[2]
-    print error("unwrapHistLists - Could not unwrap", args)
+    print error('unwrapHistLists: Could not unwrap "%s"'%(args))
     exit(1)
 
 

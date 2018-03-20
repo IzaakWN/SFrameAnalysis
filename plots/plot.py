@@ -29,7 +29,7 @@ parser.add_argument( "-l", "--list", dest="list", default=False, action='store_t
                      help="list all available categories" )
 parser.add_argument( "-v", "--verbose", dest="verbose", default=False, action='store_true',
                      help="make script verbose" )
-parser.add_argument( "-n", "--no-WJ-renom", dest="noWJrenorm", default=True, action='store_false',
+parser.add_argument( "-n", "--no-WJ-renom", dest="noWJrenorm", default=False, action='store_true',
                      help="renormalize W+Jets" )
 # parser.add_argument( "-y", "--verbosity", dest="verbosity", type=int, default=0, action='store',
 #                      metavar="VERBOSITY_LEVEL", help="set verbosity level to VERBOSITY_LEVEL" )
@@ -40,6 +40,7 @@ from PlotTools.SettingTools import *
 print ">>> loading configuration file %s for plot.py"%(args.configFile)
 settings, commands = loadConfigurationFromFile(args.configFile,verbose=args.verbose)
 exec settings
+if args.noWJrenorm: normalizeWJ = False
 loadSettings(globals(),settings,verbose=args.verbose)
 setVerbose(args.verbose)
 exec commands
@@ -54,7 +55,9 @@ def plotStacks(samples, channel, **kwargs):
     """Plot stacked histograms with data."""
     LOG.header("%s channel: Stacks plots" % channel)
     
-    DIR = kwargs.get('DIR',"%s/%s" % (PLOTS_DIR,channel))
+    global plotlabel
+    DIR         = kwargs.get('DIR', "%s/%s" % (PLOTS_DIR,channel))
+    label       = plotlabel + kwargs.get('label', "")
     ensureDirectory(DIR)
     
     stack       = True #and False
@@ -67,14 +70,26 @@ def plotStacks(samples, channel, **kwargs):
     for selection in selections:
         print ">>>\n>>> " + color("_%s:_%s_" % (channel.replace(' ','_'),selection.name.replace(' ','_')), color = "magenta", bold=True)
         
+        ## RENORMALIZE WJ
+        #print ">>> "
+        #if normalizeWJ and channel!="emu":
+        #    selectionWJ = selection.selection.replace(' && pfmt_1<100',"")
+        #    LOG.header("%s: WJ renormalization" % (channel))
+        #    samples.renormalizeWJ("pfmt_1", 200, 80, 200, selectionWJ, QCD=doQCD, reset=True, verbosity=verbosityWJ)
+        #else: LOG.warning("Not WJ renormalized! (normalizeWJ=%s, user flag=%s, channel=%s)" % (normalizeWJ,args.noWJrenorm,channel))
+        #print ">>> "
+
+        
         QCD = False
         if "q_1" in selection.selection and "q_2" in selection.selection: QCD = True and doQCD
                 
         # LOOP over VARIABLES
         for variable in variables:
+            if not variable.plotForSelection(selection):
+              print ">>> plotStacks: Ignoring %s for %s"%(variable,selection); break
             
             # NAME
-            filename = "%s/%s_%s%s.png" % (DIR,variable.filename,selection.filename,plotlabel)
+            filename = "%s/%s_%s%s.png" % (DIR,variable.filename,selection.filename,label)
             filename = makeFileName(filename)
             
             # TITLE
@@ -82,18 +97,10 @@ def plotStacks(samples, channel, **kwargs):
             title = "%s: %s" % (channel,selection.name)
             title = title.replace("category 1.2","optimized category 1").replace("category 2.2","optimized category 2")
             
-            # RESCALE Signal
-#             s = 500
-#             
-#             for sample in samples:
-#                 if sample.isSignal:
-#                     sample.scale = sample.scaleBU * int(s)
-#                     #print warning("Signal (%s) enhanced by a factor of %.1f" % (sample.label,sample.scale/sample.scaleBU))            
-            
             # LEGEND POSITION
-            position = ""
-            if "byIsolation" in name:
-              position = "centerleft"
+            position = variable.position
+            if "dxy_Sig" in name or "eta_" in name[:6] or "d0" in name or "eRatio" in name:
+              position = "leftleft"
             logy = variable.logy
             
             # PLOT
@@ -185,7 +192,8 @@ def main():
         return 0
     
     # MAKE SAMPLES
-    global samples, samplesB, samplesS, samplesD    
+    global samples, samplesB, samplesS, samplesD  
+    global samplesB_EESUp, samplesB_EESDown, samplesB_JTFUp, samplesB_JTFDown  
     
     # USER OPTIONS
     global channels
@@ -208,13 +216,19 @@ def main():
         if useCutTree and "emu" not in channel:
           treename = "tree_%s_cut_relaxed" % channel
         samples.setTreeName(treename)
+        if doEES:
+          samplesB_EESUp.setTreeName(treename)
+          samplesB_EESDown.setTreeName(treename)
+        if doJTF:
+          samplesB_JTFUp.setTreeName(treename)
+          samplesB_JTFDown.setTreeName(treename)
         
         # RENORMALIZE WJ
         print ">>> "
-        if normalizeWJ and args.noWJrenorm and channel!="emu":
+        if normalizeWJ and "emu" not in channel:
             LOG.header("%s: WJ renormalization" % (channel))
             samples.renormalizeWJ("pfmt_1", 200, 80, 200, baseline, QCD=doQCD, reset=True, verbosity=verbosityWJ)
-        else: LOG.warning("Not WJ renormalized! (normalizeWJ=%s, user input=%s, channel=%s)" % (normalizeWJ,args.noWJrenorm,channel))
+        else: LOG.warning("Not WJ renormalized! (normalizeWJ=%s, user flag=%s, channel=%s)" % (normalizeWJ,args.noWJrenorm,channel))
         print ">>> "
         
         # DIRECTORIES
@@ -223,7 +237,11 @@ def main():
         
         # MAIN ROUTINES
         if doStack:
-            plotStacks(samples,channel,DIR=DIR)
+            #plotStacks(samples,channel,DIR=DIR)
+            plotStacks(samplesB_EESUp,  channel,DIR=DIR,label="_EES1p03")
+            plotStacks(samplesB_EESDown,channel,DIR=DIR,label="_EES0p97")
+            plotStacks(samplesB_JTFUp  ,channel,DIR=DIR,label="_JTF1p15")
+            plotStacks(samplesB_JTFDown,channel,DIR=DIR,label="_JTF0p85")
         
     
 

@@ -154,7 +154,16 @@ def relaxJetSelection(cuts,**kwargs):
     
     LOG.verbose(">>>   \"%s\"\n>>>   -> \"%s\"\n>>>" % (cuts0,cuts),verbosity,level=2)
     return cuts
-    
+
+
+def isSelectionString(string,**kwargs):
+    if not isinstance(string,str): return False
+    elif '<'  in string: return True
+    elif '>'  in string: return True
+    elif '==' in string: return True
+    elif '&&' in string: return True
+    elif '||' in string: return True
+    return False
 
 
 class Selection(object):

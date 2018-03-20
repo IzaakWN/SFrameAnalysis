@@ -7,7 +7,7 @@ from array import array
 from math import sqrt, pow, log
 from SettingTools import *
 from PrintTools   import *
-
+#from SelectionTools import Selection
 
                
 varlist = {
@@ -29,13 +29,13 @@ varlist = {
     'beta_1':          "leading b jet eta",              'beta_2':     "subleading b jet eta",
     'pt_tt':           "pt_ltau",                        'R_pt_m_vis': "R = pt_ltau / m_vis",
     'pt_tt_sv':        "SVFit pt_ltau,sv",               'R_pt_m_sv':  "SVFit R_{sv} = pt_ltau / m_sv",
-    'm_sv':            "SVFit mass m_sv",                'pzeta_disc': "D_{zeta}",
-    'dR_ll':           "#DeltaR_{ltau}",                 'pzetavis':   "p_{zeta}^{vis}",
-    'pfmt_1':          "m_t(l,MET)",                     'pzetamiss':  "p_{zeta}^{miss}",
-    'dphi_ll_bj':      "#Deltaphi_ll',bj",               'met':        "MET",
-    'puweight':        "pileup weight",                  'metphi':     "MET phi",
-    'chargedPionPt_2': "charged pion pt",                
-    'neutralPionPt_2': "neutral pion pt",                 
+    'm_sv':            "SVFit mass m_sv",                'dzeta':      "D_{zeta}",
+    'dR_ll':           "#DeltaR_{ltau}",                 'pzeta_disc': "D_{zeta}",
+    'pfmt_1':          "m_t(l,MET)",                     'pzetavis':   "p_{zeta}^{vis}",
+    'dphi_ll_bj':      "#Deltaphi_ll',bj",               'pzetamiss':  "p_{zeta}^{miss}",
+    'puweight':        "pileup weight",                  'met':        "MET",
+    'chargedPionPt_2': "charged pion pt",                'metphi':     "MET phi",
+    'neutralPionPt_2': "neutral pion pt",                
 }
 
 
@@ -82,7 +82,7 @@ def makeLatex(title):
             string = re.sub(r"(?<!i)(p)_([^{}()<>=\ ]+)",r"\1_{\2}",string,flags=re.IGNORECASE).replace('{t}','{T}')
             GeV = True
         
-        if "pt" in string.lower():
+        if "pt" in string.lower() and "ptweighted" not in string.lower() and "byPhotonPt" not in string.lower():
             string = re.sub(r"(?<!k)(p)t_([^{}()<>=\ ]+)",r"\1_{T}^{\2}",string,flags=re.IGNORECASE)
             string = re.sub(r"\b(p)t\b",r"\1_{T}",string,flags=re.IGNORECASE)
             GeV = True
@@ -103,7 +103,7 @@ def makeLatex(title):
             string = string.replace("tau","#tau").replace("Tau","#tau")
             string = re.sub(r"tau_([^{}<>=\ ]+)",r"tau_{\1}",string,flags=re.IGNORECASE)
         
-        if "phi" in string.lower():
+        if "phi" in string.lower() and "dphi" not in string.lower():
             string = string.replace("phi","#phi")
             string = re.sub(r"phi_([^{}<>=\ ]+)",r"phi_{\1}",string,flags=re.IGNORECASE)
         
@@ -220,12 +220,12 @@ def shiftJetVariable(var,shift,**kwargs):
     verbosity   = max(kwargs.get('verbosity',0),verbosityVariableTools)
     varShift    = var[:]
     if len(shift)>0 and shift[0] != '_': shift = '_'+shift
-    if "jets20" in var: LOG.warning("shiftJetVariable: \"jets20\" in var")
+    if "jets20" in var: LOG.warning('shiftJetVariable: "jets20" in var')
     for jvar in [ "jpt_1", "jpt_2", "jeta_1", "jeta_2", "jets", "ncbtag",
                   "pfmt_1", "met", "dphi_ll_bj" ]:
         varShift = varShift.replace(jvar,jvar+shift)
     varShift = varShift.replace("met_nom","met")
-    if verbosity>0: print ">>>   shiftJetSelections with \"%s\" shift\n>>>   \"%s\"\n>>>     -> \"%s\""%(shift,var,varShift)
+    if verbosity>0: print '>>>   shiftJetSelections with "%s" shift\n>>>   "%s"\n>>>     -> "%s"'%(shift,var,varShift)
     return varShift
     
 
@@ -245,22 +245,26 @@ class Variable(object):
         strings         = [a for a in args if isinstance(a,str) ]
         self.name            = name
         self.title           = strings[0] if strings else makeLatex(self.name)
-        self.title           = kwargs.get('title',    self.title                ) # for plot axes
-        self.filename        = kwargs.get('filename', makeFileName(self.name)   ) # for file
+        self.title           = kwargs.get('title',          self.title                  ) # for plot axes
+        self.filename        = kwargs.get('filename',       makeFileName(self.name)     ) # for file
+        self.filename        = self.filename.replace('$NAME',self.name)
         self.nBins           = None
         self.min             = None
         self.max             = None
         self.xbins           = None
-        setBinning(args)
-        self.units           = kwargs.get('units',    ""                        ) # for plot axes
-        self.logx            = kwargs.get('logx',     False                     ) # for plot axes
-        self.logy            = kwargs.get('logy',     False                     ) # for plot axes
-        self.plot            = True
-        self.contexttitle    = getContextFromDict(kwargs, self.title, contextkey='ctitle'   ) # context-dependent title
-        self.contextbinning  = getContextFromDict(kwargs, self.getBinning(), contextkey='cbinning' ) # context-dependent title
-        self.contextplot     = getContextFromDict(kwargs, self.title, contextkey='cplot'   ) # context-dependent title
+        self.setBinning(*args)
+        self.units           = kwargs.get('units',          ""                          ) # for plot axes
+        self.logx            = kwargs.get('logx',           False                       )
+        self.logy            = kwargs.get('logy',           False                       )
+        self.position        = kwargs.get('position',       ""                          ) # legend position
+        #self.plot            = kwargs.get('plots',          True                        )
+        self.veto            = kwargs.get('veto',           [ ]                         )
+        self.contexttitle    = getContextFromDict(kwargs, None, key='ctitle'                ) # context-dependent title
+        self.contextbinning  = getContextFromDict(kwargs, None, key='cbinning', regex=True  ) # context-dependent binning
+        self.contextposition = getContextFromDict(kwargs, None, key='cposition', regex=True ) # context-dependent position
+        if self.veto:
+          if not (isinstance(self.veto,list) or instance(self.veto,tuple)): self.veto = [ self.veto ]
     
-        
     @property
     def var(self): return self.name
     @var.setter
@@ -294,7 +298,13 @@ class Variable(object):
     def __str__(self):
       """Returns string representation of Variable object."""
       return self.name
-      
+    
+    def __repr__(self):
+      """Returns string representation of Variable object."""
+      #return '<%s.%s("%s","%s",%s,%s,%s)>'%(self.__class__.__module__,self.__class__.__name__,self.name,self.title,self.nBins,self.xmin,self.xmax)
+      return '<%s("%s","%s",%s,%s,%s)>'%(self.__class__.__name__,self.name,self.title,self.nBins,self.xmin,self.xmax)
+      #hex(id(self))
+    
     def __iter__(self):
       """Start iteration over variable information."""
       for i in [self.name,self.nBins,self.min,self.max]:
@@ -303,7 +313,6 @@ class Variable(object):
     def setBinning(self,*args):
         """Set binning: (N,min,max), or xbins if it is set"""
         numbers         = [a for a in args if isinstance(a,int) or isinstance(a,float) ]
-        strings         = [a for a in args if isinstance(a,str) ]
         xbins           = [a for a in args if isinstance(a,list) or isinstance(a,tuple) ]
         if len(numbers)==3:
           self.nBins    = numbers[0]
@@ -327,7 +336,7 @@ class Variable(object):
           return self.xbins
         else:
           return (self.nBins,self.min,self.max)
-          
+        
     def hasVariableBinning(self):
         """True is xbins is set."""
         return xbins != None
@@ -356,12 +365,26 @@ class Variable(object):
     def changeContext(self,*args):
         """Change the contextual title for a set of arguments, if it is available"""
         if self.contexttitle:
-          self.title = self.contexttitle.getContext(*args)
+          title = self.contexttitle.getContext(*args)
+          if title!=None: self.title = title
         if self.contextbinning:
-          binning    = self.contexttitle.getContext(*args)
-          if (isinstance(binning,list) or isinstance(binning,tuple)) and len(binning)==3:
-            
-            self.title = self.contexttitle.getContext(*args)
+          binning = self.contextbinning.getContext(*args)
+          if binning!=None: self.setBinning(*binning)
+        if self.contextposition:
+          position = self.contextposition.getContext(*args)
+          if position!=None: self.position = position
+        #if self.contextplot:
+        #  plot = self.contextplot.getContext(*args)
+        #  if binning!=None: self.plot = plot
+    
+    def plotForSelection(self,selection):
+        if not isinstance(selection,str):
+          selection = selection.selection
+        for searchterm in self.veto:
+          if re.search(searchterm,selection):
+              LOG.verbose('Variable::plotForSelection: Regex match of selection "%s" to "%s"'%(selection,searchterm),True)
+              return False
+        return True
     
     def unwrap(self):
         return (self.name,self.nBins,self.min,self.max)
@@ -369,11 +392,11 @@ class Variable(object):
     def latex(self):
         return makeLatex(self.name)
     
-#     def load(self,context):
-#         """Load contextual binning, if available."""
-#         for pattern, variable in self.context:
-#             if re.match("(?:" + pattern + r")\Z", context):
-#                 return variable
+    #def load(self,context):
+    #    """Load contextual binning, if available."""
+    #    for pattern, variable in self.context:
+    #        if re.match("(?:" + pattern + r")\Z", context):
+    #            return variable
     
     def shiftJetVariable(self,shift,**kwargs):
         return shiftJetVariable(self.name,shift,**kwargs)
@@ -388,7 +411,7 @@ def wrapVariable(*args,**kwargs):
       return Variable(args) # (varname,N,a,b)
     elif len(args) == 1 and isinstance(args[0],Variable):
       return args[0]
-    LOG.warning("wrapVariable: Could not unwrap arguments \"%s\" to a Variable object. Returning None."%args)
+    LOG.warning('wrapVariable: Could not unwrap arguments "%s" to a Variable object. Returning None.'%args)
     return None
     
 def unwrapVariableBinning(*args,**kwargs):
@@ -398,7 +421,7 @@ def unwrapVariableBinning(*args,**kwargs):
       return (varname,N,a,b)
     elif len(args) == 1 and isintance(args[0],Variable):
       return args[0].unwrap()
-    LOG.warning("unwrapVariableBinning: Could not unwrap arguments \"%s\" to a Variable object. Returning None."%args)
+    LOG.warning('unwrapVariableBinning: Could not unwrap arguments "%s" to a Variable object. Returning None.'%args)
     return None
 
 
@@ -415,6 +438,7 @@ class Context(object):
           LOG.warning("Context::Context: No dictionary given!")
         self.context = context_dict
         self.default = args[0] if len(args)>0 else context_dict.get('default',None)
+        self.regex   = kwargs.get('regex',False)
         
     def __iter__(self):
         """Start iteration over selection information."""
@@ -423,35 +447,54 @@ class Context(object):
         
     def getContext(self,*args,**kwargs):
         """Get the contextual object for a set of ordered arguments. If it is not available, return Default."""
+        
+        regex = kwargs.get('regex', self.regex)
+        
+        # CHECK
         if len(args)==0:
           LOG.warning("Context::getContext: No arguments given!")
           return self.default
         if not self.context:
           LOG.warning("Context::getContext: No context dictionary!")
           return None
-        if args[0] not in self.context:
+        
+        # MATCH
+        ckey = args[0]
+        if regex:
+          for key in sorted(self.context,key=lambda x: len(x),reverse=True):
+            #LOG.verbose('Context::getContext: Matching "%s" to "%s"'%(key,ckey),True)
+            if re.search(key,ckey):
+              #LOG.verbose('Context::getContext: Regex match of key "%s" to "%s"'%(key,ckey),True)
+              ckey = key
+              break
+          else:
+              return self.default
+        elif ckey not in self.context:
           return self.default
-        result = self.context[args[0]]
+        result = self.context[ckey]
+        
+        # RESULT
         if isinstance(result,Context):
           return result.getContext(*args[1:],**kwargs) # recursive
         else:
           return result
         
 
-def getContextFromDict(kwargs,*default,contextkey='context'):
-    """Check for context in kwargs. If a dictionary is given, make a Context object. Else return None."""
-    context = kwargs.get(contextkey, None) # context-dependent
+def getContextFromDict(contextdict,*default,**kwargs):
+    """Check for context in contextdict. If a dictionary is given, make a Context object. Else return None."""
+    ckey    = kwargs.get('key',         'context'   )
+    regex   = kwargs.get('regex',       False       )
+    context = contextdict.get(ckey,     None        ) # context-dependent
     if isinstance(context,Context):
         return context
     if isinstance(context,dict):
         if len(default)==0: default = context.get('default', None)
         else: default = default[0]
-        context = Context(context,default)
+        context = Context(context,default,regex=regex)
         return context
     elif not context:
         return None
     LOG.error('getContext - No valid arguments "%s"'%(args))
     return None
-
 
 

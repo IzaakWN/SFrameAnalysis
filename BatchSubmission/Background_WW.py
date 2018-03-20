@@ -1,4 +1,4 @@
-path2xml="/shome/ineuteli/shared/xml/xmls_MC2017_V2"
+path2xml="/shome/ineuteli/shared/xml/xmls_MC2017_V2_newJEC"
 path2tmp="$SFRAME_DIR/../AnalysisTemp"
 jobName="WW"
 outDir="/scratch/$USER/SFrameAnalysis/AnalysisOutput_ltau2017/"+jobName

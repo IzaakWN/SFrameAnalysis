@@ -49,7 +49,7 @@ TauTauAnalysis::TauTauAnalysis() : SCycleBase(),
   DeclareProperty( "doTTpt",                m_doTTpt                = false             );
   DeclareProperty( "doJEC",                 m_doJEC                 = false             );
   DeclareProperty( "EESshift",              m_EESshift              = 0.0               );
-  DeclareProperty( "EESshiftEndCap",        m_EESshiftEndCap        = m_EESshift*2.5    );
+  DeclareProperty( "EESshiftEndCap",        m_EESshiftEndCap        = m_EESshift        );
   DeclareProperty( "doEES",                 m_doEES                 = m_EESshift != 0.0 );
   DeclareProperty( "JTFshift",              m_JTFshift              = 0.0               );
   DeclareProperty( "doTight",               m_doTight               = false             );
@@ -196,7 +196,7 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
   
   m_doEES   = m_EESshift != 0.0 and !m_isData;
   m_doJTF   = m_JTFshift != 0.0 and !m_isData;
-  m_doTight = m_doTight or m_doEES;
+  m_doTight = m_doTight or m_doEES or m_doJTF;
   m_doJEC   = m_doJEC and !(m_doEES or m_doJTF or m_isData);
   m_logger << INFO << "IsData:              " <<    (m_isData   ?   "TRUE" : "FALSE") << SLogger::endmsg;
   m_logger << INFO << "IsSignal:            " <<    (m_isSignal ?   "TRUE" : "FALSE") << SLogger::endmsg;
@@ -916,7 +916,7 @@ void TauTauAnalysis::FillBranches(const std::string& channel,
   
   float maxIso   = -1.;
   int maxIndex   = -1;
-  int genmatch_2 = -1;
+  int genmatch_3 = -1;
   UZH::Tau tau;
   for(int i=0; i<(m_tau.N); ++i){
     UZH::Tau tau( &m_tau, i );
@@ -930,17 +930,18 @@ void TauTauAnalysis::FillBranches(const std::string& channel,
     if(fabs(tau.charge()) != 1) continue; // remove for boosted ID
     //if(tau.againstElectronVLooseMVA6() < 0.5 or tau.againstMuonTight3() < 0.5) continue; // same WPs as mutau; needs SFs!
     int genmatch = -1;
-    double taupt = 0.0;
+    float taupt = tau.pt();
     if(m_doJTF){
       genmatch = genMatch(tau.eta(),tau.phi());
-      if(genmatch<5){
-        taupt = tau.pt()*(1.+m_JTFshift);
+      if(genmatch!=5){
+        taupt = taupt*(1.+m_JTFshift);
       }
     }
     if(taupt < m_tauPtCut) continue;
+    if(!m_isData and genmatch<0) genmatch = genMatch(tau.eta(),tau.phi());
     maxIndex   = i;
     maxIso     = tau.byIsolationMVArun2v1DBoldDMwLTraw();
-    genmatch_2 = genmatch;
+    genmatch_3 = genmatch;
   }
   if(maxIndex>0){
     tau = UZH::Tau( &m_tau, maxIndex );
@@ -948,7 +949,7 @@ void TauTauAnalysis::FillBranches(const std::string& channel,
     b_eta_3[ch]                                          = tau.tlv().Eta();
     b_decayMode_3[ch]                                    = tau.decayMode(); // 0, 1, 10
     b_againstLepton_3[ch]                                = tau.againstElectronVLooseMVA6() > 0.5 and tau.againstMuonTight3() > 0.5;
-    b_gen_match_3[ch]                                    = genmatch_2;
+    b_gen_match_3[ch]                                    = genmatch_3;
     // TODO: againstLepton SFs!
     b_byIsolationMVArun2v1DBoldDMwLTraw_3[ch]            = tau.byIsolationMVArun2v1DBoldDMwLTraw();
     b_byIsolationMVArun2v1DBnewDMwLTraw_3[ch]            = tau.byIsolationMVArun2v1DBnewDMwLTraw();
@@ -1097,20 +1098,23 @@ void TauTauAnalysis::FillBranches(const std::string& channel,
   // SHIFTS
   // apply shifts to tau_tlv_shifted, lep_tlv_shifted, met_tlv_corrected
   //std::cout << ">>> Shifts " << std::endl;
-  TLorentzVector electron_tlv; //_shifted
+  TLorentzVector electron_tlv;
   electron_tlv.SetPtEtaPhiM(b_pt_2[ch], b_eta_2[ch], b_phi_2[ch], b_m_2[ch]);
-  if(!m_isData and m_doEES){ // Electron Energy Scale
-    if(fabs(electron.tlv().Eta())<1.479) shiftLeptonAndMET(m_EESshift,      electron_tlv,met_tlv_corrected);
-    else                                 shiftLeptonAndMET(m_EESshiftEndCap,electron_tlv,met_tlv_corrected);
-    b_pt_2[ch]    = electron_tlv.Pt();
-    b_m_2[ch]     = electron_tlv.M();
+  if(!m_isData){
+    if(m_doEES){ // Electron ES
+      if(fabs(electron.tlv().Eta())<1.479) shiftLeptonAndMET(m_EESshift,      electron_tlv,met_tlv_corrected);
+      else                                 shiftLeptonAndMET(m_EESshiftEndCap,electron_tlv,met_tlv_corrected);
+      b_pt_2[ch]    = electron_tlv.Pt();
+      b_m_2[ch]     = electron_tlv.M();
+    }
+    if(m_doJTF and maxIndex>0 and genmatch_3!=5){ // jet to tau fake (JTF)
+      TLorentzVector tau_tlv = tau.tlv();
+      shiftLeptonAndMET(m_JTFshift,tau_tlv,met_tlv_corrected);
+      b_pt_2[ch]    = tau_tlv.Pt();
+      b_m_2[ch]     = tau_tlv.M();
+    }
+    //printRow({"after"},{tau_tlv.Pt(),tau_tlv.M()});
   }
-  if(m_doJTF and maxIndex>0 and genmatch_2>5){ // jet to tau fake (JTF)
-    TLorentzVector tau_tlv = tau.tlv();
-    shiftLeptonAndMET(m_JTFshift,tau_tlv,met_tlv_corrected);
-    b_pt_2[ch]    = tau_tlv.Pt();
-  }
-  //printRow({"after"},{tau_tlv.Pt(),tau_tlv.M()});
   // save corrections to UZH::MET object  
   met.et(met_tlv_corrected.E());
   met.phi(met_tlv_corrected.Phi());

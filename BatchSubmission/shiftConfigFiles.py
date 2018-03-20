@@ -18,7 +18,7 @@ parser.add_option("-v", "--verbose", action="store_true",
                 dest="verbose", default=False,
                 help="Verbose output [default = %default]")
 parser.add_option("-o", "--outDir", action="store",
-                dest="outDir", default="TES",
+                dest="outDir", default="./",
                 help="Output directory for merged xml file [default = %default]")
 (options, args) = parser.parse_args()
 
@@ -33,18 +33,23 @@ def main():
     nFiles = 0
     shifts = [ ]
     
-    for shift in frange(0.0,0.06001,0.002):
-        shifts.append(( "TES", "TESshift", shift, [ "Background_DY.py", ] )) #"Background_TT.py"
+    #for shift in frange(0.0,0.10001,0.002):
+    #    shifts.append(( "TES", "TESshift", shift, [ "Background_DY.py", ], 3 )) #"Background_TT.py"
     #files = glob.glob("./*.py")
+    
+    shifts.append(( "JTF", "JTFshift", 0.15, [ "Background_TT.py", "Background_ST.py" ], 2 ))
+    ###shifts.append(( "EES", "EESshift", 0.03, [ "Background_TT.py", "Background_ST.py" ], 2 ))
     
     if outDir: ensureDirectory(outDir)
     
-    for shiftname, shiftvar, shiftvalue, shiftfiles in shifts:
+    for shiftname, shiftvar, shiftvalue, shiftfiles, precision in shifts:
       if float(shiftvalue)==0.0: continue
       
-      labelShiftDn    = ("%s%.3f"%(shiftname,1.-shiftvalue)).replace('.','p')
-      labelShiftUp    = ("%s%.3f"%(shiftname,1.+shiftvalue)).replace('.','p')
-      shiftvalue      = "%.3f"%shiftvalue
+      labelFormat     = "%%s%%.%df"%(precision)
+      valueFormat     = "%%.%df"%(precision)
+      labelShiftDn    = (labelFormat%(shiftname,1.-shiftvalue)).replace('.','p')
+      labelShiftUp    = (labelFormat%(shiftname,1.+shiftvalue)).replace('.','p')
+      shiftvalue      = valueFormat%shiftvalue
       
       for fileInName in shiftfiles:
         

@@ -33,16 +33,12 @@ def main():
     nFiles = 0
     shifts = [ ]
     
-    #for shift in frange(0.0,0.10001,0.002):
-    #  shifts.append(( "TES", "TESshift", shift, [ "Background_DY.py", ], 3 )) #"Background_TT.py"
-    #files = glob.glob("./*.py")
-    
-    shifts.append(( "JTF", "JTFshift",  0.15, [ "Background_TT.py", "Background_ST.py" ], 2 ))
-    shifts.append(( "EES", "EESshift",  0.03, [ "Background_TT.py", "Background_ST.py" ], 2 ))
+    shifts.append(( "JTF", "JTFshift",  0.10, 2, [ "Background_TT.py", "Background_ST.py" ], False ))
+    shifts.append(( "EES", "EESshift",  0.03, 2, [ "Background_TT.py", "Background_ST.py" ], False ))
     
     if outDir: ensureDirectory(outDir)
     
-    for shiftname, shiftvar, shiftvalue, shiftfiles, precision in shifts:
+    for shiftname, shiftvar, shiftvalue, precision, shiftfiles, noTight in shifts:
       if float(shiftvalue)==0.0: continue
       
       labelFormat     = "%%s%%.%df"%(precision)
@@ -55,15 +51,16 @@ def main():
         
         # CHECK
         if not os.path.exists(fileInName):
-          print "  Error! \"%s\" does not exists!\n"%(fileInName)
+          error("\"%s\" does not exists!\n"%(fileInName))
           exit(1)
         
         # INPUT files
         with open(fileInName,'r') as fileIn:
           #print ">>>\n>>> %s: %s"%(shiftname,fileInName)
           
-          postFixpattern  = '.*postFix.*=.*"([^"]*)"'
-          valuepattern    = ('\[.*%s.*,.*"(\d\.\d+)".*\]'%(shiftvar)) #re.escape
+          postFixpattern  = r'.*postFix.*=.*"([^"]*)"'
+          valuepattern    = (r'\[.*%s.*,.*"(\d\.\d+)".*\]'%(shiftvar)) #re.escape
+          tightpattern    = (r'\[.*%s.*,.*"(\w+)".*\]'%("noTight")) #re.escape
           fileShiftDnName = fileInName.replace('.py',"_%s.py"%(labelShiftDn))
           fileShiftUpName = fileInName.replace('.py',"_%s.py"%(labelShiftUp))
           if outDir:
@@ -71,25 +68,29 @@ def main():
             fileShiftUpName = "%s/%s"%(outDir,fileShiftUpName)
           
           for sign, fileOutName, shiftlabel in [('-',fileShiftDnName,labelShiftDn),('',fileShiftUpName,labelShiftUp)]:
-            print ">>>\n>>> %s"%(fileOutName)
+            print ">>>\n>>> %s"%(green(fileOutName))
             
             # READ input xml file
             foundPostFixLine = False
             foundValueLine   = False
+            foundNoTightLine = False
             with open(fileOutName,'w') as fileOut:
               fileIn.seek(0)
               for line in fileIn:
                 #if "[" in line: print line.replace('\n','')
                 postFixmatches = re.findall(postFixpattern,line)
                 valuematches   = re.findall(valuepattern,line)
+                tightmatches   = re.findall(tightpattern,line)
                 
                 if postFixmatches:
                     postFixmatch = postFixmatches[0]
                     if len(postFixmatches)>1:
-                        print ">>> ERROR! Two matches for \"postFix\" in file \"%s\":\n>>>   \"%s\"!"%(fileInName,line)
+                        error('Two matches for "%s" in file "%s":'%("postFix",fileInName))
+                        error('  "%s"!'%(line))
                         exit(1)
                     if foundPostFixLine:
-                        print ">>> ERROR! Reoccuring \"postFix\" in file \"%s\":\n>>>   \"%s\"!"%(fileInName,line)
+                        error('Reoccuring "%s" in file "%s"'%("postFix",fileInName))
+                        error('  "%s"!'%(line))
                         exit(1)
                     foundPostFixLine = True
                     oldpattern = '(.*postFix.*=.*)"%s"(.*)'%(postFixmatch)
@@ -102,13 +103,16 @@ def main():
                 if valuematches:
                     matchedvalue = valuematches[0]
                     if len(valuematches)>1:
-                        print ">>> ERROR! Two matches for \"%s\" in file \"%s\":\n>>>   \"%s\"!"%(shiftvar,fileOutName,line)
+                        error('Two matches for "%s" in file "%s":'%(shiftvar,fileOutName))
+                        error('  "%s"!'%(line))
                         exit(1)
                     if foundValueLine:
-                        print ">>> ERROR! Reoccuring \"%s\" in file \"%s\":\n>>>   \"%s\"!"%(shiftvar,fileOutName,line)
+                        error('Reoccuring "%s" in file "%s":'%(shiftvar,fileOutName))
+                        error('  "%s"!'%(line))
                         exit(1)
                     if float(matchedvalue)!=0.00:
-                        print ">>> Warning! \"%s\"'s value \"%s\"!=0.00 in file \"%s\":\n>>>   \"%s\"!"%(shiftvar,shiftvalue,fileOutName,line)
+                        warning('"%s"\'s value "%s"!=0.00 in file "%s":'%(shiftvar,shiftvalue,fileOutName))
+                        warning('   "%s"!'%(line))
                     foundValueLine = True
                     oldpattern = '(\[.*"%s".*,.*)"%s"(.*\])'%(shiftvar,matchedvalue)
                     newpattern = '%s"%s"%s'%(r"\1",sign+shiftvalue,r"\2")
@@ -117,10 +121,41 @@ def main():
                     newline    = line.replace('\n','')
                     print ">>>   %22s  ->  %s"%(oldline.lstrip(' '),newline.lstrip(' '))
                     
+                if noTight and tightmatches:
+                    matchedvalue = tightmatches[0]
+                    if len(tightmatches)>1:
+                        error('Two matches for "%s" in file "%s":'%("noTight",fileOutName))
+                        error('  "%s"!'%(line))
+                        exit(1)
+                    if foundNoTightLine:
+                        error('Reoccuring "%s" in file "%s":'%("noTight",fileOutName))
+                        error('  "%s"!'%(line))
+                        exit(1)
+                    foundNoTightLine = True
+                    oldpattern = '(\[.*"%s".*,.*)"%s"(.*\])'%("noTight",matchedvalue)
+                    newpattern = '%s"%s"%s'%(r"\1","true",r"\2")
+                    oldline    = line.replace('\n','')
+                    line       = re.sub(oldpattern,newpattern,line)
+                    newline    = line.replace('\n','')
+                    print ">>>   %22s  ->  %s"%(oldline.lstrip(' '),newline.lstrip(' '))
+                    
+                
                 fileOut.write(line)
+              
+              if not foundPostFixLine:
+                warning('Did not find match for "%s" in file "%s"!'%("postFix",fileInName),pre="  ")
+              if not foundValueLine:
+                warning('Did not find match for "%s" in file "%s"!'%(shiftvar,fileOutName),pre="  ")
+              if noTight and not foundNoTightLine:
+                warning('Did not find match for "%s" in file "%s"!'%("noTight",fileOutName),pre="  ")
               nFiles += 1
-    print ">>>\n>>> number of files = %d"%nFiles  
-        
+    print ">>>\n>>> created %d file%s"%(nFiles,'' if nFiles==1 else 's')
+
+
+
+def green(string,**kwargs):   return "\x1b[0;32;40m%s\033[0m"%string
+def error(string,**kwargs):   print ">>> %s\033[1m\033[91mERROR! %s\033[0m"%(kwargs.get('pre',""),string)
+def warning(string,**kwargs): print ">>> %s\033[1m\033[93mWarning!\033[0m\033[93m %s\033[0m"%(kwargs.get('pre',""),string)
 
 def frange(start, stop, step):
     """Yield values in a range between start and stop, with  linearly spaced steps"""
@@ -128,7 +163,6 @@ def frange(start, stop, step):
     while x <= stop:
       yield x
       x += step
-
 
 def ensureDirectory(DIR):
     """Make directory if it does not exist."""

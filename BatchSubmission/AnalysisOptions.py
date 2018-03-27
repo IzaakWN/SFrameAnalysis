@@ -1,6 +1,5 @@
 
 loadLibs=[
-    #"libGenVector",
     "libNtupleVariables",
     "libGoodRunsLists",
     "libPileupReweightingTool",
@@ -27,20 +26,17 @@ loadPacks=[
 
 compilePacks=[
     "../NtupleVariables",
-    "../GoodRunsLists",
     "../PileupReweightingTool",
     "../TauTauResonances",
     "../BTaggingTools",
-    "../LepEff2016",
-    "../RecoilCorrections",
+    "../LepEff2017",
     "../JetCorrectionTool",
-    "../SVFitTool",
 ]
 
 AddUserItems = [
     ["RecoTreeName","tree"],
     ["doJEC","true"],
-    ["doSVFit","true"],
+    ["doSVFit","false"],
 ]
   
 inputTrees=["ntuplizer/tree"]

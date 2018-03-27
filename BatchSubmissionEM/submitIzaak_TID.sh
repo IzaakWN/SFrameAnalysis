@@ -1,17 +1,26 @@
 #! /bin/bash
 
+function peval { echo ">>> $@"; eval "$@"; }
+
 if [[ $1 == 1 ]]; then
   echo ">>> JTF"
-  python -u submitSFrame.py -j Background_ST_JTF1p150.py --nosandbox --useEnv | tee nohup/nohup_ST_JTF1p150.log
-  python -u submitSFrame.py -j Background_ST_JTF0p850.py --nosandbox --useEnv | tee nohup/nohup_ST_JTF0p850.log
-  python -u submitSFrame.py -j Background_TT_JTF1p150.py --nosandbox --useEnv | tee nohup/nohup_TT_JTF1p150.log
-  python -u submitSFrame.py -j Background_TT_JTF0p850.py --nosandbox --useEnv | tee nohup/nohup_TT_JTF0p850.log
-elif [[ $1 == 2 || $1 == 3 ]]; then
+#   peval "python -u submitSFrame.py -j Background_TT_JTF1p10.py --nosandbox --useEnv | tee nohup/nohup_TT_JTF1p10.log"
+#   peval "python -u submitSFrame.py -j Background_ST_JTF0p90.py --nosandbox --useEnv | tee nohup/nohup_ST_JTF0p90.log"
+#   peval "python -u submitSFrame.py -j Background_ST_JTF1p10.py --nosandbox --useEnv | tee nohup/nohup_ST_JTF1p10.log"
+#   peval "python -u submitSFrame.py -j Background_TT_JTF1p15.py --nosandbox --useEnv | tee nohup/nohup_TT_JTF1p15.log"
+#   peval "python -u submitSFrame.py -j Background_TT_JTF0p85.py --nosandbox --useEnv | tee nohup/nohup_TT_JTF0p85.log"
+#   peval "python -u submitSFrame.py -j Background_ST_JTF1p15.py --nosandbox --useEnv | tee nohup/nohup_ST_JTF1p15.log"
+#   peval "python -u submitSFrame.py -j Background_ST_JTF0p85.py --nosandbox --useEnv | tee nohup/nohup_ST_JTF0p85.log"
+#   peval "python -u submitSFrame.py -j Background_TT_EES0p97.py --nosandbox --useEnv | tee nohup/nohup_TT_EES0p97.log"
+#   peval "python -u submitSFrame.py -j Background_ST_EES1p03.py --nosandbox --useEnv | tee nohup/nohup_ST_EES1p03.log"
+elif [[ $1 == 2 ]]; then
   echo ">>> EES"
-  python -u submitSFrame.py -j Background_ST_EES1p030.py --nosandbox --useEnv | tee nohup/nohup_ST_JTF1p030.log
-  python -u submitSFrame.py -j Background_ST_EES0p970.py --nosandbox --useEnv | tee nohup/nohup_ST_JTF0p970.log
-  python -u submitSFrame.py -j Background_TT_EES1p030.py --nosandbox --useEnv | tee nohup/nohup_TT_JTF1p030.log
-  python -u submitSFrame.py -j Background_TT_EES0p970.py --nosandbox --useEnv | tee nohup/nohup_TT_JTF0p970.log
+#   peval "python -u submitSFrame.py -j Background_TT_JTF0p90.py --nosandbox --useEnv | tee nohup/nohup_TT_JTF0p90.log"
+#   peval "python -u submitSFrame.py -j Background_ST_JTF1p10.py --nosandbox --useEnv | tee nohup/nohup_ST_JTF1p10.log"
+#   peval "python -u submitSFrame.py -j Background_TT_JTF0p85.py --nosandbox --useEnv | tee nohup/nohup_TT_JTF0p85.log"
+#   peval "python -u submitSFrame.py -j Background_ST_JTF1p15.py --nosandbox --useEnv | tee nohup/nohup_ST_JTF1p15.log"
+#   peval "python -u submitSFrame.py -j Background_TT_EES1p03.py --nosandbox --useEnv | tee nohup/nohup_TT_EES1p03.log"
+#   peval "python -u submitSFrame.py -j Background_ST_EES0p97.py --nosandbox --useEnv | tee nohup/nohup_ST_EES0p97.log"
 else
-    echo ">>> Wrong input! Use 1-3."
+    echo ">>> Wrong input! Use 1-2."
 fi

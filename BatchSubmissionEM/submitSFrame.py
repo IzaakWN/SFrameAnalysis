@@ -216,6 +216,7 @@ def getJobFromId(runningJob, listOfJobs):
 def waitForBatchJobs(runningJobs, listOfJobs, userName, timeCheck):
   print "waiting for %d job(s) in the queue" %(len(runningJobs))
   nJobs = len(runningJobs)
+  nRunningJobs = nJobs
   skip  = 5 if nJobs<400 else 10
   skip2 = 5 if nJobs>400 else 1
   while not len(runningJobs)==0:
@@ -223,10 +224,10 @@ def waitForBatchJobs(runningJobs, listOfJobs, userName, timeCheck):
     queryString="qstat -u %s | grep %s | awk {\'print $1\'}" %(userName, userName)
     lock=thread.allocate_lock()
     lock.acquire()
-    compileProcess=subprocess.Popen(queryString, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-    compileProcess.wait()
+    qstatProcess = subprocess.Popen(queryString, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+    qstatProcess.wait()
     lock.release()
-    jobList = compileProcess.stdout.read()
+    jobList = qstatProcess.stdout.read()
     jobList = jobList.split("\n")
     for j in runningJobs:
       jobId=j[0]
@@ -235,10 +236,6 @@ def waitForBatchJobs(runningJobs, listOfJobs, userName, timeCheck):
           if j[1]==(l[2]+l[3]):
             l[4]="."
         runningJobs.remove(j)
-        nRunningJobs = len(runningJobs)
-        if ((nRunningJobs%skip )==0 or not(nJobs*0.25<nRunningJobs<nJobs*0.75)) and\
-           ((nRunningJobs%skip2)==0 or not(nJobs*0.07<nRunningJobs<nJobs*0.93)):
-          print "waiting for %d job(s) in the queue" %(len(runningJobs))
       #else:
       #  #store job usage info in seperate file, dump into log at the end
       #  queryString   = "qstat -j " + jobId + " | grep usage"
@@ -251,6 +248,11 @@ def waitForBatchJobs(runningJobs, listOfJobs, userName, timeCheck):
       #  job       = getJobFromId(j, listOfJobs)
       #  usageFile = getTempDirLog(job) + "/" + getCycleName(job) + ".tmp"  
       #  open(usageFile,'a').write(usageOutput)
+    if nRunningJobs != len(runningJobs):
+      nRunningJobs = len(runningJobs)
+      if ((nRunningJobs%skip )==0 or not(nJobs*0.25<nRunningJobs<nJobs*0.75)) and\
+         ((nRunningJobs%skip2)==0 or not(nJobs*0.07<nRunningJobs<nJobs*0.93)):
+        print "waiting for %d job(s) in the queue" %(len(runningJobs))
 
 
 
@@ -723,23 +725,23 @@ def main():
     useHost=""
   if not useHost=="":
     print "Sending jobs to host: %s" %(useHost)
-
+  
   if not "useOS" in dir():
     useOS=""
   if not useOS=="":
     print "Using OS: %s" %(useOS)
-
+  
   # check data
   if not "dataSets" in dir():
     print "FATAL: data sets not set"
     sys.exit()
   print "%-30s : %s" % ("dataSets", [d[0] for d in dataSets])
-
+  
   # set delay for process check
   if not "timeCheck" in dir():
     timeCheck="30"
   print "%-30s : timeCheck=%s" %("delay for process check", timeCheck)
-
+  
   if not "rootSetup" in dir():
     rootSetup="default"
   print "%-30s : rootSetup=%s" % ("Setup script for ROOT/Python", rootSetup)
@@ -973,9 +975,11 @@ def main():
           #nRunning=int(subProcess.stdout.read())
           subProcess=subprocess.Popen('qstat -u $USER | wc -l' , stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
           nSubmitted=int(subProcess.stdout.read())-2
+          subProcess.kill()
           #print " submitted:",nSubmitted
           if nSubmitted<runningJobsLimit: break
           print "|",
+          sys.stdout.flush()
           time.sleep(float(timeCheck*2))
         print
         

@@ -145,7 +145,7 @@ class TauTauAnalysis : public SCycleBase {
     virtual void FillJetBranches(     const char* ch, std::vector<UZH::Jet>& Jets,   UZH::MissingEt& met,
                                                 const TLorentzVector& tau_tlv, const TLorentzVector& lep_tlv );
     virtual void FillJetBranches_JEC( Float_t& jpt, Float_t& jeta, const TLorentzVector& jet, bool save=true );
-    virtual void countJets( const TLorentzVector& jet_tlv, Int_t& ncjets, Int_t& nfjets, Int_t& ncbtags, TLorentzVector& bjet_tlv, TLorentzVector& jet2_tlv, const bool isBTagged );
+    virtual void countJets( const TLorentzVector& jet_tlv, Int_t& ncjets, Int_t& nfjets, Int_t& ncbtags, const bool isBTagged );
     
     // check pass of triggers / MET filters
     virtual TString passTrigger();
@@ -173,7 +173,7 @@ class TauTauAnalysis : public SCycleBase {
     
     // extra scaling factors
     virtual float genMatchSF( const std::string& channel, const int genmatch_2, const float tau_eta = 0. );
-    virtual bool  getBTag_promote_demote( UZH::Jet& jet );
+    virtual bool  getBTagStatus_promote_demote( UZH::Jet& jet );
     
     /// fill cut flow
     //virtual void fillCutflow( const std::string histName, const std::string dirName, const Int_t id, const Double_t weight = 1.);
@@ -262,6 +262,7 @@ class TauTauAnalysis : public SCycleBase {
     bool    m_doJTF;
     double  m_JTFshift;
     bool    m_doTight;
+    bool    m_noTight;
 
     ///
     /// CUTS
@@ -366,7 +367,7 @@ class TauTauAnalysis : public SCycleBase {
     std::map<std::string,Int_t>    b_lum;
     
     std::map<std::string,Int_t>    b_npv;
-    std::map<std::string,Int_t>    b_npu; 
+    std::map<std::string,Float_t>  b_npu; 
     std::map<std::string,Int_t>    b_NUP;
     std::map<std::string,Float_t>  b_rho;
     
@@ -383,27 +384,22 @@ class TauTauAnalysis : public SCycleBase {
     
     std::map<std::string,Int_t>    b_njets_jesUp;
     std::map<std::string,Int_t>    b_njets_jesDown;
-    std::map<std::string,Int_t>    b_njets_nom;
     std::map<std::string,Int_t>    b_njets_jerUp;
     std::map<std::string,Int_t>    b_njets_jerDown;
     std::map<std::string,Int_t>    b_njets20_jesUp;
     std::map<std::string,Int_t>    b_njets20_jesDown;
-    std::map<std::string,Int_t>    b_njets20_nom;
     std::map<std::string,Int_t>    b_njets20_jerUp;
     std::map<std::string,Int_t>    b_njets20_jerDown;
     std::map<std::string,Int_t>    b_ncbtag_jesUp;
     std::map<std::string,Int_t>    b_ncbtag_jesDown;
-    std::map<std::string,Int_t>    b_ncbtag_nom;
     std::map<std::string,Int_t>    b_ncbtag_jerUp;
     std::map<std::string,Int_t>    b_ncbtag_jerDown;
     std::map<std::string,Int_t>    b_ncjets_jesUp;
     std::map<std::string,Int_t>    b_ncjets_jesDown;
-    std::map<std::string,Int_t>    b_ncjets_nom;
     std::map<std::string,Int_t>    b_ncjets_jerUp;
     std::map<std::string,Int_t>    b_ncjets_jerDown;
     std::map<std::string,Int_t>    b_nfjets_jesUp;
     std::map<std::string,Int_t>    b_nfjets_jesDown;
-    std::map<std::string,Int_t>    b_nfjets_nom;
     std::map<std::string,Int_t>    b_nfjets_jerUp;
     std::map<std::string,Int_t>    b_nfjets_jerDown;
     
@@ -447,16 +443,24 @@ class TauTauAnalysis : public SCycleBase {
     
     std::map<std::string,Float_t>  b_byIsolationMVArun2v1DBoldDMwLTraw_2;
     std::map<std::string,Float_t>  b_byIsolationMVArun2v1DBnewDMwLTraw_2;
+    //std::map<std::string,Float_t>  b_byIsolationMVArun2v2DBoldDMwLTraw_2;
     std::map<std::string,Int_t>    b_againstElectronLooseMVA6_2;
     std::map<std::string,Int_t>    b_againstElectronMediumMVA6_2;
     std::map<std::string,Int_t>    b_againstElectronTightMVA6_2;
     std::map<std::string,Int_t>    b_againstElectronVTightMVA6_2;
     std::map<std::string,Int_t>    b_againstMuonLoose3_2;
     std::map<std::string,Int_t>    b_againstMuonTight3_2;
+    
+    //std::map<std::string,Int_t>    b_byVLooseIsolationMVArun2v2DBoldDMwLT_2;
+    //std::map<std::string,Int_t>    b_byLooseIsolationMVArun2v2DBoldDMwLT_2;
+    //std::map<std::string,Int_t>    b_byMediumIsolationMVArun2v2DBoldDMwLT_2;
+    //std::map<std::string,Int_t>    b_byTightIsolationMVArun2v2DBoldDMwLT_2;
+    //std::map<std::string,Int_t>    b_byVTightIsolationMVArun2v2DBoldDMwLT_2;
+    //std::map<std::string,Int_t>    b_byVVTightIsolationMVArun2v2DBoldDMwLT_2;
     //std::map<std::string,Int_t>    b_byVLooseIsolationMVArun2v1DBnewDMwLT_2;
     //std::map<std::string,Int_t>    b_byLooseIsolationMVArun2v1DBnewDMwLT_2;
     //std::map<std::string,Int_t>    b_byMediumIsolationMVArun2v1DBnewDMwLT_2;
-    //std::map<std::string,Int_t>    b_byTightIsolationMVArun2v1DBnewMwLT_2;
+    //std::map<std::string,Int_t>    b_byTightIsolationMVArun2v1DBnewDMwLT_2;
     //std::map<std::string,Int_t>    b_byVTightIsolationMVArun2v1DBnewDMwLT_2;
     //std::map<std::string,Int_t>    b_byVVTightIsolationMVArun2v1DBnewDMwLT_2;
     std::map<std::string,Int_t>    b_byVVLooseCombinedIsolationDeltaBetaCorr3Hits_2;
@@ -465,6 +469,7 @@ class TauTauAnalysis : public SCycleBase {
     std::map<std::string,Int_t>    b_byMediumCombinedIsolationDeltaBetaCorr3Hits_2;
     std::map<std::string,Int_t>    b_byTightCombinedIsolationDeltaBetaCorr3Hits_2;
     std::map<std::string,Int_t>    b_byCombinedIsolationDeltaBetaCorrRaw3Hits_2;
+    
     std::map<std::string,Float_t>  b_decayModeFindingOldDMs_2;
     std::map<std::string,Int_t>    b_decayMode_2;
     
@@ -510,22 +515,18 @@ class TauTauAnalysis : public SCycleBase {
     
     std::map<std::string,Float_t>  b_jpt_1_jesUp;
     std::map<std::string,Float_t>  b_jpt_1_jesDown;
-    std::map<std::string,Float_t>  b_jpt_1_nom;
     std::map<std::string,Float_t>  b_jpt_1_jerUp;
     std::map<std::string,Float_t>  b_jpt_1_jerDown;
     std::map<std::string,Float_t>  b_jeta_1_jesUp;
     std::map<std::string,Float_t>  b_jeta_1_jesDown;
-    std::map<std::string,Float_t>  b_jeta_1_nom;
     std::map<std::string,Float_t>  b_jeta_1_jerUp;
     std::map<std::string,Float_t>  b_jeta_1_jerDown;
     std::map<std::string,Float_t>  b_jpt_2_jesUp;
     std::map<std::string,Float_t>  b_jpt_2_jesDown;
-    std::map<std::string,Float_t>  b_jpt_2_nom;
     std::map<std::string,Float_t>  b_jpt_2_jerUp;
     std::map<std::string,Float_t>  b_jpt_2_jerDown;
     std::map<std::string,Float_t>  b_jeta_2_jesUp;
     std::map<std::string,Float_t>  b_jeta_2_jesDown;
-    std::map<std::string,Float_t>  b_jeta_2_nom;
     std::map<std::string,Float_t>  b_jeta_2_jerUp;
     std::map<std::string,Float_t>  b_jeta_2_jerDown;
     
@@ -558,21 +559,18 @@ class TauTauAnalysis : public SCycleBase {
     std::map<std::string,Float_t>  b_metcov10;
     std::map<std::string,Float_t>  b_metcov11;
     
-    std::map<std::string,Float_t>  b_dphi_ll_bj_jesUp;
-    std::map<std::string,Float_t>  b_dphi_ll_bj_jesDown;
-    std::map<std::string,Float_t>  b_dphi_ll_bj_nom;
-    std::map<std::string,Float_t>  b_dphi_ll_bj_jerUp;
-    std::map<std::string,Float_t>  b_dphi_ll_bj_jerDown;
+    //std::map<std::string,Float_t>  b_dphi_ll_bj_jesUp;
+    //std::map<std::string,Float_t>  b_dphi_ll_bj_jesDown;
+    //std::map<std::string,Float_t>  b_dphi_ll_bj_jerUp;
+    //std::map<std::string,Float_t>  b_dphi_ll_bj_jerDown;
     std::map<std::string,Float_t>  b_met_jesUp;
     std::map<std::string,Float_t>  b_met_jesDown;
-    std::map<std::string,Float_t>  b_met_nom;
     std::map<std::string,Float_t>  b_met_jerUp;
     std::map<std::string,Float_t>  b_met_jerDown;
     std::map<std::string,Float_t>  b_met_UncEnUp;
     std::map<std::string,Float_t>  b_met_UncEnDown;
     std::map<std::string,Float_t>  b_pfmt_1_jesUp;
     std::map<std::string,Float_t>  b_pfmt_1_jesDown;
-    std::map<std::string,Float_t>  b_pfmt_1_nom;
     std::map<std::string,Float_t>  b_pfmt_1_jerUp;
     std::map<std::string,Float_t>  b_pfmt_1_jerDown;
     std::map<std::string,Float_t>  b_pfmt_1_UncEnUp;
@@ -592,7 +590,7 @@ class TauTauAnalysis : public SCycleBase {
     std::map<std::string,Float_t>  b_m_mub;
     
     std::map<std::string,Float_t>  b_dR_ll;
-    std::map<std::string,Float_t>  b_dphi_ll_bj;
+    //std::map<std::string,Float_t>  b_dphi_ll_bj;
     std::map<std::string,Float_t>  b_mt_tot;
     std::map<std::string,Float_t>  b_ht;
     

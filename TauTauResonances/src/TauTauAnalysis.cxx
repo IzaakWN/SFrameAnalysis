@@ -62,6 +62,7 @@ TauTauAnalysis::TauTauAnalysis() : SCycleBase(),
   DeclareProperty( "JTFshift",              m_JTFshift              = 0.0               );
   DeclareProperty( "doJTF",                 m_doJTF                 = false             );
   DeclareProperty( "doTight",               m_doTight               = false             ); // fill branches with less events
+  DeclareProperty( "noTight",               m_noTight               = false             ); // override doTight
   
   // for SUSY https://twiki.cern.ch/twiki/bin/viewauth/CMS/HiggsToTauTauWorking2016
   // for comparison https://twiki.cern.ch/twiki/bin/viewauth/CMS/MSSMAHTauTauSummer2016#Baseline
@@ -144,10 +145,10 @@ void TauTauAnalysis::BeginCycle() throw( SError ){
   m_triggers_mutau.push_back( "HLT_IsoTkMu27_eta2p1"                                    );
   
   // electron triggers                                
-//   m_triggers_etau.push_back( "HLT_Ele27_WPTight_Gsf"                                    );
-//   m_triggers_etau.push_back( "HLT_Ele27_WPLoose_Gsf"                                    );
-//   m_triggers_etau.push_back( "HLT_Ele27_eta2p1_WPLoose"                                 );
-//   m_triggers_etau.push_back( "HLT_Ele27_eta2p1_WP75_Gsf"                                );
+  //m_triggers_etau.push_back( "HLT_Ele27_WPTight_Gsf"                                    );
+  //m_triggers_etau.push_back( "HLT_Ele27_WPLoose_Gsf"                                    );
+  //m_triggers_etau.push_back( "HLT_Ele27_eta2p1_WPLoose"                                 );
+  //m_triggers_etau.push_back( "HLT_Ele27_eta2p1_WP75_Gsf"                                );
   
   m_logger << INFO << "\nmutau triggers: " << SLogger::endmsg;
   for (auto const& trigger: m_triggers_mutau) m_logger << INFO << "  " << trigger << SLogger::endmsg;
@@ -194,7 +195,8 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
   m_doEES   = m_EESshift != 0.0 and !m_isData;
   m_doLTF   = m_LTFshift != 0.0 and !m_isData;
   m_doJTF   = m_JTFshift != 0.0 and !m_isData;
-  m_doTight = m_doTight or m_doEES or m_doTES or m_doLTF or m_doJTF;
+  m_doTight = (m_doTight or m_doTES or m_doLTF); // need fail region for EES, JTF
+  m_doTight = m_doTight and !m_noTight;          // noTight overrides doTight
   m_doJEC   = m_doJEC and !(m_doTES or m_doEES or m_doLTF or m_doJTF or m_isData);
   m_logger << INFO << "IsData:              " <<    (m_isData   ?   "TRUE" : "FALSE") << SLogger::endmsg;
   m_logger << INFO << "IsSignal:            " <<    (m_isSignal ?   "TRUE" : "FALSE") << SLogger::endmsg;
@@ -212,6 +214,7 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
   m_logger << INFO << "LTFshift:            " <<    m_LTFshift          << SLogger::endmsg;
   m_logger << INFO << "doJTF:               " <<    (m_doJTF    ?   "TRUE" : "FALSE") << SLogger::endmsg;
   m_logger << INFO << "JTFshift:            " <<    m_JTFshift          << SLogger::endmsg;
+  m_logger << INFO << "noTight:             " <<    (m_noTight  ?   "TRUE" : "FALSE") << SLogger::endmsg;
   m_logger << INFO << "doTight:             " <<    (m_doTight  ?   "TRUE" : "FALSE") << SLogger::endmsg;
 
   m_logger << INFO << "ElectronPtCut:       " <<    m_electronPtCut     << SLogger::endmsg;
@@ -307,6 +310,17 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
     DeclareVariable( b_againstMuonLoose3_2[ch],            "againstMuonLoose3_2",               treeName);
     DeclareVariable( b_againstMuonTight3_2[ch],            "againstMuonTight3_2",               treeName);
     
+    DeclareVariable( b_byIsolationMVArun2v1DBoldDMwLTraw_2[ch],            "byIsolationMVArun2v1DBoldDMwLTraw_2",            treeName);
+    //DeclareVariable( b_byIsolationMVArun2v2DBoldDMwLTraw_2[ch],            "byIsolationMVArun2v2DBoldDMwLTraw_2",            treeName);
+    DeclareVariable( b_byIsolationMVArun2v1DBnewDMwLTraw_2[ch],            "byIsolationMVArun2v1DBnewDMwLTraw_2",            treeName);
+    
+    //DeclareVariable( b_byVLooseIsolationMVArun2v2DBoldDMwLT_2[ch],         "byVLooseIsolationMVArun2v2DBoldDMwLT_2",         treeName);
+    //DeclareVariable( b_byLooseIsolationMVArun2v2DBoldDMwLT_2[ch],          "byLooseIsolationMVArun2v2DBoldDMwLT_2",          treeName);
+    //DeclareVariable( b_byMediumIsolationMVArun2v2DBoldDMwLT_2[ch],         "byMediumIsolationMVArun2v2DBoldDMwLT_2",         treeName);
+    //DeclareVariable( b_byTightIsolationMVArun2v2DBoldDMwLT_2[ch],          "byTightIsolationMVArun2v2DBoldDMwLT_2",          treeName);
+    //DeclareVariable( b_byVTightIsolationMVArun2v2DBoldDMwLT_2[ch],         "byVTightIsolationMVArun2v2DBoldDMwLT_2",         treeName);
+    //DeclareVariable( b_byVVTightIsolationMVArun2v2DBoldDMwLT_2[ch],        "byVVTightIsolationMVArun2v2DBoldDMwLT_2",        treeName);
+    
     //DeclareVariable( b_byVLooseIsolationMVArun2v1DBnewDMwLT_2[ch],         "byVLooseIsolationMVArun2v1DBnewDMwLT_2",         treeName);
     //DeclareVariable( b_byLooseIsolationMVArun2v1DBnewDMwLT_2[ch],          "byLooseIsolationMVArun2v1DBnewDMwLT_2",          treeName);
     //DeclareVariable( b_byMediumIsolationMVArun2v1DBnewDMwLT_2[ch],         "byMediumIsolationMVArun2v1DBnewDMwLT_2",         treeName);
@@ -320,8 +334,6 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
     DeclareVariable( b_byMediumCombinedIsolationDeltaBetaCorr3Hits_2[ch],  "byMediumCombinedIsolationDeltaBetaCorr3Hits_2",  treeName);
     DeclareVariable( b_byTightCombinedIsolationDeltaBetaCorr3Hits_2[ch],   "byTightCombinedIsolationDeltaBetaCorr3Hits_2",   treeName);
     DeclareVariable( b_byCombinedIsolationDeltaBetaCorrRaw3Hits_2[ch],     "byCombinedIsolationDeltaBetaCorrRaw3Hits_2",     treeName);
-    DeclareVariable( b_byIsolationMVArun2v1DBoldDMwLTraw_2[ch],            "byIsolationMVArun2v1DBoldDMwLTraw_2",            treeName);
-    DeclareVariable( b_byIsolationMVArun2v1DBnewDMwLTraw_2[ch],            "byIsolationMVArun2v1DBnewDMwLTraw_2",            treeName);
     
     if(!m_doTight){
       DeclareVariable( b_chargedPionPt_2[ch],                    "chargedPionPt_2",                   treeName);
@@ -401,20 +413,6 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
     DeclareVariable( b_fjpt_2[ch],              "fjpt_2",               treeName);
     DeclareVariable( b_fjeta_2[ch],             "fjeta_2",              treeName);
     
-    DeclareVariable( b_jpt_1_nom[ch],           "jpt_1_nom",            treeName);
-    DeclareVariable( b_jeta_1_nom[ch],          "jeta_1_nom",           treeName);
-    DeclareVariable( b_jpt_2_nom[ch],           "jpt_2_nom",            treeName);
-    DeclareVariable( b_jeta_2_nom[ch],          "jeta_2_nom",           treeName);
-    
-    DeclareVariable( b_njets_nom[ch],           "njets_nom",            treeName);
-    DeclareVariable( b_njets20_nom[ch],         "njets20_nom",          treeName);
-    DeclareVariable( b_ncjets_nom[ch],          "ncjets_nom",           treeName);
-    DeclareVariable( b_ncbtag_nom[ch],          "ncbtag_nom",           treeName);
-    DeclareVariable( b_nfjets_nom[ch],          "nfjets_nom",           treeName);
-    DeclareVariable( b_met_nom[ch],             "met_nom",              treeName);
-    DeclareVariable( b_pfmt_1_nom[ch],          "pfmt_1_nom",           treeName);
-    DeclareVariable( b_dphi_ll_bj_nom[ch],      "dphi_ll_bj_nom",       treeName);
-    
     if (m_doJEC){
       DeclareVariable( b_njets_jesUp[ch],           "njets_jesUp",          treeName);
       DeclareVariable( b_njets_jesDown[ch],         "njets_jesDown",        treeName);
@@ -468,10 +466,10 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
       DeclareVariable( b_pfmt_1_UncEnUp[ch],        "pfmt_1_UncEnUp",       treeName);
       DeclareVariable( b_pfmt_1_UncEnDown[ch],      "pfmt_1_UncEnDown",     treeName);
       
-      DeclareVariable( b_dphi_ll_bj_jesUp[ch],      "dphi_ll_bj_jesUp",     treeName);
-      DeclareVariable( b_dphi_ll_bj_jesDown[ch],    "dphi_ll_bj_jesDown",   treeName);
-      DeclareVariable( b_dphi_ll_bj_jerUp[ch],      "dphi_ll_bj_jerUp",     treeName);
-      DeclareVariable( b_dphi_ll_bj_jerDown[ch],    "dphi_ll_bj_jerDown",   treeName);
+      //DeclareVariable( b_dphi_ll_bj_jesUp[ch],      "dphi_ll_bj_jesUp",     treeName);
+      //DeclareVariable( b_dphi_ll_bj_jesDown[ch],    "dphi_ll_bj_jesDown",   treeName);
+      //DeclareVariable( b_dphi_ll_bj_jerUp[ch],      "dphi_ll_bj_jerUp",     treeName);
+      //DeclareVariable( b_dphi_ll_bj_jerDown[ch],    "dphi_ll_bj_jerDown",   treeName);
       
       DeclareVariable( b_weightbtag_bcUp[ch],       "weightbtag_bcUp",      treeName);
       DeclareVariable( b_weightbtag_bcDown[ch],     "weightbtag_bcDown",    treeName);
@@ -493,7 +491,7 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
     DeclareVariable( b_R_pt_m_sv[ch],           "R_pt_m_sv",            treeName);
     
     DeclareVariable( b_dR_ll[ch],               "dR_ll",                treeName);
-    DeclareVariable( b_dphi_ll_bj[ch],          "dphi_ll_bj",           treeName);
+    //DeclareVariable( b_dphi_ll_bj[ch],          "dphi_ll_bj",           treeName);
     DeclareVariable( b_mt_tot[ch],              "mt_tot",               treeName);
     DeclareVariable( b_ht[ch],                  "ht",                   treeName);
     
@@ -524,6 +522,7 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
     Book( TH1F(hname, hname, 12, 0.5, 12.5 ), dirname);
   }
   Book( TH1F("npu",             "npu",              110, -10, 100 ), "checks");
+  Book( TH1F("npu_float",       "npu",             1100, -10, 100 ), "checks");
   Book( TH1F("npu_no0PU",       "npu_no0PU",        110, -10, 100 ), "checks");
   Book( TH1F("puweight",        "puweight",         100,   0,  10 ), "checks");
   
@@ -596,7 +595,7 @@ void TauTauAnalysis::printCutFlow(const std::string& ch, const std::string& name
   m_logger << INFO << name << " cut flow for " << ch << SLogger::endmsg;
   m_logger << INFO << Form( "Cut\t%25.25s\tEvents\tRelEff\tAbsEff", "Name" ) << SLogger::endmsg;
   m_logger << INFO << Form( "\t%25.25s\t%6.0f", "start", ntot ) << SLogger::endmsg;
-  for( Int_t ibin = 1; ibin < (int) cutName.size(); ++ibin ){
+  for( Int_t ibin=1; ibin<(int)cutName.size(); ++ibin ){
     Int_t    icut    = ibin;
     Double_t nevents = Hist(hname, dirname)->GetBinContent( ibin+1 );
     Double_t releff  = 100. * nevents / Hist(hname, dirname)->GetBinContent( ibin );
@@ -626,6 +625,7 @@ void TauTauAnalysis::BeginInputFile( const SInputData& ) throw( SError ) {
   m_electron.ConnectVariables(      m_recoTreeName.c_str(), Ntuple::ElectronBasic|Ntuple::ElectronID|Ntuple::ElectronAdvancedID|Ntuple::ElectronBoostedIsolation|Ntuple::ElectronSuperCluster, (m_electronName + "_").c_str() );
   m_muon.ConnectVariables(          m_recoTreeName.c_str(), Ntuple::MuonBasic|Ntuple::MuonID|Ntuple::MuonIsolation|Ntuple::MuonTrack|Ntuple::MuonBoostedIsolation, (m_muonName + "_").c_str() );
   m_tau.ConnectVariables(           m_recoTreeName.c_str(), Ntuple::TauBasic|Ntuple::TauID|Ntuple::TauAdvancedID, (m_tauName + "_").c_str() );
+  //m_tau.ConnectVariables(           m_recoTreeName.c_str(), Ntuple::TauBasic|Ntuple::TauID|Ntuple::TauAdvancedID|Ntuple::TauAdvancedIDv2, (m_tauName + "_").c_str() );
   
   m_missingEt.ConnectVariables(     m_recoTreeName.c_str(), Ntuple::MissingEtBasic|Ntuple::MissingEtAnalysis|Ntuple::MissingEtAnalysisSyst|Ntuple::MissingEtCovAnalysis, (m_missingEtName + "_").c_str() );
   m_puppimissingEt.ConnectVariables(m_recoTreeName.c_str(), Ntuple::MissingEtBasic, (m_missingEtName + "_puppi_").c_str() );
@@ -660,6 +660,7 @@ void TauTauAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
   }
   if (m_isData){
     Hist("npu", "checks")->Fill(m_eventInfo.PV_N);
+    Hist("npu_float", "checks")->Fill(m_eventInfo.PV_N);
     if(m_eventInfo.PV_N<=0) throw SError( SError::SkipEvent );
   }else{
     for (auto ch: channels_)
@@ -1055,15 +1056,18 @@ void TauTauAnalysis::getEventWeight() {
       
       if(b_npu_<0){
         Hist("npu", "checks")->Fill(-9);
+        Hist("npu_float", "checks")->Fill(-9);
         //std::cout<<"Warning!!! b_npu_ = "<<b_npu_<<" < 0"<<std::endl;
         throw SError( SError::SkipEvent );
       }else if(b_npu_==0){
         Hist("npu", "checks")->Fill(0);
+        Hist("npu_float", "checks")->Fill(0);
         //std::cout<<"Warning!!! b_npu_ = "<<b_npu_<<" == 0"<<std::endl;
         throw SError( SError::SkipEvent );      
       }
       
       Hist("npu", "checks")->Fill(b_npu_);
+      Hist("npu_float", "checks")->Fill(b_npu_);
       b_puweight_ = m_PileupReweightingTool.getPileUpWeight( b_npu_ );
       //if(m_doJEC){
       //  b_puweight_Up_   = m_PileupReweightingTool.getPileUpweight( b_npu_, +1 );
@@ -1145,14 +1149,25 @@ void TauTauAnalysis::FillBranches(const std::string& channel, const UZH::Tau& ta
   b_againstElectronVTightMVA6_2[ch]                    = tau.againstElectronVTightMVA6();
   b_againstMuonLoose3_2[ch]                            = tau.againstMuonLoose3();
   b_againstMuonTight3_2[ch]                            = tau.againstMuonTight3();
+  
+  
+  b_byIsolationMVArun2v1DBnewDMwLTraw_2[ch]            = tau.byIsolationMVArun2v1DBnewDMwLTraw();
+  b_byIsolationMVArun2v1DBoldDMwLTraw_2[ch]            = tau.byIsolationMVArun2v1DBoldDMwLTraw();
+  
+  //b_byIsolationMVArun2v2DBoldDMwLTraw_2[ch]            = tau.byIsolationMVArun2v2DBoldDMwLTraw();
+  //b_byVLooseIsolationMVArun2v2DBoldDMwLT_2[ch]         = tau.byVLooseIsolationMVArun2v2DBoldDMwLT();
+  //b_byLooseIsolationMVArun2v2DBoldDMwLT_2[ch]          = tau.byLooseIsolationMVArun2v2DBoldDMwLT();
+  //b_byMediumIsolationMVArun2v2DBoldDMwLT_2[ch]         = tau.byMediumIsolationMVArun2v2DBoldDMwLT();
+  //b_byTightIsolationMVArun2v2DBoldDMwLT_2[ch]          = tau.byTightIsolationMVArun2v2DBoldDMwLT();  
+  //b_byVTightIsolationMVArun2v2DBoldDMwLT_2[ch]         = tau.byVTightIsolationMVArun2v2DBoldDMwLT();
+  //b_byVVTightIsolationMVArun2v2DBoldDMwLT_2[ch]        = tau.byVVTightIsolationMVArun2v2DBoldDMwLT();
+  
   b_byVVLooseCombinedIsolationDeltaBetaCorr3Hits_2[ch] = tau.byCombinedIsolationDeltaBetaCorrRaw3Hits()<4.5;
   b_byVLooseCombinedIsolationDeltaBetaCorr3Hits_2[ch]  = tau.byCombinedIsolationDeltaBetaCorrRaw3Hits()<3.5;
   b_byLooseCombinedIsolationDeltaBetaCorr3Hits_2[ch]   = tau.byLooseCombinedIsolationDeltaBetaCorr3Hits();
   b_byMediumCombinedIsolationDeltaBetaCorr3Hits_2[ch]  = tau.byMediumCombinedIsolationDeltaBetaCorr3Hits();
   b_byTightCombinedIsolationDeltaBetaCorr3Hits_2[ch]   = tau.byTightCombinedIsolationDeltaBetaCorr3Hits();
   b_byCombinedIsolationDeltaBetaCorrRaw3Hits_2[ch]     = tau.byCombinedIsolationDeltaBetaCorrRaw3Hits();
-  b_byIsolationMVArun2v1DBnewDMwLTraw_2[ch]            = tau.byIsolationMVArun2v1DBnewDMwLTraw();
-  b_byIsolationMVArun2v1DBoldDMwLTraw_2[ch]            = tau.byIsolationMVArun2v1DBoldDMwLTraw();
   
   if(!m_doTight){
     b_chargedPionPt_2[ch]                              = tau.chargedPionPt();
@@ -1276,9 +1291,9 @@ void TauTauAnalysis::FillBranches(const std::string& channel, const UZH::Tau& ta
   if(!m_isData){
     if(m_doTES and gen_match_2==5){ // TES
       // https://twiki.cern.ch/twiki/bin/viewauth/CMS/SMTauTau2016#Tau_Energy_Scale_TES
-      shiftLeptonAndMET(m_TESshift,tau_tlv,met_tlv_corrected);
-      b_pt_2[ch]    = tau_tlv.Pt();
-      b_m_2[ch]     = tau_tlv.M();
+      //shiftLeptonAndMET(m_TESshift,tau_tlv,met_tlv_corrected);
+      b_pt_2[ch]    = tau_tlv.Pt()*(1+m_TESshift);
+      b_m_2[ch]     = tau_tlv.M()*(1+m_TESshift);
     }
     else if(m_doLTF and gen_match_2<5){ // Lepton to tau fake (LTF)
       // https://twiki.cern.ch/twiki/bin/viewauth/CMS/SMTauTau2016#Electron_to_Tau_Fake
@@ -1287,9 +1302,9 @@ void TauTauAnalysis::FillBranches(const std::string& channel, const UZH::Tau& ta
       b_m_2[ch]     = tau_tlv.M();
     }
     else if(m_doJTF and gen_match_2!=5){ // Jet to tau fake (LTF)
-      shiftLeptonAndMET(m_JTFshift,tau_tlv,met_tlv_corrected);
-      b_pt_2[ch]    = tau_tlv.Pt();
-      b_m_2[ch]     = tau_tlv.M();
+      //shiftLeptonAndMET(m_JTFshift,tau_tlv,met_tlv_corrected);
+      b_pt_2[ch]    = tau_tlv.Pt()*(1+m_JTFshift);
+      b_m_2[ch]     = tau_tlv.M()*(1+m_JTFshift);
     }
     else if(m_doEES and channel=="etau"){ // Electron ES
       if(fabs(electron.tlv().Eta())<1.479) shiftLeptonAndMET(m_EESshift,      lep_tlv,met_tlv_corrected);
@@ -1312,8 +1327,8 @@ void TauTauAnalysis::FillBranches(const std::string& channel, const UZH::Tau& ta
   //std::cout << " 4";
   
   //if(b_isolated_) std::sort(Jets.begin(), Jets.end(), UZH::sortJetPt() );
-  float fmet_nom    = met.et();
-  float fmetphi_nom = met.phi();
+  float fmet_jes    = met.et();
+  float fmetphi_jes = met.phi();
   FillJetBranches( ch, Jets, met, lep_tlv, tau_tlv );
   
   
@@ -1330,7 +1345,6 @@ void TauTauAnalysis::FillBranches(const std::string& channel, const UZH::Tau& ta
   float fpuppimetphi = puppimet.phi();
   
   b_met[ch]         = fmet;
-  b_met_nom[ch]     = fmet_nom;
   b_metphi[ch]      = fmetphi;
   b_puppimet[ch]    = fpuppimet;
   b_puppimetphi[ch] = fpuppimetphi;
@@ -1342,7 +1356,6 @@ void TauTauAnalysis::FillBranches(const std::string& channel, const UZH::Tau& ta
   
   b_pfmt_1[ch]      = TMath::Sqrt(2*lep_tlv.Pt()*fmet*(      1-TMath::Cos(deltaPhi(lep_tlv.Phi(), fmetphi      ))));
   b_puppimt_1[ch]   = TMath::Sqrt(2*lep_tlv.Pt()*fpuppimet*( 1-TMath::Cos(deltaPhi(lep_tlv.Phi(), fpuppimetphi ))));
-  b_pfmt_1_nom[ch]  = TMath::Sqrt(2*lep_tlv.Pt()*fmet_nom*(  1-TMath::Cos(deltaPhi(lep_tlv.Phi(), fmetphi_nom  ))));
   
   b_pfmt_2[ch]      = TMath::Sqrt(2*tau_tlv.Pt()*fmet*(      1-TMath::Cos(deltaPhi(tau_tlv.Phi(), fmetphi      ))));
   b_puppimt_2[ch]   = TMath::Sqrt(2*tau_tlv.Pt()*fpuppimet*( 1-TMath::Cos(deltaPhi(tau_tlv.Phi(), fpuppimetphi ))));
@@ -1364,20 +1377,19 @@ void TauTauAnalysis::FillBranches(const std::string& channel, const UZH::Tau& ta
   TVector3 leg2(tau_tlv.Px(), tau_tlv.Py(), 0.);
   TVector3 metleg   = met_tlv.Vect();
   TVector3 zetaAxis = (leg1.Unit() + leg2.Unit()).Unit();
-
+  
   b_pzetamiss[ch]   = metleg*zetaAxis;
   b_pzetavis[ch]    = leg1*zetaAxis + leg2*zetaAxis;;
   b_dzeta[ch]       = b_pzetamiss[ch] - 0.5*b_pzetavis[ch];
   
   if(m_doJEC){ // no need to substract shifts from met, use shifts available in ntuple instead:
-    TLorentzVector met_nom, met_jesUp, met_jesDown, met_jerUp, met_jerDown, met_UncEnUp, met_UncEnDown;
-    //met_nom.SetPtEtaPhiE(       fmet_nom,                           0., fmetphi_nom, fmet_nom                           );
-    met_jesUp.SetPtEtaPhiE(     fmet_nom * met.JetEnUp(),           0., fmetphi_nom, fmet_nom * met.JetEnUp()           );
-    met_jesDown.SetPtEtaPhiE(   fmet_nom * met.JetEnDown(),         0., fmetphi_nom, fmet_nom * met.JetEnDown()         );
-    met_jerUp.SetPtEtaPhiE(     fmet_nom * met.JetResUp(),          0., fmetphi_nom, fmet_nom * met.JetResUp()          );
-    met_jerDown.SetPtEtaPhiE(   fmet_nom * met.JetResDown(),        0., fmetphi_nom, fmet_nom * met.JetResDown()        );
-    met_UncEnUp.SetPtEtaPhiE(   fmet_nom * met.UnclusteredEnUp(),   0., fmetphi_nom, fmet_nom * met.UnclusteredEnUp()   );
-    met_UncEnDown.SetPtEtaPhiE( fmet_nom * met.UnclusteredEnDown(), 0., fmetphi_nom, fmet_nom * met.UnclusteredEnDown() );
+    TLorentzVector met_jesUp, met_jesDown, met_jerUp, met_jerDown, met_UncEnUp, met_UncEnDown;
+    met_jesUp.SetPtEtaPhiE(     fmet_jes * met.JetEnUp(),           0., fmetphi_jes, fmet_jes * met.JetEnUp()           );
+    met_jesDown.SetPtEtaPhiE(   fmet_jes * met.JetEnDown(),         0., fmetphi_jes, fmet_jes * met.JetEnDown()         );
+    met_jerUp.SetPtEtaPhiE(     fmet_jes * met.JetResUp(),          0., fmetphi_jes, fmet_jes * met.JetResUp()          );
+    met_jerDown.SetPtEtaPhiE(   fmet_jes * met.JetResDown(),        0., fmetphi_jes, fmet_jes * met.JetResDown()        );
+    met_UncEnUp.SetPtEtaPhiE(   fmet_jes * met.UnclusteredEnUp(),   0., fmetphi_jes, fmet_jes * met.UnclusteredEnUp()   );
+    met_UncEnDown.SetPtEtaPhiE( fmet_jes * met.UnclusteredEnDown(), 0., fmetphi_jes, fmet_jes * met.UnclusteredEnDown() );
     b_met_jesUp[ch]        = met_jesUp.Et();
     b_met_jesDown[ch]      = met_jesDown.Et();
     b_met_jerUp[ch]        = met_jerUp.Et();
@@ -1472,7 +1484,6 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
   Int_t ncbtag = 0;    Int_t ncbtag20 = 0;
   
   // JEC variables
-  Int_t nfjets_nom     = 0;  Int_t ncjets_nom     = 0;  Int_t ncbtag_nom     = 0;  Int_t njets20_nom     = 0;
   Int_t nfjets_jesUp   = 0;  Int_t ncjets_jesUp   = 0;  Int_t ncbtag_jesUp   = 0;  Int_t njets20_jesUp   = 0;
   Int_t nfjets_jesDown = 0;  Int_t ncjets_jesDown = 0;  Int_t ncbtag_jesDown = 0;  Int_t njets20_jesDown = 0;
   Int_t nfjets_jerUp   = 0;  Int_t ncjets_jerUp   = 0;  Int_t ncbtag_jerUp   = 0;  Int_t njets20_jerUp   = 0;
@@ -1480,7 +1491,6 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
   
   // to compare to uncorrected "nominal" jets
   TLorentzVector jet1,         jet2,         // default jets (JER on top of JES)
-                 jet1_nom,     jet2_nom,     // nominal jets (JES, no JER)
                  jet1_jesUp,   jet2_jesUp,
                  jet1_jesDown, jet2_jesDown,
                  jet1_jerUp,   jet2_jerUp,
@@ -1492,19 +1502,11 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
   double bdeepcsv1 = 0;
   double bdeepcsv2 = 0;
   
-  // for dphi_ll_bj: get two leading central jets, one of which b tagged
-  TLorentzVector                    jet2_dphi,
-                 bjet_dphi_nom,     jet2_dphi_nom,
-                 bjet_dphi_jesUp,   jet2_dphi_jesUp,
-                 bjet_dphi_jesDown, jet2_dphi_jesDown,
-                 bjet_dphi_jerUp,   jet2_dphi_jerUp,
-                 bjet_dphi_jerDown, jet2_dphi_jerDown;
-  
   // doJEC
   bool doJEC = m_doJEC; //and;
   TLorentzVector dtlv_jer; // difference in pt after smearing, to propagate to met
     
-  Float_t phi_ll = (lep_tlv + tau_tlv).Phi(); // for dphi_ll_bj
+  //Float_t phi_ll = (lep_tlv + tau_tlv).Phi(); // for dphi_ll_bj
   Float_t ht     = lep_tlv.E() + tau_tlv.E(); // total scalar energy HT
   
   b_weightbtag_             = 1.;
@@ -1513,30 +1515,29 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
   b_weightbtag_udsgUp[ch]   = 1.; //m_BTaggingScaleTool.getScaleFactor(Jets, 0.,+1.);
   b_weightbtag_udsgDown[ch] = 1.; //m_BTaggingScaleTool.getScaleFactor(Jets, 0.,-1.);
   
-  // https://twiki.cern.ch/twiki/bin/viewauth/CMS/HiggsToTauTauWorking2016#Other_common_selections
-  //if(Jets.size()>0) printRow({"ijet","jet pt","jerDown","jer","jerUp","jesDown","jesUp"});
-  //printRow({"ijet","jer sf DOWN","jer sf","jer sf UP"},{},{},{},15);
-  for( int ijet = 0; ijet < (int)Jets.size(); ++ijet ){ // already |eta|<4.7 jets
+  //if(Jets.size()>0) printRow({"ijet","jet pt","jesDown","jesUp","jerDown","jer","jerUp"});
+  //if(Jets.size()>0) printRow({"ijet","jec DOWN","jec","jec UP","jer sf DOWN","jer sf","jer sf UP"},{},{},{},14);
+  for( int ijet=0; ijet<(int)Jets.size(); ++ijet ){ // already |eta|<4.7 jets
       
       // "nominal" jet
       Float_t abseta     = fabs(Jets.at(ijet).eta());
       Float_t pt         = Jets.at(ijet).pt();
       TLorentzVector jet = Jets.at(ijet).tlv();
-      bool isBTagged     = getBTag_promote_demote(Jets.at(ijet));
-      countJets( jet, ncjets_nom, nfjets_nom, ncbtag_nom, bjet_dphi_nom, jet2_dphi_nom, isBTagged );
+      bool isBTagged     = getBTagStatus_promote_demote(Jets.at(ijet));
+      Jets.at(ijet).setTagged(isBTagged);
       
       // smeared jet
       if(m_isData){ // no SMEARING
-        if(pt < m_AK4jetPtCut) continue;
+        if(pt<m_AK4jetPtCut) continue;
         if(pt > jet1.Pt()){
-          if(jet1.Pt()<20){ // jet1 unset
-            jet1 = jet;  jet1_nom = jet;
-          }else{ // jet1 already set - reorder
-            jet2 = jet1; jet2_nom = jet1_nom; // reorder
-            jet1 = jet;  jet1_nom = jet;
+          if(jet1.Pt()<20){ // jet1 is unset
+            jet1 = jet;
+          }else{ // jet1 is already set - reorder
+            jet2 = jet1; // reorder
+            jet1 = jet;
           }
         }else if(pt > jet2.Pt()){
-            jet2 = jet;  jet2_nom = jet;
+            jet2 = jet;
         }
       }else{
         TLorentzVector jet_jer;
@@ -1552,43 +1553,46 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
           }
           
           // get shifts
-          std::vector<TLorentzVector> jets_jer = m_JetCorrectionTool.GetCorrectedJetJERShifted(Jets.at(ijet),m_genJetAK4);
+          float jercorr = 1.0;
+          std::vector<TLorentzVector> jets_jer = m_JetCorrectionTool.GetCorrectedJetJERShifted(Jets.at(ijet),m_genJetAK4,jercorr);
           std::vector<TLorentzVector> jets_jes = m_JetCorrectionTool.GetCorrectedJet(Jets.at(ijet));
           jet_jer = jets_jer.at(0);
           TLorentzVector jet_jerUp(jets_jer.at(1)), jet_jerDown(jets_jer.at(2));
           TLorentzVector jet_jesUp(jets_jes.at(0)), jet_jesDown(jets_jes.at(1));
-          //printRow({},{ijet},{pt,jet_jerDown.Pt(),jet_jer.Pt(),jet_jerUp.Pt(),jet_jesDown.Pt(),jet_jesUp.Pt()});
-          //printRow({},{ijet},{Jets.at(ijet).jer_sf_down(),Jets.at(ijet).jer_sf(),Jets.at(ijet).jer_sf_up()},{},15);
-          pt = jet_jer.Pt();
+          //printRow({},{ijet},{jet_jesDown.Pt(),pt,jet_jesUp.Pt(),jet_jerDown.Pt(),jet_jer.Pt(),jet_jerUp.Pt()},{},14);
+          //printRow({},{ijet},{Jets.at(ijet).jecDown(),Jets.at(ijet).jec(),Jets.at(ijet).jecUp(),Jets.at(ijet).jer_sf_down(),Jets.at(ijet).jer_sf(),Jets.at(ijet).jer_sf_up()},{},14);
+          pt           = jet_jer.Pt();
+          jet_jesUp   *= jercorr;
+          jet_jesDown *= jercorr;
           
           // reorder pt and save nominal & shifts
           if(pt > jet1.Pt()){
-            if(jet1.Pt()<20){ // set jet1 for first time
-              jet1         = jet_jer;       jet1_nom     = jet;
+            if(jet1.Pt()<20){ // jet1 is unset
+              jet1         = jet_jer;
               jet1_jerUp   = jet_jerUp;     jet1_jesUp   = jet_jesUp;
               jet1_jerDown = jet_jerDown;   jet1_jesDown = jet_jesDown;
             }else{ // jet1 is already set - reorder
-              jet2         = jet1;          jet2_nom     = jet1_nom;     // reorder
+              jet2         = jet1;                                       // reorder
               jet2_jerUp   = jet1_jerUp;    jet2_jesUp   = jet1_jesUp;   // reorder
               jet2_jerDown = jet1_jerDown;  jet2_jesDown = jet1_jesDown; // reorder
-              jet1         = jet_jer;       jet1_nom     = jet;
+              jet1         = jet_jer;
               jet1_jerUp   = jet_jerUp;     jet1_jesUp   = jet_jesUp;
               jet1_jerDown = jet_jerDown;   jet1_jesDown = jet_jesDown;
             }
           }else if(pt > jet2.Pt()){
-              jet2         = jet_jer;       jet2_nom     = jet;
+              jet2         = jet_jer;
               jet2_jerUp   = jet_jerUp;     jet2_jesUp   = jet_jesUp;
               jet2_jerDown = jet_jerDown;   jet2_jesDown = jet_jesDown;
           }
           
           // count shifted >30 GeV jets
-          countJets( jet_jesUp,   ncjets_jesUp,   nfjets_jesUp,   ncbtag_jesUp,   bjet_dphi_jesUp,   jet2_dphi_jesUp,   isBTagged );
-          countJets( jet_jesDown, ncjets_jesDown, nfjets_jesDown, ncbtag_jesDown, bjet_dphi_jesDown, jet2_dphi_jesDown, isBTagged );
-          countJets( jet_jerUp,   ncjets_jerUp,   nfjets_jerUp,   ncbtag_jerUp,   bjet_dphi_jerUp,   jet2_dphi_jerUp,   isBTagged );
-          countJets( jet_jerDown, ncjets_jerDown, nfjets_jerDown, ncbtag_jerDown, bjet_dphi_jerDown, jet2_dphi_jerDown, isBTagged );
+          countJets( jet_jesUp,   ncjets_jesUp,   nfjets_jesUp,   ncbtag_jesUp,   isBTagged );
+          countJets( jet_jesDown, ncjets_jesDown, nfjets_jesDown, ncbtag_jesDown, isBTagged );
+          countJets( jet_jerUp,   ncjets_jerUp,   nfjets_jerUp,   ncbtag_jerUp,   isBTagged );
+          countJets( jet_jerDown, ncjets_jerDown, nfjets_jerDown, ncbtag_jerDown, isBTagged );
         }else{ // do SMEARING only
           
-          // b tag weight before smearing  
+          // b tag weight before smearing
           if(pt>m_AK4jetPtCut)
             b_weightbtag_ *= m_BTaggingScaleTool.getScaleFactor(Jets.at(ijet));
           
@@ -1598,14 +1602,14 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
           // reorder pt
           if(pt > jet1.Pt()){
             if(jet1.Pt()<20){ // set jet1 for first time
-              jet1 = jet_jer; jet1_nom = jet;
+              jet1 = jet_jer;
             }else{ // jet1 is already set - reorder
-              jet2 = jet1;    jet2_nom = jet1_nom; // reorder
-              jet1 = jet_jer; jet1_nom = jet;
+              jet2 = jet1;    // reorder
+              jet1 = jet_jer;
             }
           }
           else if(pt > jet2.Pt()){
-              jet2 = jet_jer; jet2_nom = jet;
+              jet2 = jet_jer;
           }
         }
         
@@ -1645,7 +1649,7 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
               bdeepcsv2 = Jets.at(ijet).deepCSV();
           }
         }
-        if(pt>jet2_dphi.Pt() and bjet1!=jet){ jet2_dphi = jet; }
+        //if(pt>jet2_dphi.Pt() and bjet1!=jet){ jet2_dphi = jet; }
       }
       else if(abseta > 2.4){        // FORWARD 20 GeV
         if(isBTagged) nfbtag20++;   //  btag
@@ -1655,13 +1659,13 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
           nfjets++;                 //  jets
         }
         if(pt>fjet1.Pt()){ // fjet TLorentzVectors
-          if(jet1.Pt()<20){      fjet1 = jet; } // set fjet1 for first time
+          if(jet1.Pt()<20){      fjet1 = jet; } // jet1 is unset
           else{   fjet2 = fjet1; fjet1 = jet; } // reorder
         }else if(pt>fjet2.Pt()){ fjet2 = jet; }
       }
   }
   
-  // propagate smearing to MET 
+  // propagate smearing to MET
   if(!m_isData) shiftMET(dtlv_jer,met);
   
   // jet multiplicities
@@ -1688,18 +1692,14 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
   
   // JEC
   if(doJEC){
-    b_nfjets_jesUp[ch]   = nfjets_jesUp;      b_ncjets_jesUp[ch]   = ncjets_jesUp;      b_ncbtag_jesUp[ch]   = ncbtag_jesUp;  
+    b_nfjets_jesUp[ch]   = nfjets_jesUp;      b_ncjets_jesUp[ch]   = ncjets_jesUp;      b_ncbtag_jesUp[ch]   = ncbtag_jesUp;
     b_nfjets_jesDown[ch] = nfjets_jesDown;    b_ncjets_jesDown[ch] = ncjets_jesDown;    b_ncbtag_jesDown[ch] = ncbtag_jesDown;
-    b_nfjets_nom[ch]     = nfjets_nom;        b_ncjets_nom[ch]     = ncjets_nom;        b_ncbtag_nom[ch]     = ncbtag_nom;    
-    b_nfjets_jerUp[ch]   = nfjets_jerUp;      b_ncjets_jerUp[ch]   = ncjets_jerUp;      b_ncbtag_jerUp[ch]   = ncbtag_jerUp;  
+    b_nfjets_jerUp[ch]   = nfjets_jerUp;      b_ncjets_jerUp[ch]   = ncjets_jerUp;      b_ncbtag_jerUp[ch]   = ncbtag_jerUp;
     b_nfjets_jerDown[ch] = nfjets_jerDown;    b_ncjets_jerDown[ch] = ncjets_jerDown;    b_ncbtag_jerDown[ch] = ncbtag_jerDown;
     b_njets_jesUp[ch]    = nfjets_jesUp   + ncjets_jesUp;           //b_njets20_jesUp[ch]   = njets20_jesUp;
     b_njets_jesDown[ch]  = nfjets_jesDown + ncjets_jesDown;         //b_njets20_jesDown[ch] = njets20_jesDown;
-    b_njets_nom[ch]      = nfjets_nom     + ncjets_nom;             //b_njets20_nom[ch]     = njets20_jer;
     b_njets_jerUp[ch]    = nfjets_jerUp   + ncjets_jerUp;           //b_njets20_jerUp[ch]   = njets20_jerUp;
     b_njets_jerDown[ch]  = nfjets_jerDown + ncjets_jerDown;         //b_njets20_jerDown[ch] = njets20_jerDown;
-    FillJetBranches_JEC( b_jpt_1_nom[ch],     b_jeta_1_nom[ch],     jet1_nom,     jet1_nom.Pt()    >m_AK4jetPtCut);
-    FillJetBranches_JEC( b_jpt_2_nom[ch],     b_jeta_2_nom[ch],     jet2_nom,     jet2_nom.Pt()    >m_AK4jetPtCut);
     FillJetBranches_JEC( b_jpt_1_jesUp[ch],   b_jeta_1_jesUp[ch],   jet1_jesUp,   jet1_jesUp.Pt()  >m_AK4jetPtCut);
     FillJetBranches_JEC( b_jpt_2_jesUp[ch],   b_jeta_2_jesUp[ch],   jet2_jesUp,   jet2_jesUp.Pt()  >m_AK4jetPtCut);
     FillJetBranches_JEC( b_jpt_1_jesDown[ch], b_jeta_1_jesDown[ch], jet1_jesDown, jet1_jesDown.Pt()>m_AK4jetPtCut);
@@ -1743,6 +1743,7 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
     b_bpt_2[ch]      = bjet2.Pt();
     b_beta_2[ch]     = bjet2.Eta();
     b_bphi_2[ch]     = bjet2.Phi();
+    b_bcsv_2[ch]     = bcsv2;
     b_bdeepcsv_2[ch] = bdeepcsv2;
   }else{
     b_bpt_2[ch]      = -1;
@@ -1791,67 +1792,24 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
     b_m_taumub[ch]  = -1;
     b_m_mub[ch]     = -1;
   }
-  
-  // Delta phi( lep+tau, bj+cj ) if there is one central b jet and one central jet
-  // jet2_dphi = central jet that is not the same as leading b jet
-  if(bjet1.Pt() > m_AK4jetPtCut and jet2_dphi.Pt() > m_AK4jetPtCut)
-    b_dphi_ll_bj[ch] = fabs(deltaPhi( phi_ll, (bjet1+jet2_dphi).Phi() ));
-  else
-    b_dphi_ll_bj[ch] = -1;
-  
-  // Delta phi JEC
-  if(doJEC){
-    if( bjet_dphi_nom.Pt() > m_AK4jetPtCut and jet2_dphi_nom.Pt() > m_AK4jetPtCut )
-      b_dphi_ll_bj_nom[ch] = fabs(deltaPhi( phi_ll, (bjet_dphi_nom+jet2_dphi_nom).Phi() ));
-    else
-      b_dphi_ll_bj_nom[ch] = -1;
-    if( bjet_dphi_jesUp.Pt() > m_AK4jetPtCut and jet2_dphi_jesUp.Pt() > m_AK4jetPtCut )
-      b_dphi_ll_bj_jesUp[ch] = fabs(deltaPhi( phi_ll, (bjet_dphi_jesUp+jet2_dphi_jesUp).Phi() ));
-    else
-      b_dphi_ll_bj_jesUp[ch] = -1;
-    if( bjet_dphi_jesDown.Pt() > m_AK4jetPtCut and jet2_dphi_jesDown.Pt() > m_AK4jetPtCut )
-      b_dphi_ll_bj_jesDown[ch] = fabs(deltaPhi( phi_ll, (bjet_dphi_jesDown+jet2_dphi_jesDown).Phi() ));
-    else
-      b_dphi_ll_bj_jesDown[ch] = -1;
-    if( bjet_dphi_jerUp.Pt() > m_AK4jetPtCut and jet2_dphi_jerUp.Pt() > m_AK4jetPtCut )
-      b_dphi_ll_bj_jerUp[ch] = fabs(deltaPhi( phi_ll, (bjet_dphi_jerUp+jet2_dphi_jerUp).Phi() ));
-    else
-      b_dphi_ll_bj_jerUp[ch] = -1;
-    if( bjet_dphi_jerDown.Pt() > m_AK4jetPtCut and jet2_dphi_jerDown.Pt() > m_AK4jetPtCut )
-      b_dphi_ll_bj_jerDown[ch] = fabs(deltaPhi( phi_ll, (bjet_dphi_jerDown+jet2_dphi_jerDown).Phi() ));
-    else
-      b_dphi_ll_bj_jerDown[ch] = -1;
-  }
-  
-  // data
-  if(m_isData){
-    b_njets_nom[ch]      = b_njets[ch];         b_njets20_nom[ch]    = b_njets20[ch];
-    b_ncjets_nom[ch]     = b_ncjets[ch];        b_nfjets_nom[ch]     = b_nfjets[ch];
-    b_ncbtag_nom[ch]     = b_ncbtag[ch];
-    b_jpt_1_nom[ch]      = b_jpt_1[ch];         b_jpt_2_nom[ch]      = b_jpt_2[ch];
-    b_jeta_1_nom[ch]     = b_jeta_1[ch];        b_jeta_2_nom[ch]     = b_jeta_2[ch];
-    b_met_nom[ch]        = b_met[ch];
-    b_pfmt_1_nom[ch]     = b_pfmt_1[ch];
-    b_dphi_ll_bj_nom[ch] = b_dphi_ll_bj[ch];
-  }
-  
+   
 }
 
 
 
 
 
-void TauTauAnalysis::countJets(const TLorentzVector& jet, Int_t& ncjets, Int_t& nfjets, Int_t& ncbtags, TLorentzVector& bjet_dphi, TLorentzVector& jet2_dphi, const bool isBTagged){
+void TauTauAnalysis::countJets(const TLorentzVector& jet, Int_t& ncjets, Int_t& nfjets, Int_t& ncbtags, const bool isBTagged){
   //std::cout << "countJets" << std::endl;
   if(jet.Pt() < m_AK4jetPtCut) return;
   Float_t abseta = fabs(jet.Eta());
   if(abseta < 2.4){         // CENTRAL 30 GeV
     if(isBTagged) ncbtags++;
     ncjets++;
-    if(jet.Pt()>bjet_dphi.Pt() and isBTagged)
-        bjet_dphi.SetPtEtaPhiM(jet.Pt(),jet.Eta(),jet.Phi(),jet.M());
-    else if(jet.Pt()>jet2_dphi.Pt())
-        jet2_dphi.SetPtEtaPhiM(jet.Pt(),jet.Eta(),jet.Phi(),jet.M());
+    //if(jet.Pt()>bjet_dphi.Pt() and isBTagged)
+    //    bjet_dphi.SetPtEtaPhiM(jet.Pt(),jet.Eta(),jet.Phi(),jet.M());
+    //else if(jet.Pt()>jet2_dphi.Pt())
+    //    jet2_dphi.SetPtEtaPhiM(jet.Pt(),jet.Eta(),jet.Phi(),jet.M());
   }
   else if(abseta > 2.4){    // FORWARD 30 GeV
     nfjets++;
@@ -2249,7 +2207,7 @@ void TauTauAnalysis::extraLeptonVetos(const std::string& channel, const UZH::Muo
 
 
 
-bool TauTauAnalysis::getBTag_promote_demote( UZH::Jet& jet ) {
+bool TauTauAnalysis::getBTagStatus_promote_demote( UZH::Jet& jet ) {
   //std::cout << "getBTagSF_promote_demote" << std::endl;
   // https://twiki.cern.ch/twiki/bin/viewauth/CMS/HiggsToTauTauWorking2016#B_tag_scale_factors
   // example: https://github.com/rappoccio/usercode/blob/Dev_53x/EDSHyFT/plugins/BTagSFUtil_tprime.h

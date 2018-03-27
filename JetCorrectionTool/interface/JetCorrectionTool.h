@@ -47,10 +47,10 @@ class JetCorrectionTool  : public SToolBase   {
         TGraph* MassRecoEndcap;
         TF1* MassResBarrel;
         TF1* MassResEndcap;
-
+        
 
     public:
-
+        
         JetCorrectionTool( SCycleBase* parent, const char* name = "JetCorrectionTool" );
         ~JetCorrectionTool(); 
         
@@ -63,7 +63,7 @@ class JetCorrectionTool  : public SToolBase   {
         TLorentzVector GetCorrectedJetJER(TLorentzVector jet,TLorentzVector genJet, float jer, float jerUp, float jerDown, 
                                           int sigmaRes=0, bool isGenJetMatched=false, double random=0);
         TLorentzVector GetCorrectedJetJER(const UZH::Jet& jet, const Ntuple::GenJetak4NtupleObject& m_genJetAK4);
-        std::vector<TLorentzVector> GetCorrectedJetJERShifted(const UZH::Jet& jet, const Ntuple::GenJetak4NtupleObject& m_genjetAK4);
+        std::vector<TLorentzVector> GetCorrectedJetJERShifted(const UZH::Jet& jet, const Ntuple::GenJetak4NtupleObject& m_genjetAK4, float& jercorr);
         
         EnergyScaleCorrection_class* eScaler;
         TRandom3* trandom;

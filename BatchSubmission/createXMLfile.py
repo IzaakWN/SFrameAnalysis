@@ -323,12 +323,14 @@ def splitSampleListFile(filename,nChunks=2):
   nChunks = min(len(list),nChunks)
   length  = int(len(list)/nChunks)
   k, m    = divmod(len(list), nChunks)
+  lasti   = 0
   for i in xrange(nChunks):
+    nLines = k + (1 if i<m else 0) 
     subfilename = filename.replace(".txt","_split%d.txt"%(i+1))
     with open(subfilename,'w') as subfile:
-      print "Made \"%s\""%(subfilename)
-      for s in list[i*k+min(i,m):(i+1)*k+min(i+1,m)]: subfile.write(s)
-  
+      print 'Made "%s" (%d)'%(subfilename,nLines)
+      for s in list[lasti:lasti+nLines]: subfile.write(s)
+    lasti += nLines
 
 
 def plural(list,y=False):

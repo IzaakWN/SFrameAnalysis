@@ -114,10 +114,10 @@ class TauTauAnalysis : public SCycleBase {
     
     /// Function to book tree branches
     void FillBranches( const std::string& channel,
-                               const UZH::Muon& muon,      const UZH::Electron& electron,
-                               std::vector<UZH::Jet>& Jets, UZH::MissingEt& met, UZH::MissingEt& puppimet );
+                       const UZH::Muon& muon,      const UZH::Electron& electron,
+                       std::vector<UZH::Jet>& Jets, UZH::MissingEt& met, UZH::MissingEt& puppimet );
     void FillJetBranches(  const char* ch, std::vector<UZH::Jet>& Jets, UZH::MissingEt& met,
-                                   const TLorentzVector& muon_tlv, const TLorentzVector& electron_tlv );
+                           const TLorentzVector& muon_tlv, const TLorentzVector& electron_tlv, const UZH::Tau& tau );
     void FillJetBranches_JEC( Float_t& jpt, Float_t& jeta, const TLorentzVector& jet, bool save=true );
     
     // check event
@@ -324,14 +324,12 @@ class TauTauAnalysis : public SCycleBase {
     std::map<std::string,Int_t>    b_nfjets;
     std::map<std::string,Int_t>    b_ncjets;
     std::map<std::string,Int_t>    b_nbtag;
-    std::map<std::string,Int_t>    b_ncbtag;
     std::map<std::string,Int_t>    b_njets20;
     std::map<std::string,Int_t>    b_nfjets20;
     std::map<std::string,Int_t>    b_ncjets20;
     std::map<std::string,Int_t>    b_nbtag20;
-    std::map<std::string,Int_t>    b_ncbtag20;
-    std::map<std::string,Int_t>    b_ncbtag_noTau;
-    std::map<std::string,Int_t>    b_ncbtag20_noTau;
+    std::map<std::string,Int_t>    b_nbtag_noTau;
+    std::map<std::string,Int_t>    b_nbtag20_noTau;
     
     std::map<std::string,Int_t>    b_njets_jesUp;
     std::map<std::string,Int_t>    b_njets_jesDown;
@@ -341,10 +339,10 @@ class TauTauAnalysis : public SCycleBase {
     std::map<std::string,Int_t>    b_njets20_jesDown;
     std::map<std::string,Int_t>    b_njets20_jerUp;
     std::map<std::string,Int_t>    b_njets20_jerDown;
-    std::map<std::string,Int_t>    b_ncbtag_jesUp;
-    std::map<std::string,Int_t>    b_ncbtag_jesDown;
-    std::map<std::string,Int_t>    b_ncbtag_jerUp;
-    std::map<std::string,Int_t>    b_ncbtag_jerDown;
+    std::map<std::string,Int_t>    b_nbtag_jesUp;
+    std::map<std::string,Int_t>    b_nbtag_jesDown;
+    std::map<std::string,Int_t>    b_nbtag_jerUp;
+    std::map<std::string,Int_t>    b_nbtag_jerDown;
     std::map<std::string,Int_t>    b_ncjets_jesUp;
     std::map<std::string,Int_t>    b_ncjets_jesDown;
     std::map<std::string,Int_t>    b_ncjets_jerUp;
@@ -353,6 +351,14 @@ class TauTauAnalysis : public SCycleBase {
     std::map<std::string,Int_t>    b_nfjets_jesDown;
     std::map<std::string,Int_t>    b_nfjets_jerUp;
     std::map<std::string,Int_t>    b_nfjets_jerDown;
+    std::map<std::string,Int_t>    b_nbtag_noTau_jesUp;
+    std::map<std::string,Int_t>    b_nbtag_noTau_jesDown;
+    std::map<std::string,Int_t>    b_nbtag_noTau_jerUp;
+    std::map<std::string,Int_t>    b_nbtag_noTau_jerDown;
+    //std::map<std::string,Int_t>    b_nbtag20_noTau_jesUp;
+    //std::map<std::string,Int_t>    b_nbtag20_noTau_jesDown;
+    //std::map<std::string,Int_t>    b_nbtag20_noTau_jerUp;
+    //std::map<std::string,Int_t>    b_nbtag20_noTau_jerDown;
     
     std::map<std::string,Float_t>  b_met_jesUp;
     std::map<std::string,Float_t>  b_met_jesDown;
@@ -401,51 +407,61 @@ class TauTauAnalysis : public SCycleBase {
     std::map<std::string,Float_t>  b_iso_2_medium;
     std::map<std::string,Int_t>    b_gen_match_2;
     
-    std::map<std::string,Float_t> b_pt_3;
-    std::map<std::string,Float_t> b_eta_3;
-    std::map<std::string,Int_t>   b_decayMode_3;
-    std::map<std::string,Int_t>   b_gen_match_3;
-    std::map<std::string,Int_t>   b_againstLepton_3;
-    std::map<std::string,Float_t> b_byIsolationMVArun2v1DBoldDMwLTraw_3;
-    std::map<std::string,Float_t> b_byIsolationMVArun2v1DBnewDMwLTraw_3;
-    std::map<std::string,Int_t>   b_byVLooseIsolationMVArun2v1DBoldDMwLT_3;
-    std::map<std::string,Int_t>   b_byLooseIsolationMVArun2v1DBoldDMwLT_3;
-    std::map<std::string,Int_t>   b_byMediumIsolationMVArun2v1DBoldDMwLT_3;
-    std::map<std::string,Int_t>   b_byTightIsolationMVArun2v1DBoldDMwLT_3;
-    std::map<std::string,Int_t>   b_byVTightIsolationMVArun2v1DBoldDMwLT_3;
-    std::map<std::string,Int_t>   b_byVVTightIsolationMVArun2v1DBoldDMwLT_3;
-    std::map<std::string,Float_t> b_byCombinedIsolationDeltaBetaCorrRaw3Hits_3;
-    std::map<std::string,Int_t>   b_byVLooseCombinedIsolationDeltaBetaCorr3Hits_3;
-    std::map<std::string,Int_t>   b_byVVLooseCombinedIsolationDeltaBetaCorr3Hits_3;
-    std::map<std::string,Int_t>   b_byLooseCombinedIsolationDeltaBetaCorr3Hits_3;
-    std::map<std::string,Int_t>   b_byMediumCombinedIsolationDeltaBetaCorr3Hits_3;
-    std::map<std::string,Int_t>   b_byTightCombinedIsolationDeltaBetaCorr3Hits_3;
+    std::map<std::string,Float_t>  b_pt_3;
+    std::map<std::string,Float_t>  b_eta_3;
+    std::map<std::string,Int_t>    b_decayMode_3;
+    std::map<std::string,Int_t>    b_gen_match_3;
+    std::map<std::string,Int_t>    b_againstLepton_3;
+    std::map<std::string,Float_t>  b_byIsolationMVArun2v1DBoldDMwLTraw_3;
+    std::map<std::string,Float_t>  b_byIsolationMVArun2v2DBoldDMwLTraw_3;
+    std::map<std::string,Float_t>  b_byIsolationMVArun2v1DBnewDMwLTraw_3;
     
-    std::map<std::string,Float_t> b_chargedPionPt_3;
-    std::map<std::string,Float_t> b_neutralPionPt_3;
-    std::map<std::string,Float_t> b_chargedIsoPtSum_3;
-    std::map<std::string,Float_t> b_neutralIsoPtSum_3;
-    std::map<std::string,Float_t> b_chargedIsoPtSumdR03_3;
-    std::map<std::string,Float_t> b_neutralIsoPtSumdR03_3;
-    std::map<std::string,Float_t> b_puCorrPtSum_3;
-    std::map<std::string,Float_t> b_photonPtSumOutsideSignalCone_3;
-    std::map<std::string,Float_t> b_photonPtSumOutsideSignalConedR03_3;
-    std::map<std::string,Float_t> b_byPhotonPtSumOutsideSignalCone_3;
+    std::map<std::string,Int_t>    b_byVLooseIsolationMVArun2v1DBoldDMwLT_3;
+    std::map<std::string,Int_t>    b_byLooseIsolationMVArun2v1DBoldDMwLT_3;
+    std::map<std::string,Int_t>    b_byMediumIsolationMVArun2v1DBoldDMwLT_3;
+    std::map<std::string,Int_t>    b_byTightIsolationMVArun2v1DBoldDMwLT_3;
+    std::map<std::string,Int_t>    b_byVTightIsolationMVArun2v1DBoldDMwLT_3;
+    std::map<std::string,Int_t>    b_byVVTightIsolationMVArun2v1DBoldDMwLT_3;
     
-    std::map<std::string,Int_t>   b_nPhoton_3;
-    std::map<std::string,Float_t> b_ptWeightedDetaStrip_3;
-    std::map<std::string,Float_t> b_ptWeightedDphiStrip_3;
-    std::map<std::string,Float_t> b_ptWeightedDrSignal_3;
-    std::map<std::string,Float_t> b_ptWeightedDrIsolation_3;
-    std::map<std::string,Float_t> b_leadingTrackChi2_3;
-    std::map<std::string,Float_t> b_leadingTrackPt_3;
-    std::map<std::string,Float_t> b_eRatio_3;
-    std::map<std::string,Float_t> b_dxy_Sig_3;
-    std::map<std::string,Float_t> b_ip3d_3;
-    std::map<std::string,Float_t> b_ip3d_Sig_3;
-    std::map<std::string,Int_t>   b_hasSecondaryVertex_3;
-    std::map<std::string,Float_t> b_decayDistMag_3;
-    std::map<std::string,Float_t> b_flightLengthSig_3;
+    std::map<std::string,Int_t>    b_byVLooseIsolationMVArun2v2DBoldDMwLT_3;
+    std::map<std::string,Int_t>    b_byLooseIsolationMVArun2v2DBoldDMwLT_3;
+    std::map<std::string,Int_t>    b_byMediumIsolationMVArun2v2DBoldDMwLT_3;
+    std::map<std::string,Int_t>    b_byTightIsolationMVArun2v2DBoldDMwLT_3;
+    std::map<std::string,Int_t>    b_byVTightIsolationMVArun2v2DBoldDMwLT_3;
+    std::map<std::string,Int_t>    b_byVVTightIsolationMVArun2v2DBoldDMwLT_3;
+    
+    std::map<std::string,Float_t>  b_byCombinedIsolationDeltaBetaCorrRaw3Hits_3;
+    std::map<std::string,Int_t>    b_byVLooseCombinedIsolationDeltaBetaCorr3Hits_3;
+    std::map<std::string,Int_t>    b_byVVLooseCombinedIsolationDeltaBetaCorr3Hits_3;
+    std::map<std::string,Int_t>    b_byLooseCombinedIsolationDeltaBetaCorr3Hits_3;
+    std::map<std::string,Int_t>    b_byMediumCombinedIsolationDeltaBetaCorr3Hits_3;
+    std::map<std::string,Int_t>    b_byTightCombinedIsolationDeltaBetaCorr3Hits_3;
+    
+    std::map<std::string,Float_t>  b_chargedPionPt_3;
+    std::map<std::string,Float_t>  b_neutralPionPt_3;
+    std::map<std::string,Float_t>  b_chargedIsoPtSum_3;
+    std::map<std::string,Float_t>  b_neutralIsoPtSum_3;
+    std::map<std::string,Float_t>  b_chargedIsoPtSumdR03_3;
+    std::map<std::string,Float_t>  b_neutralIsoPtSumdR03_3;
+    std::map<std::string,Float_t>  b_puCorrPtSum_3;
+    std::map<std::string,Float_t>  b_photonPtSumOutsideSignalCone_3;
+    std::map<std::string,Float_t>  b_photonPtSumOutsideSignalConedR03_3;
+    std::map<std::string,Float_t>  b_byPhotonPtSumOutsideSignalCone_3;
+    
+    std::map<std::string,Int_t>    b_nPhoton_3;
+    std::map<std::string,Float_t>  b_ptWeightedDetaStrip_3;
+    std::map<std::string,Float_t>  b_ptWeightedDphiStrip_3;
+    std::map<std::string,Float_t>  b_ptWeightedDrSignal_3;
+    std::map<std::string,Float_t>  b_ptWeightedDrIsolation_3;
+    std::map<std::string,Float_t>  b_leadingTrackChi2_3;
+    std::map<std::string,Float_t>  b_leadingTrackPt_3;
+    std::map<std::string,Float_t>  b_eRatio_3;
+    std::map<std::string,Float_t>  b_dxy_Sig_3;
+    std::map<std::string,Float_t>  b_ip3d_3;
+    std::map<std::string,Float_t>  b_ip3d_Sig_3;
+    std::map<std::string,Int_t>    b_hasSecondaryVertex_3;
+    std::map<std::string,Float_t>  b_decayDistMag_3;
+    std::map<std::string,Float_t>  b_flightLengthSig_3;
     
     std::map<std::string,Int_t>    b_dilepton_veto;
     std::map<std::string,Int_t>    b_extraelec_veto;
@@ -504,7 +520,6 @@ class TauTauAnalysis : public SCycleBase {
     
     std::map<std::string,Float_t>  b_dR_ll;
     std::map<std::string,Float_t>  b_dR_ll_gen;
-    //std::map<std::string,Float_t>  b_dphi_ll_bj;
     std::map<std::string,Float_t>  b_mt_tot;
     std::map<std::string,Float_t>  b_ht;
     

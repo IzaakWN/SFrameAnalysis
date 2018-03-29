@@ -4,6 +4,7 @@
 
 from ROOT import TCut
 import os, re
+from copy import copy, deepcopy
 from SettingTools  import *
 from VariableTools import *
 from PrintTools    import *
@@ -69,7 +70,7 @@ def invertCharge(cuts,**kwargs):
     # MATCH PATTERNS https://regex101.com
     matchOS = re.findall(r"q_[12]\ *\*\ *q_[12]\ *<\ *0",cuts)
     matchSS = re.findall(r"q_[12]\ *\*\ *q_[12]\ *>\ *0",cuts)
-    LOG.verbose(">>> invertCharge:\n>>>   matchOS = %s\n>>>   matchSS = %s" % (matchOS,matchSS),verbosity,level=2)
+    LOG.verbose("invertCharge:\n>>>   matchOS = %s\n>>>   matchSS = %s" % (matchOS,matchSS),verbosity,level=2)
     
     # CUTS: invert charge
     if (len(matchOS)+len(matchSS))>1:
@@ -87,7 +88,7 @@ def invertCharge(cuts,**kwargs):
     # elif cuts: cuts = "q_1*q_2>0 && %s" % cuts
     # else:      cuts = "q_1*q_2>0"
     
-    LOG.verbose(">>>   \"%s\"\n>>>   -> \"%s\" (%s)\n>>>" % (cuts0,cuts,"OS" if OS else "SS"),verbosity,level=2)
+    LOG.verbose("   \"%s\"\n>>>   -> \"%s\" (%s)\n>>>" % (cuts0,cuts,"OS" if OS else "SS"),verbosity,level=2)
     return cuts
     
 
@@ -103,7 +104,7 @@ def invertIsolation(cuts,**kwargs):
     # MATCH PATTERNS https://regex101.com
     match_iso_1 = re.findall(r"iso_1\ *[<>]\ *\d+\.\d+\ *[^\|]&*\ *",cuts)
     match_iso_2 = re.findall(r"iso_2\ *\!?=?[<=>]\ *\d+\.\d+\ *[^\|]&*\ *",cuts)
-    LOG.verbose(">>> invertIsolation:\n>>>   match_iso_1 = %s\n>>>   match_iso_2 = \"%s\"" % (match_iso_1,match_iso_2),verbosity,level=2)
+    LOG.verbose("invertIsolation:\n>>>   match_iso_1 = %s\n>>>   match_iso_2 = \"%s\"" % (match_iso_1,match_iso_2),verbosity,level=2)
     
     # REPLACE
     if "iso_cuts==1" in cuts.replace(' ',''):
@@ -118,7 +119,7 @@ def invertIsolation(cuts,**kwargs):
         if len(match_iso_1) or len(match_iso_2): LOG.warning("invertIsolation: %d iso_1 and %d iso_2 matches! cuts=%s"%(len(match_iso_1),len(match_iso_2),cuts))
     cuts    = cuts.rstrip(' ').rstrip('&').rstrip(' ')
     
-    LOG.verbose(">>>   \"%s\"\n>>>   -> \"%s\"\n>>>" % (cuts0,cuts),verbosity,level=2)
+    LOG.verbose("  \"%s\"\n>>>   -> \"%s\"\n>>>" % (cuts0,cuts),verbosity,level=2)
     return cuts
     
 
@@ -168,7 +169,6 @@ def isSelectionString(string,**kwargs):
 
 class Selection(object):
     """
-    TODO
     Selection class to:
        - hold all relevant information of a selection that will be used to make plots:
            selection pattern, filename friendly name, LaTeX friendly title, ...
@@ -189,7 +189,7 @@ class Selection(object):
         if self.selection=="":
            LOG.warning('Selection::Selection - No selection string given for "%s"!'%(self.name))
         self.context     = getContextFromDict(kwargs,self.selection) # context-dependent channel selections
-        
+    
     @property
     def cut(self): return self.selection
     @cut.setter
@@ -198,12 +198,16 @@ class Selection(object):
     def __str__(self):
       """Returns string representation of Selection object."""
       return self.name
-      
+    
+    def __repr__(self):
+      """Returns string representation of Selection object."""
+      return '<%s("%s","%s") at %s>'%(self.__class__.__name__,self.name,self.selection,hex(id(self)))
+    
     def __iter__(self):
       """Start iteration over selection information."""
       for i in [self.name,self.selection]:
         yield i
-        
+    
     def __add__(self, selection2):
         """Add selections by combining their selection string (can be string or Selection object)."""
         if isinstance(selection2,str):
@@ -249,15 +253,26 @@ class Selection(object):
         selection = relaxJetSelection(self.selection,**kwargs)
         return Selection(name,selection,title=title,filename=self.filename)
     
-    #def shift(**kwargs):
-    
     def latex(self):
         return makeLatex(self.name)
-
+    
+    def shift(self,shifts,**kwargs):
+        if len(shifts)>0 and shifts[0]!='_':
+          shifts = '_'+shifts
+        newstring              = shift(self.selection,shifts,**kwargs)
+        newselection           = deepcopy(self)
+        newselection.selection = newstring
+        if self.selection != newstring:
+          newselection.filename += shifts
+        return newselection
+    
+    def shiftSelection(self,shifts,**kwargs):
+        return shift(self.name,shifts,**kwargs)
+    
 def sel(*args,**kwargs):
     """Shorthand for Selection class."""
     return Selection(*args,**kwargs)
-    
+
 def unwrapSelection(selection,**kwargs):
     """Make sure returned object is a string."""
     if isinstance(selection,Selection):

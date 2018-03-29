@@ -89,6 +89,8 @@ def loadSettings(globalsDict,*args,**kwargs):
         if hasattr(value,'__call__'): continue
         if hasattr(value,'read') and hasattr(value,'write'): continue
         if pattern and variable not in pattern: continue
+        if verbose and "verbosity" in variable:
+          value = 2; globalsDict[variable] = value
         globals()[variable] = value
         #print ">>>   %-15s = %s"%(variable,globals()[variable])
     

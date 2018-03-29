@@ -12,34 +12,49 @@ from copy import copy, deepcopy
 # for channel in ["mutau","etau","emu","mumu"]:
 #     TTscales[channel] = {"category 1":0, "category 2":0} # so TT renormalization is done once for each category
 
-# QCDcol = TColor.GetColor(250,202,255);   ttcol_v2 = TColor.GetColor(135,206,250)
-# DYcol  = TColor.GetColor(248,206,104);   ZLcol    = TColor.GetColor(100,182,232)
-# WJcol  = TColor.GetColor(222,90,106);    VVcol    = TColor.GetColor(222,140,106)
-# TTcol  = TColor.GetColor(155,152,204);   TTJcol   = TColor.GetColor(100,222,106)
+#colors_HTT_dict = { 'TT':   TColor.GetColor(155,152,204),  'DY':   TColor.GetColor(248,206,104),
+#                    'TTT':  TColor.GetColor(135,206,250),  'ZL':   TColor.GetColor(100,182,232),
+#                    'TTJ':  TColor.GetColor(100,222,106),  'ZJ':   TColor.GetColor(100,222,106),
+#                    'TTL':  TColor.GetColor(155,152,204),  
+#                    'ST':   TColor.GetColor(140,180,220),  'DY10': TColor.GetColor(240,175,60)
+#                    'STJ':  TColor.GetColor(200,140,220),  'WJ':   TColor.GetColor(222,90,106),
+#                    'QCD':  TColor.GetColor(250,202,255),  'VV':   TColor.GetColor(222,140,106),
+#                    'data': kBlack,                        'sig':  kBlue
+#}
+colors_IWN_dict = { 'TT':  kRed-2,        'DY':   kGreen-2,
+                    'TTT': kRed-2,        'ZL':   kAzure+5,
+                    'TTJ': kOrange+9,     'ZJ':   kSpring-7, #kGreen-7,
+                    'TTL': kRed+1,        
+                    'ST':  kMagenta-3,    'DY10': kAzure+5,
+                    'STJ': kMagenta+3,    'WJ':   kOrange-5,
+                    'QCD': kRed-7,        'VV':   kYellow+771,
+                    'data': kBlack,       'sig':  kAzure+4,
+}
+col_dict = colors_IWN_dict
 
-
-colors_sample_dict = {
-    "TT":               kRed-2,
-    'TTT':              kRed-2,         'ZTT':              kGreen-2,
-    'TTL':              kRed+1,         'ZL':               kAzure+5,
-    'TTJ':              kPink-2,        'ZJ':               kSpring-7,
-    'ttbar':            kRed-2,         'Drell*Yan':        kGreen-2,
-    'ttbar*real*tau':   kRed-2,         'Z*tau':            kGreen-2,
-    'ttbar*l':          kRed+1,         'Z*ll':             kAzure+1,
-    'ttbar*j':          kPink-2,        'Z*j*tau':          kGreen-7,
-    'ttbar*other':      kOrange+9,      'Drell*Yan other':  kAzure+5, #kSpring+3,
-    'ST':               kMagenta-3,     'D*Y*10*50':        kAzure+5,
-    'single top':       kMagenta-3,     'D*Y*50':           kGreen-2,
-    'QCD':              kRed-7,         'WW':               kYellow+771,
-    'W*jets':           kOrange-5,      'WZ':               kYellow+771,
-    'W*J':              kOrange-5,      'ZZ':               kYellow+771,
-    'W':                kOrange-5,      'VV':               kYellow+771,
-    'data':             kBlack,         'diboson':          kYellow+771,
-    'single muon':      kBlack,         'signal':           kAzure+4,
-    'single electron':  kBlack,
+colors_sample_dict = {  
+    "TT":               col_dict['TT'],      'ZTT':        col_dict['DY'],
+    'TTT':              col_dict['TT'],      'ZL':         col_dict['ZL'],
+    'TTL':              col_dict['TTL'],     'ZJ':         col_dict['ZJ'],
+    'TTJ':              col_dict['TTJ'],     'Drell*Yan':  col_dict['DY'],
+    'ttbar':            col_dict['TT'],      'Z*tau':      col_dict['DY'],
+    'ttbar*real*tau':   col_dict['TTT'],     'Z*ll':       col_dict['ZL'],
+    'ttbar*l':          col_dict['TTL'],     'Z*j*tau':    col_dict['ZJ'],
+    'ttbar*j':          col_dict['TTJ'],     'D*Y*other':  col_dict['DY10'], #kSpring+3, kPink-2
+    'ttbar*other':      col_dict['TTJ'],     'D*Y*10*50':  col_dict['DY10'],
+    'ST':               col_dict['ST'],      'D*Y*50':     col_dict['DY'],
+    'single top':       col_dict['ST'],      'W*jets':     col_dict['WJ'],
+    'STT':              col_dict['ST'],      'W*J':        col_dict['WJ'],
+    'STJ':              col_dict['STJ'],     'W':          col_dict['WJ'],
+    'single top*real':  col_dict['ST'],      'WW':         col_dict['VV'],
+    'single top*other': col_dict['STJ'],     'WZ':         col_dict['VV'],
+    'QCD':              col_dict['QCD'],     'ZZ':         col_dict['VV'],
+    'signal':           col_dict['sig'],     'VV':         col_dict['VV'],
+    'data':             col_dict['data'],    'diboson':    col_dict['VV'],
+    'single muon':      col_dict['data'],    
+    'single electron':  col_dict['data'],    
 }
 
-nPlotsMade = 0
 
 
 def makeSFrameSamples(samplesD,samplesB,samplesS,**kwargs):
@@ -289,11 +304,11 @@ class Sample(object):
         """Returns string that can be used as a row in a samples summary table"""
         pre    = kwargs.get('pre', "")
         return ">>>  %s%-20s  %-40s  %12.2f  %10i  %11i  %10.3f  %s" %\
-          (pre,self.title,self.name,self.sigma,self.N_unweighted,self.N,self.norm,self.extraweight)
+          (pre,self.title,self.name,self.sigma,self.N_unweighted,self.N,self.norm,self.extraweight) + ("  isData" if self.isData else "")
     
     def printRow(self):
         print self.row()
-        
+    
     def printSampleObjects(self,**kwargs):
         """Print all sample objects recursively"""
         pre = kwargs.get('pre',"")
@@ -335,12 +350,20 @@ class Sample(object):
     
     @property
     def tree(self):
+      if not self.file:
+        LOG.warning("Sample::tree - file not opened! Reopening...")
+        self.file = TFile(self.filename)
       if self._tree:
-        if self._tree.GetName()==self._treename:
-          return self._tree
+        if isinstance(self._tree,TTree):
+          if self._tree.GetName()==self._treename:
+            return self._tree
+          else:
+            return self.file.Get(self._treename)
         else:
-          return self.file.Get(self._treename)
-      else: return self.file.Get(self._treename)
+          LOG.warning("Sample::tree - no valid TTree instance!")
+      else:
+        #self._tree = self.file.Get(self._treename)
+        return self.file.Get(self._treename)
     
     @tree.setter
     def tree(self, value):
@@ -352,7 +375,7 @@ class Sample(object):
     
     @labels.setter
     def labels(self, value):
-      LOG.warning("Sample - No setter for \"labels\" attribute!")
+      LOG.warning('Sample::labels - No setter for "labels" attribute!')
     
     @property
     def scaleBU(self):
@@ -404,22 +427,29 @@ class Sample(object):
     #    """Set filename."""
     #    self.filename = filename
         
-    def appendFileName(self,file_app):
-        """Append filename (before globalTag)."""
+    def appendFileName(self,file_app,**kwargs):
+        """Append filename (in front of globalTag)."""
+        title_app     = kwargs.get('title_app',  "" )
+        title_tag     = kwargs.get('title_tag',  "" )
+        title_veto    = kwargs.get('title_veto', "" )
         oldfilename   = self.filename
         newfilename   = oldfilename if file_app in oldfilename else oldfilename.replace(globalTag,file_app+globalTag)
+        LOG.verbose('replacing "%s" with "%s"'%(oldfilename,self.filename),verbositySampleTools,level=3)
         self.filename = newfilename
+        if file_app  not in self.name:
+          self.name  += file_app
+        if title_app not in self.title and not (title_veto and re.search(title_veto,self.title)):
+          self.title += title_app
         if self.file:
-          reopenTree = True if self.tree else False
+          #reopenTree = True if self._tree else False
           self.file.Close()
           self.file = TFile(self.filename)
-          if reopenTree: self.tree = self.file.Get(self.treename)
-        LOG.verbose('replacing "%s" with "%s"'%(oldfilename,self.filename),verbositySampleTools,level=3)
+          #if reopenTree: self.tree = self.file.Get(self.treename)
         if isinstance(self,MergedSample):
           for sample in self.samples:
-            sample.appendFileName(file_app)
+            sample.appendFileName(file_app,**kwargs)
         for sample in self.splitsamples:
-            sample.appendFileName(file_app)
+            sample.appendFileName(file_app,**kwargs)
         
     def setTreeName(self,treename):
         """Set treename."""
@@ -444,6 +474,8 @@ class Sample(object):
         """Close and reopen file. Use it to free up some memory."""
         if self.file:
             self.file.Close()
+            #self.file.Delete()
+            del self.file
         if self.filename:
             self.file = TFile(self.filename)
         for sample in self.splitsamples:
@@ -529,7 +561,10 @@ class Sample(object):
         blind         = kwargs.get('blind',           self.blind                  )
         color0        = kwargs.get('color',           self.color                  )
         linecolor     = kwargs.get('linecolor',       self.linecolor              )
+        drawoption    = "E0" if self.isData else "HIST"
+        drawoption    = "gOff"+kwargs.get('option',   drawoption                  )
         
+        # SIGNAL
         if self.upscale != 1:
             title += " (#times%d)" % (self.upscale)
         
@@ -539,11 +574,21 @@ class Sample(object):
         weight    = combineWeights(self.weight, self.extraweight, kwargs.get('weight', ""))
         cuts      = combineCuts(cuts, kwargs.get('cuts', ""), self.cuts, blindcuts, weight=weight)
         
+        # UNDO SHIFTS
+        if self.isData and ('Up' in var or 'Down' in var or 'Up' in cuts or 'Down' in cuts):
+          var    = undoShift(var)
+          cuts   = undoShift(cuts)
+          weight = undoShift(weight)
+        
         # TREE
         tree = None
-        if treename!=self.treename: tree = self.file.Get(treename)
-        elif not self.tree:         tree = self.file.Get(treename)
-        else:                       tree = self.tree
+        if treename!=self.treename:
+          LOG.warning('Sample::hist: treename = "%s" != "%s" = self.treename'%(treename,self.treename))
+          tree = self.file.Get(treename)
+        #elif not self.tree:
+        #  tree = self.file.Get(treename)
+        else:
+          tree = self.tree
         if not tree or not isinstance(tree,TTree):
           if not self.file:
             LOG.error('Sample::hist Could not find tree "%s" for "%s"! File is closed: %s'%(treename,self.name,self.filename))
@@ -557,8 +602,8 @@ class Sample(object):
         else:           hist.Sumw2()
         
         # DRAW
-        out = tree.Draw("%s >> %s" % (var,name), cuts, "gOff")
-        if out < 0: LOG.error("Drawing histogram for %s sample failed!" % (title))
+        out = tree.Draw("%s >> %s" % (var,name), cuts, drawoption)
+        if out < 0: LOG.error('Drawing histogram for "%s" sample failed!'%(title))
         
         # SCALE
         if scale != 1.0: hist.Scale(scale)
@@ -567,7 +612,7 @@ class Sample(object):
         
         # STYLE
         hist.SetLineColor(linecolor)
-        hist.SetFillColor(color0)
+        hist.SetFillColor(kWhite if self.isData else color0)
         hist.SetMarkerColor(color0)
         
         # PRINT
@@ -580,6 +625,8 @@ class Sample(object):
             print ">>>    %s" % (cuts.replace("*(","\n>>>%s*("%(' '*18)))
         return hist
         
+    def getEfficiency(self):
+        """Calculate efficiency for some selections."""
     
     def isPartOf(self, *searchterms, **kwargs):
         """Check if all labels are in the sample's name, title or tags."""
@@ -782,12 +829,15 @@ class SampleSet(object):
         self.samplesB           = list(samplesB)
         self.samplesS           = list(samplesS)
         self._samplesD          = samplesD # may be a dictionary with channel as keys
+        self.name               = kwargs.get('name',        ""          )
+        self.label              = kwargs.get('label',       ""          )
         self.channel            = kwargs.get('channel',     "mutau"     )
         self.verbosity          = kwargs.get('verbosity',   0           )
         self.loadingbar         = kwargs.get('loadingbar',  True        ) and self.verbosity<2
         self.ignore             = kwargs.get('ignore',      [ ]         )
         self.shiftQCD           = kwargs.get('shiftQCD',    0           )
         #self.weight             = kwargs.get('weight',      ""          )
+        self.nPlotsMade         = 0
         
         self.color_dict         = { }
         self.linecolor_dict     = { }
@@ -795,6 +845,10 @@ class SampleSet(object):
     def __str__(self):
       """Returns string representation of Sample object."""
       return str([s.name for s in self.samplesB+self.samplesS]+[s.name for s in self.samplesD])
+    
+    def printSampleObjects(self):
+      for sample in self.samples:
+        sample.printSampleObjects()
     
     def printTable(self):
       """Print table of all samples."""
@@ -879,26 +933,30 @@ class SampleSet(object):
         
         # CHECK SPLIT
         for sample in self.samples:
-            if sample.color is kBlack:
-                LOG.warning("SamplesSet::setColors - %s"%sample.name)
-            if sample.color in usedColor:
-                # TODO: check other color
-                sample.setColor()
-                LOG.warning("SamplesSet::setColors - Color used twice!")
-            else:
-                usedColors.append(sample.color)
+          if sample.color is kBlack:
+              LOG.warning("SamplesSet::setColors - %s"%sample.name)
+          if sample.color in usedColor:
+              # TODO: check other color
+              sample.setColor()
+              LOG.warning("SamplesSet::setColors - Color used twice!")
+          else:
+              usedColors.append(sample.color)
     
-    def reloadFile(self,**kwargs):
+    def reloadFiles(self,**kwargs):
         """Help function to reload all files in samples list."""
         for sample in self.samples:
             sample.reloadFile()    
-        
-    def cleanMemory(self):
+    
+    def refreshMemory(self,*args,**kwargs):
         """Open/reopen files to reset file memories."""
-        global nPlotsMade
-        if nPlotsMade%10==0 and nPlotsMade>0:
-          self.reloadFile()
-        nPlotsMade +=1
+        verbosity = getVerbosity(kwargs,verbositySampleTools)
+        kwargs['verbosity'] = verbosity
+        if verbosity>1:
+          LOG.warning('>>> SampleSet::refreshMemory refreshing memory (gDirectory "%s")'%(gDirectory.GetName()))
+          gDirectory.ls()
+        if self.nPlotsMade%10==0 and self.nPlotsMade>0:
+          self.reloadFiles(**kwargs)
+        self.nPlotsMade +=1
     
     def changeContext(self,*args):
         """Help function to change context of variable object."""
@@ -913,7 +971,7 @@ class SampleSet(object):
     
     def plotStack(self, *args, **kwargs):
         """Plot stack."""
-        self.cleanMemory()
+        self.refreshMemory()
         kwargs['stack'] = True
         var = self.changeContext(*args)
         plotargs = [ var ] if var else [ ]
@@ -1109,6 +1167,7 @@ class SampleSet(object):
         for hist in histsB_SS: stack_SS.Add(hist)
         histQCD = substractStackFromHist(stack_SS,histD_SS,name=name+append,title="QCD multijet")
         if not histQCD: LOG.warning("Could not make QCD! QCD histogram is none!", pre="  ")
+        histQCD.SetOption('HIST')
         
         # YIELD only
         if relax:
@@ -1148,7 +1207,7 @@ class SampleSet(object):
         samples             = self.samples
         var, nBins, xmin, xmax, cuts  = unwrapVariableSelection(*args)
         
-        LOG.verbose("%srenormalizing WJ with mt > 80 GeV sideband for variable %s"%(kwargs.get('pre',"  "),var),True)
+        LOG.verbose("%srenormalizing WJ with mt > 80 GeV sideband for variable %s%s"%(kwargs.get('pre',"  "),var,(" for %s"%self.name) if self.name else ""),True)
         
         # CHECK mt
         if not re.search(r"m_?t",var,re.IGNORECASE):
@@ -1221,12 +1280,12 @@ class SampleSet(object):
         I_MC    = stack.GetStack().Last().IntegralAndError(1,nBins,e_MC)
         I_D     = histD.IntegralAndError(1,nBins,e_D)
         I_WJ    = histWJ.IntegralAndError(1,nBins,e_WJ)
-        purity0 = 100.0*I_WJ/I_MC
+        purity  = 100.0*I_WJ/I_MC
         close(histsD+histsB+histsS)
         if I_MC < 10:
             LOG.warning("SampleSet::renormalizeWJ - Could not renormalize WJ: integral of MC is %s < 10!" % I_MC, pre="  ")
             return 0.
-        print ">>>   data: %.1f, MC: %.1f, WJ: %.1f, QCD: %.1f, R: %.3f, WJ prior purity: %.2f%%)" % (I_D,I_MC,I_WJ,I_QCD,R,purity0)
+        print ">>>   data: %.1f, MC: %.1f, WJ: %.1f, QCD: %.1f, R: %.3f, WJ purity: %.2f%%)" % (I_D,I_MC,I_WJ,I_QCD,R,purity)
         if I_D < 10:
             LOG.warning("SampleSet::renormalizeWJ - Could not renormalize WJ: integral of data is %s < 10!" % I_D, pre="  ")
             return 0.
@@ -1237,24 +1296,202 @@ class SampleSet(object):
         # SET WJ SCALE
         e_MC_noWJ = sqrt(e_MC**2 - e_WJ**2)
         I_MC_noWJ = I_MC - I_WJ
-        scale = ( I_D - I_MC + I_WJ - R*I_QCD ) / (I_WJ - R*I_QCD)
+        scale     = ( I_D - I_MC + I_WJ - R*I_QCD ) / (I_WJ - R*I_QCD)
         err_scale = scale * sqrt( (e_D**2+e_MC_noWJ**2+e_QCD**2)/abs(I_D-I_MC_noWJ-R*I_QCD)**2 + (e_WJ**2+e_QCD**2)/(I_WJ-R*I_QCD)**2 )
+        purity   *= scale
         
         if scale < 0:
             LOG.warning("SampleSet::renormalizeWJ - Could not renormalize WJ: scale = %.2f < 0!" % scale, pre="  ")
             return scale
         WJ.resetScale(scale)
-        print ">>>   WJ renormalization scale = %.3f (new total scale = %.3f)" % (scale, WJ.scale)
+        print ">>>   WJ renormalization scale = %.3f (new total scale: %.3f, new WJ purity: %.2f%%)" % (scale,WJ.scale,purity)
         return scale
         
     
-    def renormalizeTT(self,**kwargs):
+    def renormalizeTT(self,*args,**kwargs):
         """Renormalize TT by requireing that MC and data has the same number of events in some control region.
            ..."""
         
-    def measureOSSSratio(self,**kwargs):
+        verbosity           = getVerbosity(kwargs,verbositySampleTools)
+        samples             = self.samples
+        var, nBins, xmin, xmax, cuts  = unwrapVariableSelection(*args)
+        
+        LOG.verbose("%srenormalizing TT with %s"%(kwargs.get('pre',"  "),var),True)
+        
+        TT      = None
+        histD   = None
+        histTT  = None
+        histsTT = [ ]
+        stack   = THStack("stack_QCD","stack_QCD")
+        histsD, histsB, histsS = self.createHistograms(var,nBins,xmin,xmax,cuts,reset=True,signal=False,QCD=True,split=False)
+        
+        # CHECK MC and DATA
+        if not histsB:
+            LOG.warning("SampleSet::renormalizeTT - Could not renormalize TT: no MC!", pre="  ")
+            return
+        if not histsD:
+            LOG.warning("SampleSet::renormalizeTT - Could not renormalize TT: no data!", pre="  ")
+            return
+        histD  = histsD[0]
+        
+        # STACK
+        e_QCD   = Double()
+        I_QCD   = 0
+        histsTT = [ ]
+        LOG.verbose(" ",verbosity,level=2)
+        for hist in histsB:
+            if hist.Integral(1,nBins)<=0:
+                LOG.warning("SampleSet::renormalizeTT - Ignored %s with an integral of %s <= 0 !" % (hist.GetName(),hist.Integral()), pre="  ")
+            if "TT" in hist.GetName() or re.findall(r"ttbar",hist.GetName(),re.IGNORECASE):
+                histsTT.append(hist)
+            if "qcd" in hist.GetName().lower():
+                I_QCD = hist.IntegralAndError(1,nBins,e_QCD)
+            LOG.verbose("   adding to stack %s (%.1f events)" % (hist.GetName(),hist.Integral()),verbosity,level=2)
+            stack.Add(hist)
+        
+        # CHECK TT hist
+        if len(histsTT) > 1:
+            namesTT = ', '.join([h.GetName() for h in histsTT])
+            LOG.warning("SampleSet::renormalizeTT - More than one TT sample (%s), renormalizing with first instance (%s)!"%(namesTT,histsTT[0].GetName()), pre="  ")
+        elif len(histsTT) < 1:
+            LOG.warning("SampleSet::renormalizeTT - Could not renormalize TT: no TT sample!", pre="  ")
+            return 0.
+        histTT  = histsTT[0]
+        
+        # GET TT sample
+        TT      = self.get("TT",unique=True)
+        if not TT:
+            LOG.warning("SampleSet::renormalizeTT - Could not renormalize TT: no TT sample!", pre="  ")
+            return 0.
+        
+        # INTEGRATE
+        e_MC    = Double()
+        e_D     = Double()
+        e_TT    = Double()
+        I_MC    = stack.GetStack().Last().IntegralAndError(1,nBins,e_MC)
+        I_D     = histD.IntegralAndError(1,nBins,e_D)
+        I_TT    = histTT.IntegralAndError(1,nBins,e_TT)
+        purity  = 100.0*I_TT/I_MC
+        close(histsD+histsB+histsS)
+        if I_MC < 10:
+            LOG.warning("SampleSet::renormalizeTT - Could not renormalize TT: integral of MC is %s < 10!" % I_MC, pre="  ")
+            return 0.
+        print ">>>   data: %.1f, MC: %.1f, TT: %.1f, QCD: %.1f, TT purity: %.3g%%)" % (I_D,I_MC,I_TT,I_QCD,purity)
+        if I_D < 10:
+            LOG.warning("SampleSet::renormalizeTT - Could not renormalize TT: integral of data is %s < 10!" % I_D, pre="  ")
+            return 0.
+        if I_TT < 10:
+            LOG.warning("SampleSet::renormalizeTT - Could not renormalize TT: integral of TT is %s < 10!" % I_TT, pre="  ")
+            return 0.
+        
+        # SET TT SCALE
+        e_MC_noTT = sqrt(e_MC**2 - e_TT**2)
+        I_MC_noTT = I_MC - I_TT
+        scale     = ( I_D - I_MC + I_TT ) / (I_TT)
+        err_scale = scale * sqrt( (e_D**2+e_MC_noTT**2)/abs(I_D-I_MC_noTT)**2 + (e_TT**2)/(I_TT)**2 )
+        purity   *= scale
+        
+        if scale < 0:
+            LOG.warning("SampleSet::renormalizeTT - Could not renormalize TT: scale = %.2f < 0!" % scale, pre="  ")
+            return scale
+        TT.resetScale(scale)
+        print ">>>   TT renormalization scale = %.3f (new total scale: %.3f, TT purity: %.3g%%)" % (scale,TT.scale,purity)
+        return scale
+    
+    def measurePurity(self,**kwargs):
+        """Measure purity in region."""
+    
+    def measureOSSSratio(self,*args,**kwargs):
         """Measure OS/SS ratio by substract non-QCD MC from data with opposite sign (OS) and same sign (SS)
            requirements of a lepton pair."""
+        
+        verbosity = getVerbosity(kwargs,verbositySampleTools)
+        var, nBins, xmin, xmax, cuts = unwrapVariableSelection(*args)
+        if verbosity>0:
+           LOG.header("measure OS/SS ratio in %s" % (var))
+        
+        samples         = self.samples        
+        name            = kwargs.get('name',makeHistName("QCD",var))
+        weight          = kwargs.get('weight',"")
+        relaxed         = kwargs.get('relaxed',True)
+        
+        # INVERT charge and isolation
+        if relaxed:
+          relaxed_iso     = "iso_2==1 && iso_1>0.15 && iso_1<0.5" # iso_1<0.5 && 
+          if 'emu' in self.channel:
+            relaxed_iso = "iso_1<0.5 && iso_2<0.5 && iso_1>0.20" # ||iso_2>0.10
+          cuts = invertIsolation(cuts,to=relaxed_iso)
+        cutsOS = invertCharge(cuts,OS=True)
+        cutsSS = invertCharge(cuts,OS=False)
+        
+        # HISTOGRAMS
+        histsD_OS, histsMC_OS, histsS = self.createHistograms(var,nBins,xmin,xmax,cutsOS,weight=weight,append="_OS",signal=False,task="calculating QCD",QCD=False,split=True,verbosity=verbosity)
+        histsD_SS, histsMC_SS, histsS = self.createHistograms(var,nBins,xmin,xmax,cutsSS,weight=weight,append="_SS",signal=False,task="calculating QCD",QCD=False,split=True,verbosity=verbosity)
+        if not histsD_OS or not histsD_SS:
+            print warning("No data to make DATA driven QCD!")
+            return None
+        #histsMC_OS = [ ]
+        #histsMC_SS = [ ]
+        #histsD_OS  = [ ]
+        #histsD_SS  = [ ]
+        #if self.loadingbar:
+        #    bar = LoadingBar(len(samples),width=16,pre=">>> %s: calculating OS/SS: "%(var),counter=True,remove=True)
+        #for sample in samples:
+        #    if self.loadingbar: bar.count(sample.label)
+        #    if sample.isPartOf('QCD'): continue
+        #    name_OS = makeHistName(sample.label+"_SS", var)
+        #    name_SS = makeHistName(sample.label+"_OS", var)
+        #    if sample.isBackground:
+        #        histOS = sample.hist(var, nBins, xmin, xmax, cutsOS, weight=weight, name=name_OS, verbosity=verbosity-1)
+        #        histSS = sample.hist(var, nBins, xmin, xmax, cutsSS, weight=weight, name=name_SS, verbosity=verbosity-1)
+        #        histsMC_OS.append(histOS)
+        #        histsMC_SS.append(histSS)
+        #    elif sample.isData:
+        #        histsD_OS.append(sample.hist(var, nBins, xmin, xmax, cutsOS, name=name_OS, verbosity=verbosity-1))
+        #        histsD_SS.append(sample.hist(var, nBins, xmin, xmax, cutsSS, name=name_SS, verbosity=verbosity-1))
+        #    if self.loadingbar: bar.count("%s done"%sample.label)
+        #if not histsD_OS or not histsD_SS:
+        #    print warning("No data to make DATA driven QCD!")
+        #    return None
+        
+        # STACK
+        stack_OS = THStack("stack_OS","stack_OS")
+        stack_SS = THStack("stack_SS","stack_SS")
+        for hist in histsMC_OS: stack_OS.Add(hist)
+        for hist in histsMC_SS: stack_SS.Add(hist)
+        e_MC_OS,   e_MC_SS   = Double(), Double()
+        e_data_OS, e_data_SS = Double(), Double()
+        MC_OS   = stack_OS.GetStack().Last().IntegralAndError(1,nBins+1,e_MC_OS)
+        MC_SS   = stack_SS.GetStack().Last().IntegralAndError(1,nBins+1,e_MC_SS)
+        data_OS = histsD_OS[0].IntegralAndError(1,nBins+1,e_data_OS)
+        data_SS = histsD_SS[0].IntegralAndError(1,nBins+1,e_data_SS)
+        
+        # CHECK
+        if verbosity>0:
+            print ">>>"
+            print '>>>   "%s"'%(cutsOS)
+            print '>>>   "%s"'%(cutsSS)
+            print ">>> %8s %10s %10s"     % ("sample","OS",   "SS"   )
+            print ">>> %8s %10.1f %10.1f" % ("MC",    MC_OS,  MC_SS  )
+            print ">>> %8s %10.1f %10.1f" % ("data",  data_OS,data_SS)
+        
+        # YIELD
+        QCD_OS   = data_OS-MC_OS
+        QCD_SS   = data_SS-MC_SS
+        e_QCD_OS = sqrt(e_data_OS**2+e_MC_OS**2)
+        e_QCD_SS = sqrt(e_data_SS**2+e_MC_SS**2)
+        if QCD_SS:
+            OSSS = QCD_OS/QCD_SS
+            e_OSSSS = OSSS*sqrt( (e_data_OS**2+e_MC_OS**2)/QCD_OS**2 + (e_data_SS**2+e_MC_SS**2)/QCD_SS**2)
+            if verbosity > 0:
+              result = color("%.3f +/-%.3f"%(OSSS,e_OSSSS),color='grey')
+              print ">>>   QCD_OS/QCD_SS = ( %.1f +/-%.1f ) / ( %.1f +/-%.1f ) = %s %s" % (QCD_OS,e_QCD_OS,QCD_SS,e_QCD_SS,result,"(relaxed)" if relaxed else "")
+        else:
+            LOG.warning("measureOSSSratio: denominator QCD_SS is zero: %.1f/%.1f"% (QCD_OS,QCD_SS))
+        
+        for hist in histsMC_OS + histsMC_SS + histsD_OS + histsD_SS:
+            gDirectory.Delete(hist.GetName())
+            del hist
         
     def significanceScan(self,*args,**kwargs):
         """Scan cut on a range of some variable, integrating the signal and background histograms,
@@ -1262,28 +1499,41 @@ class SampleSet(object):
     
     def measureSFFromVar(self,var,nBins,a,b,**kwargs):
         """Method to create a SF for a given var, s.t. the data and MC agree."""
-        
+    
+    def resetScales(self,*searchterms,**kwargs):
+        """Reset scale of sample."""
+        scale = kwargs.get('scale',1)
+        samples = self.get(*searchterms,**kwargs)
+        if isinstance(samples,list) or isinstance(samples,tuple):
+          for sample in samples:
+            sample.resetScale(scale=scale)
+        elif isinstance(samples,Sample):
+          samples.resetScale(scale=scale)
+        else:
+          LOG.ERROR("SampleSet::resetScales: Found sample is not a list or Sample or list object!")
+        return samples
+    
     def get(self,*searchterms,**kwargs):
         return getSample(self.samples,*searchterms,**kwargs)
     
     def getSignal(self,*searchterms,**kwargs):
         return getSignal(self.samplesS,*searchterms,**kwargs)
-        
+    
     def getBackground(self,*searchterms,**kwargs):
         return getBackground(self.samplesB,*searchterms,**kwargs)
-        
+    
     def getMC(self,*searchterms,**kwargs):
         return getMC(self.samplesMC,*searchterms,**kwargs)
-        
+    
     def getData(self,*searchterms,**kwargs):
         return getData(self.samplesD,*searchterms,**kwargs)
-        
+    
     def merge(self,*searchterms,**kwargs):
         self.samplesMC = merge(self.samplesMC,*searchterms,**kwargs)
-        
+    
     def stitch(self,*searchterms,**kwargs):
         self.samplesMC = stitch(self.samplesMC,*searchterms,**kwargs)
-        
+    
     def replaceMergedSamples(self,mergedsample):
         """Help function to replace merged samples with their MergedSample object in the same position."""
         index0 = len(self.samples)
@@ -1307,6 +1557,12 @@ class SampleSet(object):
     def shiftSample(self,searchterms,file_app,title_app,**kwargs):
         """Shift samples in samples set by creating new samples with new filename/titlename/weight."""
         filter          = kwargs.get('filter',      False       )
+        title_tag       = kwargs.get('title_tag',   False       )
+        title_veto      = kwargs.get('title_veto',  False       )
+        kwargs.setdefault('name', file_app.lstrip('_'))
+        kwargs.setdefault('label', file_app)
+        
+        
         if not (isinstance(searchterms,list) or isinstance(searchterms,tuple)): searchterms = [ searchterms ]
         samplesD        = { }
         samplesB        = [ ]
@@ -1314,8 +1570,7 @@ class SampleSet(object):
         for sample in self.samplesB:
           if sample.isPartOf(*searchterms,exclusive=False):
             newsample = sample.clone(samename=True,deep=True)
-            newsample.appendFileName(file_app)
-            newsample.title = newsample.title+title_app
+            newsample.appendFileName(file_app,title_app=title_app,title_veto=title_veto)
             samplesB.append(newsample)
           elif not filter:
             newsample = sample.clone(samename=True,deep=True)
@@ -1323,8 +1578,7 @@ class SampleSet(object):
         for sample in self.samplesS:
           if sample.isPartOf(*searchterms,exclusive=False):
             newsample = sample.clone(samename=True,deep=True)
-            newsample.appendFileName(file_app)
-            newsample.title = newsample.title+title_app
+            newsample.appendFileName(file_app,title_app=title_app,title_veto=title_veto)
             samplesS.append(newsample)
           elif not filter:
             newsample = sample.clone(samename=True,deep=True)

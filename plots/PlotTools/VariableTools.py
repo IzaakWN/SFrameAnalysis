@@ -4,6 +4,7 @@
 
 import os, re
 from array import array
+from copy import copy, deepcopy
 from math import sqrt, pow, log
 from SettingTools import *
 from PrintTools   import *
@@ -40,11 +41,12 @@ varlist = {
 
 
 
-def makeLatex(title):
+def makeLatex(title,**kwargs):
     """Convert patterns in a string to LaTeX format."""
     
-    GeV = False
-    cm  = False
+    units = kwargs.get('units',True)
+    GeV   = False
+    cm    = False
     
     #if "jpt" in title:
     #    if   "jpt_1" in title and title.count(">3.0") is 2:
@@ -145,13 +147,14 @@ def makeLatex(title):
     
     newtitle = ' / '.join(strings)
     
-    if GeV or "mass" in newtitle or ("MET" in newtitle.lower() and "phi" not in newtitle ):
-      if "GeV" not in newtitle:
-        newtitle += " [GeV]"
-    if cm:
-      newtitle += " [cm]"
-      if GeV:
-        LOG.warning("makeLatex: Flagged units are both GeV and cm!")
+    if units:
+      if GeV or "mass" in newtitle or ("MET" in newtitle.lower() and "phi" not in newtitle ):
+        if "GeV" not in newtitle:
+          newtitle += " [GeV]"
+        if cm:
+          LOG.warning("makeLatex: Flagged units are both GeV and cm!")
+      elif cm:
+        newtitle += " [cm]"
     
     return newtitle
     
@@ -159,13 +162,10 @@ def makeLatex(title):
 
 def makeTitle(title,**kwargs):
     """Make header with LaTeX."""
+    kwargs['units'] = False
     title = makeLatex(title,**kwargs)
-    if " [GeV]" in title:
-      title = title.replace('[GeV]',"")
     return title
     
-
-
 def makeHistName(*labels,**kwargs):
     """Use label and var to make an unique and valid histogram name."""
     hist_name = '_'.join(labels)
@@ -174,60 +174,41 @@ def makeHistName(*labels,**kwargs):
                                   "<","lt").replace(">","gt").replace("=","e").replace("*","x")
     return hist_name
     
-
-
-def makeFileName(name,**kwargs):
+def makeFileName(string,**kwargs):
     """Make filename without inconvenient character."""
-    name = name.replace(" and ",'-').replace(',','-').replace('(','').replace(')','').replace(':','-').replace(
-                             '|','').replace('&','').replace('-m_T','-mt').replace(
-                         '>=',"geq").replace('<=',"leq").replace('>',"gt").replace('<',"lt").replace("=","eq").replace(
-                          ' ','')
+    string = string.replace(" and ",'-').replace(',','-').replace('(','').replace(')','').replace(':','-').replace(
+                                '|','').replace('&','').replace('m_T','mt').replace('m_t','mt').replace(
+                               '>=',"geq").replace('<=',"leq").replace('>',"gt").replace('<',"lt").replace("=","eq").replace(
+                                ' ','').replace('GeV','')
+    #if "m_" in string.lower():
+    #    string = re.sub(r"(?<!u)(m)_([^{}\(\)<>=\ ]+)",r"\1_{\2}",string,flags=re.IGNORECASE).replace('{t}','{T}')
     #if not (".png" in name or ".pdf" in name or ".jpg" in name): name += kwargs.get('ext',".png")
-    return name
+    return string
     
 
 
-def shift(arg, shift,**kwargs):
-    """Shorthand for shiftJetSelections and shiftJetVariables. Warning! Only use this for
-       single variables, if they do not contain comparison or boolean tokens!"""
-    for token in ['>','<','=','&&','||']:
-      if token in arg:
-        if '*' in arg and "q_1*q_2" not in arg:
-            LOG.warning("shift: \'*\' token found in argument \"%s\","%(arg)+\
-                  "is this a variable or selection? Assuming selections.")
-        return shiftJetSelections(arg, shift, **kwargs)
-    return shiftJetVariable( arg, shift, **kwargs)
+def shift(string, shifts, **kwargs):
+    """Shift all jet variable in a given string (e.g. to propagate JEC/JER)."""
+    return shiftJetVariable( string, shifts, **kwargs)
     
-def shiftJetSelections(cuts,shift,**kwargs):
-    """Convert variables in cuts to variables
-       that have been propagated a given JEC/JER shift."""
+def shiftJetVariable(var, shifts, **kwargs):
+    """Shift all jet variable in a given string (e.g. to propagate JEC/JER)."""
     
-    verbosity   = max(kwargs.get('verbosity',0),verbosityVariableTools)
-    cutsShift   = cuts[:]
-    if len(shift)>0 and shift[0] != '_': shift = '_'+shift
-    if "jets20" in cuts: LOG.warning("shiftJetSelections: \"jets20\" in cuts")
-    for jvar in [ "jpt_1","jpt_2","jeta_1","jeta_2", "jets", "ncbtag",
-                  "pfmt_1","met","dphi_ll_bj" ]:
-        cutsShift = cutsShift.replace(jvar,jvar+shift)
-    cutsShift = cutsShift.replace("met_nom","met") #.replace("jets_nom","jets")
-    if verbosity>0: print ">>>   shiftJetSelections with \"%s\" shift\n>>>   \"%s\"\n>>>     -> \"%s\""%(shift,cuts,cutsShift)
-    return cutsShift
-    
-def shiftJetVariable(var,shift,**kwargs):
-    """Convert variable to a variable
-       that had been propagated a given JEC/JER shift."""
-    
-    verbosity   = max(kwargs.get('verbosity',0),verbosityVariableTools)
+    verbosity   = getVerbosity(kwargs,verbosityVariableTools)
+    vars        = kwargs.get('vars',  ['jpt_[12]','jeta_[12]','jets(?:20)?','(nc?btag(?!_noTau))','pfmt_1','met','dphi_ll_bj'] )
     varShift    = var[:]
-    if len(shift)>0 and shift[0] != '_': shift = '_'+shift
+    if len(shifts)>0 and shifts[0] != '_': shifts = '_'+shifts
     if "jets20" in var: LOG.warning('shiftJetVariable: "jets20" in var')
-    for jvar in [ "jpt_1", "jpt_2", "jeta_1", "jeta_2", "jets", "ncbtag",
-                  "pfmt_1", "met", "dphi_ll_bj" ]:
-        varShift = varShift.replace(jvar,jvar+shift)
-    varShift = varShift.replace("met_nom","met")
-    if verbosity>0: print '>>>   shiftJetSelections with "%s" shift\n>>>   "%s"\n>>>     -> "%s"'%(shift,var,varShift)
+    for jvar in vars:
+        oldvarpattern = r'('+jvar+r')'
+        newvarpattern = r"\1%s"%(shifts)
+        varShift = re.sub(oldvarpattern,newvarpattern,varShift)
+    LOG.verbose('>>>   shiftJetVariable with "%s" shift\n>>>   "%s"\n>>>     -> "%s"'%(shifts,var,varShift), verbosity)
     return varShift
     
+def undoShift(string):
+    shiftless = re.sub(r"_[a-zA-Z]*(Up|Down|nom)","",string)
+    return shiftless
 
 
 class Variable(object):
@@ -258,12 +239,15 @@ class Variable(object):
         self.logy            = kwargs.get('logy',           False                       )
         self.position        = kwargs.get('position',       ""                          ) # legend position
         #self.plot            = kwargs.get('plots',          True                        )
+        self.only            = kwargs.get('only',           [ ]                         )
         self.veto            = kwargs.get('veto',           [ ]                         )
         self.contexttitle    = getContextFromDict(kwargs, None, key='ctitle'                ) # context-dependent title
-        self.contextbinning  = getContextFromDict(kwargs, None, key='cbinning', regex=True  ) # context-dependent binning
+        self.contextbinning  = getContextFromDict(kwargs, None, key='cbinning',  regex=True ) # context-dependent binning
         self.contextposition = getContextFromDict(kwargs, None, key='cposition', regex=True ) # context-dependent position
+        if self.only:
+          if not (isinstance(self.only,list) or isinstance(self.only,tuple)): self.only = [ self.only ]
         if self.veto:
-          if not (isinstance(self.veto,list) or instance(self.veto,tuple)): self.veto = [ self.veto ]
+          if not (isinstance(self.veto,list) or isinstance(self.veto,tuple)): self.veto = [ self.veto ]
     
     @property
     def var(self): return self.name
@@ -302,13 +286,15 @@ class Variable(object):
     def __repr__(self):
       """Returns string representation of Variable object."""
       #return '<%s.%s("%s","%s",%s,%s,%s)>'%(self.__class__.__module__,self.__class__.__name__,self.name,self.title,self.nBins,self.xmin,self.xmax)
-      return '<%s("%s","%s",%s,%s,%s)>'%(self.__class__.__name__,self.name,self.title,self.nBins,self.xmin,self.xmax)
-      #hex(id(self))
+      return '<%s("%s","%s",%s,%s,%s) at %s>'%(self.__class__.__name__,self.name,self.title,self.nBins,self.xmin,self.xmax,hex(id(self)))
     
     def __iter__(self):
       """Start iteration over variable information."""
       for i in [self.name,self.nBins,self.min,self.max]:
         yield i
+    
+    def printWithBinning(self):
+        return '%s(%s,%s,%s)'%(self.name,self.nBins,self.xmin,self.xmax)
     
     def setBinning(self,*args):
         """Set binning: (N,min,max), or xbins if it is set"""
@@ -328,15 +314,14 @@ class Variable(object):
         else:
           print error('Variable: bad arguments "%s" for binning!'%(args))
           exit(1)
-
-          
+    
     def getBinning(self):
         """Get binning: (N,xmin,xmax), or xbins if it is set"""
         if self.hasVariableBinning():
           return self.xbins
         else:
           return (self.nBins,self.min,self.max)
-        
+    
     def hasVariableBinning(self):
         """True is xbins is set."""
         return xbins != None
@@ -349,17 +334,17 @@ class Variable(object):
         regex       = kwargs.get('regex',       False   )
         exlcusive   = kwargs.get('exclusive',   True    )
         for searchterm in searchterms:
-            if not regex:
-                searchterm = re.sub(r"([^\.])\*",r"\1.*",searchterm) # replace * with .*
-            if exlcusive:
-                for varlabel in [self.name,self.title]:
-                    matches    = re.findall(searchterm,varlabel)
-                    if matches: break
-                else: return False # none of the labels contain the searchterm
-            else: # inclusive
-                for varlabel in [self.name,self.title]:
-                    matches    = re.findall(searchterm,varlabel)
-                    if matches: return True # one of the searchterm has been found
+          if not regex:
+            searchterm = re.sub(r"([^\.])\*",r"\1.*",searchterm) # replace * with .*
+          if exlcusive:
+            for varlabel in [self.name,self.title]:
+                matches    = re.findall(searchterm,varlabel)
+                if matches: break # try next searchterm, or return True
+            else: return False # none of the labels contain the searchterm
+          else: # inclusive
+            for varlabel in [self.name,self.title]:
+                matches    = re.findall(searchterm,varlabel)
+                if matches: return True # one of the searchterm has been found
         return exlcusive
     
     def changeContext(self,*args):
@@ -377,14 +362,20 @@ class Variable(object):
         #  plot = self.contextplot.getContext(*args)
         #  if binning!=None: self.plot = plot
     
-    def plotForSelection(self,selection):
+    def plotForSelection(self,selection,**kwargs):
+        """Check is selection is vetoed for this variable."""
+        verbosity = getVerbosity(kwargs,verbosityVariableTools)
         if not isinstance(selection,str):
           selection = selection.selection
         for searchterm in self.veto:
           if re.search(searchterm,selection):
-              LOG.verbose('Variable::plotForSelection: Regex match of selection "%s" to "%s"'%(selection,searchterm),True)
-              return False
-        return True
+            LOG.verbose('Variable::plotForSelection: Regex match of selection "%s" to "%s"'%(selection,searchterm),verbosity,level=2)
+            return False
+        for searchterm in self.only:
+          if re.search(searchterm,selection):
+            LOG.verbose('Variable::plotForSelection: Regex match of selection "%s" to "%s"'%(selection,searchterm),verbosity,level=2)
+            return True
+        return len(self.only)==0
     
     def unwrap(self):
         return (self.name,self.nBins,self.min,self.max)
@@ -392,19 +383,23 @@ class Variable(object):
     def latex(self):
         return makeLatex(self.name)
     
-    #def load(self,context):
-    #    """Load contextual binning, if available."""
-    #    for pattern, variable in self.context:
-    #        if re.match("(?:" + pattern + r")\Z", context):
-    #            return variable
+    def shift(self,shifts,**kwargs):
+        if len(shifts)>0 and shifts[0]!='_':
+          shifts = '_'+shifts
+        newname               = shift(self.name,shifts,**kwargs)
+        newvariable           = deepcopy(self)
+        newvariable.name      = newname
+        if self.name != newname:
+          newvariable.filename += shifts
+        return newvariable
     
-    def shiftJetVariable(self,shift,**kwargs):
-        return shiftJetVariable(self.name,shift,**kwargs)
-
+    def shiftName(self,shifts,**kwargs):
+        return shift(self.name,shifts,**kwargs)
+    
 def var(*args,**kwargs):
     """Shorthand for Variable class."""
     return Variable(*args,**kwargs)
-    
+
 def wrapVariable(*args,**kwargs):
     """Help function to wrap variable arguments into a Variable object."""
     if   len(args) == 4 or len(args) == 5:
@@ -413,7 +408,7 @@ def wrapVariable(*args,**kwargs):
       return args[0]
     LOG.warning('wrapVariable: Could not unwrap arguments "%s" to a Variable object. Returning None.'%args)
     return None
-    
+
 def unwrapVariableBinning(*args,**kwargs):
     """Help function to unwrap variable arguments to return variable name, number of bins,
     minumum and maximum x axis value."""

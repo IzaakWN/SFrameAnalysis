@@ -17,20 +17,24 @@ verbositySelectionTools = 0
 
 # PLOTS OPTIONS
 doStack             = True #and False
+drawShifts          = True #and False
 useCutTree          = True #and False
-normalizeWJ         = True and False
-doQCD               = True #and False
-OSSS_ratio          = 1.06
 
 # DATACARD OPTIONS
+doDatacard          = True and False
 recreateDC          = True #and False
-doTESscan           = True and False
 doNominal           = True #and False
+doTESscan           = True and False # not for emu
+doTES               = True and False
 doEES               = True #and False
 doJTF               = True #and False
+doJER               = True #and False
+doJEC               = True #and False
 
 # SAMPLE OPTIONS
-splitDY             = True and False
+splitDY             = True #and False
+splitTT             = True #and False
+splitST             = True and False
 stitchWJ            = True #and False
 stitchDY50          = True #and False
 stitchDY10to50      = True #and False
@@ -38,8 +42,9 @@ mergeDY             = True #and False
 mergeTT             = True #and False
 mergeST             = True #and False
 mergeVV             = True #and False
-splitDY             = True and False
-splitTT             = True #and False
+normalizeWJ         = True and False # not for emu
+doQCD               = True #and False
+OSSS_ratio          = 1.06
 
 # SAMPLES
 SFRAME              = "SFrameAnalysis_ltau2017"
@@ -84,32 +89,33 @@ selections  = [
 #     sel("baseline, tight, m_T<50GeV",             "%s && %s" %(baseline,"pfmt_1<50")                  ),
 #     sel("baseline, tight, m_T>80GeV",             "%s && %s" %(baseline,"pfmt_1>80")                  ),
 #     sel("ZTT enriched, tight",                    "%s && %s" %(baseline, ZTTregion)                   ),
-#     sel("baseline, m_t<50GeV",                    "%s && %s" %(baseline,"pfmt_1<50")                     ),
-#     sel("baseline, m_t<50GeV, DM0",               "%s && %s" %(baseline,"pfmt_1<50 && decayMode_2==0")   ),
-#     sel("baseline, m_t<50GeV, DM1",               "%s && %s" %(baseline,"pfmt_1<50 && decayMode_2==1")   ),
-#     sel("baseline, m_t<50GeV, DM10",              "%s && %s" %(baseline,"pfmt_1<50 && decayMode_2==10")  ),
+#     sel("baseline, m_T<50GeV",                    "%s && %s" %(baseline,"pfmt_1<50")                     ),
+#     sel("baseline, m_T<50GeV, DM0",               "%s && %s" %(baseline,"pfmt_1<50 && decayMode_2==0")   ),
+#     sel("baseline, m_T<50GeV, DM1",               "%s && %s" %(baseline,"pfmt_1<50 && decayMode_2==1")   ),
+#     sel("baseline, m_T<50GeV, DM10",              "%s && %s" %(baseline,"pfmt_1<50 && decayMode_2==10")  ),
 #     sel("baseline, >=1b",                         "%s && %s" %(baseline,"nbtag>0")                       ),
 #     sel("baseline, >=1b, 20",                     "%s && %s" %(baseline,"nbtag20>0")                     ),
-    sel("baseline, >=1b, no tau ID", "%s && %s" %(baseline,"ncbtag_noTau>0 && againstLepton_3==1") ),
-#     sel("baseline, >=1b, m_T<100GeV", "%s && %s" %(baseline,"ncbtag_noTau>0 && againstLepton_3==1 && pfmt_1<100") ),
-    sel("baseline, >=1b, tight",      "%s && %s" %(baseline,"ncbtag_noTau>0 && againstLepton_3==1 && byTightIsolationMVArun2v1DBoldDMwLT_3==1") ),
-#     sel("baseline, >=1b, Tight fail", "%s && %s" %(baseline,"ncbtag_noTau>0 && againstLepton_3==1 && byTightIsolationMVArun2v1DBoldDMwLT_3!=1") ),
-#     sel("baseline, >=1b, VTight",     "%s && %s" %(baseline,"ncbtag_noTau>0 && againstLepton_3==1 && byVTightIsolationMVArun2v1DBoldDMwLT_3==1") ),
+    sel("baseline, >=1b, no tau ID", "%s && %s" %(baseline,"nbtag_noTau>0 && againstLepton_3==1") ),
+#     sel("baseline, >=1b, m_T<100GeV", "%s && %s" %(baseline,"nbtag_noTau>0 && againstLepton_3==1 && pfmt_1<100") ),
+    sel("baseline, >=1b, tight",      "%s && %s" %(baseline,"nbtag_noTau>0 && againstLepton_3==1 && byTightIsolationMVArun2v1DBoldDMwLT_3==1") ),
+#     sel("baseline, >=1b, Tight fail", "%s && %s" %(baseline,"nbtag_noTau>0 && againstLepton_3==1 && byTightIsolationMVArun2v1DBoldDMwLT_3!=1") ),
+#     sel("baseline, >=1b, VTight",     "%s && %s" %(baseline,"nbtag_noTau>0 && againstLepton_3==1 && byVTightIsolationMVArun2v1DBoldDMwLT_3==1") ),
 ]
 
 
 # VARIABLES
 variables = [
-    var("m_vis",                                40,     0,  200 ),
-#     ###var("m_sv",                                 40,     0,  200 ),
-#     var("m_2",                                  50,     0,    2 ),
-#     var("m_2",                                  75,     0,    3, logy=True, filename="$NAME_log" ),
-#     ###var("ht",                                   50,     0,  500 ),
+    var("m_vis",                                40,     0,  200, cbinning={'iso_2.*nbtag':(20,0,200)} ),
+#     ###var("m_sv",                              40,     0,  200 ),
+#     var("m_2",                                  50,     0,    2, title="m_e" ),
+#     var("m_2",                                  75,     0,    3, title="m_e", logy=True, filename="$NAME_log" ),
+#     ###var("ht",                                50,     0,  500 ),
 #     var("dR_ll",                                30,     0,    6 ),
-    var("pfmt_1",                               40,     0,  200 ),
+    var("pfmt_1",                               40,     0,  200, title="m_t(mu,MET)", ctitle={'etau':"m_t(e,MET)"}, cbinning={'iso_2.*nbtag':(20,0,200)} ),
 #     var("met",                                  40,     0,  200 ),
 #     var("metphi",                               36,  -3.5,  3.5 ),
-#     #var("gen_match_2",                          9,    -1,    8, position='center' ),
+    var("gen_match_2",                          9,    -1,    8, position='center', title="electron gen. match" ),
+    var("gen_match_3",                          9,    -1,    8, position='center', title="tau gen. match" ),
 #     ###var("puweight",                            100,     0,  200, logy=True ),
 #     var("npu",                                  40,     0,   80 ),
 #     var("npv",                                  40,     0,   80 ),
@@ -121,9 +127,10 @@ variables = [
 #     var("eta_1",                                26,  -2.6,  2.6, title="muon eta", ctitle={'etau':"electron eta"} ),
 #     var("pt_2",                                 30,     0,  150, title="tau pt",   ctitle={'emu': "electron pt"}  ),
 #     var("eta_2",                                26,  -2.6,  2.6, title="tau eta",  ctitle={'emu': "electron eta"} ),
+#     var("pt_3",                                 30,     0,  150, title="tau pt",  ),
+#     var("eta_3",                                26,  -2.6,  2.6, title="tau eta", ),
 #     #var("iso_1",                               100,     0,  0.5 ),
-#     #var("decayMode_2",                          14,     0,   14, position='center' ),
-#     var("byIsolationMVArun2v1DBoldDMwLTraw_3",  50,   0.8,  1.0, filename="$NAME_zoom0p8", veto=['decayMode_3==11'], position='centerleft' ),
+#     var("byIsolationMVArun2v1DBoldDMwLTraw_3",  50,   0.8,  1.0, filename="$NAME_zoom0p8", veto=['decayMode_3==11'], position='centerleft', cbinning={'iso_2.*nbtag':(20,0.8,1.0)} ),
 #     var("byIsolationMVArun2v1DBoldDMwLTraw_3",  50,  -1.0,  1.0, logy=True, veto=['by.*IsolationMVA.*_3.*decayMode_3==11'], position='centerleft' ),
 #     ###var("byIsolationMVArun2v1DBoldDMwLTraw_2",  30,  -0.2,  1.0, filename="$NAME_zoom-0p2", position='centerleft' ),
 #     var("byIsolationMVArun2v1DBnewDMwLTraw_3",  50,   0.8,  1.0, filename="$NAME_zoom0p8", position='centerleft' ),
@@ -194,6 +201,7 @@ samplesD = {
     "emu"   :  ( "SingleMuon",      "SingleMuon_Run2017",     "single muon"     ),
 }
 
+# SAMPLESET
 makeSFrameSamples(samplesD,samplesB,samplesS,weight=_weight,binN_weighted=10)
 samples = SampleSet(samplesD,samplesB,samplesS)
 #samples.printTable()
@@ -203,20 +211,25 @@ if stitchDY50:     samples.stitch("DY*J*M-50",     name_incl="DYJ", name="DY_M-5
 if mergeVV:        samples.merge( "VV","VV","WZ","WW","ZZ",         name="VV",          title="diboson"               )
 if mergeST:        samples.merge( "ST",                             name="ST",          title="single top"            )
 if mergeTT:        samples.merge( "TT",                             name="TT",          title="ttbar"                 )
-if splitDY:        samples.splitSample("DY",{'Z -> tautau': "gen_match_3==5", 'Drell-Yan other': "gen_match_3!=5",})
-if splitTT:        samples.splitSample("TT",{'ttbar with real tau_h': "gen_match_3==5", 'ttbar other': "gen_match_3!=5" }) #'ttbar j -> tau_h': "gen_match_2<5"
+if splitDY:        samples.splitSample("DY",{'Z -> tautau':           "gen_match_3==5", 'Drell-Yan other': "gen_match_3!=5" })
+if splitTT:        samples.splitSample("TT",{'ttbar with real tau_h': "gen_match_3==5", 'ttbar other':     "gen_match_3!=5" }) #'ttbar j -> tau_h': "gen_match_2<5"
 samples.printTable()
+#samples.printSampleObjects()
 
-#for sample in samples:
-#    sample.printSampleObjects()
-
-samplesB_EESUp   = samples.shiftSample(['TT','ST'],"_EES1p03","  +3% EES",    filter=False)
-samplesB_EESDown = samples.shiftSample(['TT','ST'],"_EES0p97","  -3% EES",    filter=False)
-samplesB_JTFUp   = samples.shiftSample(['TT','ST'],"_JTF1p15"," +15% JTF ES", filter=False)
-samplesB_JTFDown = samples.shiftSample(['TT','ST'],"_JTF0p85"," -15% JTF ES", filter=False)
-samplesB_EESUp.printTable()
-samplesB_JTFUp.printTable()
-#for sample in samplesB_EESUp:
-#    sample.printSampleObjects()
+# SHIFT
+samplesB_TESscan = { }
+samplesB_TESUp, samplesB_TESDown, samplesB_EESUp, samplesB_EESDown, samplesB_JTFUp, samplesB_JTFDown = [ ], [ ], [ ], [ ], [ ], [ ]
+if doEES:
+  samplesB_EESUp   = samples.shiftSample(['TT','ST'],"_EES1p03","  +3% EES",    filter=not doStack)
+  samplesB_EESDown = samples.shiftSample(['TT','ST'],"_EES0p97","  -3% EES",    filter=not doStack)
+if doJTF:
+  #samplesB_JTFUp   = samples.shiftSample(['TT','ST'],"_JTF1p15"," +15% JTF ES", filter=not doStack, title_veto="real")
+  #samplesB_JTFDown = samples.shiftSample(['TT','ST'],"_JTF0p85"," -15% JTF ES", filter=not doStack, title_veto="real")
+  samplesB_JTFUp   = samples.shiftSample(['TT','ST'],"_JTF1p10"," +10% JTF ES", filter=not doStack, title_veto="real")
+  samplesB_JTFDown = samples.shiftSample(['TT','ST'],"_JTF0p90"," -10% JTF ES", filter=not doStack, title_veto="real")
+  #samplesB_EESUp.printTable()
+  #samplesB_JTFDown.printTable()
+  #samplesB_JTFUp.printTable()
+  #samplesB_JTFUp.printSampleObjects()
 
 

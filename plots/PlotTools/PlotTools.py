@@ -7,7 +7,7 @@ from ROOT import TFile, TCanvas, TPad, TH1, TH1D, TLegend, TAxis, THStack, TGrap
                  TGaxis, gDirectory, gROOT, gPad, Double,\
                  kBlack, kGray, kWhite, kRed, kBlue, kGreen, kYellow,\
                  kAzure, kCyan, kMagenta, kOrange, kPink, kSpring, kTeal, kViolet,\
-                 kDashed, kDotted
+                 kSolid, kDashed, kDotted
 import CMS_lumi, tdrstyle
 import os, re
 from math import sqrt, pow, log
@@ -33,13 +33,13 @@ TGaxis.SetExponentOffset(-0.058,0.005,'y')
 # http://imagecolorpicker.com/nl
 # TColor::GetColor(R,B,G)
 legendTextSize = 0.034 #0.036
-colors     = [ kBlack,
-               kRed+1, kAzure+5, kGreen+2, kOrange+1, kMagenta-4, kYellow+1,
+colors     = [ kRed+1, kAzure+5, kGreen+2, kOrange+1, kMagenta-4, kYellow+1,
                kRed-9, kAzure-4, kGreen-2, kOrange+6, kMagenta+3, kYellow+2 ]
 fillcolors = [ kRed-2, kAzure+5,
                kMagenta-3, kYellow+771, kOrange-5,  kGreen-2,
                kRed-7, kAzure-9, kOrange+382,  kGreen+3,  kViolet+5, kYellow-2 ]
                #kYellow-3
+styles     = [ kSolid, kDashed, kDotted ]
 
 def ensureDirectory(DIR):
     """Make directory if it does not exist."""
@@ -134,6 +134,8 @@ def makeLegend(*hists,**kwargs):
     styleB      = 'f' if histsB else 'l'
     styleS      = 'l'
     styleD      = 'lep'
+    
+    if title=="noname": title = ""
     
     if entries and hists and len(entries)!=len(hists):
       print error("makeLegend - %d=len(entries)!=len(hists)=%d !"%(len(entries),len(hists)))
@@ -274,9 +276,9 @@ def makeAxes(frame, *args, **kwargs):
     frame.GetXaxis().SetNdivisions(510)
     #ROOT.gPad.SetTicks(1,1)
     #ROOT.gPad.SetGrid(1,1)
-
-
     
+
+
 def symmetricYRange(self, frame, **kwargs):
     """Make symmetric Y range around some center value.
        Made for ratio plots with variable y axis."""
@@ -309,57 +311,55 @@ def symmetricYRange(self, frame, **kwargs):
     
     width = max(abs(center-min),abs(Max-center))*1.10
     return [ center-width, center+width ]    
-
-
+    
 
 
 def setFillStyle(*hists,**kwargs):
     """Make fill style."""
+    global fillcolors
+    fillcolors0 = kwargs.get('colors', fillcolors )
     for i, hist in enumerate(hists):
-        color0 = fillcolors[i%len(fillcolors)]
+        color0 = fillcolors0[i%len(fillcolors0)]
         hist.SetFillColor(color0)
-    
+
 def setLineStyle(*hists,**kwargs):
     """Make line color."""
-    style        = kwargs.get('style',True)
-    offset       = kwargs.get('offset',0)
-    style_offset = kwargs.get('style_offset',0)+1
-    if kwargs.get('noblack',True): offset += 1 # skip black
-    colors0 = colors[offset:]
-    if len(hists) is 0: hists = self.hists
+    global colors, styles
+    colors0      = kwargs.get('colors',         colors  )
+    style        = kwargs.get('style',          True    )
+    offset       = kwargs.get('offset',         0       )
+    style_offset = kwargs.get('style_offset',   0       )
     for i, hist in enumerate(hists):
-        colori = colors0[i%len(colors0)]
-        hist.SetLineColor(colori)
-        if style: hist.SetLineStyle(style_offset+i%3)
+        hist.SetLineColor(colors0[i%len(colors0)])
+        if style: hist.SetLineStyle(styles[i%len(styles)])
         hist.SetLineWidth(2)
         if not isinstance(hist,TLine): hist.SetMarkerSize(0)
 
 def setMarkerStyle(*hists,**kwargs):
     """Make marker style."""
-    size         = kwargs.get('size',0.8)
-    style        = kwargs.get('style',True)
-    offset       = kwargs.get('offset',0)
-    style_offset = kwargs.get('style_offset',0)+1
-    if kwargs.get('noblack',False): offset += 1 # skip black
-    colors0 = colors[offset:]
+    global colors
+    colors0      = kwargs.get('colors',         colors  )
+    size         = kwargs.get('size',           0.6     )
+    style        = kwargs.get('style',          True    )
+    offset       = kwargs.get('offset',         0       )
+    style_offset = kwargs.get('style_offset',   0       )
     for i, hist in enumerate(hists):
-        colori = colors0[i%len(colors0)]
-        hist.SetMarkerColor(colori)
-        hist.SetLineColor(colori)
-        if style: hist.SetLineStyle(style_offset+i%3)
+        color = colors0[i%len(colors0)]
+        hist.SetMarkerColor(color)
+        hist.SetLineColor(color)
         hist.SetMarkerStyle(20)
         hist.SetMarkerSize(size)
-    
+
 def setStatisticalErrorStyle(hist_error,**kwargs):
     """Set fill area style."""
     # https://root.cern.ch/doc/v608/classTAttFill.html#F2
     # 3001 small dots, 3003 large dots, 3004 hatched
     
-    style = kwargs.get('style','hatched')
+    color = kwargs.get('color',     kBlack      )
+    style = kwargs.get('style',     'hatched'   )
     if   style in 'hatched': style = 3004
     elif style in 'dots':    style = 3002
     elif style in 'cross':   style = 3013
-    color = kwargs.get('color', kBlack)
     hist_error.SetLineStyle(1)
     hist_error.SetMarkerSize(0)
     hist_error.SetFillColor(color)
@@ -373,10 +373,10 @@ def makeStatisticalError(hists,**kwargs):
     if isinstance(hists,THStack):    hists = [hists.GetStack.Last()]
     elif not isinstance(hists,list): hists = [hists]
     
-    name        = kwargs.get('name',        "error_"+hists[0].GetName()     )
-    title       = kwargs.get('title',       "stat. error"                   )
-    color       = kwargs.get('color',       kBlack                          )
-    verbosity   = kwargs.get('verbosity',   0                               )#False)
+    name        = kwargs.get('name',        "error_"+hists[0].GetName() )
+    title       = kwargs.get('title',       "stat. error"               )
+    color       = kwargs.get('color',       kBlack                      )
+    verbosity   = kwargs.get('verbosity',   0                           )
     (N, a, b)   = (hists[0].GetNbinsX(), hists[0].GetXaxis().GetXmin(),hists[0].GetXaxis().GetXmax())
     hist_error  = hists[0].Clone(name)
     hist_error.SetTitle(title)
@@ -388,8 +388,6 @@ def makeStatisticalError(hists,**kwargs):
     
     if verbosity>1:
         printRow("bin","content","sqrt(content)","error",append=("  "+name),widths=[4,14],line="abovebelow")
-        #for i, binc in enumerate(hist_error):
-        #    printRow(i,binc,sqrt(binc),hist.GetBinError(i))
         for i in range(0,N+2):
             printRow(i,hist_error.GetBinContent(i),sqrt(hist_error.GetBinContent(i)),hist_error.GetBinError(i),widths=[4,14])
     
@@ -577,19 +575,25 @@ def norm(*hists,**kwargs):
     
 def close(*hists,**kwargs):
     """ Close histograms."""
-    verbosity = getVerbosity(kwargs,verbosityPlotTools) 
+    verbosity = getVerbosity(kwargs,verbosityPlotTools)
     if len(hists)>0 and (isinstance(hists,list) or isinstance(hists,tuple)):
       hists = hists[0]
     for hist in hists:
       if isinstance(hist,THStack):
+        if verbosity>1: print '>>> close: Deleting histograms from stack "%s"...'%(hist.GetName())
         for subhist in hist.GetStack():
-            if verbosity>1: print ">>> close: Deleting histogram %s from stack %s..."%(subhist.GetName(),hist.GetName())
-            gDirectory.Delete(subhist.GetName())
-        if verbosity>1: print ">>> close: Deleting stack %s..."%(hist.GetName())
-        gDirectory.Delete(hist.GetName())
+          deleteHist(subhist,**kwargs)
+        deleteHist(hist,**kwargs)
       else:
-        if verbosity>1: print ">>> close: Deleting histogram %s..."%(hist.GetName())
-        gDirectory.Delete(hist.GetName())
+        deleteHist(hist,**kwargs)
+    
+def deleteHist(*hists,**kwargs):
+    """Completely remove histograms from memory."""
+    verbosity = getVerbosity(kwargs,verbosityPlotTools) 
+    for hist in hists:
+      if verbosity>1: print '>>> deleteHist: deleting histogram "%s"'%(hist.GetName())
+      gDirectory.Delete(hist.GetName())
+      del hist
     
 
 
@@ -601,25 +605,32 @@ class Ratio(object):
            to do data / MC stack."""
         
         self.ratios     = [ ]
+        self.error      = None
         self.title      = kwargs.get('title',       "ratio"         )
         self.line       = kwargs.get('line',        True            )
         error0          = kwargs.get('error',       None            )
         staterror       = kwargs.get('staterror',   True            )
+        denominator     = kwargs.get('denominator', -1              )
         
-        if len(hists)<1:
+        if len(hists)==0:
             LOG.warning("Ratio::init: No histogram to compare with!")
+        elif denominator>1:
+            hists.insert(0,hist0)
+            hist0 = hists[denominator-1]
+            self.line = False
         if isinstance(hist0,THStack):
             hist0 = hist0.GetStack().Last() # should have correct bin content and error
         for hist in hists:
-            hist1       = hist.Clone("ratio_%s-%s"%(hist0.GetName(),hist.GetName()))
-            hist1.SetTitle(self.title)
+            if isinstance(hist,THStack):
+              hist = hist.GetStack().Last()
+            hist1 = hist.Clone("ratio_%s-%s"%(hist0.GetName(),hist.GetName()))
             hist1.Reset()
+            hist1.SetTitle(self.title)
             self.ratios.append(hist1)
         self.ratio      = self.ratios[0]
         self.frame      = self.ratios[0]
         nBins           = hist0.GetNbinsX()
         
-        self.error      = None
         if isinstance(error0,TGraphAsymmErrors):
             self.error  = error0.Clone()
         elif staterror:
@@ -646,7 +657,6 @@ class Ratio(object):
                 width = hist0.GetXaxis().GetBinWidth(i)
                 self.error.SetPoint(i,x,1)
                 self.error.SetPointError(i,width/2,width/2,hist0.GetBinErrorLow(i)/binc0,hist0.GetBinErrorUp(i)/binc0)
-    
     
     def Draw(self, *option, **kwargs):
         """Draw all objects."""
@@ -685,21 +695,21 @@ class Ratio(object):
         
         if self.line:
             self.line = TLine(xmin,1,xmax,1)
+            #self.line.SetName(makeHistName("line",self.title))
             self.line.SetLineColor(12) # dark grey
             self.line.SetLineStyle(2)
             self.line.Draw('SAME') # only draw line if a histogram has been drawn!
         
         frame.Draw(option)
     
-    
     def close(self):
         """Delete the histograms."""
         for ratio in self.ratios:
-          gDirectory.Delete(ratio.GetName())
+          deleteHist(ratio)
         if self.error:
-          gDirectory.Delete(self.error.GetName())
+          deleteHist(self.error)
         if self.line:
-          gDirectory.Delete(self.line.GetName())
+          deleteHist(self.line)
         
 
 
@@ -719,9 +729,6 @@ class Plot(object):
         self.verbosity          = getVerbosity(kwargs,verbosityPlotTools)
         variable, self.histsD, self.histsB, self.histsS = unwrapHistogramLists(*hists)
         self.weight             = kwargs.get('weight',             ""               )
-        self.shift_QCD          = kwargs.get('shift_QCD',          0                )
-        self.ratio_WJ_QCD_SS    = kwargs.get('ratio_WJ_QCD_SS',    0                )
-        self.ratio_TT_QCD_SS    = kwargs.get('ratio_TT_QCD_SS',    0                )
         self.channel            = kwargs.get('channel',            "mutau"          )
         self.name               = kwargs.get('name',               "noname"         )
         self.title              = kwargs.get('title',              self.name        )
@@ -741,9 +748,9 @@ class Plot(object):
             self.logy           = kwargs.get('logy',               False            )
         self.ylabel             = kwargs.get('ylabel',             ""               )
         
-        self.hist_error         = None
+        self.staterror          = None
         self.error              = None
-        self.ratio              = None
+        self.ratio              = kwargs.get('ratio',              False            )
         self.stack              = kwargs.get('stack',              False            )
         self.reset              = kwargs.get('reset',              False            )
         self.split              = kwargs.get('split',              False            )
@@ -752,8 +759,7 @@ class Plot(object):
         self.data               = kwargs.get('data',               True             )
         self.ignore             = kwargs.get('ignore',             [ ]              )
         self.append             = kwargs.get('append',             ""               )
-        #self.histsS, self.histsB, self.histsD = self.samples.createHistograms(self.variable,self.selection,**kwargs)
-        #self.samples_dict
+        self.black              = kwargs.get('black',              False            )
         
         self.canvas             = None
         self.frame              = frame
@@ -763,7 +769,9 @@ class Plot(object):
         #self.x2 = 0.89; self.x1 = self.x2-self.width
         #self.y2 = 0.92; self.y1 = self.y2-self.height
         self.fillcolors         = fillcolors[:]
-        self.colors             = colors[1:]
+        self.markercolors       = colors[:]
+        self.colors             = colors[:]
+        if self.black: self.colors.insert(0,kBlack)
     
     @property
     def hists(self): return ( self.histsB + self.histsS + self.histsD )
@@ -795,8 +803,8 @@ class Plot(object):
         # https://root.cern.ch/doc/master/classTHStack.html
         # https://root.cern.ch/doc/master/classTHistPainter.html#HP01e
         stack       = kwargs.get('stack',       False           ) or self.stack
+        ratio       = (kwargs.get('ratio',      False           ) or self.ratio) and self.histsD
         residue     = kwargs.get('residue',     False           ) and self.histsD
-        ratio       = kwargs.get('ratio',       False           ) and self.histsD
         errorbars   = kwargs.get('errorbars',   False           )
         staterror   = kwargs.get('staterror',   False           )
         JEC_errors  = kwargs.get('JEC_errors',  False           )
@@ -844,21 +852,21 @@ class Plot(object):
             self.setFillStyle(*self.histsB)
             for hist in self.histsMC: hist.SetMarkerStyle(1)
         else:
-            setLineStyle(*self.histsB)
+            self.setLineStyle(*self.histsB)
         if self.histsD:
-            setMarkerStyle(*self.histsD)
+            self.setMarkerStyle(*self.histsD)
         if self.histsS:
             self.setLineStyle(*self.histsS)
         
         # STATISTICAL ERROR
         if staterror:
-            self.hist_error = makeStatisticalError(self.histsB, name=makeHistName("stat_error",self.name),
-                                                   title="statistical error")
+            self.staterror = makeStatisticalError(self.histsB, name=makeHistName("stat_error",self.name),
+                                                               title="statistical error")
             if stack and JEC_errors:
                 self.error = self.makeErrorFromJECShifts(JEC=JEC_errors)
                 self.error.Draw('E2 SAME')
             else:
-                self.hist_error.Draw('E2 SAME')
+                self.staterror.Draw('E2 SAME')
         
         # AXES & LEGEND
         self.makeAxes(self.frame, *(self.histsB+self.histsD), xlabel=xlabel, noxaxis=ratio,
@@ -894,18 +902,19 @@ class Plot(object):
             #if self.canvas_sigma:
                 #self.canvas_sigma.SaveAs(filename.replace(".png","_eff.png"))
                 #self.canvas_sigma.SaveAs(filename.replace(".png","_eff.pdf"))
-        if close: self.close()
+        if close:
+            self.close()
         
     
     def close(self):
         """Close canvas and delete the histograms."""
         
-        if self.canvas:       self.canvas.Close()
-        #if self.canvas_sigma: self.canvas_sigma.Close()
+        if self.canvas:
+            self.canvas.Close()
         for hist in self.hists:
-            gDirectory.Delete(hist.GetName())
-        if self.hist_error:
-            gDirectory.Delete(self.hist_error.GetName())
+            deleteHist(hist)
+        if self.staterror:
+            deleteHist(self.staterror)
         if self.ratio:
             self.ratio.close()
         
@@ -935,40 +944,37 @@ class Plot(object):
         """Make axis."""
         makeAxes(frame,*args,**kwargs)
         
-    
-    
     def setLineStyle(self, *hists, **kwargs):
         """Make line style."""
-
-        if len(hists) is 0: hists = self.hists
-        gen = kwargs.get('gen', False)
-        colors2 = self.colors
-        
-        if gen:
-          line = [1,3,2,3]
-          for i, hist in enumerate(hists):
-            if hist.GetFillColor!=kBlack: continue
-            hists[i].SetLineColor(colors2[i])
-            hists[i].SetLineStyle(line[i%4])
-            hists[i].SetLineWidth(3)
-        else:
-          for i, hist in enumerate(hists):
-            if hist.GetFillColor!=kBlack: continue
-            hists[i].SetLineColor(colors2[i%len(colors2)])
-            hists[i].SetLineStyle(i%4+1)
-            hists[i].SetLineWidth(3)
-        
-    
+        if not hists: hists = self.hists[:]
+        hists = [h for h in hists if h.GetFillColor()!=kBlack]
+        if hists:
+          kwargs.setdefault('colors',self.color)
+          setLineStyle(*hists,**kwargs)
+          
+    def setMarkerStyle(self, *hists, **kwargs):
+        """Make line style."""
+        if not hists: hists = self.hists[:]
+        hists = [h for h in hists if h.GetMarkerColor()!=kBlack]
+        if hists:
+          kwargs.setdefault('colors',self.markercolors)
+          setMarkerStyle(*hists,**kwargs)
     
     def setFillStyle(self, *hists):
         """Make fill style."""
-        if len(hists) is 0: hists = self.hists
-        for i, hist in enumerate(hists):
-            if hist.GetFillColor!=kBlack: continue
-            print  "setFillStyle - hist \"%s\" has unset color!"
-            color0 = self.fillcolors_dict.get(hist.GetName(),self.fillcolors[i%len(self.fillcolors)])
-            hist.SetFillColor(color0)
+        if not hists: hists = self.hists[:]
+        i = 0
+        for hist in hists:
+          if hist.GetFillColor()!=kBlack: continue
+          print  'Plot::setFillStyle: hist "%s" has unset color!'
+          color0 = self.fillcolors_dict.get(hist.GetName(), None )
+          if not color0:
+            color0 = self.fillcolors[i%len(self.fillcolors)]
+            i += 1
+          hist.SetFillColor(color0)
         
+    
+    
     def makeErrorFromJECShifts(self,**kwargs):
         """Method to create a SF for a given var, s.t. the data and MC agree."""
         

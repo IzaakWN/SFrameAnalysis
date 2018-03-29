@@ -66,7 +66,7 @@ namespace Ntuple {
     Int_t lumiBlock;
 
     // EventInfoBasic
-    std::vector< int >* averageIntPerXing;
+    std::vector<float>* averageIntPerXing;
     std::vector< int >* actualIntPerXing;
     std::vector< int >* bunchCrossing;
     floatingnumber rho;

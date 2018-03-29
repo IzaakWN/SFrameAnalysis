@@ -62,6 +62,10 @@ namespace UZH {
     floatingnumber* m_byIsolationMVArun2v1DBnewDMwLTraw;
     floatingnumber* m_byIsolationMVArun2v1DBoldDMwLTraw;
     floatingnumber* m_byIsolationMVArun2v1PWnewDMwLTraw;
+    bool m_byVLooseIsolationMVArun2v1DBdR03oldDMwLT;
+    bool m_byVLooseIsolationMVArun2v1DBnewDMwLT;
+    bool m_byVLooseIsolationMVArun2v1DBoldDMwLT;
+    bool m_byVLooseIsolationMVArun2v1PWnewDMwLT;
     bool m_byLooseIsolationMVArun2v1DBdR03oldDMwLT;
     bool m_byLooseIsolationMVArun2v1DBnewDMwLT;
     bool m_byLooseIsolationMVArun2v1DBoldDMwLT;
@@ -74,10 +78,6 @@ namespace UZH {
     bool m_byTightIsolationMVArun2v1DBnewDMwLT;
     bool m_byTightIsolationMVArun2v1DBoldDMwLT;
     bool m_byTightIsolationMVArun2v1PWnewDMwLT;
-    bool m_byVLooseIsolationMVArun2v1DBdR03oldDMwLT;
-    bool m_byVLooseIsolationMVArun2v1DBnewDMwLT;
-    bool m_byVLooseIsolationMVArun2v1DBoldDMwLT;
-    bool m_byVLooseIsolationMVArun2v1PWnewDMwLT;
     bool m_byVTightIsolationMVArun2v1DBdR03oldDMwLT;
     bool m_byVTightIsolationMVArun2v1DBnewDMwLT;
     bool m_byVTightIsolationMVArun2v1DBoldDMwLT;
@@ -110,6 +110,13 @@ namespace UZH {
     bool m_hasSecondaryVertex;
     floatingnumber* m_decayDistMag;
     floatingnumber* m_flightLenthSig;
+    floatingnumber* m_byIsolationMVArun2v2DBoldDMwLTraw;
+    bool m_byVLooseIsolationMVArun2v2DBoldDMwLT;
+    bool m_byLooseIsolationMVArun2v2DBoldDMwLT;
+    bool m_byMediumIsolationMVArun2v2DBoldDMwLT;
+    bool m_byTightIsolationMVArun2v2DBoldDMwLT;
+    bool m_byVTightIsolationMVArun2v2DBoldDMwLT;
+    bool m_byVVTightIsolationMVArun2v2DBoldDMwLT;
     int* m_pdgId;
     floatingnumber* m_charge;
     floatingnumber* m_d0;
@@ -137,6 +144,10 @@ namespace UZH {
     floatingnumber byIsolationMVArun2v1DBnewDMwLTraw() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyIsolationMVArun2v1DBnewDMwLTraw)) std::cout<<"byIsolationMVArun2v1DBnewDMwLTraw not connected!"<<std::endl;*/ return *(m_byIsolationMVArun2v1DBnewDMwLTraw); } 
     floatingnumber byIsolationMVArun2v1DBoldDMwLTraw() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyIsolationMVArun2v1DBoldDMwLTraw)) std::cout<<"byIsolationMVArun2v1DBoldDMwLTraw not connected!"<<std::endl;*/ return *(m_byIsolationMVArun2v1DBoldDMwLTraw); } 
     floatingnumber byIsolationMVArun2v1PWnewDMwLTraw() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyIsolationMVArun2v1PWnewDMwLTraw)) std::cout<<"byIsolationMVArun2v1PWnewDMwLTraw not connected!"<<std::endl;*/ return *(m_byIsolationMVArun2v1PWnewDMwLTraw); } 
+    bool byVLooseIsolationMVArun2v1DBdR03oldDMwLT() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyVLooseIsolationMVArun2v1DBdR03oldDMwLT)) std::cout<<"byVLooseIsolationMVArun2v1DBdR03oldDMwLT not connected!"<<std::endl;*/ return (m_byVLooseIsolationMVArun2v1DBdR03oldDMwLT); } 
+    bool byVLooseIsolationMVArun2v1DBnewDMwLT() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyVLooseIsolationMVArun2v1DBnewDMwLT)) std::cout<<"byVLooseIsolationMVArun2v1DBnewDMwLT not connected!"<<std::endl;*/ return (m_byVLooseIsolationMVArun2v1DBnewDMwLT); } 
+    bool byVLooseIsolationMVArun2v1DBoldDMwLT() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyVLooseIsolationMVArun2v1DBoldDMwLT)) std::cout<<"byVLooseIsolationMVArun2v1DBoldDMwLT not connected!"<<std::endl;*/ return (m_byVLooseIsolationMVArun2v1DBoldDMwLT); } 
+    bool byVLooseIsolationMVArun2v1PWnewDMwLT() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyVLooseIsolationMVArun2v1PWnewDMwLT)) std::cout<<"byVLooseIsolationMVArun2v1PWnewDMwLT not connected!"<<std::endl;*/ return (m_byVLooseIsolationMVArun2v1PWnewDMwLT); } 
     bool byLooseIsolationMVArun2v1DBdR03oldDMwLT() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyLooseIsolationMVArun2v1DBdR03oldDMwLT)) std::cout<<"byLooseIsolationMVArun2v1DBdR03oldDMwLT not connected!"<<std::endl;*/ return (m_byLooseIsolationMVArun2v1DBdR03oldDMwLT); } 
     bool byLooseIsolationMVArun2v1DBnewDMwLT() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyLooseIsolationMVArun2v1DBnewDMwLT)) std::cout<<"byLooseIsolationMVArun2v1DBnewDMwLT not connected!"<<std::endl;*/ return (m_byLooseIsolationMVArun2v1DBnewDMwLT); } 
     bool byLooseIsolationMVArun2v1DBoldDMwLT() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyLooseIsolationMVArun2v1DBoldDMwLT)) std::cout<<"byLooseIsolationMVArun2v1DBoldDMwLT not connected!"<<std::endl;*/ return (m_byLooseIsolationMVArun2v1DBoldDMwLT); } 
@@ -149,10 +160,6 @@ namespace UZH {
     bool byTightIsolationMVArun2v1DBnewDMwLT() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyTightIsolationMVArun2v1DBnewDMwLT)) std::cout<<"byTightIsolationMVArun2v1DBnewDMwLT not connected!"<<std::endl;*/ return (m_byTightIsolationMVArun2v1DBnewDMwLT); } 
     bool byTightIsolationMVArun2v1DBoldDMwLT() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyTightIsolationMVArun2v1DBoldDMwLT)) std::cout<<"byTightIsolationMVArun2v1DBoldDMwLT not connected!"<<std::endl;*/ return (m_byTightIsolationMVArun2v1DBoldDMwLT); } 
     bool byTightIsolationMVArun2v1PWnewDMwLT() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyTightIsolationMVArun2v1PWnewDMwLT)) std::cout<<"byTightIsolationMVArun2v1PWnewDMwLT not connected!"<<std::endl;*/ return (m_byTightIsolationMVArun2v1PWnewDMwLT); } 
-    bool byVLooseIsolationMVArun2v1DBdR03oldDMwLT() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyVLooseIsolationMVArun2v1DBdR03oldDMwLT)) std::cout<<"byVLooseIsolationMVArun2v1DBdR03oldDMwLT not connected!"<<std::endl;*/ return (m_byVLooseIsolationMVArun2v1DBdR03oldDMwLT); } 
-    bool byVLooseIsolationMVArun2v1DBnewDMwLT() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyVLooseIsolationMVArun2v1DBnewDMwLT)) std::cout<<"byVLooseIsolationMVArun2v1DBnewDMwLT not connected!"<<std::endl;*/ return (m_byVLooseIsolationMVArun2v1DBnewDMwLT); } 
-    bool byVLooseIsolationMVArun2v1DBoldDMwLT() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyVLooseIsolationMVArun2v1DBoldDMwLT)) std::cout<<"byVLooseIsolationMVArun2v1DBoldDMwLT not connected!"<<std::endl;*/ return (m_byVLooseIsolationMVArun2v1DBoldDMwLT); } 
-    bool byVLooseIsolationMVArun2v1PWnewDMwLT() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyVLooseIsolationMVArun2v1PWnewDMwLT)) std::cout<<"byVLooseIsolationMVArun2v1PWnewDMwLT not connected!"<<std::endl;*/ return (m_byVLooseIsolationMVArun2v1PWnewDMwLT); } 
     bool byVTightIsolationMVArun2v1DBdR03oldDMwLT() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyVTightIsolationMVArun2v1DBdR03oldDMwLT)) std::cout<<"byVTightIsolationMVArun2v1DBdR03oldDMwLT not connected!"<<std::endl;*/ return (m_byVTightIsolationMVArun2v1DBdR03oldDMwLT); } 
     bool byVTightIsolationMVArun2v1DBnewDMwLT() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyVTightIsolationMVArun2v1DBnewDMwLT)) std::cout<<"byVTightIsolationMVArun2v1DBnewDMwLT not connected!"<<std::endl;*/ return (m_byVTightIsolationMVArun2v1DBnewDMwLT); } 
     bool byVTightIsolationMVArun2v1DBoldDMwLT() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyVTightIsolationMVArun2v1DBoldDMwLT)) std::cout<<"byVTightIsolationMVArun2v1DBoldDMwLT not connected!"<<std::endl;*/ return (m_byVTightIsolationMVArun2v1DBoldDMwLT); } 
@@ -185,6 +192,13 @@ namespace UZH {
     bool hasSecondaryVertex() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::khasSecondaryVertex)) std::cout<<"hasSecondaryVertex not connected!"<<std::endl;*/ return (m_hasSecondaryVertex); } 
     floatingnumber decayDistMag() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kdecayDistMag)) std::cout<<"decayDistMag not connected!"<<std::endl;*/ return *(m_decayDistMag); } 
     floatingnumber flightLenthSig() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kflightLenthSig)) std::cout<<"flightLenthSig not connected!"<<std::endl;*/ return *(m_flightLenthSig); } 
+    floatingnumber byIsolationMVArun2v2DBoldDMwLTraw() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyIsolationMVArun2v2DBoldDMwLTraw)) std::cout<<"byIsolationMVArun2v2DBoldDMwLTraw not connected!"<<std::endl;*/ return *(m_byIsolationMVArun2v2DBoldDMwLTraw); } 
+    bool byVLooseIsolationMVArun2v2DBoldDMwLT() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyVLooseIsolationMVArun2v2DBoldDMwLT)) std::cout<<"byVLooseIsolationMVArun2v2DBoldDMwLT not connected!"<<std::endl;*/ return (m_byVLooseIsolationMVArun2v2DBoldDMwLT); } 
+    bool byLooseIsolationMVArun2v2DBoldDMwLT() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyLooseIsolationMVArun2v2DBoldDMwLT)) std::cout<<"byLooseIsolationMVArun2v2DBoldDMwLT not connected!"<<std::endl;*/ return (m_byLooseIsolationMVArun2v2DBoldDMwLT); } 
+    bool byMediumIsolationMVArun2v2DBoldDMwLT() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyMediumIsolationMVArun2v2DBoldDMwLT)) std::cout<<"byMediumIsolationMVArun2v2DBoldDMwLT not connected!"<<std::endl;*/ return (m_byMediumIsolationMVArun2v2DBoldDMwLT); } 
+    bool byTightIsolationMVArun2v2DBoldDMwLT() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyTightIsolationMVArun2v2DBoldDMwLT)) std::cout<<"byTightIsolationMVArun2v2DBoldDMwLT not connected!"<<std::endl;*/ return (m_byTightIsolationMVArun2v2DBoldDMwLT); } 
+    bool byVTightIsolationMVArun2v2DBoldDMwLT() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyVTightIsolationMVArun2v2DBoldDMwLT)) std::cout<<"byVTightIsolationMVArun2v2DBoldDMwLT not connected!"<<std::endl;*/ return (m_byVTightIsolationMVArun2v2DBoldDMwLT); } 
+    bool byVVTightIsolationMVArun2v2DBoldDMwLT() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kbyVVTightIsolationMVArun2v2DBoldDMwLT)) std::cout<<"byVVTightIsolationMVArun2v2DBoldDMwLT not connected!"<<std::endl;*/ return (m_byVVTightIsolationMVArun2v2DBoldDMwLT); } 
     int pdgId() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kpdgId)) std::cout<<"pdgId not connected!"<<std::endl;*/ return *(m_pdgId); } 
     floatingnumber charge() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kcharge)) std::cout<<"charge not connected!"<<std::endl;*/ return *(m_charge); } 
     floatingnumber d0() const { /*if(!m_ana->getConnectSucceeded(Ntuple::TauNtupleObject::kd0)) std::cout<<"d0 not connected!"<<std::endl;*/ return *(m_d0); } 
@@ -211,6 +225,10 @@ namespace UZH {
     void byIsolationMVArun2v1DBnewDMwLTraw( const floatingnumber& val){ *(m_byIsolationMVArun2v1DBnewDMwLTraw)=val; } 
     void byIsolationMVArun2v1DBoldDMwLTraw( const floatingnumber& val){ *(m_byIsolationMVArun2v1DBoldDMwLTraw)=val; } 
     void byIsolationMVArun2v1PWnewDMwLTraw( const floatingnumber& val){ *(m_byIsolationMVArun2v1PWnewDMwLTraw)=val; } 
+    void byVLooseIsolationMVArun2v1DBdR03oldDMwLT( const bool& val){ (m_byVLooseIsolationMVArun2v1DBdR03oldDMwLT)=val; } 
+    void byVLooseIsolationMVArun2v1DBnewDMwLT( const bool& val){ (m_byVLooseIsolationMVArun2v1DBnewDMwLT)=val; } 
+    void byVLooseIsolationMVArun2v1DBoldDMwLT( const bool& val){ (m_byVLooseIsolationMVArun2v1DBoldDMwLT)=val; } 
+    void byVLooseIsolationMVArun2v1PWnewDMwLT( const bool& val){ (m_byVLooseIsolationMVArun2v1PWnewDMwLT)=val; } 
     void byLooseIsolationMVArun2v1DBdR03oldDMwLT( const bool& val){ (m_byLooseIsolationMVArun2v1DBdR03oldDMwLT)=val; } 
     void byLooseIsolationMVArun2v1DBnewDMwLT( const bool& val){ (m_byLooseIsolationMVArun2v1DBnewDMwLT)=val; } 
     void byLooseIsolationMVArun2v1DBoldDMwLT( const bool& val){ (m_byLooseIsolationMVArun2v1DBoldDMwLT)=val; } 
@@ -223,10 +241,6 @@ namespace UZH {
     void byTightIsolationMVArun2v1DBnewDMwLT( const bool& val){ (m_byTightIsolationMVArun2v1DBnewDMwLT)=val; } 
     void byTightIsolationMVArun2v1DBoldDMwLT( const bool& val){ (m_byTightIsolationMVArun2v1DBoldDMwLT)=val; } 
     void byTightIsolationMVArun2v1PWnewDMwLT( const bool& val){ (m_byTightIsolationMVArun2v1PWnewDMwLT)=val; } 
-    void byVLooseIsolationMVArun2v1DBdR03oldDMwLT( const bool& val){ (m_byVLooseIsolationMVArun2v1DBdR03oldDMwLT)=val; } 
-    void byVLooseIsolationMVArun2v1DBnewDMwLT( const bool& val){ (m_byVLooseIsolationMVArun2v1DBnewDMwLT)=val; } 
-    void byVLooseIsolationMVArun2v1DBoldDMwLT( const bool& val){ (m_byVLooseIsolationMVArun2v1DBoldDMwLT)=val; } 
-    void byVLooseIsolationMVArun2v1PWnewDMwLT( const bool& val){ (m_byVLooseIsolationMVArun2v1PWnewDMwLT)=val; } 
     void byVTightIsolationMVArun2v1DBdR03oldDMwLT( const bool& val){ (m_byVTightIsolationMVArun2v1DBdR03oldDMwLT)=val; } 
     void byVTightIsolationMVArun2v1DBnewDMwLT( const bool& val){ (m_byVTightIsolationMVArun2v1DBnewDMwLT)=val; } 
     void byVTightIsolationMVArun2v1DBoldDMwLT( const bool& val){ (m_byVTightIsolationMVArun2v1DBoldDMwLT)=val; } 
@@ -259,6 +273,13 @@ namespace UZH {
     void hasSecondaryVertex( const bool& val){ (m_hasSecondaryVertex)=val; } 
     void decayDistMag( const floatingnumber& val){ *(m_decayDistMag)=val; } 
     void flightLenthSig( const floatingnumber& val){ *(m_flightLenthSig)=val; } 
+    void byIsolationMVArun2v2DBoldDMwLTraw( const floatingnumber& val){ *(m_byIsolationMVArun2v2DBoldDMwLTraw)=val; } 
+    void byVLooseIsolationMVArun2v2DBoldDMwLT( const bool& val){ (m_byVLooseIsolationMVArun2v2DBoldDMwLT)=val; } 
+    void byLooseIsolationMVArun2v2DBoldDMwLT( const bool& val){ (m_byLooseIsolationMVArun2v2DBoldDMwLT)=val; } 
+    void byMediumIsolationMVArun2v2DBoldDMwLT( const bool& val){ (m_byMediumIsolationMVArun2v2DBoldDMwLT)=val; } 
+    void byTightIsolationMVArun2v2DBoldDMwLT( const bool& val){ (m_byTightIsolationMVArun2v2DBoldDMwLT)=val; } 
+    void byVTightIsolationMVArun2v2DBoldDMwLT( const bool& val){ (m_byVTightIsolationMVArun2v2DBoldDMwLT)=val; } 
+    void byVVTightIsolationMVArun2v2DBoldDMwLT( const bool& val){ (m_byVVTightIsolationMVArun2v2DBoldDMwLT)=val; } 
     void pdgId( const int& val){ *(m_pdgId)=val; } 
     void charge( const floatingnumber& val){ *(m_charge)=val; } 
     void d0( const floatingnumber& val){ *(m_d0)=val; } 

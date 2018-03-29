@@ -36,10 +36,11 @@ namespace Ntuple {
    */
   
   enum TauDetails {
-    TauBasic = 1,
-    TauID = 2,
-    TauAdvancedID = 4,
-    TauAll = 7,
+    TauID = 1,
+    TauBasic = 2,
+    TauAdvancedIDv2 = 4,
+    TauAdvancedID = 8,
+    TauAll = 15,
   };
   
   // forward declaration of NtupleObjectNames
@@ -88,22 +89,22 @@ namespace Ntuple {
       kbyIsolationMVArun2v1DBnewDMwLTraw = 23,
       kbyIsolationMVArun2v1DBoldDMwLTraw = 24,
       kbyIsolationMVArun2v1PWnewDMwLTraw = 25,
-      kbyLooseIsolationMVArun2v1DBdR03oldDMwLT = 26,
-      kbyLooseIsolationMVArun2v1DBnewDMwLT = 27,
-      kbyLooseIsolationMVArun2v1DBoldDMwLT = 28,
-      kbyLooseIsolationMVArun2v1PWnewDMwLT = 29,
-      kbyMediumIsolationMVArun2v1DBdR03oldDMwLT = 30,
-      kbyMediumIsolationMVArun2v1DBnewDMwLT = 31,
-      kbyMediumIsolationMVArun2v1DBoldDMwLT = 32,
-      kbyMediumIsolationMVArun2v1PWnewDMwLT = 33,
-      kbyTightIsolationMVArun2v1DBdR03oldDMwLT = 34,
-      kbyTightIsolationMVArun2v1DBnewDMwLT = 35,
-      kbyTightIsolationMVArun2v1DBoldDMwLT = 36,
-      kbyTightIsolationMVArun2v1PWnewDMwLT = 37,
-      kbyVLooseIsolationMVArun2v1DBdR03oldDMwLT = 38,
-      kbyVLooseIsolationMVArun2v1DBnewDMwLT = 39,
-      kbyVLooseIsolationMVArun2v1DBoldDMwLT = 40,
-      kbyVLooseIsolationMVArun2v1PWnewDMwLT = 41,
+      kbyVLooseIsolationMVArun2v1DBdR03oldDMwLT = 26,
+      kbyVLooseIsolationMVArun2v1DBnewDMwLT = 27,
+      kbyVLooseIsolationMVArun2v1DBoldDMwLT = 28,
+      kbyVLooseIsolationMVArun2v1PWnewDMwLT = 29,
+      kbyLooseIsolationMVArun2v1DBdR03oldDMwLT = 30,
+      kbyLooseIsolationMVArun2v1DBnewDMwLT = 31,
+      kbyLooseIsolationMVArun2v1DBoldDMwLT = 32,
+      kbyLooseIsolationMVArun2v1PWnewDMwLT = 33,
+      kbyMediumIsolationMVArun2v1DBdR03oldDMwLT = 34,
+      kbyMediumIsolationMVArun2v1DBnewDMwLT = 35,
+      kbyMediumIsolationMVArun2v1DBoldDMwLT = 36,
+      kbyMediumIsolationMVArun2v1PWnewDMwLT = 37,
+      kbyTightIsolationMVArun2v1DBdR03oldDMwLT = 38,
+      kbyTightIsolationMVArun2v1DBnewDMwLT = 39,
+      kbyTightIsolationMVArun2v1DBoldDMwLT = 40,
+      kbyTightIsolationMVArun2v1PWnewDMwLT = 41,
       kbyVTightIsolationMVArun2v1DBdR03oldDMwLT = 42,
       kbyVTightIsolationMVArun2v1DBnewDMwLT = 43,
       kbyVTightIsolationMVArun2v1DBoldDMwLT = 44,
@@ -112,30 +113,37 @@ namespace Ntuple {
       kbyVVTightIsolationMVArun2v1DBnewDMwLT = 47,
       kbyVVTightIsolationMVArun2v1DBoldDMwLT = 48,
       kbyVVTightIsolationMVArun2v1PWnewDMwLT = 49,
-      kchargedIsoPtSum = 50,
-      kneutralIsoPtSum = 51,
-      kpuCorrPtSum = 52,
-      kchargedIsoPtSumdR03 = 53,
-      kneutralIsoPtSumdR03 = 54,
-      kphotonPtSumOutsideSignalCone = 55,
-      kphotonPtSumOutsideSignalConedR03 = 56,
-      kbyPhotonPtSumOutsideSignalCone = 57,
-      kchargedPionPt = 58,
-      kneutralPionPt = 59,
-      knPhoton = 60,
-      kptWeightedDetaStrip = 61,
-      kptWeightedDphiStrip = 62,
-      kptWeightedDrSignal = 63,
-      kptWeightedDrIsolation = 64,
-      kleadingTrackChi2 = 65,
-      kleadingTrackPt = 66,
-      keRatio = 67,
-      kdxy_Sig = 68,
-      kip3d = 69,
-      kip3d_Sig = 70,
-      khasSecondaryVertex = 71,
-      kdecayDistMag = 72,
-      kflightLenthSig = 73,
+      kchargedIsoPtSum = 57,
+      kneutralIsoPtSum = 58,
+      kpuCorrPtSum = 59,
+      kchargedIsoPtSumdR03 = 60,
+      kneutralIsoPtSumdR03 = 61,
+      kphotonPtSumOutsideSignalCone = 62,
+      kphotonPtSumOutsideSignalConedR03 = 63,
+      kbyPhotonPtSumOutsideSignalCone = 64,
+      kchargedPionPt = 65,
+      kneutralPionPt = 66,
+      knPhoton = 67,
+      kptWeightedDetaStrip = 68,
+      kptWeightedDphiStrip = 69,
+      kptWeightedDrSignal = 70,
+      kptWeightedDrIsolation = 71,
+      kleadingTrackChi2 = 72,
+      kleadingTrackPt = 73,
+      keRatio = 74,
+      kdxy_Sig = 75,
+      kip3d = 76,
+      kip3d_Sig = 77,
+      khasSecondaryVertex = 78,
+      kdecayDistMag = 79,
+      kflightLenthSig = 80,
+      kbyIsolationMVArun2v2DBoldDMwLTraw = 50,
+      kbyVLooseIsolationMVArun2v2DBoldDMwLT = 51,
+      kbyLooseIsolationMVArun2v2DBoldDMwLT = 52,
+      kbyMediumIsolationMVArun2v2DBoldDMwLT = 53,
+      kbyTightIsolationMVArun2v2DBoldDMwLT = 54,
+      kbyVTightIsolationMVArun2v2DBoldDMwLT = 55,
+      kbyVVTightIsolationMVArun2v2DBoldDMwLT = 56,
       kpdgId = 1,
       kcharge = 2,
       kd0 = 3,
@@ -173,6 +181,10 @@ namespace Ntuple {
     std::vector< floatingnumber >  *byIsolationMVArun2v1DBnewDMwLTraw;
     std::vector< floatingnumber >  *byIsolationMVArun2v1DBoldDMwLTraw;
     std::vector< floatingnumber >  *byIsolationMVArun2v1PWnewDMwLTraw;
+    std::vector< bool >  *byVLooseIsolationMVArun2v1DBdR03oldDMwLT;
+    std::vector< bool >  *byVLooseIsolationMVArun2v1DBnewDMwLT;
+    std::vector< bool >  *byVLooseIsolationMVArun2v1DBoldDMwLT;
+    std::vector< bool >  *byVLooseIsolationMVArun2v1PWnewDMwLT;
     std::vector< bool >  *byLooseIsolationMVArun2v1DBdR03oldDMwLT;
     std::vector< bool >  *byLooseIsolationMVArun2v1DBnewDMwLT;
     std::vector< bool >  *byLooseIsolationMVArun2v1DBoldDMwLT;
@@ -185,10 +197,6 @@ namespace Ntuple {
     std::vector< bool >  *byTightIsolationMVArun2v1DBnewDMwLT;
     std::vector< bool >  *byTightIsolationMVArun2v1DBoldDMwLT;
     std::vector< bool >  *byTightIsolationMVArun2v1PWnewDMwLT;
-    std::vector< bool >  *byVLooseIsolationMVArun2v1DBdR03oldDMwLT;
-    std::vector< bool >  *byVLooseIsolationMVArun2v1DBnewDMwLT;
-    std::vector< bool >  *byVLooseIsolationMVArun2v1DBoldDMwLT;
-    std::vector< bool >  *byVLooseIsolationMVArun2v1PWnewDMwLT;
     std::vector< bool >  *byVTightIsolationMVArun2v1DBdR03oldDMwLT;
     std::vector< bool >  *byVTightIsolationMVArun2v1DBnewDMwLT;
     std::vector< bool >  *byVTightIsolationMVArun2v1DBoldDMwLT;
@@ -221,6 +229,13 @@ namespace Ntuple {
     std::vector< bool >  *hasSecondaryVertex;
     std::vector< floatingnumber >  *decayDistMag;
     std::vector< floatingnumber >  *flightLenthSig;
+    std::vector< floatingnumber >  *byIsolationMVArun2v2DBoldDMwLTraw;
+    std::vector< bool >  *byVLooseIsolationMVArun2v2DBoldDMwLT;
+    std::vector< bool >  *byLooseIsolationMVArun2v2DBoldDMwLT;
+    std::vector< bool >  *byMediumIsolationMVArun2v2DBoldDMwLT;
+    std::vector< bool >  *byTightIsolationMVArun2v2DBoldDMwLT;
+    std::vector< bool >  *byVTightIsolationMVArun2v2DBoldDMwLT;
+    std::vector< bool >  *byVVTightIsolationMVArun2v2DBoldDMwLT;
     std::vector< int >  *pdgId;
     std::vector< floatingnumber >  *charge;
     std::vector< floatingnumber >  *d0;

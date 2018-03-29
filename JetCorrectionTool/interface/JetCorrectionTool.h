@@ -63,7 +63,7 @@ class JetCorrectionTool  : public SToolBase   {
         TLorentzVector GetCorrectedJetJER(TLorentzVector jet,TLorentzVector genJet, float jer, float jerUp, float jerDown, 
                                           int sigmaRes=0, bool isGenJetMatched=false, double random=0);
         TLorentzVector GetCorrectedJetJER(const UZH::Jet& jet, const Ntuple::GenJetak4NtupleObject& m_genJetAK4);
-        std::vector<TLorentzVector> GetCorrectedJetJERShifted(const UZH::Jet& jet, const Ntuple::GenJetak4NtupleObject& m_genjetAK4, float& jercorr);
+        std::vector<TLorentzVector> GetCorrectedJetJERShifted(const UZH::Jet& jet, const Ntuple::GenJetak4NtupleObject& m_genjetAK4, TLorentzVector& jet_jesUp, TLorentzVector& jet_jesDown);
         
         EnergyScaleCorrection_class* eScaler;
         TRandom3* trandom;

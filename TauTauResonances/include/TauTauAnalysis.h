@@ -375,12 +375,10 @@ class TauTauAnalysis : public SCycleBase {
     std::map<std::string,Int_t>    b_nfjets;
     std::map<std::string,Int_t>    b_ncjets;
     std::map<std::string,Int_t>    b_nbtag;
-    std::map<std::string,Int_t>    b_ncbtag;
     std::map<std::string,Int_t>    b_njets20;
     std::map<std::string,Int_t>    b_nfjets20;
     std::map<std::string,Int_t>    b_ncjets20;
     std::map<std::string,Int_t>    b_nbtag20;
-    std::map<std::string,Int_t>    b_ncbtag20;
     
     std::map<std::string,Int_t>    b_njets_jesUp;
     std::map<std::string,Int_t>    b_njets_jesDown;
@@ -390,10 +388,10 @@ class TauTauAnalysis : public SCycleBase {
     std::map<std::string,Int_t>    b_njets20_jesDown;
     std::map<std::string,Int_t>    b_njets20_jerUp;
     std::map<std::string,Int_t>    b_njets20_jerDown;
-    std::map<std::string,Int_t>    b_ncbtag_jesUp;
-    std::map<std::string,Int_t>    b_ncbtag_jesDown;
-    std::map<std::string,Int_t>    b_ncbtag_jerUp;
-    std::map<std::string,Int_t>    b_ncbtag_jerDown;
+    std::map<std::string,Int_t>    b_nbtag_jesUp;
+    std::map<std::string,Int_t>    b_nbtag_jesDown;
+    std::map<std::string,Int_t>    b_nbtag_jerUp;
+    std::map<std::string,Int_t>    b_nbtag_jerDown;
     std::map<std::string,Int_t>    b_ncjets_jesUp;
     std::map<std::string,Int_t>    b_ncjets_jesDown;
     std::map<std::string,Int_t>    b_ncjets_jerUp;
@@ -443,7 +441,7 @@ class TauTauAnalysis : public SCycleBase {
     
     std::map<std::string,Float_t>  b_byIsolationMVArun2v1DBoldDMwLTraw_2;
     std::map<std::string,Float_t>  b_byIsolationMVArun2v1DBnewDMwLTraw_2;
-    //std::map<std::string,Float_t>  b_byIsolationMVArun2v2DBoldDMwLTraw_2;
+    std::map<std::string,Float_t>  b_byIsolationMVArun2v2DBoldDMwLTraw_2;
     std::map<std::string,Int_t>    b_againstElectronLooseMVA6_2;
     std::map<std::string,Int_t>    b_againstElectronMediumMVA6_2;
     std::map<std::string,Int_t>    b_againstElectronTightMVA6_2;
@@ -451,18 +449,20 @@ class TauTauAnalysis : public SCycleBase {
     std::map<std::string,Int_t>    b_againstMuonLoose3_2;
     std::map<std::string,Int_t>    b_againstMuonTight3_2;
     
-    //std::map<std::string,Int_t>    b_byVLooseIsolationMVArun2v2DBoldDMwLT_2;
-    //std::map<std::string,Int_t>    b_byLooseIsolationMVArun2v2DBoldDMwLT_2;
-    //std::map<std::string,Int_t>    b_byMediumIsolationMVArun2v2DBoldDMwLT_2;
-    //std::map<std::string,Int_t>    b_byTightIsolationMVArun2v2DBoldDMwLT_2;
-    //std::map<std::string,Int_t>    b_byVTightIsolationMVArun2v2DBoldDMwLT_2;
-    //std::map<std::string,Int_t>    b_byVVTightIsolationMVArun2v2DBoldDMwLT_2;
-    //std::map<std::string,Int_t>    b_byVLooseIsolationMVArun2v1DBnewDMwLT_2;
-    //std::map<std::string,Int_t>    b_byLooseIsolationMVArun2v1DBnewDMwLT_2;
-    //std::map<std::string,Int_t>    b_byMediumIsolationMVArun2v1DBnewDMwLT_2;
-    //std::map<std::string,Int_t>    b_byTightIsolationMVArun2v1DBnewDMwLT_2;
-    //std::map<std::string,Int_t>    b_byVTightIsolationMVArun2v1DBnewDMwLT_2;
-    //std::map<std::string,Int_t>    b_byVVTightIsolationMVArun2v1DBnewDMwLT_2;
+    std::map<std::string,Int_t>    b_byVLooseIsolationMVArun2v2DBoldDMwLT_2;
+    std::map<std::string,Int_t>    b_byLooseIsolationMVArun2v2DBoldDMwLT_2;
+    std::map<std::string,Int_t>    b_byMediumIsolationMVArun2v2DBoldDMwLT_2;
+    std::map<std::string,Int_t>    b_byTightIsolationMVArun2v2DBoldDMwLT_2;
+    std::map<std::string,Int_t>    b_byVTightIsolationMVArun2v2DBoldDMwLT_2;
+    std::map<std::string,Int_t>    b_byVVTightIsolationMVArun2v2DBoldDMwLT_2;
+    
+    std::map<std::string,Int_t>    b_byVLooseIsolationMVArun2v1DBnewDMwLT_2;
+    std::map<std::string,Int_t>    b_byLooseIsolationMVArun2v1DBnewDMwLT_2;
+    std::map<std::string,Int_t>    b_byMediumIsolationMVArun2v1DBnewDMwLT_2;
+    std::map<std::string,Int_t>    b_byTightIsolationMVArun2v1DBnewDMwLT_2;
+    std::map<std::string,Int_t>    b_byVTightIsolationMVArun2v1DBnewDMwLT_2;
+    std::map<std::string,Int_t>    b_byVVTightIsolationMVArun2v1DBnewDMwLT_2;
+    
     std::map<std::string,Int_t>    b_byVVLooseCombinedIsolationDeltaBetaCorr3Hits_2;
     std::map<std::string,Int_t>    b_byVLooseCombinedIsolationDeltaBetaCorr3Hits_2;
     std::map<std::string,Int_t>    b_byLooseCombinedIsolationDeltaBetaCorr3Hits_2;

@@ -367,13 +367,13 @@ TLorentzVector JetCorrectionTool::GetCorrectedJetJER(const UZH::Jet& jet, const 
   
   TLorentzVector jet_tlv_jer;
   jet_tlv_jer.SetPtEtaPhiE(    jet.pt(), jet.eta(), jet.phi(), jet.e());
-  double random = trandom->Gaus(0.,jet.jer_sigma_pt());
   
   //std::cout << ">>> JetCorrectionTool::GetCorrectedJetJER: jet matches with genJet = " << matched << std::endl;
   if (matched){
     dpt          = jet.pt()-genjetpt;
     jet_tlv_jer *= 1. + (jet.jer_sf()-1.)*dpt/jet.pt();
   }else{
+    double random = trandom->Gaus(0.,jet.jer_sigma_pt());
     jet_tlv_jer *= 1. + random*std::sqrt(std::max(0.0, jet.jer_sf()*jet.jer_sf() - 1.));
     //if (jet.jer_sf()>1) jet_tlv_jer *= std::max(0.0,1. + random*std::sqrt(jet.jer_sf() *jet.jer_sf() - 1));
     //else std::cout << "Warning! JetCorrectionTool::GetCorrectedJetJER: SF = " << jet.jer_sf() << " <= 1 !" << std::endl;
@@ -384,7 +384,7 @@ TLorentzVector JetCorrectionTool::GetCorrectedJetJER(const UZH::Jet& jet, const 
 
 
 
-std::vector<TLorentzVector> JetCorrectionTool::GetCorrectedJetJERShifted(const UZH::Jet& jet, const Ntuple::GenJetak4NtupleObject& m_genJetAK4, float& jercorr) {
+std::vector<TLorentzVector> JetCorrectionTool::GetCorrectedJetJERShifted(const UZH::Jet& jet, const Ntuple::GenJetak4NtupleObject& m_genJetAK4, TLorentzVector& jet_tlv_jesUp, TLorentzVector& jet_tlv_jesDown) {
   //std::cout<< "JetCorrectionTool::GetCorrectedJetJER"<< std::endl;
   // https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetResolution#Smearing_procedures
   if(!(jet.pt() > 0.)) return {jet.tlv(),jet.tlv(),jet.tlv()};
@@ -416,24 +416,27 @@ std::vector<TLorentzVector> JetCorrectionTool::GetCorrectedJetJERShifted(const U
   
   if (matched){
     dpt              = jet.pt()-genjetpt;
-    jercorr          = 1. + (jet.jer_sf()     -1.)*dpt/jet.pt();
-    jet_tlv_jer     *= jercorr;
+    float jetcorr          = 1. + (jet.jer_sf()     -1.)*dpt/jet.pt();
+    jet_tlv_jer     *= jetcorr; //1. + (jet.jer_sf()     -1.)*dpt/jet.pt();
     jet_tlv_jerUp   *= 1. + (jet.jer_sf_up()  -1.)*dpt/jet.pt();
     jet_tlv_jerDown *= 1. + (jet.jer_sf_down()-1.)*dpt/jet.pt();
+    jet_tlv_jesUp   *= 1. + (jet.jer_sf()     -1.)*(jet_tlv_jesUp.Pt()  -genjetpt)/jet_tlv_jesUp.Pt();
+    jet_tlv_jesDown *= 1. + (jet.jer_sf()     -1.)*(jet_tlv_jesDown.Pt()-genjetpt)/jet_tlv_jesDown.Pt();
   }else{
     double random    = trandom->Gaus(0.,jet.jer_sigma_pt());
-    jercorr          = 1. + random*std::sqrt(std::max(0.0, jet.jer_sf()     *jet.jer_sf()     - 1.)); 
+    float jercorr          = 1. + random*std::sqrt(std::max(0.0, jet.jer_sf()     *jet.jer_sf()     - 1.)); 
     jet_tlv_jer     *= jercorr;
-    //else std::cout << "Warning! JetCorrectionTool::GetCorrectedJetJER: SF = " << jet.jer_sf() << " <= 1 !\n";
     jet_tlv_jerUp   *= 1. + random*std::sqrt(std::max(0.0, jet.jer_sf_up()  *jet.jer_sf_up()  - 1.));
     jet_tlv_jerDown *= 1. + random*std::sqrt(std::max(0.0, jet.jer_sf_down()*jet.jer_sf_down()- 1.));
+    jet_tlv_jesUp   *= jercorr;
+    jet_tlv_jesDown *= jercorr;
     //if(jet_tlv_jerDown.Pt()<jet_tlv_jer.Pt() and jet_tlv_jerUp.Pt()<jet_tlv_jer.Pt()){
     //  std::cout << "!!! GetCorrectedJetJERShifted: JER UP/DOWN both have pt < JER central pt:\n";
     //  TauTauAnalysis::printRow({"pt original","pt jer","pt jerUp","pt jerDown","jer_sf","jer_sf_up","jer_sf_down","random","jer_sigma_pt"},{},{},{},14);
     //  TauTauAnalysis::printRow({},{},{jet.pt(),jet_tlv_jer.Pt(),jet_tlv_jerUp.Pt(),jet_tlv_jerDown.Pt(),jet.jer_sf(),jet.jer_sf_up(),jet.jer_sf_down(),random,jet.jer_sigma_pt()},{},14); }
   }
   
-  return {jet_tlv_jer,jet_tlv_jerUp,jet_tlv_jerDown};
+  return {jet_tlv_jer,jet_tlv_jerDown,jet_tlv_jerUp};
 }
 
 

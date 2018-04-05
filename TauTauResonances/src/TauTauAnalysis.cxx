@@ -197,7 +197,7 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
   m_doJTF   = m_JTFshift != 0.0 and !m_isData;
   m_doTight = (m_doTight or m_doTES or m_doLTF); // need fail region for EES, JTF
   m_doTight = m_doTight and !m_noTight;          // noTight overrides doTight
-  m_doJEC   = m_doJEC and !(m_doTES or m_doEES or m_doLTF or m_doJTF or m_isData);
+  m_doJEC   = m_doJEC and !(m_doEES or m_doLTF or m_doJTF or m_isData);
   m_logger << INFO << "IsData:              " <<    (m_isData   ?   "TRUE" : "FALSE") << SLogger::endmsg;
   m_logger << INFO << "IsSignal:            " <<    (m_isSignal ?   "TRUE" : "FALSE") << SLogger::endmsg;
   m_logger << INFO << "doSVFit:             " <<    (m_doSVFit  ?   "TRUE" : "FALSE") << SLogger::endmsg;
@@ -274,7 +274,6 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
     DeclareVariable( b_q_1[ch],                 "q_1",                  treeName);
     DeclareVariable( b_d0_1[ch],                "d0_1",                 treeName);
     DeclareVariable( b_dz_1[ch],                "dz_1",                 treeName);
-    //DeclareVariable( b_mt_1[ch],                "mt_1",                 treeName);
     DeclareVariable( b_pfmt_1[ch],              "pfmt_1",               treeName);
     DeclareVariable( b_puppimt_1[ch],           "puppimt_1",            treeName);
     DeclareVariable( b_iso_1[ch],               "iso_1",                treeName);
@@ -288,7 +287,6 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
     DeclareVariable( b_q_2[ch],                 "q_2",                  treeName);
     DeclareVariable( b_d0_2[ch],                "d0_2",                 treeName);
     DeclareVariable( b_dz_2[ch],                "dz_2",                 treeName);
-    //DeclareVariable( b_mt_2[ch],                "mt_2",                 treeName);
     DeclareVariable( b_pfmt_2[ch],              "pfmt_2",               treeName);
     DeclareVariable( b_puppimt_2[ch],           "puppimt_2",            treeName);
     DeclareVariable( b_iso_2_vloose[ch],        "iso_2_vloose",         treeName);
@@ -464,11 +462,6 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
       DeclareVariable( b_pfmt_1_UncEnUp[ch],        "pfmt_1_UncEnUp",       treeName);
       DeclareVariable( b_pfmt_1_UncEnDown[ch],      "pfmt_1_UncEnDown",     treeName);
       
-      //DeclareVariable( b_dphi_ll_bj_jesUp[ch],      "dphi_ll_bj_jesUp",     treeName);
-      //DeclareVariable( b_dphi_ll_bj_jesDown[ch],    "dphi_ll_bj_jesDown",   treeName);
-      //DeclareVariable( b_dphi_ll_bj_jerUp[ch],      "dphi_ll_bj_jerUp",     treeName);
-      //DeclareVariable( b_dphi_ll_bj_jerDown[ch],    "dphi_ll_bj_jerDown",   treeName);
-      
       DeclareVariable( b_weightbtag_bcUp[ch],       "weightbtag_bcUp",      treeName);
       DeclareVariable( b_weightbtag_bcDown[ch],     "weightbtag_bcDown",    treeName);
       DeclareVariable( b_weightbtag_udsgUp[ch],     "weightbtag_udsgUp",    treeName);
@@ -489,7 +482,6 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
     DeclareVariable( b_R_pt_m_sv[ch],           "R_pt_m_sv",            treeName);
     
     DeclareVariable( b_dR_ll[ch],               "dR_ll",                treeName);
-    //DeclareVariable( b_dphi_ll_bj[ch],          "dphi_ll_bj",           treeName);
     DeclareVariable( b_mt_tot[ch],              "mt_tot",               treeName);
     DeclareVariable( b_ht[ch],                  "ht",                   treeName);
     

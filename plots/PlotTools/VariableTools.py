@@ -44,6 +44,7 @@ varlist = {
 def makeLatex(title,**kwargs):
     """Convert patterns in a string to LaTeX format."""
     
+    if title[0]=='{' and title[-1]=='}': return title[1:-1]
     units = kwargs.get('units',True)
     GeV   = False
     cm    = False
@@ -97,6 +98,10 @@ def makeLatex(title,**kwargs):
             string = re.sub(r"(m)t_([^{}()<>=\ ]+)",r"\1_{T}^{\2}",string,flags=re.IGNORECASE)
             GeV = True
         
+        if "ht" in string.lower():
+            string = re.sub(r"\b(h)t\b",r"\1_{T}",string,flags=re.IGNORECASE)
+            GeV = True
+        
         if " d_" in string.lower():
             string = re.sub(r"(\ d)_([^{}()<>=\ ]+)",r"\1_{\2}",string,flags=re.IGNORECASE)
             cm = True
@@ -148,7 +153,7 @@ def makeLatex(title,**kwargs):
     newtitle = ' / '.join(strings)
     
     if units:
-      if GeV or "mass" in newtitle or ("MET" in newtitle.lower() and "phi" not in newtitle ):
+      if GeV or "mass" in newtitle or ("met" in newtitle.lower() and "phi" not in newtitle ):
         if "GeV" not in newtitle:
           newtitle += " [GeV]"
         if cm:
@@ -187,23 +192,25 @@ def makeFileName(string,**kwargs):
     
 
 
-def shift(string, shifts, **kwargs):
+def shift(string, jshift, **kwargs):
     """Shift all jet variable in a given string (e.g. to propagate JEC/JER)."""
-    return shiftJetVariable( string, shifts, **kwargs)
+    return shiftJetVariable( string, jshift, **kwargs)
     
-def shiftJetVariable(var, shifts, **kwargs):
+def shiftJetVariable(var, jshift, **kwargs):
     """Shift all jet variable in a given string (e.g. to propagate JEC/JER)."""
     
+    vars        = [r'pfmt_1',r'met'] if "UncEn" in jshift else\
+                  [r'jpt_[12]',r'jeta_[12]',r'jets(?:20)?',r'nc?btag(?:20)?(?:_noTau)?',r'pfmt_1',r'met',r'dphi_ll_bj']
     verbosity   = getVerbosity(kwargs,verbosityVariableTools)
-    vars        = kwargs.get('vars',  ['jpt_[12]','jeta_[12]','jets(?:20)?','(nc?btag(?!_noTau))','pfmt_1','met','dphi_ll_bj'] )
+    vars        = kwargs.get('vars',  vars )
     varShift    = var[:]
-    if len(shifts)>0 and shifts[0] != '_': shifts = '_'+shifts
+    if len(jshift)>0 and jshift[0]!='_': jshift = '_'+jshift
     if "jets20" in var: LOG.warning('shiftJetVariable: "jets20" in var')
     for jvar in vars:
         oldvarpattern = r'('+jvar+r')'
-        newvarpattern = r"\1%s"%(shifts)
+        newvarpattern = r"\1%s"%(jshift)
         varShift = re.sub(oldvarpattern,newvarpattern,varShift)
-    LOG.verbose('>>>   shiftJetVariable with "%s" shift\n>>>   "%s"\n>>>     -> "%s"'%(shifts,var,varShift), verbosity)
+    LOG.verbose('>>>   shiftJetVariable with "%s" shift\n>>>   "%s"\n>>>     -> "%s"'%(jshift,var,varShift), verbosity)
     return varShift
     
 def undoShift(string):
@@ -383,18 +390,18 @@ class Variable(object):
     def latex(self):
         return makeLatex(self.name)
     
-    def shift(self,shifts,**kwargs):
-        if len(shifts)>0 and shifts[0]!='_':
-          shifts = '_'+shifts
-        newname               = shift(self.name,shifts,**kwargs)
+    def shift(self,jshift,**kwargs):
+        if len(jshift)>0 and jshift[0]!='_':
+          jshift = '_'+jshift
+        newname               = shift(self.name,jshift,**kwargs)
         newvariable           = deepcopy(self)
         newvariable.name      = newname
         if self.name != newname:
-          newvariable.filename += shifts
+          newvariable.filename += jshift
         return newvariable
     
-    def shiftName(self,shifts,**kwargs):
-        return shift(self.name,shifts,**kwargs)
+    def shiftName(self,jshift,**kwargs):
+        return shift(self.name,jshift,**kwargs)
     
 def var(*args,**kwargs):
     """Shorthand for Variable class."""

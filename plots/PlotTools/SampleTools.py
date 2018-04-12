@@ -8,6 +8,7 @@ from math import sqrt, pow
 from ROOT import TFile, TTree, TH1D, TH2D, gDirectory, TColor, \
                  kAzure, kBlack, kBlue, kCyan, kGray, kGreen, kMagenta, kOrange, kPink, kRed, kSpring, kTeal, kWhite, kViolet, kYellow
 from copy import copy, deepcopy
+from collections import namedtuple as ntuple
 
 # for channel in ["mutau","etau","emu","mumu"]:
 #     TTscales[channel] = {"category 1":0, "category 2":0} # so TT renormalization is done once for each category
@@ -50,7 +51,9 @@ colors_sample_dict = {
     'single top*other': col_dict['STJ'],     'WZ':         col_dict['VV'],
     'QCD':              col_dict['QCD'],     'ZZ':         col_dict['VV'],
     'signal':           col_dict['sig'],     'VV':         col_dict['VV'],
-    'data':             col_dict['data'],    'diboson':    col_dict['VV'],
+    'VLQ':              col_dict['sig'],     'diboson':    col_dict['VV'],
+    'bbA':              col_dict['sig'],
+    'data':             col_dict['data'],
     'single muon':      col_dict['data'],    
     'single electron':  col_dict['data'],    
 }
@@ -139,11 +142,15 @@ def shiftSample(samples0,searchterms,file_app,title_app,**kwargs):
     # Cutflows #
     ############
 
-def getEfficienciesFromHistogram(hist,cuts):
+def getEfficienciesFromHistogram(hist,cuts,**kwargs):
     """Get efficiencies for some histogram, as defined by a list of selections."""
     
-    efficiencies = [ ]
-    N_tot0 = hist.GetBinContent(1)
+    weight = kwargs.get('weight',   ""      )
+    offset = kwargs.get('offset',   0       )
+    iN     = kwargs.get('iN',       1       )
+    efficiencies = EffTable([ ],[ ],[ ],[ ],[ ],[ ])
+    
+    N_tot0 = hist.GetBinContent(iN)
     N_tot  = N_tot0
     N      = N_tot0
     for i, cutname in enumerate(cuts,1):
@@ -153,8 +160,9 @@ def getEfficienciesFromHistogram(hist,cuts):
             efficiencies.append(( cutname, N, N/N_tot*100, N/N_tot0*100 ))
         else:
             efficiencies.append(( cutname, N, 0, 0 ))
-            LOG.warning("getEfficienciesFromHistogram - GetBinContent(%i) = %s, GetBinContent(%i) = %s "%(i,N,i-1,N_tot))
+            print ">>> Warning: GetBinContent(%i) = %s, GetBinContent(%i) = %s " % (i,N,i-1,N_tot)
         N_tot = N
+        #efficiencies.add(cutname,cutname,N,N,)
     
     #for cutname, efficiency in efficiencies:
     #    print ">>> %s: %5.2f%%" % (cut,efficiency*100)
@@ -164,30 +172,47 @@ def getEfficienciesFromHistogram(hist,cuts):
 def getEfficienciesFromTree(tree,cuts,**kwargs):
     """Get efficiencies for some tree, as defined by a list of selections [(name,cut)]."""
     
+    weight = kwargs.get('weight',"")
+    
     efficiencies = [ ]
     if not cuts: return [ ]
-    N_tot0 = kwargs.get('N',float(tree.GetEntries(cuts[0][1])))
+    
+    N_tot0 = kwargs.get('N',getSumWeights(tree,cuts[0][1],weight))
     N_tot  = N_tot0
     N      = N_tot0
+    
     for i, (cutname,cut) in enumerate(cuts):
-        N = float(tree.GetEntries(cut))
+        print cut
+        N = getSumWeights(tree,cut,weight)
         if N_tot0<1:  N_tot0 = N
         if N and N_tot:
             efficiencies.append(( cutname, N, N/N_tot*100, N/N_tot0*100 ))
         else: 
             efficiencies.append(( cutname, N, 0, 0 ))
-            LOG.warning("getEfficienciesFromTree - GetEntries(cut) = %.1f, GetEntries(cut-1) = %.1f, cut=%s"%(N,N_tot,cut))
+            print ">>> Warning: GetEntries(cut) = %.1f, GetEntries(cut-1) = %.1f, cut=%s" % (N,N_tot,cut)
         N_tot = N
     
     return efficiencies
     
+def getSumWeights(tree,cut0,weight):
+    """Get sum of weights. In case a weight is given, the weighted number of events."""
+    if not weight:
+      return float(tree.GetEntries(cut))
+    else:
+      hist     = TH1F("Sumw","Sumw",2,0,2)
+      cut      = "(%s)*%s"%(cut0,weight)
+      out      = tree.Draw("%s >> %s"%(1,"Sumw"),cut,"gOff")
+      integral = hist.GetBinContent(2)
+      gDirectory.Delete(hist.GetName())
+      return integral
+      
 def printComparingCutflow(efficiencies1,efficiencies2):
     print ">>> %13s:   %21s %8s   %15s   %16s   " % ("name","events".center(21,' '),"ratio".center(5,' '),"rel. eff.".center(15,' '),"abs. eff.".center(17,' '))
     for (name1,N1,releff1,abseff1), (name2,N2,releff2,abseff2) in zip(efficiencies1,efficiencies2):
        ratio = "-"
        if N1: ratio = N2/N1
        print (">>> %13s:   %9d - %9d %8.2f   %6.2f - %6.2f   %7.3f - %7.3f  " % (name1,N1,N2,ratio,releff1,releff2,abseff1,abseff2))
-    
+       
 
 
 def getColor(name):
@@ -199,7 +224,36 @@ def getColor(name):
         return colors_sample_dict[searchterm]
     LOG.warning('getColor: Could not find color for "%s"!'%name)
     return 0
+
+
+
+CutInfo = ntuple("CutInfo",['name','cut','N','N_unweighted','abseff','releff','kwargs'])
+class Cutflow(object):
+    """Sample to store relative and absolute efficiencies."""
     
+    def __init__(self, name, **kwargs):
+        self.name = name
+        self.cuts = [ ]
+        
+    def add(self, *args, **kwargs):
+        strings = [a for a in arg if isinstance(a,str)]
+        numbers = [a for a in arg if isinstance(a,int) or isinstance(a,float)]
+        if len(strings)==0:
+          LOG.warning("Cutflow::add: Did not find name!")
+          strings = [ "no name" ]
+        if len(numbers)<3:
+          LOG.warning("Cutflow::add: Not enough numbers!")
+          while len(numbers)<=4: numbers.append(0)
+        if len(numbers)==3:
+          numbers.insert(1,numbers[0])
+        name   = strings[0]
+        cut    = strings[1] if len(strings)>1 else name
+        N      = numbers[0]
+        N_unw  = numbers[1]
+        abseff = numbers[2]
+        releff = numbers[3]
+        self.cuts.append(CutInfo(name,cut,N,N_unweighted,abseff,releff))
+
 
 
     ##########
@@ -253,7 +307,7 @@ class Sample(object):
         self.isData         = kwargs.get('data',            False               )
         self.isBackground   = kwargs.get('background',      False               )
         self.isSignal       = kwargs.get('signal',          False               )
-        self.blind          = kwargs.get('blind',           { }                 )
+        self.blind_dict     = kwargs.get('blind',           { }                 ) # var vs. (xmin,xmax)
         self.split_dict     = kwargs.get('split',           { }                 )
         self.splitsamples   = [ ]
         self.color          = kwargs.get('color',           getColor(self.title))
@@ -472,7 +526,11 @@ class Sample(object):
         
     def reloadFile(self,**kwargs):
         """Close and reopen file. Use it to free up some memory."""
+        verbosity = kwargs.get('verbosity', 0)
         if self.file:
+            if verbosity>1:
+              LOG.verbose('Sample::reloadFile: closing and deleting %s with content:'%(self.file.GetName()),verbosity)
+              self.file.ls()
             self.file.Close()
             #self.file.Delete()
             del self.file
@@ -550,27 +608,33 @@ class Sample(object):
         """Make a histogram with a tree."""
         
         verbosity     = getVerbosity(kwargs,verbositySampleTools)
-        var, N, a, b, cuts = unwrapVariableSelection(*args)
-        scale         = kwargs.get('scale',           1.0                         ) * self.scale * self.upscale * self.norm
+        var, N, xmin, xmax, cuts = unwrapVariableSelection(*args)
+        scale         = kwargs.get('scale',           1.0                         ) * self.scale * self.norm
         treename      = kwargs.get('treename',        self.treename               )
         name          = kwargs.get('name',            makeHistName(self.name,var) )
         name         += kwargs.get('append',          ""                          )
         title         = kwargs.get('title',           self.title                  )
         shift         = kwargs.get('shift',           0                           )
         smear         = kwargs.get('smear',           0                           )
-        blind         = kwargs.get('blind',           self.blind                  )
+        scaleup       = kwargs.get('scaleup',         False                       )
+        blind         = kwargs.get('blind',           False                       )
         color0        = kwargs.get('color',           self.color                  )
         linecolor     = kwargs.get('linecolor',       self.linecolor              )
         drawoption    = "E0" if self.isData else "HIST"
         drawoption    = "gOff"+kwargs.get('option',   drawoption                  )
         
         # SIGNAL
-        if self.upscale != 1:
+        if scaleup and self.upscale!=1:
             title += " (#times%d)" % (self.upscale)
+            scale *= self.upscale
+        
+        # BLIND
+        blindcuts = ""
+        if blind and var in self.blind_dict:
+            a, b      = self.blind_dict[var]
+            blindcuts = makeBlindCuts(var,a,b,N,xmin,xmax)
         
         # CUTS & WEIGHTS
-        blindcuts = ""
-        if var in blind and "SS" not in name: blindcuts = blind[var] # TODO: blind by removing bins from hist or rounding? FindBin(a), SetBinContent
         weight    = combineWeights(self.weight, self.extraweight, kwargs.get('weight', ""))
         cuts      = combineCuts(cuts, kwargs.get('cuts', ""), self.cuts, blindcuts, weight=weight)
         
@@ -597,7 +661,7 @@ class Sample(object):
           exit(1)
         
         # HIST
-        hist = TH1D(name, title, N, a, b)
+        hist = TH1D(name, title, N, xmin, xmax)
         if self.isData: hist.SetBinErrorOption(TH1D.kPoisson)
         else:           hist.Sumw2()
         
@@ -627,6 +691,9 @@ class Sample(object):
         
     def getEfficiency(self):
         """Calculate efficiency for some selections."""
+        # TODO:
+        #  - from cutflow hist
+        #  - from selections in tree 
     
     def isPartOf(self, *searchterms, **kwargs):
         """Check if all labels are in the sample's name, title or tags."""
@@ -748,7 +815,6 @@ class MergedSample(Sample):
         name             = kwargs.get('name',               makeHistName(self.name+"_merged", var))
         name            += kwargs.get('append',             ""                      )
         title            = kwargs.get('title',              self.title              )
-        blind            = kwargs.get('blind',              self.blind              )
         cuts             = combineCuts(cuts,                self.cuts               )
         kwargs['weight'] = combineWeights(kwargs.get('weight', ""), self.weight     )# pass scale down
         kwargs['scale']  = kwargs.get('scale', 1.0) * self.scale * self.norm # pass scale down
@@ -837,8 +903,9 @@ class SampleSet(object):
         self.ignore             = kwargs.get('ignore',      [ ]         )
         self.shiftQCD           = kwargs.get('shiftQCD',    0           )
         #self.weight             = kwargs.get('weight',      ""          )
-        self.nPlotsMade         = 0
         
+        self.TTscale            = { '1b1f': 1., '1b1c': 1., 'bbA': 1., }
+        self.nPlotsMade         = 0
         self.color_dict         = { }
         self.linecolor_dict     = { }
         
@@ -945,7 +1012,7 @@ class SampleSet(object):
     def reloadFiles(self,**kwargs):
         """Help function to reload all files in samples list."""
         for sample in self.samples:
-            sample.reloadFile()    
+            sample.reloadFile(**kwargs)    
     
     def refreshMemory(self,*args,**kwargs):
         """Open/reopen files to reset file memories."""
@@ -997,11 +1064,15 @@ class SampleSet(object):
         """Create histograms for all samples and return lists of histograms and a dictionairy
         of sample objects with histograms as keys."""
         
-        var, N, a, b, cuts = unwrapVariableSelection(*args)
+        var, N, xmin, xmax, cuts = unwrapVariableSelection(*args)
         verbosity       = getVerbosity(kwargs,verbositySampleTools)
+        data            = kwargs.get('data',            True                )
+        signal          = kwargs.get('background',      True                )
+        background      = kwargs.get('background',      True                )
         weight          = kwargs.get('weight',          ""                  )
         weight_data     = kwargs.get('weight_data',     ""                  )
         split           = kwargs.get('split',           True                )
+        blind           = kwargs.get('blind',           True                )
         reset           = kwargs.get('reset',           False               )
         append          = kwargs.get('append',          ""                  )
         ratio_WJ_QCD    = kwargs.get('ratio_WJ_QCD_SS', False               )
@@ -1016,6 +1087,8 @@ class SampleSet(object):
         if split:
             samples = [ ]
             for sample in self.samples:
+              if not signal and sample.isSignal: continue
+              if not data   and sample.isData:   continue
               if sample.splitsamples:
                 samples += sample.splitsamples
               else:
@@ -1032,20 +1105,20 @@ class SampleSet(object):
               continue
             
             # ADD background
-            if sample.isBackground and kwargs.get('background',True):
-              hist = sample.hist(var,N,a,b,cuts,append=append,weight=weight,verbosity=verbosity)
+            if sample.isBackground and background:
+              hist = sample.hist(var,N,xmin,xmax,cuts,append=append,weight=weight,verbosity=verbosity)
               histsB.append(hist)
               #samples_dict[hist] = sample
             
             # ADD signal
-            elif sample.isSignal and kwargs.get('signal',True):
-              hist = sample.hist(var,N,a,b,cuts,append=append,weight=weight,verbosity=verbosity)
+            elif sample.isSignal and signal:
+              hist = sample.hist(var,N,xmin,xmax,cuts,append=append,weight=weight,verbosity=verbosity)
               histsS.append(hist)
               #samples_dict[hist] = sample
             
             # ADD data
-            elif sample.isData and kwargs.get('data',True):
-              hist = sample.hist(var,N,a,b,cuts,append=append,weight=weight_data,verbosity=verbosity)
+            elif sample.isData and data:
+              hist = sample.hist(var,N,xmin,xmax,cuts,append=append,weight=weight_data,blind=blind,verbosity=verbosity)
               histsD.append(hist)
               #samples_dict[hist] = sample
             
@@ -1053,7 +1126,7 @@ class SampleSet(object):
         
         # ADD QCD
         if kwargs.get('QCD',False):
-            hist = self.QCD(var,N,a,b,cuts,ratio_WJ_QCD_SS=ratio_WJ_QCD,append=append,weight=weight,verbosity=verbosity)
+            hist = self.QCD(var,N,xmin,xmax,cuts,ratio_WJ_QCD_SS=ratio_WJ_QCD,append=append,weight=weight,verbosity=verbosity)
             if hist:
               histsB.append(hist)
               #samples_dict[hist] = "QCD"
@@ -1076,21 +1149,19 @@ class SampleSet(object):
         append          = kwargs.get('append',          ""                      )+"_SS"
         ratio_WJ_QCD    = kwargs.get('ratio_WJ_QCD_SS', False                   )
         doRatio_WJ_QCD  = isinstance(ratio_WJ_QCD,      c_double                )
-        
         weight          = kwargs.get('weight',          ""                      )
         weight_data     = kwargs.get('weight',          ""                      )
+        shift           = kwargs.get('shift',           0.0                     ) + self.shiftQCD # for systematics
         
-        relax           = 'emu' in self.channel or ("jets" in cuts0 and "btag" in cuts0 and "btag" not in var)
-        relax           = kwargs.get('relax',relax) #and False
-        if "n" in var.lower() and ("jets" in var or "btag" in var):
-          if relax:
-            LOG.warning("SampleSet::QCD - Don't relax cuts in QCD CR for \"%s\""%(var))
+        relax           = 'emu' in self.channel or ("jets" in cuts0 and "btag" in cuts0)
+        relax           = kwargs.get('relax',           relax                   )
+        if relax and "n" in var.lower() and ("jets" in var or "btag" in var):
+            LOG.warning('SampleSet::QCD: do not relax cuts in QCD CR for "%s"'%(var))
             relax = False
         
-        shift           = kwargs.get('shift',0.0) + self.shiftQCD # for systematics
         scaleup         = 2.0 if "emu" in self.channel else OSSS_ratio
         scaleup         = 1.0 if "q_1*q_2>0" in cuts0.replace(' ','') else scaleup
-        scaleup         = kwargs.get('scaleup',scaleup)
+        scaleup         = kwargs.get('scaleup',         scaleup                 )
         LOG.verbose("   QCD: scaleup = %s, shift = %s, self.shiftQCD = %s" % (scaleup,shift,self.shiftQCD),verbosity,level=2)
         
         # CUTS: invert charge
@@ -1099,51 +1170,51 @@ class SampleSet(object):
         # CUTS: relax cuts for QCD_SS_SB
         # https://indico.cern.ch/event/566854/contributions/2367198/attachments/1368758/2074844/QCDStudy_20161109_HTTMeeting.pdf
         QCD_OS_SR = 0
-        #if relax:
-        #    
-        #    # GET yield QCD_OS_SR = SF * QCD_SS_SR
-        #    if 'emu' in self.channel: # use weight instead of scaleup
-        #        scaleup     = 1.0
-        #        weight      = combineWeights("getQCDWeight(pt_2, pt_1, dR_ll)",weight)
-        #        weight_data = "getQCDWeight(pt_2, pt_1, dR_ll)" # SF ~ 2.4 average
-        #    kwargs_SR       = kwargs.copy()
-        #    kwargs_SR.update({ 'scaleup':scaleup, 'weight':weight, 'weight_data':weight_data, 'relax':False })
-        #    histQCD_OS_SR   = self.QCD(**kwargs_SR)
-        #    QCD_OS_SR       = histQCD_OS_SR.Integral(1,N+1) # yield
-        #    scaleup         = 1.0
-        #    gDirectory.Delete(histQCD_OS_SR.GetName())
-        #    if QCD_OS_SR < 1: LOG.warning("QCD: QCD_SR = %.1f < 1"%QCD_OS_SR)
-        #    
-        #    # RELAX cuts for QCD_OS_SB = SF * QCD_SS_SB
-        #    append      = "_isorel" + append
-        #    iso_relaxed = "iso_1>0.15 && iso_1<0.5 && iso_2==1" #iso_2_medium
-        #    if 'emu' in self.channel: iso_relaxed = "iso_1>0.20 && iso_1<0.5 && iso_2<0.5"
-        #    else: cuts = relaxJetSelection(cuts)
-        #    cuts = invertIsolation(cuts,to=iso_relaxed)
-        #    
-        #    # # CHECK for 30 GeV jets
-        #    # if "bpt_" in var and "btag" in cuts0 and "btag" not in cuts:
-        #    #   btags_g  = re.findall(r"&*\ *nc?btag\ *>\ *(\d+)\ *",cuts0)
-        #    #   btags_ge = re.findall(r"&*\ *nc?btag\ *>=\ *(\d+)\ *",cuts0)
-        #    #   btags_e  = re.findall(r"&*\ *nc?btag\ *==\ *(\d+)\ *",cuts0)
-        #    #   nbtags = 0
-        #    #   if   btags_g:  nbtags = int(btags_g[0])+1
-        #    #   elif btags_ge: nbtags = int(btags_ge[0])
-        #    #   elif btags_e:  nbtags = int(btags_e[0])
-        #    #   if nbtags>0:
-        #    #     if "bpt_1" in var and nbtags>0:
-        #    #       cuts+=" && bpt_1>30"
-        #    #       LOG.warning("QCD: %s - added 30 GeV cut on b jets in \"%s\""%(var,cuts))
-        #    #     if "bpt_2" in var and nbtags>1:
-        #    #       cuts+=" && bpt_2>30"
-        #    #       LOG.warning("QCD: %s - added 30 GeV cut on b jets in \"%s\""%(var,cuts))
+        if relax:
+            
+            # GET yield QCD_OS_SR = SF * QCD_SS_SR
+            if 'emu' in self.channel: # use weight instead of scaleup
+                scaleup     = 1.0
+                weight      = combineWeights("getQCDWeight(pt_2, pt_1, dR_ll)",weight)
+                weight_data = "getQCDWeight(pt_2, pt_1, dR_ll)" # SF ~ 2.4 average
+            kwargs_SR       = kwargs.copy()
+            kwargs_SR.update({ 'scaleup':scaleup, 'weight':weight, 'weight_data':weight_data, 'relax':False })
+            histQCD_OS_SR   = self.QCD(*args,**kwargs_SR)
+            QCD_OS_SR       = histQCD_OS_SR.Integral(1,N+1) # yield
+            scaleup         = 1.0
+            deleteHist(histQCD_OS_SR)
+            if QCD_OS_SR < 1: LOG.warning("QCD: QCD_SR = %.1f < 1"%QCD_OS_SR)
+            
+            # RELAX cuts for QCD_OS_SB = SF * QCD_SS_SB
+            append      = "_isorel" + append
+            iso_relaxed = "iso_1>0.15 && iso_1<0.5 && iso_2==1" #iso_2_medium
+            if 'emu' in self.channel: iso_relaxed = "iso_1>0.20 && iso_1<0.5 && iso_2<0.5"
+            else: cuts = relaxJetSelection(cuts)
+            cuts = invertIsolation(cuts,to=iso_relaxed)
+            
+            # # CHECK for 30 GeV jets
+            # if "bpt_" in var and "btag" in cuts0 and "btag" not in cuts:
+            #   btags_g  = re.findall(r"&*\ *nc?btag\ *>\ *(\d+)\ *",cuts0)
+            #   btags_ge = re.findall(r"&*\ *nc?btag\ *>=\ *(\d+)\ *",cuts0)
+            #   btags_e  = re.findall(r"&*\ *nc?btag\ *==\ *(\d+)\ *",cuts0)
+            #   nbtags = 0
+            #   if   btags_g:  nbtags = int(btags_g[0])+1
+            #   elif btags_ge: nbtags = int(btags_ge[0])
+            #   elif btags_e:  nbtags = int(btags_e[0])
+            #   if nbtags>0:
+            #     if "bpt_1" in var and nbtags>0:
+            #       cuts+=" && bpt_1>30"
+            #       LOG.warning("QCD: %s - added 30 GeV cut on b jets in \"%s\""%(var,cuts))
+            #     if "bpt_2" in var and nbtags>1:
+            #       cuts+=" && bpt_2>30"
+            #       LOG.warning("QCD: %s - added 30 GeV cut on b jets in \"%s\""%(var,cuts))
         
         LOG.verbose("   QCD - cuts = %s %s" % (cuts,"(relaxed)" if relax else ""),verbosity,level=2)
         
         # HISTOGRAMS
         histD  = None
         histWJ = None
-        histsD_SS, histsB_SS, histsS_SS = self.createHistograms(var,N,a,b,cuts,signal=False,QCD=False,task="calculating QCD",append=append,split=False)
+        histsD_SS, histsB_SS, histsS_SS = self.createHistograms(var,N,a,b,cuts,signal=False,QCD=False,task="calculating QCD",append=append,split=False,blind=False)
         
         # GET WJ
         if doRatio_WJ_QCD:
@@ -1173,10 +1244,10 @@ class SampleSet(object):
         if relax:
             QCD_SS = histQCD.Integral(1,N+1)
             if QCD_SS:
-                scaleup = QCD_OS_SR/QCD_SS # normalizing to OS_SR
-                LOG.verbose("   QCD - scaleup = QCD_OS_SR/QCD_SS_SB = %.1f/%.1f = %.3f" % (QCD_OS_SR,QCD_SS,scaleup),verbosity,level=2)
+              scaleup = QCD_OS_SR/QCD_SS # normalizing to OS_SR
+              LOG.verbose("   QCD - scaleup = QCD_OS_SR/QCD_SS_SB = %.1f/%.1f = %.3f" % (QCD_OS_SR,QCD_SS,scaleup),verbosity,level=2)
             else:
-                LOG.warning("SampleSet::QCD - QCD_SS_SB.Integral() == 0!")
+              LOG.warning("SampleSet::QCD - QCD_SS_SB.Integral() == 0!")
         scale   = scaleup*(1.0+shift) # scale up QCD 6% in OS region by default
         histQCD.Scale(scale)
         histQCD.SetFillColor(getColor('QCD'))
@@ -1197,30 +1268,37 @@ class SampleSet(object):
         return histQCD
         
     
-    def renormalizeWJ(self,*args,**kwargs):
+    def renormalizeWJ(self,cuts,**kwargs):
         """Renormalize WJ by requireing that MC and data has the same number of events in
            the mt_1 > 80 GeV sideband.
            This method assume that the variable of this Plot object is a transverse mass and is plotted
            from 80 GeV to at least 100 GeV."""
         
-        verbosity           = getVerbosity(kwargs,verbositySampleTools)
-        samples             = self.samples
-        var, nBins, xmin, xmax, cuts  = unwrapVariableSelection(*args)
+        var, nBins, xmin, xmax = "pfmt_1", 200, 80, 200
+        if isinstance(cuts,Selection): cuts = cuts.selection
+        samples     = self.samples
+        verbosity   = getVerbosity(kwargs,verbositySampleTools)
+        shifts      = kwargs.get('shift', False)
+        
+        # SHIFT
+        if shifts:
+          var  = shift(var, shifts)
+          cuts = shift(cuts,shifts)
         
         LOG.verbose("%srenormalizing WJ with mt > 80 GeV sideband for variable %s%s"%(kwargs.get('pre',"  "),var,(" for %s"%self.name) if self.name else ""),True)
         
         # CHECK mt
         if not re.search(r"m_?t",var,re.IGNORECASE):
-            LOG.warning("SampleSet::renormalizeWJ - Could not renormalize WJ: variable %s is not a transverse mass variable!"%(var), pre="  ")
+            LOG.warning("SampleSet::renormalizeWJ: could not renormalize WJ: variable %s is not a transverse mass variable!"%(var), pre="  ")
             return
         
         # CHECK a, b (assume histogram range goes from 80 to >100 GeV)
         LOG.verbose("  nBins=%s, (a,b)=(%s,%s)"%(nBins,xmin,xmax), verbosity, level=2)
         LOG.verbose('  cuts = "%s"'%(cuts), verbosity, level=1)
         if xmin is not 80:
-            LOG.warning("SampleSet::renormalizeWJ - Renormalizing WJ with %s > %s GeV, instead of mt > 80 GeV!" % (var,xmin), pre="  ")
+            LOG.warning("SampleSet::renormalizeWJ: renormalizing WJ with %s > %s GeV, instead of mt > 80 GeV!" % (var,xmin), pre="  ")
         if xmax < 150:
-            LOG.warning("SampleSet::renormalizeWJ - Renormalizing WJ with %s < %s GeV < 150 GeV!" % (var,xmax), pre="  ")
+            LOG.warning("SampleSet::renormalizeWJ: renormalizing WJ with %s < %s GeV < 150 GeV!" % (var,xmax), pre="  ")
             return
         
         R       = c_double() # ratio_WJ_QCD_SS
@@ -1229,14 +1307,14 @@ class SampleSet(object):
         histWJ  = None
         histsWJ = [ ]
         stack   = THStack("stack_QCD","stack_QCD")
-        histsD, histsB, histsS = self.createHistograms(var,nBins,xmin,xmax,cuts,reset=True,signal=False,QCD=True,ratio_WJ_QCD_SS=R,split=False)
+        histsD, histsB, histsS = self.createHistograms(var,nBins,xmin,xmax,cuts,reset=True,signal=False,QCD=True,ratio_WJ_QCD_SS=R,split=False,blind=False)
         
         # CHECK MC and DATA
         if not histsB:
-            LOG.warning("SampleSet::renormalizeWJ - Could not renormalize WJ: no MC!", pre="  ")
+            LOG.warning("SampleSet::renormalizeWJ: could not renormalize WJ: no MC!", pre="  ")
             return
         if not histsD:
-            LOG.warning("SampleSet::renormalizeWJ - Could not renormalize WJ: no data!", pre="  ")
+            LOG.warning("SampleSet::renormalizeWJ: could not renormalize WJ: no data!", pre="  ")
             return
         histD  = histsD[0]
         
@@ -1249,7 +1327,7 @@ class SampleSet(object):
         LOG.verbose(" ",verbosity,level=2)
         for hist in histsB:
             if hist.Integral(1,nBins)<=0:
-                LOG.warning("SampleSet::renormalizeWJ - Ignored %s with an integral of %s <= 0 !" % (hist.GetName(),hist.Integral()), pre="  ")
+                LOG.warning("SampleSet::renormalizeWJ: ignored %s with an integral of %s <= 0 !" % (hist.GetName(),hist.Integral()), pre="  ")
             if "WJ" in hist.GetName() or re.findall(r"w.jets",hist.GetName(),re.IGNORECASE):
                 histsWJ.append(hist)
             if "qcd" in hist.GetName().lower():
@@ -1261,16 +1339,16 @@ class SampleSet(object):
         # CHECK WJ hist
         if len(histsWJ) > 1:
             namesWJ = ', '.join([h.GetName() for h in histsWJ])
-            LOG.warning("SampleSet::renormalizeWJ - More than one WJ sample (%s), renormalizing with first instance (%s)!"%(namesWJ,histsWJ[0].GetName()), pre="  ")
+            LOG.warning("SampleSet::renormalizeWJ: more than one WJ sample (%s), renormalizing with first instance (%s)!"%(namesWJ,histsWJ[0].GetName()), pre="  ")
         elif len(histsWJ) < 1:
-            LOG.warning("SampleSet::renormalizeWJ - Could not renormalize WJ: no WJ sample!", pre="  ")
+            LOG.warning("SampleSet::renormalizeWJ: could not renormalize WJ: no WJ sample!", pre="  ")
             return 0.
         histWJ  = histsWJ[0]
         
         # GET WJ sample
         WJ      = self.get("WJ",unique=True)
         if not WJ:
-            LOG.warning("SampleSet::renormalizeWJ - Could not renormalize WJ: no WJ sample!", pre="  ")
+            LOG.warning("SampleSet::renormalizeWJ: could not renormalize WJ: no WJ sample!", pre="  ")
             return 0.
         
         # INTEGRATE
@@ -1283,14 +1361,14 @@ class SampleSet(object):
         purity  = 100.0*I_WJ/I_MC
         close(histsD+histsB+histsS)
         if I_MC < 10:
-            LOG.warning("SampleSet::renormalizeWJ - Could not renormalize WJ: integral of MC is %s < 10!" % I_MC, pre="  ")
+            LOG.warning("SampleSet::renormalizeWJ: could not renormalize WJ: integral of MC is %s < 10!" % I_MC, pre="  ")
             return 0.
         print ">>>   data: %.1f, MC: %.1f, WJ: %.1f, QCD: %.1f, R: %.3f, WJ purity: %.2f%%)" % (I_D,I_MC,I_WJ,I_QCD,R,purity)
         if I_D < 10:
-            LOG.warning("SampleSet::renormalizeWJ - Could not renormalize WJ: integral of data is %s < 10!" % I_D, pre="  ")
+            LOG.warning("SampleSet::renormalizeWJ: could not renormalize WJ: integral of data is %s < 10!" % I_D, pre="  ")
             return 0.
         if I_WJ < 10:
-            LOG.warning("SampleSet::renormalizeWJ - Could not renormalize WJ: integral of WJ is %s < 10!" % I_WJ, pre="  ")
+            LOG.warning("SampleSet::renormalizeWJ: could not renormalize WJ: integral of WJ is %s < 10!" % I_WJ, pre="  ")
             return 0.
         
         # SET WJ SCALE
@@ -1301,36 +1379,70 @@ class SampleSet(object):
         purity   *= scale
         
         if scale < 0:
-            LOG.warning("SampleSet::renormalizeWJ - Could not renormalize WJ: scale = %.2f < 0!" % scale, pre="  ")
+            LOG.warning("SampleSet::renormalizeWJ: could not renormalize WJ: scale = %.2f < 0!" % scale, pre="  ")
             return scale
         WJ.resetScale(scale)
-        print ">>>   WJ renormalization scale = %.3f (new total scale: %.3f, new WJ purity: %.2f%%)" % (scale,WJ.scale,purity)
+        print ">>>   WJ renormalization scale = %s (new total scale: %.3f, new WJ purity: %.2f%%)" % (color("%.3f"%scale,color='green'),WJ.scale,purity)
         return scale
         
     
-    def renormalizeTT(self,*args,**kwargs):
+    def renormalizeTT(self,cuts,**kwargs):
         """Renormalize TT by requireing that MC and data has the same number of events in some control region.
            ..."""
         
-        verbosity           = getVerbosity(kwargs,verbositySampleTools)
-        samples             = self.samples
-        var, nBins, xmin, xmax, cuts  = unwrapVariableSelection(*args)
-        
+        var, nBins, xmin, xmax = 'pfmt_1', 100, 0, 400
+        if isinstance(cuts,Selection): cuts = cuts.selection
+        samples         = self.samples
+        verbosity       = getVerbosity(kwargs,verbositySampleTools)
+        shifts          = kwargs.get('shift',    False                                        )
+        baseline        = kwargs.get('baseline', "iso_cuts==1 && lepton_vetos==0 && q_1*q_2<0")
         LOG.verbose("%srenormalizing TT with %s"%(kwargs.get('pre',"  "),var),True)
         
+        # SHIFT
+        if shifts:
+          var  = shift(var, shifts)
+          cuts = shift(cuts,shifts)
+        
+        # CATEGORY
+        category    = None
+        TTcuts1 = "%s && nbtag>0 && ncjets==1 && nfjets >0 && met>60 && pfmt_1>60 && jpt_1>30 && jpt_2>30"%(baseline)
+        TTcuts2 = "%s && nbtag>0 && ncjets==2 && nfjets==0 && met>60 && pfmt_1>60 && jpt_1>30 && jpt_2>30"%(baseline)
+        matchesb   = re.findall(r"nc?btag(?:20)?\ *>\ *[01]",      cuts)
+        matchesf   = re.findall(r"nfjets(?:20)?\ *[>=]=?\ *[01]",  cuts)
+        matchesnof = re.findall(r"nfjets(?:20)?\ *==\ *0",         cuts)
+        matchesc   = re.findall(r"ncjets(?:20)?\ *[>=]=?\ *[0124]",cuts)
+        if matchesb and matchesc and matchesf:
+          category = '1b1f'
+        if matchesb and matchesc and matchesnof:
+          category = '1b1c'
+        if not category:
+          #LOG.warning("SampeSet::renormalizeTT: Did not recognize category for selections %s! Reverting to original scale (1)."%(cuts),pre="  ")
+          LOG.verbose("SampeSet::renormalizeTT: did not recognize category for selections %s! Reverting to original scale (1)."%(cuts),1,pre="  ")
+          TT = self.get("TT",unique=True)
+          TT.resetScale()
+          return 1.
+        LOG.verbose('SampeSet::renormalizeTT: found category "%s" in "%s"'%(category,cuts),1,pre="  ")
+        TTcuts = TTcuts1 if category=='1b1f' else TTcuts2
+        
+        # PREVIOUS
+        if self.TTscale[category]!=1:
+          LOG.verbose('SampeSet::renormalizeTT: found previous scale %f!'%(self.TTscale[category]),1,pre="  ")
+          return self.TTscale[category]
+        
+        # HISTS
         TT      = None
         histD   = None
         histTT  = None
         histsTT = [ ]
         stack   = THStack("stack_QCD","stack_QCD")
-        histsD, histsB, histsS = self.createHistograms(var,nBins,xmin,xmax,cuts,reset=True,signal=False,QCD=True,split=False)
+        histsD, histsB, histsS = self.createHistograms(var,nBins,xmin,xmax,TTcuts,reset=True,signal=False,QCD=True,split=False,blind=False)
         
         # CHECK MC and DATA
         if not histsB:
-            LOG.warning("SampleSet::renormalizeTT - Could not renormalize TT: no MC!", pre="  ")
+            LOG.warning("SampleSet::renormalizeTT: could not renormalize TT: no MC!", pre="  ")
             return
         if not histsD:
-            LOG.warning("SampleSet::renormalizeTT - Could not renormalize TT: no data!", pre="  ")
+            LOG.warning("SampleSet::renormalizeTT: could not renormalize TT: no data!", pre="  ")
             return
         histD  = histsD[0]
         
@@ -1341,7 +1453,7 @@ class SampleSet(object):
         LOG.verbose(" ",verbosity,level=2)
         for hist in histsB:
             if hist.Integral(1,nBins)<=0:
-                LOG.warning("SampleSet::renormalizeTT - Ignored %s with an integral of %s <= 0 !" % (hist.GetName(),hist.Integral()), pre="  ")
+                LOG.warning("SampleSet::renormalizeTT: ignored %s with an integral of %s <= 0 !" % (hist.GetName(),hist.Integral()), pre="  ")
             if "TT" in hist.GetName() or re.findall(r"ttbar",hist.GetName(),re.IGNORECASE):
                 histsTT.append(hist)
             if "qcd" in hist.GetName().lower():
@@ -1352,16 +1464,16 @@ class SampleSet(object):
         # CHECK TT hist
         if len(histsTT) > 1:
             namesTT = ', '.join([h.GetName() for h in histsTT])
-            LOG.warning("SampleSet::renormalizeTT - More than one TT sample (%s), renormalizing with first instance (%s)!"%(namesTT,histsTT[0].GetName()), pre="  ")
+            LOG.warning("SampleSet::renormalizeTT: core than one TT sample (%s), renormalizing with first instance (%s)!"%(namesTT,histsTT[0].GetName()), pre="  ")
         elif len(histsTT) < 1:
-            LOG.warning("SampleSet::renormalizeTT - Could not renormalize TT: no TT sample!", pre="  ")
+            LOG.warning("SampleSet::renormalizeTT: could not renormalize TT: no TT sample!", pre="  ")
             return 0.
         histTT  = histsTT[0]
         
         # GET TT sample
         TT      = self.get("TT",unique=True)
         if not TT:
-            LOG.warning("SampleSet::renormalizeTT - Could not renormalize TT: no TT sample!", pre="  ")
+            LOG.warning("SampleSet::renormalizeTT: could not renormalize TT: no TT sample!", pre="  ")
             return 0.
         
         # INTEGRATE
@@ -1374,14 +1486,14 @@ class SampleSet(object):
         purity  = 100.0*I_TT/I_MC
         close(histsD+histsB+histsS)
         if I_MC < 10:
-            LOG.warning("SampleSet::renormalizeTT - Could not renormalize TT: integral of MC is %s < 10!" % I_MC, pre="  ")
+            LOG.warning("SampleSet::renormalizeTT: could not renormalize TT: integral of MC is %s < 10!" % I_MC, pre="  ")
             return 0.
         print ">>>   data: %.1f, MC: %.1f, TT: %.1f, QCD: %.1f, TT purity: %.3g%%)" % (I_D,I_MC,I_TT,I_QCD,purity)
         if I_D < 10:
-            LOG.warning("SampleSet::renormalizeTT - Could not renormalize TT: integral of data is %s < 10!" % I_D, pre="  ")
+            LOG.warning("SampleSet::renormalizeTT: could not renormalize TT: integral of data is %s < 10!" % I_D, pre="  ")
             return 0.
         if I_TT < 10:
-            LOG.warning("SampleSet::renormalizeTT - Could not renormalize TT: integral of TT is %s < 10!" % I_TT, pre="  ")
+            LOG.warning("SampleSet::renormalizeTT: could not renormalize TT: integral of TT is %s < 10!" % I_TT, pre="  ")
             return 0.
         
         # SET TT SCALE
@@ -1391,9 +1503,11 @@ class SampleSet(object):
         err_scale = scale * sqrt( (e_D**2+e_MC_noTT**2)/abs(I_D-I_MC_noTT)**2 + (e_TT**2)/(I_TT)**2 )
         purity   *= scale
         
-        if scale < 0:
-            LOG.warning("SampleSet::renormalizeTT - Could not renormalize TT: scale = %.2f < 0!" % scale, pre="  ")
+        if scale<0:
+            LOG.warning("SampleSet::renormalizeTT: could not renormalize TT: scale = %.2f < 0!" % scale, pre="  ")
             return scale
+        
+        self.TTscale[category] = scale
         TT.resetScale(scale)
         print ">>>   TT renormalization scale = %.3f (new total scale: %.3f, TT purity: %.3g%%)" % (scale,TT.scale,purity)
         return scale
@@ -1407,26 +1521,24 @@ class SampleSet(object):
         
         verbosity = getVerbosity(kwargs,verbositySampleTools)
         var, nBins, xmin, xmax, cuts = unwrapVariableSelection(*args)
-        if verbosity>0:
-           LOG.header("measure OS/SS ratio in %s" % (var))
         
         samples         = self.samples        
-        name            = kwargs.get('name',makeHistName("QCD",var))
-        weight          = kwargs.get('weight',"")
-        relaxed         = kwargs.get('relaxed',True)
+        name            = kwargs.get('name',    makeHistName("QCD",var) )
+        weight          = kwargs.get('weight',  ""                      )
+        relaxed         = kwargs.get('relaxed', True                    )
         
         # INVERT charge and isolation
         if relaxed:
-          relaxed_iso     = "iso_2==1 && iso_1>0.15 && iso_1<0.5" # iso_1<0.5 && 
+          anti_iso = "iso_2==1 && iso_1>0.15 && iso_1<0.5" # iso_1<0.5 && 
           if 'emu' in self.channel:
-            relaxed_iso = "iso_1<0.5 && iso_2<0.5 && iso_1>0.20" # ||iso_2>0.10
-          cuts = invertIsolation(cuts,to=relaxed_iso)
-        cutsOS = invertCharge(cuts,OS=True)
+            anti_iso = "iso_1<0.5 && iso_2<0.5 && iso_1>0.20" # ||iso_2>0.10
+          cuts = invertIsolation(cuts,to=anti_iso)
+        cutsOS = invertCharge(cuts,OS=True )
         cutsSS = invertCharge(cuts,OS=False)
         
         # HISTOGRAMS
-        histsD_OS, histsMC_OS, histsS = self.createHistograms(var,nBins,xmin,xmax,cutsOS,weight=weight,append="_OS",signal=False,task="calculating QCD",QCD=False,split=True,verbosity=verbosity)
-        histsD_SS, histsMC_SS, histsS = self.createHistograms(var,nBins,xmin,xmax,cutsSS,weight=weight,append="_SS",signal=False,task="calculating QCD",QCD=False,split=True,verbosity=verbosity)
+        histsD_OS, histsMC_OS, histsS = self.createHistograms(var,nBins,xmin,xmax,cutsOS,weight=weight,append="_OS",signal=False,task="calculating QCD",QCD=False,split=False,verbosity=verbosity)
+        histsD_SS, histsMC_SS, histsS = self.createHistograms(var,nBins,xmin,xmax,cutsSS,weight=weight,append="_SS",signal=False,task="calculating QCD",QCD=False,split=False,verbosity=verbosity)
         if not histsD_OS or not histsD_SS:
             print warning("No data to make DATA driven QCD!")
             return None
@@ -1467,7 +1579,7 @@ class SampleSet(object):
         data_SS = histsD_SS[0].IntegralAndError(1,nBins+1,e_data_SS)
         
         # CHECK
-        if verbosity>0:
+        if verbosity>1:
             print ">>>"
             print '>>>   "%s"'%(cutsOS)
             print '>>>   "%s"'%(cutsSS)
@@ -1476,6 +1588,7 @@ class SampleSet(object):
             print ">>> %8s %10.1f %10.1f" % ("data",  data_OS,data_SS)
         
         # YIELD
+        OSSS     = -1
         QCD_OS   = data_OS-MC_OS
         QCD_SS   = data_SS-MC_SS
         e_QCD_OS = sqrt(e_data_OS**2+e_MC_OS**2)
@@ -1485,13 +1598,12 @@ class SampleSet(object):
             e_OSSSS = OSSS*sqrt( (e_data_OS**2+e_MC_OS**2)/QCD_OS**2 + (e_data_SS**2+e_MC_SS**2)/QCD_SS**2)
             if verbosity > 0:
               result = color("%.3f +/-%.3f"%(OSSS,e_OSSSS),color='grey')
-              print ">>>   QCD_OS/QCD_SS = ( %.1f +/-%.1f ) / ( %.1f +/-%.1f ) = %s %s" % (QCD_OS,e_QCD_OS,QCD_SS,e_QCD_SS,result,"(relaxed)" if relaxed else "")
+              print ">>>   QCD_OS/QCD_SS = ( %.1f +/-%.1f ) / ( %.1f +/-%.1f ) = %s %s" % (QCD_OS,e_QCD_OS,QCD_SS,e_QCD_SS,result,"(anti-isolated)" if relaxed else "")
         else:
             LOG.warning("measureOSSSratio: denominator QCD_SS is zero: %.1f/%.1f"% (QCD_OS,QCD_SS))
         
-        for hist in histsMC_OS + histsMC_SS + histsD_OS + histsD_SS:
-            gDirectory.Delete(hist.GetName())
-            del hist
+        close(histsMC_OS+histsMC_SS+histsD_OS+histsD_SS)
+        return OSSS
         
     def significanceScan(self,*args,**kwargs):
         """Scan cut on a range of some variable, integrating the signal and background histograms,
@@ -1512,6 +1624,13 @@ class SampleSet(object):
         else:
           LOG.ERROR("SampleSet::resetScales: Found sample is not a list or Sample or list object!")
         return samples
+    
+    def has(self,*searchterms,**kwargs):
+        """Return true if sample set contains a sample corresponding to given searchterms."""
+        kwargs.set_default('nowarning',True)
+        results = self.get(*searchterms,**kwargs)
+        found = isinstance(results,Sample) or len(results)!=0
+        return found
     
     def get(self,*searchterms,**kwargs):
         return getSample(self.samples,*searchterms,**kwargs)
@@ -1557,11 +1676,11 @@ class SampleSet(object):
     def shiftSample(self,searchterms,file_app,title_app,**kwargs):
         """Shift samples in samples set by creating new samples with new filename/titlename/weight."""
         filter          = kwargs.get('filter',      False       )
+        share           = kwargs.get('share',       False       )
         title_tag       = kwargs.get('title_tag',   False       )
         title_veto      = kwargs.get('title_veto',  False       )
         kwargs.setdefault('name', file_app.lstrip('_'))
         kwargs.setdefault('label', file_app)
-        
         
         if not (isinstance(searchterms,list) or isinstance(searchterms,tuple)): searchterms = [ searchterms ]
         samplesD        = { }
@@ -1573,7 +1692,7 @@ class SampleSet(object):
             newsample.appendFileName(file_app,title_app=title_app,title_veto=title_veto)
             samplesB.append(newsample)
           elif not filter:
-            newsample = sample.clone(samename=True,deep=True)
+            newsample = sample if share else sample.clone(samename=True,deep=True)
             samplesB.append(newsample)
         for sample in self.samplesS:
           if sample.isPartOf(*searchterms,exclusive=False):
@@ -1581,7 +1700,7 @@ class SampleSet(object):
             newsample.appendFileName(file_app,title_app=title_app,title_veto=title_veto)
             samplesS.append(newsample)
           elif not filter:
-            newsample = sample.clone(samename=True,deep=True)
+            newsample = sample if share else sample.clone(samename=True,deep=True)
             samplesS.append(newsample)
         if not filter:
             samplesD = self.samplesD
@@ -1599,11 +1718,12 @@ def getSample(samples,*searchterms,**kwargs):
     verbosity   = getVerbosity(kwargs,verbositySampleTools)
     filename    = kwargs.get(    'filename',        ""          )
     unique      = kwargs.get(    'unique',          False       )
+    nowarning   = kwargs.get(    'nowarning',       False       )
     matches     = [ ]
     for sample in samples:
         if sample.isPartOf(*searchterms) and filename in sample.filename:
             matches.append(sample)
-    if not matches:
+    if not matches and not nowarning:
         LOG.warning("getSample - Could not find a sample with search terms %s..." % (', '.join(labels+(filename,))))
     elif unique:
         if len(matches)>1: LOG.warning("getSample - Found more than one match to %s. Using first match only: %s" % (", ".join(searchterms),", ".join([s.name for s in matches])))

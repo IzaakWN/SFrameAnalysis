@@ -60,8 +60,35 @@ def combineCuts(*cuts,**kwargs):
     
 
 
+def makeBlindCuts(var,a,b,N,xmin,xmax,**kwargs):
+    """Helpfunction to make a selection string to blind a given variable within some window (a,b),
+    making sure the cuts match the bin edges of some (N,xmin,xmax) binning."""
+    blindcut = ""
+    xbins    = kwargs.get('xbins', [ ] ) # TODO: variable xbins ?
+    binwidth = float(xmax-xmin)/N
+    if xmax<=xmin:
+      LOG.ERROR('makeBlindCuts: "%s" has xmax = %s <= %s = xmin !'%(var,xmax,xmin))
+    if b<=a:
+      LOG.ERROR('makeBlindCuts: "%s" has window a = %s <= %s = b !'%(var,a,b))
+    if xmin<a<xmax:
+      bin, rem = divmod(a-xmin,binwidth)
+      xlow     = bin*binwidth
+      blindcut = "%s<%s"%(var,xlow)
+    if xmin<b<xmax:
+      bin, rem = divmod(b-xmin,binwidth)
+      if rem>0:    bin      += 1
+      xhigh    = bin*binwidth
+      if blindcut:
+        blindcut = "(%s || %s<%s)"%(blindcut,xhigh,var)
+      else:
+        blindcut = "%s<%s"%(xhigh,var)
+    LOG.verbose('makeBlindCuts: blindcut = "%s" for a (%s,%s) window and (%s,%s,%s) binning'%(blindcut,a,b,N,xmin,xmax),verbosity,level=2) 
+    return blindcut
+    
+
+
 def invertCharge(cuts,**kwargs):
-    """Find, invert and replace charge selections."""
+    """Helpfunction to find, invert and replace charge selections."""
     
     verbosity   = max(kwargs.get('verbosity',0),verbositySelectionTools)
     cuts0       = cuts
@@ -94,7 +121,7 @@ def invertCharge(cuts,**kwargs):
 
 
 def invertIsolation(cuts,**kwargs):
-    """Find, invert and replace isolation selections."""
+    """Helpfunction to find, invert and replace isolation selections."""
     
     verbosity   = max(kwargs.get('verbosity',0),verbositySelectionTools)
     channel     = kwargs.get('channel','emu')
@@ -102,8 +129,8 @@ def invertIsolation(cuts,**kwargs):
     cuts0       = cuts 
     
     # MATCH PATTERNS https://regex101.com
-    match_iso_1 = re.findall(r"iso_1\ *[<>]\ *\d+\.\d+\ *[^\|]&*\ *",cuts)
-    match_iso_2 = re.findall(r"iso_2\ *\!?=?[<=>]\ *\d+\.\d+\ *[^\|]&*\ *",cuts)
+    match_iso_1 = re.findall(r"iso_1\ *[<>]=?\ *\d+\.\d+\ *[^\|]&*\ *",cuts)
+    match_iso_2 = re.findall(r"iso_2\ *\!?[<=>]=?\ *\d+\.?\d*\ *[^\|]&*\ *",cuts)
     LOG.verbose("invertIsolation:\n>>>   match_iso_1 = %s\n>>>   match_iso_2 = \"%s\"" % (match_iso_1,match_iso_2),verbosity,level=2)
     
     # REPLACE
@@ -116,7 +143,7 @@ def invertIsolation(cuts,**kwargs):
         cuts = cuts.replace(match_iso_2[0],'')
         cuts = "%s && %s" % (iso_relaxed,cuts)
     elif cuts:
-        if len(match_iso_1) or len(match_iso_2): LOG.warning("invertIsolation: %d iso_1 and %d iso_2 matches! cuts=%s"%(len(match_iso_1),len(match_iso_2),cuts))
+        if len(match_iso_1) or len(match_iso_2): LOG.warning('invertIsolation: %d iso_1 and %d iso_2 matches! cuts="%s"'%(len(match_iso_1),len(match_iso_2),cuts))
     cuts    = cuts.rstrip(' ').rstrip('&').rstrip(' ')
     
     LOG.verbose("  \"%s\"\n>>>   -> \"%s\"\n>>>" % (cuts0,cuts),verbosity,level=2)
@@ -125,7 +152,7 @@ def invertIsolation(cuts,**kwargs):
 
 
 def relaxJetSelection(cuts,**kwargs):
-    """Find, relax and replace jet selections:
+    """Helpfunction to find, relax and replace jet selections:
          1) remove b tag requirements
          2) relax central jet requirements."""
     
@@ -139,7 +166,7 @@ def relaxJetSelection(cuts,**kwargs):
     btags  = re.findall(r"&*\ *nc?btag(?:20)?\ *[<=>]=?\ *\d+\ *",cuts)
     cjets  = re.findall(r"&*\ *ncjets(?:20)?\ *[<=>]=?\ *\d+\ *",cuts)
     cjets += re.findall(r"&*\ *nc?btag(?:20)?\ *[<=>]=?\ *ncjets(?:20)?\ *",cuts)
-    LOG.verbose(">>> relaxJetSelection:\n>>>   btags = %s\n>>>   cjets = \"%s\"" % (btags,cjets),verbosity,level=2)
+    LOG.verbose("relaxJetSelection:\n>>>   btags = %s\n>>>   cjets = \"%s\"" % (btags,cjets),verbosity,level=2)
     
     # REPLACE
     if len(btags) and len(cjets):
@@ -158,6 +185,7 @@ def relaxJetSelection(cuts,**kwargs):
 
 
 def isSelectionString(string,**kwargs):
+    """Check if string has boolean or comparison operators."""
     if not isinstance(string,str): return False
     elif '<'  in string: return True
     elif '>'  in string: return True
@@ -189,6 +217,12 @@ class Selection(object):
         if self.selection=="":
            LOG.warning('Selection::Selection - No selection string given for "%s"!'%(self.name))
         self.context     = getContextFromDict(kwargs,self.selection) # context-dependent channel selections
+        self.only            = kwargs.get('only',           [ ]                         )
+        self.veto            = kwargs.get('veto',           [ ]                         )
+        if self.only:
+          if not (isinstance(self.only,list) or isinstance(self.only,tuple)): self.only = [ self.only ]
+        if self.veto:
+          if not (isinstance(self.veto,list) or isinstance(self.veto,tuple)): self.veto = [ self.veto ]
     
     @property
     def cut(self): return self.selection
@@ -227,6 +261,21 @@ class Selection(object):
         """Change the contextual selections for a set of arguments, if it is available"""
         if self.context:
           self.selections = self.context.getContext(*args)
+    
+    def plotForVariable(self,variable,**kwargs):
+        """Check is variable is vetoed for this variable."""
+        verbosity = getVerbosity(kwargs,verbosityVariableTools)
+        if not isinstance(variable,str):
+          variable = variable.name
+        for searchterm in self.veto:
+          if re.search(searchterm,variable):
+            LOG.verbose('Variable::plotForSelection: Regex match of variable "%s" to "%s"'%(variable,searchterm),verbosity,level=2)
+            return False
+        for searchterm in self.only:
+          if re.search(searchterm,variable):
+            LOG.verbose('Variable::plotForSelection: Regex match of variable "%s" to "%s"'%(variable,searchterm),verbosity,level=2)
+            return True
+        return len(self.only)==0
     
     def combine(self, *selection2s):
         # TODO: check if selection2 is a string, if possible
@@ -281,6 +330,7 @@ def unwrapSelection(selection,**kwargs):
 
 def unwrapVariableSelection(*args,**kwargs):
     """Help function to unwrap arguments that contain variable and selection."""
+    # TODO: return variable binning xbins?
     if   len(args)==5 or len(args)==6:
       return args
     elif len(args)==2 and isinstance(args[0],Variable) and isinstance(args[1],Selection):

@@ -10,17 +10,17 @@ from cStringIO import StringIO # for stdout capturing
 
 
 text_color_dict = {
-    "black"     : 30,   "red"       : 31,
-    "green"     : 32,   "yellow"    : 33,   "orange" : 33,
-    "blue"      : 34,   "purple"    : 35,
-    "magenta"   : 36,   "grey"      : 37,  }
+    'black'     : 30,   'red'       : 31,
+    'green'     : 32,   'yellow'    : 33,   'orange' : 33,
+    'blue'      : 34,   'purple'    : 35,
+    'magenta'   : 36,   'grey'      : 37,  }
 
 
 background_color_dict = {
-    "black"     : 40,   "red"       : 41,
-    "green"     : 42,   "yellow"    : 43,   "orange" : 43,
-    "blue"      : 44,   "purple"    : 45,
-    "magenta"   : 46,   "grey"      : 47, }
+    'black'     : 40,   'red'       : 41,
+    'green'     : 42,   'yellow'    : 43,   'orange' : 43,
+    'blue'      : 44,   'purple'    : 45,
+    'magenta'   : 46,   'grey'      : 47,  }
 
 
 

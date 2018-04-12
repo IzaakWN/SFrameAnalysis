@@ -25,7 +25,7 @@ CMS_lumi.cmsTextSize  = 0.65
 CMS_lumi.lumiTextSize = 0.60
 CMS_lumi.relPosX = 0.105
 CMS_lumi.outOfFrame = True
-CMS_lumi.lumi_13TeV = "%s fb^{-1}" % luminosity
+CMS_lumi.lumi_13TeV = "%s fb^{-1}"%luminosity if luminosity else ""
 tdrstyle.setTDRStyle()
 TGaxis.SetExponentOffset(-0.058,0.005,'y')
 
@@ -52,6 +52,7 @@ def ensureDirectory(DIR):
 def makeCanvas(**kwargs):
     """Make canvas and pads for ratio plots."""
     
+    global luminosity
     square              = kwargs.get('square',              False       )
     scaleleftmargin     = kwargs.get('scaleleftmargin',     1           )
     scalerightmargin    = kwargs.get('scalerightmargin',    1           )
@@ -81,8 +82,8 @@ def makeCanvas(**kwargs):
     
     canvas = TCanvas("canvas","canvas",100,100,W,H)
     canvas.SetFillColor(0)
+    canvas.SetFillStyle(0)
     canvas.SetBorderMode(0)
-    canvas.SetFrameFillStyle(0)
     canvas.SetFrameBorderMode(0)
     canvas.SetTopMargin(  T ); canvas.SetBottomMargin( B )
     canvas.SetLeftMargin( L ); canvas.SetRightMargin(  R )
@@ -93,14 +94,16 @@ def makeCanvas(**kwargs):
         gPad.SetPad("pad1","pad1", 0, 0.33, 1, 0.95)
         gPad.SetLeftMargin(0.125);  gPad.SetRightMargin(0.03)
         gPad.SetTopMargin(0.02);    gPad.SetBottomMargin(0.00001)
-        gPad.SetFillColor(0)
+        gPad.SetFillColor(0) #SetFillColorAlpha(0,1.0)
+        gPad.SetFillStyle(0) # 4000
         gPad.SetBorderMode(0)
         gPad.Draw()
         canvas.cd(2)
         gPad.SetPad("pad2","pad2", 0, 0.05, 1, 0.30)
         gPad.SetLeftMargin(0.125);  gPad.SetRightMargin(0.03)
         gPad.SetTopMargin(0.00001); gPad.SetBottomMargin(0.22)
-        gPad.SetFillColor(0)
+        gPad.SetFillColor(0) #SetFillColorAlpha(0,1.0)
+        gPad.SetFillStyle(0) # 4000
         gPad.SetBorderMode(0)
         gPad.Draw()
         canvas.cd(1)
@@ -112,6 +115,7 @@ def makeCanvas(**kwargs):
 def makeLegend(*hists,**kwargs):
     """Make legend."""
     
+    global legendTextSize
     title       = kwargs.get('title',           ""              )
     entries     = kwargs.get('entries',         [ ]             )
     position    = kwargs.get('position',        ""              ).lower()
@@ -128,25 +132,32 @@ def makeLegend(*hists,**kwargs):
     style0      = kwargs.get('style0',          'l'             )
     style1      = kwargs.get('style',           'l'             )
     stack       = kwargs.get('stack',           False           )
-    textSize    = kwargs.get('stack',           legendTextSize  )
+    textsize    = kwargs.get('textsize',        legendTextSize  )
+    text        = kwargs.get('text',            ""              )
     
     if not hists: hists = histsB+histsS+histsD
-    styleB      = 'f' if histsB else 'l'
+    styleB      = 'f' if histsB and histsD else 'l'
     styleS      = 'l'
     styleD      = 'lep'
+    if not (isinstance(text,list) or isinstance(text,tuple)): text = [ text ]
     
     if title=="noname": title = ""
     
     if entries and hists and len(entries)!=len(hists):
       print error("makeLegend - %d=len(entries)!=len(hists)=%d !"%(len(entries),len(hists)))
+      while len(entries)<len(hists):
+        entries.append(hists[len(entries)-1].GetTitle())
     elif len(entries)==0:
       entries = [ h.GetTitle() for h in hists ]
     
     nLines = len(entries)+sum([e.count("newline") for e in entries])
     if title: nLines += 1 + title.count("newline")
+    else:     nLines += 0.80
+    if text:  nLines += 1 + text.count("newline")
     
-    if width==0:  width  = 0.16
-    if height==0: height = 1.0*textSize*nLines
+    
+    if width==0:  width  = 0.18 if textsize>legendTextSize else 0.16
+    if height==0: height = 1.05*textsize*nLines
     x2 = 0.86; x1 = x2 - width
     y2 = 0.92; y1 = y2 - height
     
@@ -167,7 +178,7 @@ def makeLegend(*hists,**kwargs):
     if transparent: legend.SetFillStyle(0) # 0 = transparent
     else: legend.SetFillColor(kWhite)
     legend.SetBorderSize(0)
-    legend.SetTextSize(textSize)
+    legend.SetTextSize(textsize)
     legend.SetTextFont(62) # bold for title
                    
     if title: legend.SetHeader(makeTitle(title))
@@ -181,7 +192,10 @@ def makeLegend(*hists,**kwargs):
         elif hist in histsD: style = styleD
         elif hist in histsS: style = styleS
         elif i==0:           style = style0
-        legend.AddEntry(hist,makeLatex(entry),style)
+        legend.AddEntry(hist,makeTitle(entry),style)
+    for line in text:
+      legend.AddEntry(0,makeTitle(line),'')
+    
     
     legend.Draw()
     return legend
@@ -327,12 +341,13 @@ def setLineStyle(*hists,**kwargs):
     global colors, styles
     colors0      = kwargs.get('colors',         colors  )
     style        = kwargs.get('style',          True    )
+    width        = kwargs.get('width',          2       )
     offset       = kwargs.get('offset',         0       )
     style_offset = kwargs.get('style_offset',   0       )
     for i, hist in enumerate(hists):
         hist.SetLineColor(colors0[i%len(colors0)])
         if style: hist.SetLineStyle(styles[i%len(styles)])
-        hist.SetLineWidth(2)
+        hist.SetLineWidth(width)
         if not isinstance(hist,TLine): hist.SetMarkerSize(0)
 
 def setMarkerStyle(*hists,**kwargs):
@@ -614,7 +629,8 @@ class Ratio(object):
         
         if len(hists)==0:
             LOG.warning("Ratio::init: No histogram to compare with!")
-        elif denominator>1:
+        elif denominator>0:
+            hists = list(hists)
             hists.insert(0,hist0)
             hist0 = hists[denominator-1]
             self.line = False
@@ -627,6 +643,7 @@ class Ratio(object):
             hist1.Reset()
             hist1.SetTitle(self.title)
             self.ratios.append(hist1)
+        self.hist0      = hist0
         self.ratio      = self.ratios[0]
         self.frame      = self.ratios[0]
         nBins           = hist0.GetNbinsX()
@@ -658,19 +675,20 @@ class Ratio(object):
                 self.error.SetPoint(i,x,1)
                 self.error.SetPointError(i,width/2,width/2,hist0.GetBinErrorLow(i)/binc0,hist0.GetBinErrorUp(i)/binc0)
     
-    def Draw(self, *option, **kwargs):
+    def Draw(self, *options, **kwargs):
         """Draw all objects."""
         
-        option      = option[0] if len(option)>0 else "E same"
-        frame       = self.ratios[0]
+        ratios      = self.ratios
+        option      = options[0] if len(options)>0 else 'E'
+        frame       = ratios[0]
         xmin        = frame.GetXaxis().GetXmin()
         xmax        = frame.GetXaxis().GetXmax()
-        xmin        = kwargs.get('xmin',    xmin    )
-        xmax        = kwargs.get('xmax',    xmax    )
-        ymin        = kwargs.get('ymin',    0.4     )
-        ymax        = kwargs.get('ymax',    1.6     )
-        ylabel      = kwargs.get('ylabel',  "ratio" ) #"data / M.C."
-        xlabel      = kwargs.get('xlabel',  ""      )
+        xmin        = kwargs.get('xmin',      xmin      )
+        xmax        = kwargs.get('xmax',      xmax      )
+        ymin        = kwargs.get('ymin',      0.4       )
+        ymax        = kwargs.get('ymax',      1.6       )
+        ylabel      = kwargs.get('ylabel',    "ratio"   ) #"data / M.C."
+        xlabel      = kwargs.get('xlabel',    ""        )
         size        = 1.0 #0.9
         
         frame.GetYaxis().SetTitle(ylabel)
@@ -695,12 +713,18 @@ class Ratio(object):
         
         if self.line:
             self.line = TLine(xmin,1,xmax,1)
-            #self.line.SetName(makeHistName("line",self.title))
-            self.line.SetLineColor(12) # dark grey
-            self.line.SetLineStyle(2)
+            if "E" in option:
+              self.line.SetLineColor(12)
+              self.line.SetLineWidth(1)
+              self.line.SetLineStyle(2)
+            else:
+              self.line.SetLineColor(self.hist0.GetLineColor())
+              self.line.SetLineWidth(self.hist0.GetLineWidth())
+              self.line.SetLineStyle(1)
             self.line.Draw('SAME') # only draw line if a histogram has been drawn!
         
-        frame.Draw(option)
+        for ratio in self.ratios:
+            ratio.Draw(option+'SAME')
     
     def close(self):
         """Delete the histograms."""
@@ -802,9 +826,10 @@ class Plot(object):
         
         # https://root.cern.ch/doc/master/classTHStack.html
         # https://root.cern.ch/doc/master/classTHistPainter.html#HP01e
+        vartitle    = self.xlabel if self.xlabel else self.var if self.var else makeLatex(args[0]) if args else ""
         stack       = kwargs.get('stack',       False           ) or self.stack
-        ratio       = (kwargs.get('ratio',      False           ) or self.ratio) and self.histsD
-        residue     = kwargs.get('residue',     False           ) and self.histsD
+        ratio       = (kwargs.get('ratio',      False           ) or self.ratio)
+        residue     = kwargs.get('residue',     False           )
         errorbars   = kwargs.get('errorbars',   False           )
         staterror   = kwargs.get('staterror',   False           )
         JEC_errors  = kwargs.get('JEC_errors',  False           )
@@ -813,9 +838,15 @@ class Plot(object):
         norm        = kwargs.get('norm',        False           )
         title       = kwargs.get('title',       self.title      )
         ylabel      = kwargs.get('xlabel',      self.ylabel     )
-        xlabel      = kwargs.get('xlabel',      self.xlabel     )
+        xlabel      = kwargs.get('xlabel',      vartitle        )
         legend      = kwargs.get('legend',      True            )
+        entries     = kwargs.get('entries',     [ ]             )
+        text        = kwargs.get('text',        [ ]             ) # extra text for legend
+        textsize    = kwargs.get('textsize', legendTextSize*(1 if self.histsD else 1.2))
         position    = kwargs.get('position',    ""              )
+        autostyle   = kwargs.get('autostyle',   True            )
+        linestyle   = kwargs.get('linestyle',   True            )
+        linewidth   = kwargs.get('linewidth',   2               )
         option      = 'hist' #+ kwargs.get('option', '')
         if errorbars: option = 'E0 '+option
         
@@ -852,11 +883,11 @@ class Plot(object):
             self.setFillStyle(*self.histsB)
             for hist in self.histsMC: hist.SetMarkerStyle(1)
         else:
-            self.setLineStyle(*self.histsB)
+            self.setLineStyle(*self.histsB,style=linestyle)
         if self.histsD:
             self.setMarkerStyle(*self.histsD)
         if self.histsS:
-            self.setLineStyle(*self.histsS)
+            self.setLineStyle(*self.histsS,style=linestyle)
         
         # STATISTICAL ERROR
         if staterror:
@@ -872,8 +903,7 @@ class Plot(object):
         self.makeAxes(self.frame, *(self.histsB+self.histsD), xlabel=xlabel, noxaxis=ratio,
                        logy=kwargs.get('logy',False), logx=kwargs.get('logx',False))
         if legend:
-            self.makeLegend(title=title, entries=kwargs.get('entries', [ ]),
-                                         position=position)
+            self.makeLegend(title=title, entries=entries, position=position, text=text,textsize=textsize)
         
         # CMS LUMI
         CMS_lumi.cmsTextSize  = 0.65
@@ -882,18 +912,20 @@ class Plot(object):
         CMS_lumi.CMS_lumi(self.canvas,13,0)
         
         # RATIO
-        if ratio and stack and self.histsD:
+        if ratio:
             self.canvas.cd(2)
-            self.ratio = Ratio(self.stack, self.histsD[0], staterror=staterror, error=self.error,
-                                name=makeHistName("ratio",self.name))
-            self.ratio.Draw('SAME')
+            hargs       = [self.stack, self.histsD[0]] if stack else self.histsB
+            roption     = "E" if drawData else "HIST"
+            denominator = ratio if isinstance(ratio,int) and ratio>1 else -1 
+            self.ratio  = Ratio(*hargs, staterror=staterror, error=self.error, denominator=denominator)
+            self.ratio.Draw(roption)
             self.makeAxes(self.ratio, ylabel="ratio", xlabel=xlabel)
         
     
     def saveAs(self,filename,**kwargs):
         """Save plot, close canvas and delete the histograms."""
         
-        save = kwargs.get('save',True)
+        save  = kwargs.get('save', True)
         close = kwargs.get('close',True)
         printSameLine("")
         if save:
@@ -946,26 +978,29 @@ class Plot(object):
         
     def setLineStyle(self, *hists, **kwargs):
         """Make line style."""
+        reset = kwargs.get('reset',  True  )
         if not hists: hists = self.hists[:]
-        hists = [h for h in hists if h.GetFillColor()!=kBlack]
+        if not reset: hists = [h for h in hists if h.GetFillColor() in [kBlack,kWhite]]
         if hists:
-          kwargs.setdefault('colors',self.color)
+          kwargs.setdefault('colors',self.colors)
           setLineStyle(*hists,**kwargs)
           
     def setMarkerStyle(self, *hists, **kwargs):
         """Make line style."""
+        reset = kwargs.get('reset',  True  )
         if not hists: hists = self.hists[:]
         hists = [h for h in hists if h.GetMarkerColor()!=kBlack]
         if hists:
           kwargs.setdefault('colors',self.markercolors)
           setMarkerStyle(*hists,**kwargs)
     
-    def setFillStyle(self, *hists):
+    def setFillStyle(self, *hists, **kwargs):
         """Make fill style."""
+        reset = kwargs.get('reset',  False  )
         if not hists: hists = self.hists[:]
         i = 0
         for hist in hists:
-          if hist.GetFillColor()!=kBlack: continue
+          if not reset and hist.GetFillColor() not in [kBlack,kWhite]: continue
           print  'Plot::setFillStyle: hist "%s" has unset color!'
           color0 = self.fillcolors_dict.get(hist.GetName(), None )
           if not color0:

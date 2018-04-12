@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE JobConfiguration PUBLIC "" "JobConfig.dtd">
+<JobConfiguration JobName="TauTauAnalysisJob" OutputLevel="INFO">
+  <Library Name="libNtupleVariables" />
+  <Library Name="libGoodRunsLists" />
+  <Library Name="libPileupReweightingTool" />
+  <Library Name="libBTaggingTools" />
+  <Library Name="libTauTauResonances" />
+  <Library Name="libScaleFactorTool" />
+  <Library Name="libRecoilCorrector" />
+  <Library Name="libJetCorrectionTool" />
+  <Library Name="libSVFitTool" />
+  
+  <Package Name="SFrameCore.par" />
+  <Package Name="NtupleVariables.par" />
+  <Package Name="GoodRunsLists.par" />
+  <Package Name="PileupReweightingTool.par" />
+  <Package Name="BTaggingTools.par" />
+  <Package Name="TauTauResonances.par" />
+  <Package Name="ScaleFactorTool.par" />
+  <Package Name="RecoilCorrector.par" />
+  <Package Name="JetCorrectionTool.par" />
+  <Package Name="SVFitTool.par" />
+  
+  <Cycle Name="TauTauAnalysis" OutputDirectory="./" PostFix="" ProofServer="lite" ProofWorkDir="" RunMode="LOCAL" TargetLumi="1.0">
+    <InputData Lumi="0.0" NEventsMax="1000000" Type="WJets" Version="UZH" SkipValid="False">
+  
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/180326_150449/0000/flatTuple_75.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/180326_150449/0000/flatTuple_115.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/180326_150449/0000/flatTuple_118.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/180326_150449/0000/flatTuple_152.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/180326_150449/0000/flatTuple_157.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/180326_150449/0000/flatTuple_163.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/180326_150449/0000/flatTuple_170.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/180326_150449/0000/flatTuple_188.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/180326_150449/0000/flatTuple_201.root" Lumi="1.0" />
+<!-- 
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/180326_150449/0000/flatTuple_214.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/180326_150449/0000/flatTuple_218.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/180326_150449/0000/flatTuple_222.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/180326_150449/0000/flatTuple_252.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/180326_150449/0000/flatTuple_256.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/180326_150449/0000/flatTuple_261.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/180326_150449/0000/flatTuple_284.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/180326_150449/0000/flatTuple_293.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/180326_150449/0000/flatTuple_315.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/180326_150449/0000/flatTuple_316.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8/180326_150449/0000/flatTuple_326.root" Lumi="1.0" />
+ -->
+
+
+      <InputTree Name="ntuplizer/tree" />
+      <OutputTree Name="tree_mutau" />
+      <OutputTree Name="tree_etau" />
+    </InputData>
+  <UserConfig>
+    <Item Name="RecoTreeName"               Value="tree" />
+    <Item Name="doSVFit"                    Value="False" />
+    <Item Name="IsSignal"                   Value="False" />
+    <Item Name="doRecoilCorr"               Value="False" />
+    <Item Name="doZpt"                      Value="False" />
+    <Item Name="doJEC"                      Value="False" />
+    <Item Name="TESshift"                   Value="0.00" />
+    <Item Name="LTFshift"                   Value="0.00" />
+  </UserConfig>
+  </Cycle>
+</JobConfiguration>
+
+
+

@@ -52,7 +52,8 @@ TauTauAnalysis::TauTauAnalysis() : SCycleBase(),
   DeclareProperty( "EESshiftEndCap",        m_EESshiftEndCap        = m_EESshift        );
   DeclareProperty( "doEES",                 m_doEES                 = m_EESshift != 0.0 );
   DeclareProperty( "JTFshift",              m_JTFshift              = 0.0               );
-  DeclareProperty( "doTight",               m_doTight               = false             );
+  DeclareProperty( "doTight",               m_doTight               = false             ); // fill branches with less events
+  DeclareProperty( "noTight",               m_noTight               = false             ); // override doTight
   
   DeclareProperty( "AK4JetPtCut",           m_AK4jetPtCut           = 20.               );
   DeclareProperty( "AK4JetEtaCut",          m_AK4jetEtaCut          = 4.7               );
@@ -196,7 +197,8 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
   
   m_doEES   = m_EESshift != 0.0 and !m_isData;
   m_doJTF   = m_JTFshift != 0.0 and !m_isData;
-  m_doTight = m_doTight or m_doEES or m_doJTF;
+  m_doTight = m_doTight or m_doEES or m_doJTF; // need fail region for EES, JTF
+  m_doTight = m_doTight and !m_noTight;        // noTight overrides doTight
   m_doJEC   = m_doJEC and !(m_doEES or m_doJTF or m_isData);
   m_logger << INFO << "IsData:              " <<    (m_isData   ?   "TRUE" : "FALSE") << SLogger::endmsg;
   m_logger << INFO << "IsSignal:            " <<    (m_isSignal ?   "TRUE" : "FALSE") << SLogger::endmsg;
@@ -210,6 +212,7 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
   m_logger << INFO << "doJTF:               " <<    (m_doJTF    ?   "TRUE" : "FALSE") << SLogger::endmsg;
   m_logger << INFO << "JTFshift:            " <<    m_JTFshift          << SLogger::endmsg;
   m_logger << INFO << "doJEC:               " <<    (m_doJEC    ?   "TRUE" : "FALSE") << SLogger::endmsg;
+  m_logger << INFO << "noTight:             " <<    (m_noTight  ?   "TRUE" : "FALSE") << SLogger::endmsg;
   m_logger << INFO << "doTight:             " <<    (m_doTight  ?   "TRUE" : "FALSE") << SLogger::endmsg;
   
   m_logger << INFO << "ElectronPtCut:       " <<    m_electronPtCut     << SLogger::endmsg;
@@ -268,6 +271,7 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
     DeclareVariable( b_njets20[ch],             "njets20",              treeName);
     DeclareVariable( b_nfjets20[ch],            "nfjets20",             treeName);
     DeclareVariable( b_ncjets20[ch],            "ncjets20",             treeName);
+    DeclareVariable( b_njets_noTau[ch],         "njets_noTau",          treeName);
     DeclareVariable( b_nbtag20[ch],             "nbtag20",              treeName);
     DeclareVariable( b_nbtag_noTau[ch],         "nbtag_noTau",          treeName);
     DeclareVariable( b_nbtag20_noTau[ch],       "nbtag20_noTau",        treeName);
@@ -1273,13 +1277,19 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
   Int_t nfjets = 0;       Int_t nfjets20 = 0;
   Int_t ncjets = 0;       Int_t ncjets20 = 0;
   Int_t nbtag  = 0;       Int_t nbtag20  = 0;
+  Int_t njets_noTau = 0;
   Int_t nbtag_noTau = 0;  Int_t nbtag20_noTau = 0;
   
   // JEC variables
-  Int_t nfjets_jesUp   = 0;  Int_t ncjets_jesUp   = 0;  Int_t nbtag_jesUp   = 0;  Int_t njets20_jesUp   = 0;  Int_t nbtag_noTau_jesUp   = 0;
-  Int_t nfjets_jesDown = 0;  Int_t ncjets_jesDown = 0;  Int_t nbtag_jesDown = 0;  Int_t njets20_jesDown = 0;  Int_t nbtag_noTau_jesDown = 0;
-  Int_t nfjets_jerUp   = 0;  Int_t ncjets_jerUp   = 0;  Int_t nbtag_jerUp   = 0;  Int_t njets20_jerUp   = 0;  Int_t nbtag_noTau_jerUp   = 0;
-  Int_t nfjets_jerDown = 0;  Int_t ncjets_jerDown = 0;  Int_t nbtag_jerDown = 0;  Int_t njets20_jerDown = 0;  Int_t nbtag_noTau_jerDown = 0;
+  Int_t nfjets_jesUp   = 0;  Int_t ncjets_jesUp   = 0;  Int_t nbtag_jesUp   = 0;  Int_t njets20_jesUp   = 0;
+  Int_t nfjets_jesDown = 0;  Int_t ncjets_jesDown = 0;  Int_t nbtag_jesDown = 0;  Int_t njets20_jesDown = 0;
+  Int_t nfjets_jerUp   = 0;  Int_t ncjets_jerUp   = 0;  Int_t nbtag_jerUp   = 0;  Int_t njets20_jerUp   = 0;
+  Int_t nfjets_jerDown = 0;  Int_t ncjets_jerDown = 0;  Int_t nbtag_jerDown = 0;  Int_t njets20_jerDown = 0;
+  Int_t njets_noTau_jesUp   = 0;  Int_t nbtag_noTau_jesUp   = 0;
+  Int_t njets_noTau_jesDown = 0;  Int_t nbtag_noTau_jesDown = 0;
+  Int_t njets_noTau_jerUp   = 0;  Int_t nbtag_noTau_jerUp   = 0;
+  Int_t njets_noTau_jerDown = 0;  Int_t nbtag_noTau_jerDown = 0;
+
   
   // to compare to uncorrected "nominal" jets
   TLorentzVector jet1,         jet2,         // default jets (JER on top of JES)
@@ -1317,7 +1327,7 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
       TLorentzVector jet = Jets.at(ijet).tlv();
       bool isBTagged     = getBTagStatus_promote_demote(Jets.at(ijet));
       Jets.at(ijet).setTagged(isBTagged);
-      bool noTau         = isBTagged and (tau.pt()<20 or Jets.at(ijet).DeltaR(tau)>0.5) and abseta<2.4;
+      bool noTau         = (tau.pt()<20 or Jets.at(ijet).DeltaR(tau)>0.5) and abseta<2.4;
       
       // smeared jet
       if(m_isData){ // no SMEARING
@@ -1383,10 +1393,17 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
           
           // remove tau overlap
           if(noTau){
-            if(jet_jesUp.Pt()  >30) nbtag_noTau_jesUp++;
-            if(jet_jesDown.Pt()>30) nbtag_noTau_jesDown++;
-            if(jet_jerUp.Pt()  >30) nbtag_noTau_jerUp++;
-            if(jet_jerDown.Pt()>30) nbtag_noTau_jerDown++;
+            if(isBTagged){
+              if(jet_jesUp.Pt()  >30){ njets_noTau_jesUp++;   nbtag_noTau_jesUp++;   }
+              if(jet_jesDown.Pt()>30){ njets_noTau_jesDown++; nbtag_noTau_jesDown++; }
+              if(jet_jerUp.Pt()  >30){ njets_noTau_jerUp++;   nbtag_noTau_jerUp++;   }
+              if(jet_jerDown.Pt()>30){ njets_noTau_jerDown++; nbtag_noTau_jerDown++; }
+            }else{
+              if(jet_jesUp.Pt()  >30) njets_noTau_jesUp++;
+              if(jet_jesDown.Pt()>30) njets_noTau_jesDown++;
+              if(jet_jerUp.Pt()  >30) njets_noTau_jerUp++;
+              if(jet_jerDown.Pt()>30) njets_noTau_jerDown++;
+            }
           }
           
         }else{ // do SMEARING only
@@ -1461,8 +1478,12 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
       
       // remove tau overlap
       if(noTau){
-        nbtag20_noTau++;
-        if(jet.Pt()>30) nbtag_noTau++;
+        if(isBTagged){
+          nbtag20_noTau++;
+          if(jet.Pt()>30){ njets_noTau++; nbtag_noTau++; }
+        }else{
+          if(jet.Pt()>30) njets_noTau++;
+        }
       }
       
   }
@@ -1476,6 +1497,7 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
   b_nfjets[ch]  = nfjets;             b_nfjets20[ch]  = nfjets20;
   b_ncjets[ch]  = ncjets;             b_ncjets20[ch]  = ncjets20;
   b_nbtag[ch]   = nbtag;              b_nbtag20[ch]   = nbtag20;
+  b_njets_noTau[ch] = njets_noTau;
   b_nbtag_noTau[ch] = nbtag_noTau;    b_nbtag20_noTau[ch] = nbtag20_noTau;
   b_ht[ch]      = ht;
   
@@ -1501,10 +1523,10 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
     b_njets_jesDown[ch]  = nfjets_jesDown + ncjets_jesDown;         //b_njets20_jesDown[ch] = njets20_jesDown;
     b_njets_jerUp[ch]    = nfjets_jerUp   + ncjets_jerUp;           //b_njets20_jerUp[ch]   = njets20_jerUp;
     b_njets_jerDown[ch]  = nfjets_jerDown + ncjets_jerDown;         //b_njets20_jerDown[ch] = njets20_jerDown;
-    b_nbtag_noTau_jesUp[ch]   = nbtag_noTau_jesUp;
-    b_nbtag_noTau_jesDown[ch] = nbtag_noTau_jesDown;
-    b_nbtag_noTau_jerUp[ch]   = nbtag_noTau_jerUp;
-    b_nbtag_noTau_jerDown[ch] = nbtag_noTau_jerDown;
+    b_njets_jesUp[ch]    = njets_noTau_jesUp;    b_nbtag_noTau_jesUp[ch]   = nbtag_noTau_jesUp;
+    b_njets_jesDown[ch]  = njets_noTau_jesDown;  b_nbtag_noTau_jesDown[ch] = nbtag_noTau_jesDown;
+    b_njets_jerUp[ch]    = njets_noTau_jerUp;    b_nbtag_noTau_jerUp[ch]   = nbtag_noTau_jerUp;
+    b_njets_jerDown[ch]  = njets_noTau_jerDown;  b_nbtag_noTau_jerDown[ch] = nbtag_noTau_jerDown;
     FillJetBranches_JEC( b_jpt_1_jesUp[ch],   b_jeta_1_jesUp[ch],   jet1_jesUp,   jet1_jesUp.Pt()  >m_AK4jetPtCut);
     FillJetBranches_JEC( b_jpt_2_jesUp[ch],   b_jeta_2_jesUp[ch],   jet2_jesUp,   jet2_jesUp.Pt()  >m_AK4jetPtCut);
     FillJetBranches_JEC( b_jpt_1_jesDown[ch], b_jeta_1_jesDown[ch], jet1_jesDown, jet1_jesDown.Pt()>m_AK4jetPtCut);
@@ -1807,19 +1829,18 @@ float TauTauAnalysis::genMatchSF(const std::string& channel, const int genmatch_
 
 
 
-void TauTauAnalysis::shiftLeptonAndMET(const float shift, TLorentzVector& lep_shifted, TLorentzVector& met_shifted, bool shiftEnergy){
+void TauTauAnalysis::shiftLeptonAndMET(const float shift, TLorentzVector& lep_shifted, TLorentzVector& met_shifted){
   //std::cout << "shiftLeptonAndMET" << std::endl;
   
   //std::cout << ">>> after:  lep_shifted pt = " << lep_shifted.Pt()  << ", m   = " << lep_shifted.M() << std::endl;
   TLorentzVector Delta_lep_tlv(lep_shifted.Px()*shift, lep_shifted.Py()*shift, 0, 0); // (dpx,dpy,0,0)
-  if(shiftEnergy) lep_shifted.SetPtEtaPhiM((1.+shift)*lep_shifted.Pt(),lep_shifted.Eta(),lep_shifted.Phi(),(1.+shift)*lep_shifted.M());
-  else            lep_shifted.SetPtEtaPhiM((1.+shift)*lep_shifted.Pt(),lep_shifted.Eta(),lep_shifted.Phi(),           lep_shifted.M());
+  //lep_shifted.SetPtEtaPhiM((1.+shift)*lep_shifted.Pt(),lep_shifted.Eta(),lep_shifted.Phi(),(1.+shift)*lep_shifted.M());
+  lep_shifted *= (1.+shift);
   TLorentzVector met_diff;
   met_diff.SetPtEtaPhiM(met_shifted.Pt(),met_shifted.Eta(),met_shifted.Phi(),0.); // MET(px,dpy,0,0) - (dpx,dpy,0,0)
   met_diff -= Delta_lep_tlv;
-  met_shifted.SetPtEtaPhiM(met_diff.Pt(),met_diff.Eta(),met_diff.Phi(),0.); // keep E = |p| !
+  met_shifted.SetPtEtaPhiM(met_diff.Pt(),0,met_diff.Phi(),0.); // keep E = |p| !
   //std::cout << ">>> after:  lep_shifted pt = " << lep_shifted.Pt()  << ", m   = " << lep_shifted.M() << ", shift = " << shift << std::endl;
-  
 }
 
 

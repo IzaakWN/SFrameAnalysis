@@ -195,8 +195,8 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
   m_doEES   = m_EESshift != 0.0 and !m_isData;
   m_doLTF   = m_LTFshift != 0.0 and !m_isData;
   m_doJTF   = m_JTFshift != 0.0 and !m_isData;
-  m_doTight = (m_doTight or m_doTES or m_doLTF); // need fail region for EES, JTF
-  m_doTight = m_doTight and !m_noTight;          // noTight overrides doTight
+  m_doTight = m_doTight or m_doTES or m_doLTF; // need fail region for EES, JTF
+  m_doTight = m_doTight and !m_noTight;        // noTight overrides doTight
   m_doJEC   = m_doJEC and !(m_doEES or m_doLTF or m_doJTF or m_isData);
   m_logger << INFO << "IsData:              " <<    (m_isData   ?   "TRUE" : "FALSE") << SLogger::endmsg;
   m_logger << INFO << "IsSignal:            " <<    (m_isSignal ?   "TRUE" : "FALSE") << SLogger::endmsg;
@@ -206,7 +206,7 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
   m_logger << INFO << "doTTpt:              " <<    (m_doTTpt   ?   "TRUE" : "FALSE") << SLogger::endmsg;
   m_logger << INFO << "doJEC:               " <<    (m_doJEC    ?   "TRUE" : "FALSE") << SLogger::endmsg;
   m_logger << INFO << "doTES:               " <<    (m_doTES    ?   "TRUE" : "FALSE") << SLogger::endmsg;
-  m_logger << INFO << "TESshift:            " <<    m_TESshift << SLogger::endmsg;
+  m_logger << INFO << "TESshift:            " <<    m_TESshift          << SLogger::endmsg;
   m_logger << INFO << "doEES:               " <<    (m_doEES    ?   "TRUE" : "FALSE") << SLogger::endmsg;
   m_logger << INFO << "EESshift:            " <<    m_EESshift          << SLogger::endmsg;
   m_logger << INFO << "EESshiftEndCap:      " <<    m_EESshiftEndCap    << SLogger::endmsg;
@@ -1282,8 +1282,9 @@ void TauTauAnalysis::FillBranches(const std::string& channel, const UZH::Tau& ta
     if(m_doTES and gen_match_2==5){ // TES
       // https://twiki.cern.ch/twiki/bin/viewauth/CMS/SMTauTau2016#Tau_Energy_Scale_TES
       //shiftLeptonAndMET(m_TESshift,tau_tlv,met_tlv_corrected);
-      b_pt_2[ch]    = tau_tlv.Pt()*(1+m_TESshift);
-      b_m_2[ch]     = tau_tlv.M()*(1+m_TESshift);
+      tau_tlv      *= (1.+m_TESshift);
+      b_pt_2[ch]    = tau_tlv.Pt();
+      b_m_2[ch]     = tau_tlv.M();
     }
     else if(m_doLTF and gen_match_2<5){ // Lepton to tau fake (LTF)
       // https://twiki.cern.ch/twiki/bin/viewauth/CMS/SMTauTau2016#Electron_to_Tau_Fake
@@ -1293,8 +1294,9 @@ void TauTauAnalysis::FillBranches(const std::string& channel, const UZH::Tau& ta
     }
     else if(m_doJTF and gen_match_2!=5){ // Jet to tau fake (LTF)
       //shiftLeptonAndMET(m_JTFshift,tau_tlv,met_tlv_corrected);
-      b_pt_2[ch]    = tau_tlv.Pt()*(1+m_JTFshift);
-      b_m_2[ch]     = tau_tlv.M()*(1+m_JTFshift);
+      tau_tlv      *= (1.+m_JTFshift);
+      b_pt_2[ch]    = tau_tlv.Pt();
+      b_m_2[ch]     = tau_tlv.M();
     }
     else if(m_doEES and channel=="etau"){ // Electron ES
       if(fabs(electron.tlv().Eta())<1.479) shiftLeptonAndMET(m_EESshift,      lep_tlv,met_tlv_corrected);
@@ -2057,13 +2059,13 @@ float TauTauAnalysis::genMatchSF(const std::string& channel, const int genmatch_
 
 
 
-void TauTauAnalysis::shiftLeptonAndMET(const float shift, TLorentzVector& lep_shifted, TLorentzVector& met_shifted, bool shiftEnergy){
+void TauTauAnalysis::shiftLeptonAndMET(const float shift, TLorentzVector& lep_shifted, TLorentzVector& met_shifted){
   //std::cout << "shiftLeptonAndMET" << std::endl;
   
   //std::cout << ">>> after:  lep_shifted pt = " << lep_shifted.Pt()  << ", m   = " << lep_shifted.M() << std::endl;
   TLorentzVector Delta_lep_tlv(lep_shifted.Px()*shift, lep_shifted.Py()*shift, 0, 0); // (dpx,dpy,0,0)
-  if(shiftEnergy) lep_shifted.SetPtEtaPhiM((1.+shift)*lep_shifted.Pt(),lep_shifted.Eta(),lep_shifted.Phi(),(1.+shift)*lep_shifted.M());
-  else            lep_shifted.SetPtEtaPhiM((1.+shift)*lep_shifted.Pt(),lep_shifted.Eta(),lep_shifted.Phi(),           lep_shifted.M());
+  //lep_shifted.SetPtEtaPhiM((1.+shift)*lep_shifted.Pt(),lep_shifted.Eta(),lep_shifted.Phi(),(1.+shift)*lep_shifted.M());
+  lep_shifted *= (1.+shift);
   TLorentzVector met_diff;
   met_diff.SetPtEtaPhiM(met_shifted.Pt(),met_shifted.Eta(),met_shifted.Phi(),0.); // MET(px,dpy,0,0) - (dpx,dpy,0,0)
   met_diff -= Delta_lep_tlv;

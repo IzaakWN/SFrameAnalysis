@@ -164,7 +164,7 @@ class TauTauAnalysis : public SCycleBase {
     // help function
     static Float_t deltaPhi( Float_t p1, Float_t p2 );
     static Float_t deltaR(   Float_t p1, Float_t p2 );
-    void shiftLeptonAndMET( const float shift, TLorentzVector& lep_shifted, TLorentzVector& met_shifted, bool shiftEnergy = true );
+    void shiftLeptonAndMET( const float shift, TLorentzVector& lep_shifted, TLorentzVector& met_shifted );
     void shiftMET(TLorentzVector& shift, UZH::MissingEt& met);
     
     // IDs

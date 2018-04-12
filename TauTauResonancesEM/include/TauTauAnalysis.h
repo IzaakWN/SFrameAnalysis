@@ -131,7 +131,7 @@ class TauTauAnalysis : public SCycleBase {
     Float_t deltaPhi(Float_t p1, Float_t p2);
     Float_t deltaR(Float_t p1, Float_t p2);
     void countJets(  const TLorentzVector& jet_tlv, Int_t& ncjets, Int_t& nfjets, Int_t& ncbtags, const bool isBTagged );
-    void shiftLeptonAndMET( const float shift, TLorentzVector& lep_shifted, TLorentzVector& met_shifted, bool shiftEnergy = true );
+    void shiftLeptonAndMET( const float shift, TLorentzVector& lep_shifted, TLorentzVector& met_shifted );
     void shiftMET(TLorentzVector& shift, UZH::MissingEt& met);
     
     // set tlv of generator boson for recoil corrections
@@ -201,56 +201,57 @@ class TauTauAnalysis : public SCycleBase {
     std::string m_genParticleName;      ///< name of gen particle collection in tree with reconstructed objects
   
     // XML flags for TauTauAnalysis
-    bool      m_isData;
-    bool      m_isSignal;
-    bool      m_applyMETFilters;
-    bool      m_doSVFit;
-    bool      m_doRecoilCorr;
-    bool      m_doZpt;
-    bool      m_doTTpt;
-    bool      m_doEES;
-    double    m_EESshift;
-    double    m_EESshiftEndCap;
-    bool      m_doJTF;
-    double    m_JTFshift;
-    bool      m_doJEC;
-    bool      m_doTight;
+    bool    m_isData;
+    bool    m_isSignal;
+    bool    m_applyMETFilters;
+    bool    m_doSVFit;
+    bool    m_doRecoilCorr;
+    bool    m_doZpt;
+    bool    m_doTTpt;
+    bool    m_doEES;
+    double  m_EESshift;
+    double  m_EESshiftEndCap;
+    bool    m_doJTF;
+    double  m_JTFshift;
+    bool    m_doJEC;
+    bool    m_doTight;
+    bool    m_noTight;
     
     ///
     /// CUTS
     ///
     
     // jet
-    double    m_jetPtCut;
-    double    m_jetEtaCut;
-    double    m_AK4jetPtCut;
-    double    m_AK4jetEtaCut;
-    double    m_CSVWorkingPoint;
+    double  m_jetPtCut;
+    double  m_jetEtaCut;
+    double  m_AK4jetPtCut;
+    double  m_AK4jetEtaCut;
+    double  m_CSVWorkingPoint;
     
     // b-tagging
-    double    m_csvMin;
+    double  m_csvMin;
     
     // electrons
-    double    m_electronPtCut;
-    double    m_electronEtaCut;
-    double    m_electronD0Cut;
-    double    m_electronDzCut;
-    double    m_electronIsoCut;
+    double  m_electronPtCut;
+    double  m_electronEtaCut;
+    double  m_electronD0Cut;
+    double  m_electronDzCut;
+    double  m_electronIsoCut;
     
     // muons
-    double    m_muonPtCut;
-    double    m_muonEtaCut;
-    double    m_muonD0Cut;
-    double    m_muonDzCut;
-    double    m_muonIsoCut;
+    double  m_muonPtCut;
+    double  m_muonEtaCut;
+    double  m_muonD0Cut;
+    double  m_muonDzCut;
+    double  m_muonIsoCut;
     
     // taus
-    double    m_tauPtCut;
-    double    m_tauEtaCut;
-    double    m_tauDzCut;
+    double  m_tauPtCut;
+    double  m_tauEtaCut;
+    double  m_tauDzCut;
     
     // MET
-    double    m_metCut;
+    double  m_metCut;
     
     
     std::string m_jsonName;
@@ -260,7 +261,7 @@ class TauTauAnalysis : public SCycleBase {
     std::vector<std::string> m_triggers_emu;
     std::string m_trigger_Flags;
     
-    int e_mu;
+    int   e_mu;
     
     
     
@@ -276,11 +277,11 @@ class TauTauAnalysis : public SCycleBase {
     float  b_weightbtag_;
     float  b_npu_;
     float  b_dR_ll_gen_ = -1;
-    Int_t b_isData_;
+    Int_t  b_isData_;
     
-    bool b_dilepton_veto_;
-    bool b_extraelec_veto_;
-    bool b_extramuon_veto_;
+    bool   b_dilepton_veto_;
+    bool   b_extraelec_veto_;
+    bool   b_extramuon_veto_;
     
     //double b_weightBtag;
     //double b_weightBtag_veto;
@@ -328,6 +329,7 @@ class TauTauAnalysis : public SCycleBase {
     std::map<std::string,Int_t>    b_nfjets20;
     std::map<std::string,Int_t>    b_ncjets20;
     std::map<std::string,Int_t>    b_nbtag20;
+    std::map<std::string,Int_t>    b_njets_noTau;
     std::map<std::string,Int_t>    b_nbtag_noTau;
     std::map<std::string,Int_t>    b_nbtag20_noTau;
     

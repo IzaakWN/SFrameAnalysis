@@ -64,6 +64,7 @@ OSSS_ratio          = 1.06
 
 # SAMPLES
 SFRAME              = "SFrameAnalysis_ltau2017"
+PNFS                = "root://t3dcachedb.psi.ch:1094//pnfs/psi.ch/cms/trivcat/store/user/ineuteli/analysis/SFrameAnalysis/AnalysisOutput/"
 SAMPLE_DIR          = os.path.expandvars("/scratch/ineuteli/SFrameAnalysis/AnalysisOutput")
 PLOTS_DIR           = os.path.expandvars("/shome/ineuteli/analysis/%s/plots"%SFRAME)
 DATACARDS_DIR       = "%s/%s"%(PLOTS_DIR,"datacards")
@@ -71,11 +72,13 @@ DATACARDS_DIR       = "%s/%s"%(PLOTS_DIR,"datacards")
 #### END SETTINGS ########################################################################
 
 
+# CHANNELS
 channels = [
     "mutau",
     #"etau",
 ]
 
+# LABELS
 if isinstance(doJECErrors,str): plotlabel+="_err_%s"%doJECErrors
 elif doJECErrors==True:         plotlabel+="_err"
 if not drawSignal:  plotlabel+="_noSignal"
@@ -83,6 +86,12 @@ if not doQCD:       plotlabel+="_noQCD"
 if not normalizeWJ: plotlabel+="_noWJrenormalization"
 if not normalizeTT: plotlabel+="_noTTrenormalization"
 if not normalizeWJ and "emu" not in channels: plotlabel+="_noWJrenorm"
+
+# BLIND
+blind_dict = { "m_vis":      ( 15, 70), "m_sv" :     ( 20,  80),  "dR_ll" : (  0,1.2),
+               #"pt_tt":     ( 80,200),  "pt_tt_sv":  ( 80, 200), 
+               #"R_pt_m_vis": (2.5, 10), "R_pt_m_sv": (2.0,  10),
+}
 
 # CATEGORIES / SELECTIONS
 _weight         = "weight*trigweight_or_1"
@@ -100,17 +109,13 @@ baseline_rel    = "channel>0 && %s && %s && q_1*q_2<0 && %s" % ("iso_1>0.15 && i
 baseline_emu    = "channel>0 && %s && iso_1<0.20 && iso_2<0.15 && q_1*q_2<0" % (vetos_emu)
 emu_check       = "channel>0 && njets==2 && jpt_1>30 && jpt_2>30 && pt_1>25 && pt_2>25 && abs(eta_1)<2.1 && abs(eta_2)<2.1 && iso_1<0.10 && q_1*q_2<0 && 70<m_vis&&m_vis<110" # && abs(eta_2)<2.1 # iso_1<0.15 && iso_2<0.15  && ncbtag==0
 if "emu" in channels: baseline = baseline_emu # emu
-category_bbA2   = "ncbtag > 0 && ncbtag == ncjets && nfjets == 0"
-category_bbA    = "ncbtag == 1 && ncjets == 1 && nfjets == 0" # no optimaztions
-category1       = "ncbtag > 0 && ncjets == 1 && nfjets  > 0"
-category2       = "ncbtag > 0 && ncjets == 2 && nfjets == 0 && dphi_ll_bj>2 && met<60"
-category2J      = "ncbtag > 0 && ncjets == 2 && nfjets == 0"
-category1TT0    = "ncbtag > 1 && ncjets == 2 && nfjets  > 0"
-category1TT1    = "ncbtag > 1 && ncjets  > 1 && nfjets  > 0"
-#category1TT     = "ncbtag > 1 && ncjets  > 0 && nfjets  > 0 && met>60"
-#category2TT     = "ncbtag > 0 && ncjets  > 1 && nfjets == 0 && met>60"
-category1TT     = "ncbtag > 0 && ncjets == 1 && nfjets  > 0 && met>60 && pfmt_1>60 && jpt_1 > 30 && jpt_2 > 30"
-category2TT     = "ncbtag > 0 && ncjets == 2 && nfjets == 0 && dphi_ll_bj>2 && met>60 && pfmt_1>60 && jpt_1 > 30 && jpt_2 > 30"
+category_bbA2   = "ncbtag >0 && ncbtag==ncjets && nfjets==0"
+category_bbA    = "ncbtag==1 && ncjets==1 && nfjets==0" # no optimizations
+category1       = "ncbtag>0 && ncjets==1 && nfjets >0"
+category2       = "ncbtag>0 && ncjets==2 && nfjets==0 && dphi_ll_bj>2 && met<60"
+category2J      = "ncbtag>0 && ncjets==2 && nfjets==0"
+category1TT     = "ncbtag>0 && ncjets==1 && nfjets >0 && met>60 && pfmt_1>60 && jpt_1>30 && jpt_2>30"
+category2TT     = "ncbtag>0 && ncjets==2 && nfjets==0 && dphi_ll_bj>2 && met>60 && pfmt_1>60 && jpt_1>30 && jpt_2>30"
 (metcut,mt1cut) = ("met<60","pfmt_1<60")
 if "emu" in channels: (metcut,mt1cut) = ("met<40","pfmt_1<40")
 newcuts         = "%s && %s" % (metcut,mt1cut)
@@ -150,8 +155,8 @@ selections  = [
 #     sel(">=1j",                  "%s"       % (emu_check.replace("njets==2","njets>0").replace(" && jpt_2>30",""))),
 #     sel(">0j20",                 "%s"       % (emu_check.replace("njets==2","njets20>0").replace(" && jpt_2>30",""))),
 #     sel("1j1f, |eta|<3",         "%s && %s" % (emu_check,"(abs(jeta_1)>3 || abs(jeta_2)>3)")),
-#     sel("category 1",            "%s && %s" % (baseline, category1)                              ),
-#     sel("category 2",            "%s && %s" % (baseline, category2)                              ),
+    sel("category 1",            "%s && %s" % (baseline, category1)                              ),
+    sel("category 2",            "%s && %s" % (baseline, category2)                              ),
 #     sel("category 2J",            "%s && %s" % (baseline, category2J)                              ),
 #     sel("category 2J DY CR",      "%s && %s" % (baseline, category2J.replace("btag > 0","btag==0")) ),
 #     sel("category 1 TT CR0",     "%s && %s" % (baseline, category1TT0)                           ),
@@ -178,8 +183,8 @@ selections  = [
 variables = [
 #     ##var("m_vis",                         35,   0,  70 ),
 #     ##var("m_sv",                          35,   0,  70 ),
-#     var("m_sv",                            40,   0, 160 ),
-#     var("m_vis",                           35,   0, 140 ),
+    var("m_sv",                            40,   0, 160 ),
+    var("m_vis",                           35,   0, 140 ),
 #     var("m_2",                             30,   0,   3 ),
 #     var("met",                             40,   0, 200 ),
     var("pfmt_1",                          40,   0, 200 ),
@@ -272,15 +277,34 @@ samplesB = [                                                              # cros
     ###("ST", "ST_t-channel_top_4f_inclusiveDecays",     'ST',                      0.00  ), # 
 ]
 
-samplesS = [
-    #( "LowMass", "LowMass_28GeV_DiTauResonance",      "signal",               1000.0   ),
-]
-
 samplesD = {
-    "mutau" :  ( "SingleMuon",      "SingleMuon_Run2016",     "single muon"     ),
-    "etau" :  ( "SingleElectron",   "SingleElectron_Run2016", "single electron" ),
-    "emu"   :  ( "SingleMuon",      "SingleMuon_Run2016",     "single muon"     ),
+    "mutau" :  ( "SingleMuon",      "SingleMuon_Run2016",     "single muon",     {'blind':blind_dict} ),
+    "etau"  :  ( "SingleElectron",  "SingleElectron_Run2016", "single electron", {'blind':blind_dict} ),
+    "emu"   :  ( "SingleMuon",      "SingleMuon_Run2016",     "single muon",     {'blind':blind_dict} ),
 }
+
+samplesS   = [ ]
+VLQ_bqX    = [ ]
+VLQ_bqX_MB300 = [ ]
+VLQ_bqX_MB450 = [ ]
+SUSY_bbA   = [ ]
+if 'bbA' in plotlabel or doDataCard:
+  SUSY_bbA = [(25,0.021),(30,0.0311),(35,0.04172),(40,0.0568),(45,0.07724),(50,0.09666),(55,0.11672),(60,0.1386),(65,0.157),(70,0.175),]
+  if not doDataCard:
+    SUSY_bbA = [m for m in SUSY_bbA if m[0]%10==0]
+  for mass, eff in SUSY_bbA:
+    samplesS.append(( "SUSY", "SUSYGluGluToBBa1ToTauTau_M-%d"%mass, "bbA m_{A}=%d"%mass, 1*eff, { 'upscale': 500/eff } ))
+if 'bbA' not in plotlabel or doDataCard:
+  VLQ_bqX = [(20,0.6969),(28,1),(40,0.7082),(50,0.7318),(60,0.7685),(70,0.8032)]
+  VLQ_bqX_MB300 = [(20,1.),(28,1.),(40,1.),(50,1.),(60,1.),(70,1.)]
+  VLQ_bqX_MB450 = [(20,1.),(28,1.),(40,1.),(50,1.),(60,1.),(70,1.)]
+  for mass, eff in VLQ_bqX:
+    samplesS.append(( "LowMass", "LowMassDiTau_M-%d_MB-%d"%(mass,170), "VLQ m_{B}=%d, m_{X}=%d"%(170,mass), 1*eff, { 'upscale': 500/eff } ))
+  if doDataCard:
+    for mass, eff in VLQ_bqX_MB300:
+      samplesS.append(( "LowMass", "LowMassDiTau_M-%d_MB-%d"%(mass,300), "VLQ m_{B}=%d, m_{X}=%d"%(300,mass), 1*eff ))
+    for mass, eff in VLQ_bqX_MB450:
+      samplesS.append(( "LowMass", "LowMassDiTau_M-%d_MB-%d"%(mass,450), "VLQ m_{B}=%d, m_{X}=%d"%(450,mass), 1*eff ))
 
 # SAMPLESET
 makeSFrameSamples(samplesD,samplesB,samplesS,weight=_weight,binN_weighted=8)
@@ -304,12 +328,11 @@ samplesB_TESUp, samplesB_TESDown, samplesB_EESUp, samplesB_EESDown, samplesB_JTF
 if doTES:
   samplesB_TESUp   = samples.shiftSample(['TT','ST','DY'],"_TES1p03"," +3% TES", title_veto="other")
   samplesB_TESDown = samples.shiftSample(['TT','ST','DY'],"_TES0p97"," -3% TES", title_veto="other")
+if doLTF:
+  samplesB_LTFUp   = samples.shiftSample(['TT','ST','DY'],"_LTF1p10"," +3% LTF ES", filter=not doStack, title_veto="real")
+  samplesB_LTFDown = samples.shiftSample(['TT','ST','DY'],"_LTF0p90"," -3% LTF ES", filter=not doStack, title_veto="real")
 if doJTF:
-  #samplesB_JTFUp   = samples.shiftSample(['TT','ST'],"_JTF1p15"," +15% JTF ES", filter=not doStack, title_veto="real")
-  #samplesB_JTFDown = samples.shiftSample(['TT','ST'],"_JTF0p85"," -15% JTF ES", filter=not doStack, title_veto="real")
   samplesB_JTFUp   = samples.shiftSample(['TT','ST','WJ'],"_JTF1p10"," +10% JTF ES", filter=not doStack, title_veto="real")
   samplesB_JTFDown = samples.shiftSample(['TT','ST','WJ'],"_JTF0p90"," -10% JTF ES", filter=not doStack, title_veto="real")
-  samplesB_JTFUp.printTable()
-  samplesB_JTFUp.printSampleObjects()
 
 

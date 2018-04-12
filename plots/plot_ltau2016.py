@@ -37,7 +37,7 @@ parser.add_argument( "-n", "--no-WJ-renom", dest="noWJrenorm", default=False, ac
 #                      metavar="VERBOSITY_LEVEL", help="set verbosity level to VERBOSITY_LEVEL" )
 args = parser.parse_args()
 if not args.configFile:
-    args.configFile = "PlotTools/config_emu2017.py" if args.emu else "PlotTools/config_ltau2017.py"
+    args.configFile = "PlotTools/config_emu2016.py" if args.emu else "PlotTools/config_ltau2016.py"
 
 # LOAD config
 from PlotTools.SettingTools import *
@@ -69,25 +69,19 @@ def plotStacks(samples, channel, **kwargs):
     staterror   = True
     errorbars   = (not staterror)
     data        = True
+    blind       = True
+    scaleup     = True
     ratio       = data
     
     # LOOP over SELECTIONS
     for selection in selections:
         print ">>>\n>>> " + color("_%s:_%s_" % (channel.replace(' ','_'),selection.name.replace(' ','_')), color = "magenta", bold=True)
         
-        ## RENORMALIZE WJ
-        #print ">>> "
-        #if normalizeWJ and channel!="emu":
-        #    selectionWJ = selection.selection.replace(' && pfmt_1<100',"")
-        #    LOG.header("%s: WJ renormalization" % (channel))
-        #    samples.renormalizeWJ("pfmt_1", 200, 80, 200, selectionWJ, QCD=doQCD, reset=True, verbosity=verbosityWJ)
-        #else: LOG.warning("Not WJ renormalized! (normalizeWJ=%s, user flag=%s, channel=%s)" % (normalizeWJ,args.noWJrenorm,channel))
-        #print ">>> "
-        
+        samples.renormalizeTT(selection,baseline=baseline)
         
         # LOOP over VARIABLES
         for variable in variables:
-            if not variable.plotForSelection(selection) or not selection.plotForVariable(variable):
+            if not variable.plotForSelection(selection):
               print ">>> plotStacks: ignoring %s for %s"%(variable.printWithBinning(),selection); continue
             if "restr" in selection.name and not variable.isPartOf('m_2'):
               print ">>> plotStacks: ignoting %s for %s"%(variable.printWithBinning(),selection); continue
@@ -111,8 +105,8 @@ def plotStacks(samples, channel, **kwargs):
             QCD = doQCD and ("gen_match" not in variable.name or "npu" not in variable.name)
             
             # PLOT
-            plot = samples.plotStack(variable, selection, name=name, title=title, channel=channel, QCD=QCD)
-            plot.plot(stack=stack, position=position, staterror=staterror, logy=logy, ratio=ratio, errorbars=errorbars, data=data)
+            plot = samples.plotStack(variable,selection,name=name,title=title,channel=channel,QCD=QCD)
+            plot.plot(stack=stack,position=position,staterror=staterror,logy=logy,ratio=ratio,errorbars=errorbars,data=data,blind=blind,scaleup=scaleup)
             plot.saveAs(filename)
             
             # RESET CUTS
@@ -120,7 +114,66 @@ def plotStacks(samples, channel, **kwargs):
             #    for sample in samples:
             #        if sample.isSignal: sample.scale = sample.scaleBU
             
+
+
+    #######################
+    # Measure OS/SS ratio #
+    #######################
     
+def measureOSSSratios(samples, channel, **kwargs):
+    """Measure the OS/SS ratios."""
+    print header("%s channel: Measure OS/SS ratio" % channel)
+    
+    category_bbA     = "ncbtag==1 && ncjets==1 && nfjets==0" # no optimizations
+    category_bbA2    = "ncbtag >0 && ncbtag==ncjets && nfjets==0"
+    category_bbA_rel = "ncbtag >0"
+    category1        = "ncbtag>0 && ncjets==1 && nfjets >0"
+    category2J       = "ncbtag>0 && ncjets==2 && nfjets==0"
+    category1_rel    = "ncbtag>0 && ncjets>0 && nfjets >0"
+    category2J_rel   = "ncbtag>0 && ncjets>0 && nfjets==0"
+    
+    categories      = [
+        ("baseline",                 "%s"       % (baseline)),
+        ("baseline, m_sv<50",        "%s && %s" % (baseline,"m_sv<50")),
+        ("baseline, 50<=m_sv<100",   "%s && %s" % (baseline,"50<=m_sv && m_sv<100")),
+        ("baseline, 100<=m_sv<150",  "%s && %s" % (baseline,"100<=m_sv && m_sv<150")),
+        ("baseline, 150<=m_sv",      "%s && %s" % (baseline,"150<=m_sv")),
+        ("1b1f",                     "%s && %s"       % (baseline,category1_rel)),
+        ("1b1f, m_sv<50",            "%s && %s && %s" % (baseline,category1_rel,"m_sv<50")),
+        ("1b1f, 50<=m_sv<100",       "%s && %s && %s" % (baseline,category1_rel,"50<=m_sv && m_sv<100")),
+        ("1b1f, 100<=m_sv<150",      "%s && %s && %s" % (baseline,category1_rel,"100<=m_sv && m_sv<150")),
+        ("1b1f, 150<=m_sv",          "%s && %s && %s" % (baseline,category1_rel,"150<=m_sv")),
+        ("1b1c",                     "%s && %s"       % (baseline,category2J_rel)),
+        ("1b1c, m_sv<50",            "%s && %s && %s" % (baseline,category2J_rel,"m_sv<50")),
+        ("1b1c, 50<=m_sv<100",       "%s && %s && %s" % (baseline,category2J_rel,"50<=m_sv && m_sv<100")),
+        ("1b1c, 100<=m_sv<150",      "%s && %s && %s" % (baseline,category2J_rel,"100<=m_sv && m_sv<150")),
+        ("1b1c, 150<=m_sv",          "%s && %s && %s" % (baseline,category2J_rel,"150<=m_sv")),
+        ("1 b tag + veto",                 "%s && %s"       % (baseline,category_bbA)),
+        ("1 b tag + veto, m_sv<50",        "%s && %s && %s" % (baseline,category_bbA,"m_sv<50")),
+        ("1 b tag + veto, 50<=m_sv<100",   "%s && %s && %s" % (baseline,category_bbA,"50<=m_sv && m_sv<100")),
+        ("1 b tag + veto, 100<=m_sv<150",  "%s && %s && %s" % (baseline,category_bbA,"100<=m_sv && m_sv<150")),
+        ("1 b tag + veto, 150<=m_sv",      "%s && %s && %s" % (baseline,category_bbA,"150<=m_sv")),
+        ("1 b tag",                 "%s && %s"       % (baseline,category_bbA_rel)),
+        ("1 b tag, m_sv<50",        "%s && %s && %s" % (baseline,category_bbA_rel,"m_sv<50")),
+        ("1 b tag, 50<=m_sv<100",   "%s && %s && %s" % (baseline,category_bbA_rel,"50<=m_sv && m_sv<100")),
+        ("1 b tag, 100<=m_sv<150",  "%s && %s && %s" % (baseline,category_bbA_rel,"100<=m_sv && m_sv<150")),
+        ("1 b tag, 150<=m_sv",      "%s && %s && %s" % (baseline,category_bbA_rel,"150<=m_sv")),
+    ]
+    variables0      = [ ("pfmt_1",100,0,400)]
+    verbosityOSSS   = 0 
+    
+    # LOOP over SELECTIONS
+    for label, cuts in categories:
+        print ">>>\n>>> " + color("_%s:_%s_" % (channel.replace(' ','_'),label.replace(' ','_')), color = "magenta", bold=True)
+        
+        # TT RENORMALIZATION
+        #if normalizeTT: renormalizeTT(samples, label=label, channel=channel, QCD=doQCD, verbosity=verbosityTT)        
+        
+        # LOOP over VARIABLES
+        for var, nBins, a, b in variables0:
+            samples.measureOSSSratio(var,nBins,a,b,cuts,relaxed=True,verbosity=1)
+            #samples.measureOSSSratio(var,nBins,a,b,cuts,relaxed=False,verbosity=1)
+
 
 
 
@@ -200,7 +253,7 @@ def main():
     
     # MAKE SAMPLES
     global samples, samplesB, samplesS, samplesD  
-    global samples_EESUp, samples_EESDown, samples_JTFUp, samples_JTFDown  
+    global samplesB_EESUp, samplesB_EESDown, samplesB_JTFUp, samplesB_JTFDown  
     
     # USER OPTIONS
     global channels
@@ -223,35 +276,25 @@ def main():
         if useCutTree and "emu" not in channel:
           treename = "tree_%s_cut_relaxed" % channel
         samples.setTreeName(treename)
-        if drawShifts:
-          if doTES:
-            samples_TESUp.setTreeName(treename)
-            samples_TESDown.setTreeName(treename)
-          if doEES:
-            samples_EESUp.setTreeName(treename)
-            samples_EESDown.setTreeName(treename)
-          if doJTF:
-            samples_JTFUp.setTreeName(treename)
-            samples_JTFDown.setTreeName(treename)
-          for label, samples_TESscan in sorted(samples_TESscan.iteritems()):
-            samples_TESscan.setTreeName(treename)
+        if doEES:
+          samplesB_EESUp.setTreeName(treename)
+          samplesB_EESDown.setTreeName(treename)
+        if doJTF:
+          samplesB_JTFUp.setTreeName(treename)
+          samplesB_JTFDown.setTreeName(treename)
         
         # RENORMALIZE WJ
         print ">>> "
         if normalizeWJ and "emu" not in channel:
-          LOG.header("%s: WJ renormalization" % (channel))
-          if doNominal:
-            samples.renormalizeWJ(baseline, QCD=doQCD, reset=True, verbosity=verbosityWJ)
-          if drawShifts:
+            LOG.header("%s: WJ renormalization" % (channel))
+            if doNominal:
+              samples.renormalizeWJ(baseline, QCD=doQCD, reset=True, verbosity=verbosityWJ)
             if doEES:
-              samples_EESUp.renormalizeWJ(  baseline, QCD=doQCD, reset=True, verbosity=verbosityWJ)
-              samples_EESDown.renormalizeWJ(baseline, QCD=doQCD, reset=True, verbosity=verbosityWJ)
+              samplesB_EESUp.renormalizeWJ(  baseline, QCD=doQCD, reset=True, verbosity=verbosityWJ)
+              samplesB_EESDown.renormalizeWJ(baseline, QCD=doQCD, reset=True, verbosity=verbosityWJ)
             if doJTF:
-              samples_JTFUp.renormalizeWJ(  baseline, QCD=doQCD, reset=True, verbosity=verbosityWJ)
-              samples_JTFDown.renormalizeWJ(baseline, QCD=doQCD, reset=True, verbosity=verbosityWJ)
-            #if doTESscan:
-            #  samples_TESscan['0.970'].renormalizeWJ("pfmt_1", 200, 80, 200, baseline, QCD=doQCD, reset=True, verbosity=verbosityWJ)
-            #  samples_TESscan['1.030'].renormalizeWJ("pfmt_1", 200, 80, 200, baseline, QCD=doQCD, reset=True, verbosity=verbosityWJ)
+              samplesB_JTFUp.renormalizeWJ(  baseline, QCD=doQCD, reset=True, verbosity=verbosityWJ)
+              samplesB_JTFDown.renormalizeWJ(baseline, QCD=doQCD, reset=True, verbosity=verbosityWJ)
         else: LOG.warning("Not WJ renormalized! (normalizeWJ=%s, user flag=%s, channel=%s)" % (normalizeWJ,args.noWJrenorm,channel))
         print ">>> "
         
@@ -263,19 +306,17 @@ def main():
         if doStack:
             if doNominal:
                 plotStacks(samples,         channel,DIR=DIR)
+                #measureOSSSratios(samples,channel)
             if drawShifts:
               if doEES and "emu" in channel:
-                plotStacks(samples_EESUp,  channel,DIR=DIR)
-                plotStacks(samples_EESDown,channel,DIR=DIR)
+                plotStacks(samplesB_EESUp,  channel,DIR=DIR)
+                plotStacks(samplesB_EESDown,channel,DIR=DIR)
               if doJTF:
-                plotStacks(samples_JTFUp,  channel,DIR=DIR)
-                plotStacks(samples_JTFDown,channel,DIR=DIR)
+                plotStacks(samplesB_JTFUp,  channel,DIR=DIR)
+                plotStacks(samplesB_JTFDown,channel,DIR=DIR)
               if doTES:
-                plotStacks(samples_TESUp,  channel,DIR=DIR)
-                plotStacks(samples_TESDown,channel,DIR=DIR)
-              elif doTESscan:
-                plotStacks(samples_TESscan['0.970'],channel,DIR=DIR)
-                plotStacks(samples_TESscan['1.030'],channel,DIR=DIR)
+                plotStacks(samplesB_TESUp,channel,DIR=DIR)
+                plotStacks(samplesB_TESDown,channel,DIR=DIR)
             
     
 

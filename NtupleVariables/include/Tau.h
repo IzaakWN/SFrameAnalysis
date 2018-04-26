@@ -40,10 +40,6 @@ namespace UZH {
     
     // constructor with index
     Tau( const Ntuple::TauNtupleObject* ana, const Int_t idx );
-    
-    TLorentzVector* getTLV() const;
-    TLorentzVector tlv() const;
-    
     // variable definitions
     bool m_againstElectronVLooseMVA6;
     bool m_againstElectronLooseMVA6;

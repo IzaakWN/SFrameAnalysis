@@ -40,10 +40,6 @@ namespace UZH {
     
     // constructor with index
     Electron( const Ntuple::ElectronNtupleObject* ana, const Int_t idx );
-    
-    TLorentzVector* getTLV() const;
-    TLorentzVector tlv() const;
-    
     // variable definitions
     int* m_passConversionVeto;
     floatingnumber* m_full5x5_sigmaIetaIeta;

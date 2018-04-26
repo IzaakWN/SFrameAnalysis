@@ -144,16 +144,3 @@ bool operator<<( const Muon& e1, const Muon& e2 ) {
   return sort( e1, e2 );
 }
 
-
-TLorentzVector* Muon::getTLV() const {
-  TLorentzVector* tlv = new TLorentzVector();
-  tlv->SetPtEtaPhiE(*(m_pt), *(m_eta), *(m_phi), *(m_e));
-  return tlv;
-}
-
-TLorentzVector Muon::tlv() const {
-  TLorentzVector tlv;
-  tlv.SetPtEtaPhiE(*(m_pt), *(m_eta), *(m_phi), *(m_e));
-  return tlv;
-}
-

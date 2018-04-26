@@ -43,10 +43,6 @@ namespace UZH {
     
     // constructor with index
     Muon( const Ntuple::MuonNtupleObject* ana, const Int_t idx );
-    
-    TLorentzVector* getTLV() const;
-    TLorentzVector tlv() const;
-    
     // variable definitions
     floatingnumber* m_charge;
     int* m_pdgId;

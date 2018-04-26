@@ -150,19 +150,6 @@ bool operator<<( const Jet& e1, const Jet& e2 ) {
 }
 
 
-TLorentzVector* Jet::getTLV() const {
-  TLorentzVector* tlv = new TLorentzVector();
-  tlv->SetPtEtaPhiE(*(m_pt), *(m_eta), *(m_phi), *(m_e));
-  return tlv;
-}
-
-TLorentzVector Jet::tlv() const {
-  TLorentzVector tlv;
-  tlv.SetPtEtaPhiE(*(m_pt), *(m_eta), *(m_phi), *(m_e));
-  return tlv;
-}
-
-
 floatingnumber Jet::deepCSV( ) const { return *(m_deep_csv_b)+*(m_deep_csv_bb); }
 void Jet::scaleJES( const floatingnumber ssigma ) {
   m_scalefactor = ssigma;

@@ -43,11 +43,12 @@ namespace UZH {
     
     // constructor with index
     ${Object}( const Ntuple::${Object}NtupleObject* ana, const Int_t idx );
-    ${{Only:Muon,Electron,Tau,Jet,TruthJet,GenParticle,MissingEt:
+    ${{Only:GenParticle,MissingEt:
     TLorentzVector* getTLV() const;
     TLorentzVector tlv() const;
     }}
-    ${{Only:GenParticle:floatingnumber DeltaR(const ${Object}& p) const;
+    ${{Only:GenParticle:
+    floatingnumber DeltaR(const ${Object}& p) const;
     }}
     // variable definitions
     ${{Only:Jet,TruthJet:bool m_isTagged; ///< user-level flag to indicate b-tag}}

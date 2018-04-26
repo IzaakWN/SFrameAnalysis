@@ -38,7 +38,6 @@ floatingnumber Particle::DeltaR(const Particle* p) const {
   return sqrt( deta*deta+dphi*dphi );
 }
 
-
 floatingnumber Particle::DeltaR(const Particle p) const {
   Double_t deta = *(m_eta) - p.eta();
   Double_t dphi = *(m_phi) - p.phi();
@@ -49,10 +48,7 @@ floatingnumber Particle::DeltaR(const Particle p) const {
   return sqrt( deta*deta+dphi*dphi );
 }
 
-
-ostream& operator<<( ostream& out,
-                     const Particle& rhs ) {
-
+ostream& operator<<( ostream& out, const Particle& rhs ) {
   out << " m:"   << rhs.m()
       << " e:"   << rhs.e()
       << " pt:"  << rhs.pt()
@@ -62,15 +58,25 @@ ostream& operator<<( ostream& out,
   return out;
 }
 
-
-bool sortParticlePt::operator()( const Particle& p1, 
-                                 const Particle& p2 ) {
-  return ( p1.pt() > p2.pt() ) ? true : false;
+Particle& Particle::operator*=(const floatingnumber scale) {
+  *(m_e)  *= scale;
+  *(m_m)  *= scale;
+  *(m_pt) *= scale;
+  return *this;
 }
 
+bool sortParticlePt::operator()( const Particle& p1, const Particle& p2 ) {
+  return ( p1.pt() > p2.pt() ) ? true : false;
+}
 
 TLorentzVector* Particle::getTLV() const {
   TLorentzVector* tlv = new TLorentzVector();
   tlv->SetPtEtaPhiE(*(m_pt), *(m_eta), *(m_phi), *(m_e));
+  return tlv;
+}
+
+TLorentzVector Particle::tlv() const {
+  TLorentzVector tlv;
+  tlv.SetPtEtaPhiE(*(m_pt), *(m_eta), *(m_phi), *(m_e));
   return tlv;
 }

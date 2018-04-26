@@ -233,16 +233,3 @@ bool operator<<( const Tau& e1, const Tau& e2 ) {
   return sort( e1, e2 );
 }
 
-
-TLorentzVector* Tau::getTLV() const {
-  TLorentzVector* tlv = new TLorentzVector();
-  tlv->SetPtEtaPhiE(*(m_pt), *(m_eta), *(m_phi), *(m_e));
-  return tlv;
-}
-
-TLorentzVector Tau::tlv() const {
-  TLorentzVector tlv;
-  tlv.SetPtEtaPhiE(*(m_pt), *(m_eta), *(m_phi), *(m_e));
-  return tlv;
-}
-

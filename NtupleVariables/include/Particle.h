@@ -43,6 +43,7 @@ namespace UZH {
     floatingnumber calculateE();
     
     TLorentzVector* getTLV() const;
+    TLorentzVector tlv() const;
     floatingnumber DeltaR(const Particle* p) const;
     floatingnumber DeltaR(const Particle p) const;
     
@@ -52,8 +53,10 @@ namespace UZH {
     floatingnumber* m_phi;
     floatingnumber* m_m;
     
+    Particle& operator*=(const floatingnumber scale);
+    
   };
-
+  
   inline floatingnumber Particle::e()   const { return m_e   ? *(m_e)   : 0; }
   inline floatingnumber Particle::pt()  const { return m_pt  ? *(m_pt)  : 0; }
   inline floatingnumber Particle::eta() const { return m_eta ? *(m_eta) : 0; }
@@ -62,7 +65,7 @@ namespace UZH {
   
   // sort particles by pT
   bool operator<( const Particle& p1, const Particle& p2 );
-
+  
   // function class to sort ElectronList contents first by Et
   class sortParticlePt {
   public:

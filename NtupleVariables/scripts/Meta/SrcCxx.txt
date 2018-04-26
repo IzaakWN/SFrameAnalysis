@@ -61,19 +61,6 @@ bool operator<<( const ${Object}& e1, const ${Object}& e2 ) {
   return sort( e1, e2 );
 }
 }}
-${{Only:Muon,Electron,Tau,Jet,TruthJet:
-TLorentzVector* ${Object}::getTLV() const {
-  TLorentzVector* tlv = new TLorentzVector();
-  tlv->SetPtEtaPhiE(*(m_pt), *(m_eta), *(m_phi), *(m_e));
-  return tlv;
-}
-
-TLorentzVector ${Object}::tlv() const {
-  TLorentzVector tlv;
-  tlv.SetPtEtaPhiE(*(m_pt), *(m_eta), *(m_phi), *(m_e));
-  return tlv;
-}
-}}
 ${{Only:GenParticle:
 TLorentzVector* ${Object}::getTLV() const {
   TLorentzVector* tlv = new TLorentzVector();

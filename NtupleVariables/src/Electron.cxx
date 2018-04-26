@@ -193,16 +193,3 @@ bool operator<<( const Electron& e1, const Electron& e2 ) {
   return sort( e1, e2 );
 }
 
-
-TLorentzVector* Electron::getTLV() const {
-  TLorentzVector* tlv = new TLorentzVector();
-  tlv->SetPtEtaPhiE(*(m_pt), *(m_eta), *(m_phi), *(m_e));
-  return tlv;
-}
-
-TLorentzVector Electron::tlv() const {
-  TLorentzVector tlv;
-  tlv.SetPtEtaPhiE(*(m_pt), *(m_eta), *(m_phi), *(m_e));
-  return tlv;
-}
-

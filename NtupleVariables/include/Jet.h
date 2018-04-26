@@ -40,10 +40,6 @@ namespace UZH {
     
     // constructor with index
     Jet( const Ntuple::JetNtupleObject* ana, const Int_t idx );
-    
-    TLorentzVector* getTLV() const;
-    TLorentzVector tlv() const;
-    
     // variable definitions
     bool m_isTagged; ///< user-level flag to indicate b-tag
     floatingnumber  m_scalefactor; ///< scale factor for JES shifts (0 for nominal JES)

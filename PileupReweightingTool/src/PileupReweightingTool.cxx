@@ -8,13 +8,13 @@ PileupReweightingTool::PileupReweightingTool( SCycleBase* parent, const char* na
 
 
 // initialize before event loop
-void PileupReweightingTool::BeginInputData( const SInputData& ) throw( SError ) {
+void PileupReweightingTool::BeginInputData( const SInputData&, std::string dataFileName, std::string tag ) throw( SError ) {
   
-  DeclareProperty( m_name + "_MCRootFileName",       m_MCRootFileName       = "$SFRAME_DIR/../PileupReweightingTool/histograms/MC_PileUp_Winter17_PU25ns_V2_fromMC.root" );
-  DeclareProperty( m_name + "_m_MCRootHistName",     m_MCRootHistName       = "pileup" );
-  DeclareProperty( m_name + "_DataRootFileName",     m_DataRootFileName     = "$SFRAME_DIR/../PileupReweightingTool/histograms/Data_PileUp_2017_69p2.root" );
-  DeclareProperty( m_name + "_DataRootFileName80p0", m_DataRootFileName80p0 = "$SFRAME_DIR/../PileupReweightingTool/histograms/Data_PileUp_2017_80p0.root" );
-  DeclareProperty( m_name + "_m_DataRootHistName",   m_DataRootHistName     = "pileup" );
+  DeclareProperty( m_name + "_MCRootFileName"+tag,       m_MCRootFileName       = "$SFRAME_DIR/../PileupReweightingTool/histograms/MC_PileUp_Winter17_PU25ns_V2_fromMC.root" );
+  DeclareProperty( m_name + "_MCRootHistName"+tag,       m_MCRootHistName       = "pileup" );
+  DeclareProperty( m_name + "_DataRootFileName"+tag,     m_DataRootFileName     = dataFileName );
+  //DeclareProperty( m_name + "_DataRootFileName80p0", m_DataRootFileName80p0 = "$SFRAME_DIR/../PileupReweightingTool/histograms/Data_PileUp_2017_80p0.root" );
+  DeclareProperty( m_name + "_DataRootHistName"+tag,     m_DataRootHistName     = "pileup" );
   //DeclareProperty( m_name + "_DataRootFileNameUp", m_DataRootFileNameUp = "$SFRAME_DIR/../PileupReweightingTool/histograms/Moriond17_72383.root" );
   //DeclareProperty( m_name + "_m_DataRootHistNameUp", m_DataRootHistNameUp = "pileup" );
   //DeclareProperty( m_name + "_DataRootFileNameDown", m_DataRootFileNameDown = "$SFRAME_DIR/../PileupReweightingTool/histograms/Moriond17_66156.root" );
@@ -24,8 +24,8 @@ void PileupReweightingTool::BeginInputData( const SInputData& ) throw( SError ) 
   m_logger << INFO << "MCRootHistName:        " << m_MCRootHistName       << SLogger::endmsg;
   m_logger << INFO << "DataRootFileName:      " << m_DataRootFileName     << SLogger::endmsg;
   m_logger << INFO << "DataRootHistName:      " << m_DataRootHistName     << SLogger::endmsg;
-  m_logger << INFO << "DataRootFileName80p0:  " << m_DataRootFileName80p0 << SLogger::endmsg;
-  m_logger << INFO << "DataRootHistName80p0:  " << m_DataRootHistName     << SLogger::endmsg;
+  //m_logger << INFO << "DataRootFileName80p0:  " << m_DataRootFileName80p0 << SLogger::endmsg;
+  //m_logger << INFO << "DataRootHistName80p0:  " << m_DataRootHistName     << SLogger::endmsg;
   //m_logger << INFO << "DataRootFileNameUp:    " << m_DataRootFileNameUp << SLogger::endmsg;
   //m_logger << INFO << "m_DataRootHistNameUp:    " << m_DataRootHistNameUp << SLogger::endmsg;
   //m_logger << INFO << "DataRootFileNameDown:  " << m_DataRootFileNameDown << SLogger::endmsg;
@@ -49,14 +49,14 @@ void PileupReweightingTool::BeginInputData( const SInputData& ) throw( SError ) 
   }
   else m_logger << WARNING << "‎File " << m_DataRootFileName << " does not exist. Please check." << SLogger::endmsg;
   
-  TFile* DataRootFile80p0 = new TFile(m_DataRootFileName80p0.c_str(), "READ");
-  if(DataRootFile80p0) {
-      m_DataRootHist80p0 = (TH1F*)DataRootFile80p0->Get(m_DataRootHistName.c_str());
-      if(m_DataRootHist) m_DataRootHist80p0->SetDirectory(0);
-      else m_logger << WARNING << "‎Hist " << m_DataRootHistName << " does not exist. Please check." << SLogger::endmsg;
-      DataRootFile80p0->Close();
-  }
-  else m_logger << WARNING << "‎File " << m_DataRootFileName80p0 << " does not exist. Please check." << SLogger::endmsg;
+  //TFile* DataRootFile80p0 = new TFile(m_DataRootFileName80p0.c_str(), "READ");
+  //if(DataRootFile80p0) {
+  //    m_DataRootHist80p0 = (TH1F*)DataRootFile80p0->Get(m_DataRootHistName.c_str());
+  //    if(m_DataRootHist) m_DataRootHist80p0->SetDirectory(0);
+  //    else m_logger << WARNING << "‎Hist " << m_DataRootHistName << " does not exist. Please check." << SLogger::endmsg;
+  //    DataRootFile80p0->Close();
+  //}
+  //else m_logger << WARNING << "‎File " << m_DataRootFileName80p0 << " does not exist. Please check." << SLogger::endmsg;
   
   // DataRootFileUp = new TFile(m_DataRootFileNameUp.c_str(), "READ");
   // if(DataRootFileUp) {
@@ -79,12 +79,12 @@ void PileupReweightingTool::BeginInputData( const SInputData& ) throw( SError ) 
   // Normalize to unity
   m_MCRootHist->Scale(1./m_MCRootHist->Integral());
   m_DataRootHist->Scale(1./m_DataRootHist->Integral());
-  m_DataRootHist80p0->Scale(1./m_DataRootHist80p0->Integral());
+  //m_DataRootHist80p0->Scale(1./m_DataRootHist80p0->Integral());
   //m_DataRootHistUp->Scale(1./m_DataRootHistUp->Integral());
   //m_DataRootHistDown->Scale(1./m_DataRootHistDown->Integral());
   
   if(m_MCRootHist->GetNbinsX() != m_DataRootHist->GetNbinsX()) m_logger << WARNING << "Pileup histograms binning is different" << SLogger::endmsg;
-  if(m_MCRootHist->GetNbinsX() != m_DataRootHist80p0->GetNbinsX()) m_logger << WARNING << "Pileup histograms binning is different" << SLogger::endmsg;
+  //if(m_MCRootHist->GetNbinsX() != m_DataRootHist80p0->GetNbinsX()) m_logger << WARNING << "Pileup histograms binning is different" << SLogger::endmsg;
   m_logger << INFO << "Pileup weights initialised" << SLogger::endmsg;
   
   return;
@@ -153,16 +153,16 @@ double PileupReweightingTool::getPileUpWeight(const int npu, const int sigma){
 
 
 
-double PileupReweightingTool::getPileUpWeight80p0(const int npu, const int sigma){
-  float data(1.), mc(0.);
-  data = m_DataRootHist80p0->GetBinContent(m_DataRootHist80p0->FindBin(npu));
-  mc   = m_MCRootHist->GetBinContent(m_MCRootHist->FindBin(npu));
-  
-  if(mc > 0.)
-    return data / mc;
-  
-  m_logger << WARNING << "Non-defined Pileup Weight: npu = " << npu << ", data = " << data << ", mc = " << mc << SLogger::endmsg;
-  return 1;
-}
+//double PileupReweightingTool::getPileUpWeight80p0(const int npu, const int sigma){
+//  float data(1.), mc(0.);
+//  data = m_DataRootHist80p0->GetBinContent(m_DataRootHist80p0->FindBin(npu));
+//  mc   = m_MCRootHist->GetBinContent(m_MCRootHist->FindBin(npu));
+//  
+//  if(mc > 0.)
+//    return data / mc;
+//  
+//  m_logger << WARNING << "Non-defined Pileup Weight: npu = " << npu << ", data = " << data << ", mc = " << mc << SLogger::endmsg;
+//  return 1;
+//}
 
 

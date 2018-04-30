@@ -22,10 +22,10 @@ class PileupReweightingTool : public SToolBase {
         PileupReweightingTool( SCycleBase* parent, const char* name = "PileupReweightingTool" );
         ~PileupReweightingTool() { };
         
-        void BeginInputData( const SInputData& id ) throw( SError );
+        void BeginInputData( const SInputData& id, std::string dataFileName="$SFRAME_DIR/../PileupReweightingTool/histograms/Data_PileUp_2017_69p2.root", std::string tag="" ) throw( SError );
         void drawPUWeight();
         double getPileUpWeight(const int npu, const int sigma=0);
-        double getPileUpWeight80p0(const int npu, const int sigma=0);
+        //double getPileUpWeight80p0(const int npu, const int sigma=0);
 
 
     private:
@@ -37,8 +37,8 @@ class PileupReweightingTool : public SToolBase {
         std::string m_MCRootHistName;
         std::string m_DataRootFileName;
         std::string m_DataRootHistName;
-        std::string m_DataRootFileName80p0;
-        std::string m_DataRootHistName80p0;
+        //std::string m_DataRootFileName80p0;
+        //std::string m_DataRootHistName80p0;
         std::string m_DataRootFileNameUp;
         std::string m_DataRootHistNameUp;
         std::string m_DataRootFileNameDown;
@@ -50,7 +50,7 @@ class PileupReweightingTool : public SToolBase {
         //TFile* DataRootFileDown;
         TH1F* m_MCRootHist;
         TH1F* m_DataRootHist;
-        TH1F* m_DataRootHist80p0;
+        //TH1F* m_DataRootHist80p0;
         TH1F* m_DataRootHistUp;
         TH1F* m_DataRootHistDown;
         

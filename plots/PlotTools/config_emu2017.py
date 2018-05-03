@@ -5,8 +5,9 @@
 
 # LABELS & LUMI
 globalTag   = "_2017_V2" # extra label for opening file, saving plots to dir
-plotlabel   = "_newJEC" # extra label for image file
+plottag     = ""  # extra label for image file
 luminosity  = 41.86
+year        = 2017
 
 # VERBOSITY
 verbosity               = 1
@@ -65,7 +66,7 @@ if not doShifts:
 
 # CATEGORIES / SELECTIONS
 _weight            = "genweight*puweight*trigweight_1*idisoweight_1*idisoweight_2"
-#weight_           += "*ttptweight"; plotlabel+="_ttptweight"
+#weight_           += "*ttptweight"; plottag+="_ttptweight"
 isocuts            = "iso_1<0.15 && iso_2==1" #iso_cuts==1"
 isocuts_emu        = "iso_1<0.20 && iso_2<0.15"
 vetos              = "lepton_vetos==0"

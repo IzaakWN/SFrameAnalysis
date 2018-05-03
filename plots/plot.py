@@ -29,6 +29,8 @@ parser.add_argument( "-u", "--emu", dest="emu", default=False, action='store_tru
                      help="run only for the emu channel" )
 parser.add_argument( "-l", "--list", dest="list", default=False, action='store_true',
                      help="list all available categories" )
+parser.add_argument( "-t", "--plot-tag", dest="plottag", type=str, default="", action='store',
+                     metavar="TAG", help="" )
 parser.add_argument( "-v", "--verbose", dest="verbose", default=False, action='store_true',
                      help="make script verbose" )
 parser.add_argument( "-n", "--no-WJ-renom", dest="noWJrenorm", default=False, action='store_true',
@@ -44,8 +46,9 @@ from PlotTools.SettingTools import *
 print ">>> loading configuration file %s for plot.py"%(args.configFile)
 settings, commands = loadConfigurationFromFile(args.configFile,verbose=args.verbose)
 exec settings
+plottag += args.plottag
 doStack = True; doDataCard = False
-if args.noWJrenorm: normalizeWJ = False
+normalizeWJ = normalizeWJ and not doFakeRate and not args.noWJrenorm
 loadSettings(globals(),settings,verbose=args.verbose)
 #setVerbose(args.verbose)
 exec commands
@@ -60,9 +63,9 @@ def plotStacks(samples, channel, **kwargs):
     """Plot stacked histograms with data."""
     LOG.header("%s channel: Stacks plots %s"%(channel,samples.name))
     
-    global plotlabel
+    global plottag
     DIR         = kwargs.get('DIR', "%s/%s" % (PLOTS_DIR,channel))
-    label       = plotlabel + samples.label + kwargs.get('label', "")
+    label       = plottag + samples.label + kwargs.get('label', "")
     ensureDirectory(DIR)
     
     stack       = True #and False
@@ -84,7 +87,6 @@ def plotStacks(samples, channel, **kwargs):
         #else: LOG.warning("Not WJ renormalized! (normalizeWJ=%s, user flag=%s, channel=%s)" % (normalizeWJ,args.noWJrenorm,channel))
         #print ">>> "
         
-        
         # LOOP over VARIABLES
         for variable in variables:
             if not variable.plotForSelection(selection) or not selection.plotForVariable(variable):
@@ -95,6 +97,7 @@ def plotStacks(samples, channel, **kwargs):
             # NAME
             filename = "%s/%s_%s%s.png" % (DIR,variable.filename,selection.filename,label)
             filename = makeFileName(filename)
+            saveToFile = filename.replace('.png','.root')
             
             # TITLE
             name  = variable.name
@@ -109,9 +112,10 @@ def plotStacks(samples, channel, **kwargs):
             
             # QCD
             QCD = doQCD and ("gen_match" not in variable.name or "npu" not in variable.name)
+            JFR = doFakeRate
             
             # PLOT
-            plot = samples.plotStack(variable, selection, name=name, title=title, channel=channel, QCD=QCD)
+            plot = samples.plotStack(variable, selection, name=name, title=title, channel=channel, QCD=QCD, JFR=JFR, saveToFile=saveToFile)
             plot.plot(stack=stack, position=position, staterror=staterror, logy=logy, ratio=ratio, errorbars=errorbars, data=data)
             plot.saveAs(filename)
             

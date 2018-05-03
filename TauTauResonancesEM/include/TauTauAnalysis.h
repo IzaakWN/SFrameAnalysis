@@ -179,6 +179,7 @@ class TauTauAnalysis : public SCycleBase {
     
     Root::TGoodRunsList     m_grl;
     PileupReweightingTool   m_PileupReweightingTool;
+    PileupReweightingTool   m_PileupReweightingTool_80p0;
     BTaggingScaleTool       m_BTaggingScaleTool;
     ScaleFactorTool         m_ScaleFactorTool;
     RecoilCorrectorTool     m_RecoilCorrector;
@@ -253,8 +254,9 @@ class TauTauAnalysis : public SCycleBase {
     // MET
     double  m_metCut;
     
-    
     std::string m_jsonName;
+    std::string m_dataPUFileName;
+    std::string m_dataPUFileName_80p0;
     
     // other variables needed
     std::vector<std::string> m_triggers_mutau;
@@ -431,6 +433,13 @@ class TauTauAnalysis : public SCycleBase {
     std::map<std::string,Int_t>    b_byTightIsolationMVArun2v2DBoldDMwLT_3;
     std::map<std::string,Int_t>    b_byVTightIsolationMVArun2v2DBoldDMwLT_3;
     std::map<std::string,Int_t>    b_byVVTightIsolationMVArun2v2DBoldDMwLT_3;
+    
+    std::map<std::string,Int_t>    b_byVLooseIsolationMVArun2v1DBnewDMwLT_3;
+    std::map<std::string,Int_t>    b_byLooseIsolationMVArun2v1DBnewDMwLT_3;
+    std::map<std::string,Int_t>    b_byMediumIsolationMVArun2v1DBnewDMwLT_3;
+    std::map<std::string,Int_t>    b_byTightIsolationMVArun2v1DBnewDMwLT_3;
+    std::map<std::string,Int_t>    b_byVTightIsolationMVArun2v1DBnewDMwLT_3;
+    std::map<std::string,Int_t>    b_byVVTightIsolationMVArun2v1DBnewDMwLT_3;
     
     std::map<std::string,Float_t>  b_byCombinedIsolationDeltaBetaCorrRaw3Hits_3;
     std::map<std::string,Int_t>    b_byVLooseCombinedIsolationDeltaBetaCorr3Hits_3;

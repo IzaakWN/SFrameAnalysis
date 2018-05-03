@@ -7,6 +7,7 @@
 #include "core/include/SCycleBase.h"
 
 // External include(s):
+#include "../NtupleVariables/include/Particle.h"
 #include "../NtupleVariables/include/JetNtupleObject.h"
 #include "../NtupleVariables/include/Jet.h"
 #include "../NtupleVariables/include/GenJetak4NtupleObject.h"
@@ -215,6 +216,9 @@ class TauTauAnalysis : public SCycleBase {
     
     Root::TGoodRunsList     m_grl;
     PileupReweightingTool   m_PileupReweightingTool;
+    PileupReweightingTool   m_PileupReweightingTool_80p0;
+    PileupReweightingTool   m_PileupReweightingTool_BtoE;
+    PileupReweightingTool   m_PileupReweightingTool_F;
     BTaggingScaleTool       m_BTaggingScaleTool;
     ScaleFactorTool         m_ScaleFactorTool;
     RecoilCorrectorTool     m_RecoilCorrector;
@@ -304,8 +308,11 @@ class TauTauAnalysis : public SCycleBase {
     int mu_tau;
     int ele_tau;
     std::string m_jsonName;
+    std::string m_dataPUFileName;
+    std::string m_dataPUFileName_80p0;
+    std::string m_dataPUFileName_BtoE;
+    std::string m_dataPUFileName_F;
     
-        
     std::string m_trigger_Flags;
     std::vector<std::string> m_triggers_mutau;
     std::vector<std::string> m_triggers_etau;
@@ -354,6 +361,8 @@ class TauTauAnalysis : public SCycleBase {
     std::map<std::string,Float_t>  b_genweight;
     std::map<std::string,Float_t>  b_puweight;
     std::map<std::string,Float_t>  b_puweight80p0;
+    std::map<std::string,Float_t>  b_puweightBtoE;
+    std::map<std::string,Float_t>  b_puweightF;
     std::map<std::string,Float_t>  b_weightbtag;
     std::map<std::string,Float_t>  b_zptweight;
     std::map<std::string,Float_t>  b_ttptweight;

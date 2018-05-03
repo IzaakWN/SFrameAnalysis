@@ -19,6 +19,7 @@ TauTauAnalysis::TauTauAnalysis() : SCycleBase(),
     m_puppimissingEt( this ),
     m_genParticle( this ),
     m_PileupReweightingTool( this ),
+    m_PileupReweightingTool_80p0( this ),
     m_BTaggingScaleTool( this ),
     m_ScaleFactorTool( this ),
     m_RecoilCorrector( this ),
@@ -76,6 +77,8 @@ TauTauAnalysis::TauTauAnalysis() : SCycleBase(),
   DeclareProperty( "TauDzCut",              m_tauDzCut              = 0.2               );
   
   DeclareProperty( "JSONName",              m_jsonName              = std::string(std::getenv("SFRAME_DIR"))+"/../GoodRunsLists/JSON/Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt" ); // 41.86 /fb
+  DeclareProperty( "dataPUFileName",        m_dataPUFileName        = "$SFRAME_DIR/../PileupReweightingTool/histograms/Data_PileUp_2017_69p2.root"     );
+  DeclareProperty( "dataPUFileName_80p0",   m_dataPUFileName_80p0   = "$SFRAME_DIR/../PileupReweightingTool/histograms/Data_PileUp_2017_80p0.root"     );
   
 }
 
@@ -325,7 +328,14 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
     DeclareVariable( b_byTightIsolationMVArun2v2DBoldDMwLT_3[ch],          "byTightIsolationMVArun2v2DBoldDMwLT_3",          treeName);
     DeclareVariable( b_byVTightIsolationMVArun2v2DBoldDMwLT_3[ch],         "byVTightIsolationMVArun2v2DBoldDMwLT_3",         treeName);
     DeclareVariable( b_byVVTightIsolationMVArun2v2DBoldDMwLT_3[ch],        "byVVTightIsolationMVArun2v2DBoldDMwLT_3",        treeName);
-
+    
+    DeclareVariable( b_byVLooseIsolationMVArun2v1DBnewDMwLT_3[ch],         "byVLooseIsolationMVArun2v1DBnewDMwLT_3",         treeName);
+    DeclareVariable( b_byLooseIsolationMVArun2v1DBnewDMwLT_3[ch],          "byLooseIsolationMVArun2v1DBnewDMwLT_3",          treeName);
+    DeclareVariable( b_byMediumIsolationMVArun2v1DBnewDMwLT_3[ch],         "byMediumIsolationMVArun2v1DBnewDMwLT_3",         treeName);
+    DeclareVariable( b_byTightIsolationMVArun2v1DBnewDMwLT_3[ch],          "byTightIsolationMVArun2v1DBnewMwLT_3",           treeName);
+    DeclareVariable( b_byVTightIsolationMVArun2v1DBnewDMwLT_3[ch],         "byVTightIsolationMVArun2v1DBnewDMwLT_3",         treeName);
+    DeclareVariable( b_byVVTightIsolationMVArun2v1DBnewDMwLT_3[ch],        "byVVTightIsolationMVArun2v1DBnewDMwLT_3",        treeName);
+    
     DeclareVariable( b_byCombinedIsolationDeltaBetaCorrRaw3Hits_3[ch],     "byCombinedIsolationDeltaBetaCorrRaw3Hits_3",     treeName);
     DeclareVariable( b_byVVLooseCombinedIsolationDeltaBetaCorr3Hits_3[ch], "byVVLooseCombinedIsolationDeltaBetaCorr3Hits_3", treeName);
     DeclareVariable( b_byVLooseCombinedIsolationDeltaBetaCorr3Hits_3[ch],  "byVLooseCombinedIsolationDeltaBetaCorr3Hits_3",  treeName);
@@ -507,8 +517,10 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
   //Book( TH1F("taupt_before", "taupt", 120, 0, 120 ), "checks");
   //Book( TH1F("taupt_after", "taupt", 120, 0, 120 ), "checks");
   
-  if (!m_isData) m_PileupReweightingTool.BeginInputData( id );
-  else{
+  if (!m_isData){
+    m_PileupReweightingTool.BeginInputData(      id, m_dataPUFileName               );
+    m_PileupReweightingTool_80p0.BeginInputData( id, m_dataPUFileName_80p0, "_80p0" );
+  }else{
     TObject* grl;
     if( ! ( grl = GetConfigObject( "MyGoodRunsList" ) ) ) {
       m_logger << FATAL << "Can't access the GRL!" << SLogger::endmsg;
@@ -566,7 +578,7 @@ void TauTauAnalysis::EndInputData( const SInputData& ) throw( SError ) {
 
 
 void TauTauAnalysis::BeginInputFile( const SInputData& ) throw( SError ) {
-//   std::cout << "BeginInputFile" << std::endl;
+  //std::cout << "BeginInputFile" << std::endl;
 
   m_logger << INFO << "Connecting input variables" << SLogger::endmsg;
   if (m_isData) {
@@ -652,6 +664,7 @@ void TauTauAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
   
   
   // Cut 4: lepton (muon)
+  //std::cout << ">>> ExecuteEvent - Cut 4" << std::endl;
   std::vector<UZH::Muon> goodMuons;
   for( int i = 0; i < m_muon.N; ++i ){
     UZH::Muon mymuon( &m_muon, i );
@@ -857,7 +870,7 @@ void TauTauAnalysis::FillBranches(const std::string& channel,
   b_weight[ch]      = b_weight_;
   b_genweight[ch]   = b_genweight_;
   b_puweight[ch]    = b_puweight_;
-  b_puweight80p0[ch] = m_isData ? 1.0 : m_PileupReweightingTool.getPileUpWeight80p0( b_npu_ );
+  b_puweight80p0[ch] = m_isData ? 1.0 : m_PileupReweightingTool_80p0.getPileUpWeight( b_npu_ );
   b_evt[ch]         = m_eventInfo.eventNumber;
   b_run[ch]         = m_eventInfo.runNumber;
   b_lum[ch]         = m_eventInfo.lumiBlock;
@@ -957,20 +970,26 @@ void TauTauAnalysis::FillBranches(const std::string& channel,
     b_byIsolationMVArun2v1DBoldDMwLTraw_3[ch]            = tau.byIsolationMVArun2v1DBoldDMwLTraw();
     b_byIsolationMVArun2v2DBoldDMwLTraw_3[ch]            = tau.byIsolationMVArun2v2DBoldDMwLTraw();
     b_byIsolationMVArun2v1DBnewDMwLTraw_3[ch]            = tau.byIsolationMVArun2v1DBnewDMwLTraw();
-    b_byVLooseIsolationMVArun2v1DBoldDMwLT_3[ch]         = tau.byVLooseIsolationMVArun2v1DBoldDMwLT();
+    b_byCombinedIsolationDeltaBetaCorrRaw3Hits_3[ch]     = tau.byCombinedIsolationDeltaBetaCorrRaw3Hits();
+    b_byVLooseIsolationMVArun2v1DBoldDMwLT_3[ch]         = tau.byVLooseIsolationMVArun2v1DBoldDMwLT();  // MVArun2v1DBold
     b_byLooseIsolationMVArun2v1DBoldDMwLT_3[ch]          = tau.byLooseIsolationMVArun2v1DBoldDMwLT();
     b_byMediumIsolationMVArun2v1DBoldDMwLT_3[ch]         = tau.byMediumIsolationMVArun2v1DBoldDMwLT();
     b_byTightIsolationMVArun2v1DBoldDMwLT_3[ch]          = tau.byTightIsolationMVArun2v1DBoldDMwLT();
     b_byVTightIsolationMVArun2v1DBoldDMwLT_3[ch]         = tau.byVTightIsolationMVArun2v1DBoldDMwLT();
     b_byVVTightIsolationMVArun2v1DBoldDMwLT_3[ch]        = tau.byVVTightIsolationMVArun2v1DBoldDMwLT();
-    b_byVLooseIsolationMVArun2v2DBoldDMwLT_3[ch]         = tau.byVLooseIsolationMVArun2v2DBoldDMwLT();
+    b_byVLooseIsolationMVArun2v2DBoldDMwLT_3[ch]         = tau.byVLooseIsolationMVArun2v2DBoldDMwLT();  // MVArun2v2DBold
     b_byLooseIsolationMVArun2v2DBoldDMwLT_3[ch]          = tau.byLooseIsolationMVArun2v2DBoldDMwLT();
     b_byMediumIsolationMVArun2v2DBoldDMwLT_3[ch]         = tau.byMediumIsolationMVArun2v2DBoldDMwLT();
     b_byTightIsolationMVArun2v2DBoldDMwLT_3[ch]          = tau.byTightIsolationMVArun2v2DBoldDMwLT();
     b_byVTightIsolationMVArun2v2DBoldDMwLT_3[ch]         = tau.byVTightIsolationMVArun2v2DBoldDMwLT();
     b_byVVTightIsolationMVArun2v2DBoldDMwLT_3[ch]        = tau.byVVTightIsolationMVArun2v2DBoldDMwLT();
-    b_byCombinedIsolationDeltaBetaCorrRaw3Hits_3[ch]     = tau.byCombinedIsolationDeltaBetaCorrRaw3Hits();
-    b_byVVLooseCombinedIsolationDeltaBetaCorr3Hits_3[ch] = tau.byCombinedIsolationDeltaBetaCorrRaw3Hits()<4.5;
+    b_byVLooseIsolationMVArun2v1DBnewDMwLT_3[ch]         = tau.byVLooseIsolationMVArun2v1DBnewDMwLT();  // MVArun2v1DBnew
+    b_byLooseIsolationMVArun2v1DBnewDMwLT_3[ch]          = tau.byLooseIsolationMVArun2v1DBnewDMwLT();
+    b_byMediumIsolationMVArun2v1DBnewDMwLT_3[ch]         = tau.byMediumIsolationMVArun2v1DBnewDMwLT();
+    b_byTightIsolationMVArun2v1DBnewDMwLT_3[ch]          = tau.byTightIsolationMVArun2v1DBnewDMwLT();
+    b_byVTightIsolationMVArun2v1DBnewDMwLT_3[ch]         = tau.byVTightIsolationMVArun2v1DBnewDMwLT();
+    b_byVVTightIsolationMVArun2v1DBnewDMwLT_3[ch]        = tau.byVVTightIsolationMVArun2v1DBnewDMwLT();
+    b_byVVLooseCombinedIsolationDeltaBetaCorr3Hits_3[ch] = tau.byCombinedIsolationDeltaBetaCorrRaw3Hits()<4.5; // DeltaBetaCorr
     b_byVLooseCombinedIsolationDeltaBetaCorr3Hits_3[ch]  = tau.byCombinedIsolationDeltaBetaCorrRaw3Hits()<3.5;
     b_byLooseCombinedIsolationDeltaBetaCorr3Hits_3[ch]   = tau.byLooseCombinedIsolationDeltaBetaCorr3Hits();
     b_byMediumCombinedIsolationDeltaBetaCorr3Hits_3[ch]  = tau.byMediumCombinedIsolationDeltaBetaCorr3Hits();
@@ -1025,8 +1044,7 @@ void TauTauAnalysis::FillBranches(const std::string& channel,
       b_hasSecondaryVertex_3[ch]                         = -9;
       b_decayDistMag_3[ch]                               = -9;
       b_flightLengthSig_3[ch]                            = -9;
-  }
-    
+    }
   }else{
     b_pt_3[ch]                                           = -9;
     b_eta_3[ch]                                          = -9;
@@ -1047,6 +1065,12 @@ void TauTauAnalysis::FillBranches(const std::string& channel,
     b_byTightIsolationMVArun2v2DBoldDMwLT_3[ch]          = -9;
     b_byVTightIsolationMVArun2v2DBoldDMwLT_3[ch]         = -9;
     b_byVVTightIsolationMVArun2v2DBoldDMwLT_3[ch]        = -9;
+    b_byVLooseIsolationMVArun2v1DBnewDMwLT_3[ch]         = -9;
+    b_byLooseIsolationMVArun2v1DBnewDMwLT_3[ch]          = -9;
+    b_byMediumIsolationMVArun2v1DBnewDMwLT_3[ch]         = -9;
+    b_byTightIsolationMVArun2v1DBnewDMwLT_3[ch]          = -9;
+    b_byVTightIsolationMVArun2v1DBnewDMwLT_3[ch]         = -9;
+    b_byVVTightIsolationMVArun2v1DBnewDMwLT_3[ch]        = -9;
     b_byCombinedIsolationDeltaBetaCorrRaw3Hits_3[ch]     = -9;
     b_byVVLooseCombinedIsolationDeltaBetaCorr3Hits_3[ch] = -9;
     b_byVLooseCombinedIsolationDeltaBetaCorr3Hits_3[ch]  = -9;

@@ -1209,7 +1209,7 @@ void TauTauAnalysis::FillBranches(const std::string& channel,
   TVector3 zetaAxis = (leg1.Unit() + leg2.Unit()).Unit();
   b_pzetamiss[ch]   = metleg*zetaAxis;
   b_pzetavis[ch]    = leg1*zetaAxis + leg2*zetaAxis;
-  b_dzeta[ch]       = b_pzetamiss[ch] - 0.5*b_pzetavis[ch];
+  b_dzeta[ch]       = b_pzetamiss[ch] - 0.85*b_pzetavis[ch];
   
   if(m_doJEC){ // no need to substract shifts from met, use shifts available in ntuple instead:
     TLorentzVector met_jes, met_jesUp, met_jesDown, met_jerUp, met_jerDown, met_UncEnUp, met_UncEnDown;

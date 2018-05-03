@@ -17,8 +17,8 @@ description = """This script make plots."""
 parser = ArgumentParser(prog="plotter",description=description,epilog="Succes!")
 parser.add_argument( "-i", "--config", dest="configFile", type=str, default="", action='store',
                      metavar="CONFIG_FILE", help="name of config file containing the settings, samples, selections and variables" )
-parser.add_argument( "-s", "--category", dest="category", type=int, default=-1, action='store',
-                     metavar="CATEGORY", help="run only for this category of selection and cuts" )
+parser.add_argument( "-o", "--obs",    dest="obs", nargs='*', type=str, default=[], action='store',
+                     metavar="MASS",   help="name of mass observable" )
 parser.add_argument( "-c", "--channel", dest="channel", default="", action='store',
                      metavar="CHANNEL", help="run only for this channel" )
 parser.add_argument( "-e", "--etau", dest="etau", default=False, action='store_true',
@@ -40,8 +40,8 @@ from PlotTools.SettingTools import *
 print ">>> loading configuration file %s for plot.py"%(args.configFile)
 settings, commands = loadConfigurationFromFile(args.configFile,verbose=args.verbose)
 exec settings
-doStack = False; doDataCard = True
-if args.noWJrenorm: normalizeWJ = False
+doStack = False; doDatacard = True
+normalizeWJ = normalizeWJ and not doFakeRate and not args.noWJrenorm
 loadSettings(globals(),settings,verbose=args.verbose)
 exec commands
 
@@ -91,7 +91,7 @@ def writeDataCardHistograms(sampleset, channel, var, binWidth, a, b, **kwargs):
     
     verbosity   = kwargs.get('verbosity',   0               )
     filter      = kwargs.get('filter',      [ ]             )
-    process     = kwargs.get('process',     "ttbar"         )
+    process     = kwargs.get('process',     "ztt"           )
     analysis    = kwargs.get('analysis',    "tes"           )
     DIR         = kwargs.get('DIR',         DATACARDS_DIR   )
     recreate    = kwargs.get('recreate',    False           )
@@ -115,34 +115,32 @@ def writeDataCardHistograms(sampleset, channel, var, binWidth, a, b, **kwargs):
     extraweight = ""
     
     # SELECTIONS
+    #ZTTregion   = { }
     iso1        = "iso_1<0.15"
     iso2        = "iso_2==1"
     vetos       = "lepton_vetos==0"
     baselineNDM = "%s && %s && %s && q_1*q_2<0" % (iso1,iso2,vetos)
     baseline    = "%s && %s && %s && q_1*q_2<0 && decayMode_2<11" % (iso1,iso2,vetos)
-    ZTTregion   = "pfmt_1<40 && 45<m_vis && m_vis<85 && pt_2>30 && dzeta>-25"
-    ZTTregion2  = "pfmt_1<50 && 40<m_vis && m_vis<90 && dzeta>-30"
-    ZTTregion3  = "pfmt_1<50"
-    ZTTregion4  = "pfmt_1<50 && dzeta>-30"
-    #label += "_ZTTregion"
+    #label += "_ZTTregion";  ZTTregion = "pfmt_1<40 && 45<m_vis && m_vis<85 && pt_2>30 && dzeta>-25"
+    label += "_ZTTregion_0p10"; ZTTregion = "pfmt_1<40 && 45<m_vis && m_vis<85 && pt_2>30 && dzeta>-25"
+    #label += "_ZTTregion2"; ZTTregion = "pfmt_1<50 && 40<m_vis && m_vis<90 && dzeta>-30"
+    #label += "_mtlt50";     ZTTregion = "pfmt_1<50"
+    #label += "_mtlt50_0p10"; ZTTregion = "pfmt_1<50"
+    #label += "_mtlt50_0photon"; ZTTregion = "pfmt_1<50 && nPhoton_2==0"
     
     selectionsDC = [
-      ('DM0',    "%s && %s && %s"%(baselineNDM,ZTTregion3,"decayMode_2==0")   ),
-      ('DM1',    "%s && %s && %s"%(baselineNDM,ZTTregion3,"decayMode_2==1")   ),
-      ('DM10',   "%s && %s && %s"%(baselineNDM,ZTTregion3,"decayMode_2==10")  ),
+      ('DM0',    "%s && %s && %s"%(baselineNDM,ZTTregion,"decayMode_2==0")   ),
+      ('DM1',    "%s && %s && %s"%(baselineNDM,ZTTregion,"decayMode_2==1")   ),
+      ('DM10',   "%s && %s && %s"%(baselineNDM,ZTTregion,"decayMode_2==10")  ),
       #('DM11',  "%s && %s && %s"%(baselineNDM,ZTTregion,"decayMode_2==11")  ),
       #('all',   "%s && %s && %s"%(baselineNDM,ZTTregion,"decayMode_2<11")   ),
     ]
     
     # RESTRICT
     if 'm_2' in var:
-      label += "_restr3"
-      selectionsDC = [(n,s+(" && 0.90<m_2 && m_2<1.30" if 'DM10' in n else
-                            " && 0.35<m_2 && m_2<1.20" if 'DM1'  in n else "")) for n, s in selectionsDC ]
-    elif 'm_vis' in var:
-      label += "_restr3"
-      selectionsDC = [(n,s+(" && 0.90<m_2 && m_2<1.30" if 'DM10' in n else
-                            " && 0.35<m_2 && m_2<1.20" if 'DM1'  in n else "")) for n, s in selectionsDC ]
+      selectionsDC = [(n,s+(" && 0.85<m_2 && m_2<1.35" if 'DM10' in n else
+                            " && 0.35<m_2 && m_2<1.20" if 'DM1'  in n else
+                            " && %s<%s && %s<%s"%(a,var,var,b))) for n, s in selectionsDC ]
     
     # MEASUREMENT
     if var=="m_2": selectionsDC = [s for s in selectionsDC if s[0]!="DM0"]
@@ -212,7 +210,7 @@ def writeDataCardHistograms(sampleset, channel, var, binWidth, a, b, **kwargs):
         else: samples_dict.pop(key,None)
     
     # PRINT
-    if verbosity>0 or not doShift:
+    if verbosity>0 or not doShift or JES or JER or UncEn:
       print ">>> selections:"
       for cutname, cut in selectionsDC:
         print ">>>   %-18s %s"%(cutname,cut)
@@ -254,6 +252,11 @@ def writeDataCardHistograms(sampleset, channel, var, binWidth, a, b, **kwargs):
         sampleset.refreshMemory()
         (dir,dirname) = makeDataCardTDir(outfile,category)
         
+        # WRITE selection string
+        if recreate:
+          canvas, pave = canvasWithText(selection,title=category)
+          canvas.Write("selection")
+        
         # LOOP over SAMPLES
         for samplename in sorted(samples_dict):
             if not samples_dict[samplename]: continue
@@ -273,7 +276,7 @@ def writeDataCardHistograms(sampleset, channel, var, binWidth, a, b, **kwargs):
                 
                 # SETUP NAMES
                 name = subsample+su_label
-                cuts = combineCuts(selection,extracuts,"%s<%s && %s<%s"%(a,var,var,b))
+                cuts = combineCuts(selection,extracuts)
                 
                 # MAKE HIST
                 hist = None
@@ -294,8 +297,9 @@ def writeDataCardHistograms(sampleset, channel, var, binWidth, a, b, **kwargs):
                 else:
                   hist = sample.hist(var,nBins,a,b,cuts,name=name,weight=extraweight,verbosity=0)
                   hist.SetOption("E0" if sample.isData else "EHIST")
+                
                 hist.GetXaxis().SetTitle(var)
-                hist.SetLineColor(hist.GetFillColor())
+                hist.SetLineColor(kBlack if 'data' in name else hist.GetFillColor())
                 hist.SetFillColor(0)
                 
                 for i, bin in enumerate(hist):
@@ -341,20 +345,6 @@ def makeDataCardTDir(outfile, category):
     
 
 
-
-
-    ##################
-    # Help functions #
-    ##################
-
-def ensureDirectory(DIR):
-    """Make directory if it does not exist."""
-    if not os.path.exists(DIR):
-        os.makedirs(DIR)
-        print ">>> made directory " + DIR
-    
-
-    
     ########
     # main #
     ########
@@ -413,38 +403,39 @@ def main():
         
         # MAIN ROUTINES
         LOG.header("%s channel: Writing histogram for datacards" % channel)
-        keys = [ ("ztt","tes","m_2",0.04,0,3),
+        keys = [ ("ztt","tes","m_2",0.10,0.2,2),
                  #("ztt","tes","m_vis",5,0,200),
                  #("ztt","tes","m_vis",8,0,200),
         ]
+        if args.obs: keys = [k for k in keys if any(o in k[2] for o in args.obs)]
         for process, analysis, var, width, a, b in keys:
             kwargs = { 'process': process, 'analysis': analysis }
             #if doNominal:
             writeDataCardHistograms(samples,              channel, var, width, a, b, recreate=True, **kwargs )
-            #if doJTF:
-            #    writeDataCardHistograms(samples_JTFUp,    channel, var, width, a, b, JTF='Up',   filter=['TT','ST','WJ'],  **kwargs )
-            #    writeDataCardHistograms(samples_JTFDown,  channel, var, width, a, b, JTF='Down', filter=['TT','ST','WJ'],  **kwargs )
-            #if doJEC:
-            #    writeDataCardHistograms(samples,          channel, var, width, a, b, JES='Up',   **kwargs )
-            #    writeDataCardHistograms(samples,          channel, var, width, a, b, JES='Down', **kwargs )
-            #if doJER:
-            #    writeDataCardHistograms(samples,          channel, var, width, a, b, JER='Up',   **kwargs )
-            #    writeDataCardHistograms(samples,          channel, var, width, a, b, JER='Down', **kwargs )
-            #if doUncEn:
-            #    writeDataCardHistograms(samples,          channel, var, width, a, b, UncEn='Up',   **kwargs )
-            #    writeDataCardHistograms(samples,          channel, var, width, a, b, UncEn='Down', **kwargs )
+            if doJTF:
+                writeDataCardHistograms(samples_JTFUp,    channel, var, width, a, b, JTF='Up',   filter=['TT','DY','ST','WJ','QCD'],  **kwargs )
+                writeDataCardHistograms(samples_JTFDown,  channel, var, width, a, b, JTF='Down', filter=['TT','DY','ST','WJ','QCD'],  **kwargs )
+            if doJEC:
+                writeDataCardHistograms(samples,          channel, var, width, a, b, JES='Up',   **kwargs )
+                writeDataCardHistograms(samples,          channel, var, width, a, b, JES='Down', **kwargs )
+            if doJER:
+                writeDataCardHistograms(samples,          channel, var, width, a, b, JER='Up',   **kwargs )
+                writeDataCardHistograms(samples,          channel, var, width, a, b, JER='Down', **kwargs )
+            if doUncEn:
+                writeDataCardHistograms(samples,          channel, var, width, a, b, UncEn='Up',   **kwargs )
+                writeDataCardHistograms(samples,          channel, var, width, a, b, UncEn='Down', **kwargs )
             if doTESscan:
               for label, set in sorted(samples_TESscan.iteritems()):
                 writeDataCardHistograms(set,              channel, var, width, a, b, TESscan=label, filter=['DY',], **kwargs ) #'QCD'
-                #if doJEC:
-                #  writeDataCardHistograms(set,            channel, var, width, a, b, TESscan=label, filter=['DY','QCD'], JES='Up',   **kwargs )
-                #  writeDataCardHistograms(set,            channel, var, width, a, b, TESscan=label, filter=['DY','QCD'], JES='Down', **kwargs )
-                #if doJER:
-                #  writeDataCardHistograms(set,            channel, var, width, a, b, TESscan=label, filter=['DY','QCD'], JER='Up',   **kwargs )
-                #  writeDataCardHistograms(set,            channel, var, width, a, b, TESscan=label, filter=['DY','QCD'], JER='Down', **kwargs )
-                #if doUncEn:
-                #  writeDataCardHistograms(samples,        channel, var, width, a, b, TESscan=label, filter=['DY','QCD'], UncEn='Up',   **kwargs )
-                #  writeDataCardHistograms(samples,        channel, var, width, a, b, TESscan=label, filter=['DY','QCD'], UncEn='Down', **kwargs )
+                if doJEC:
+                  writeDataCardHistograms(set,            channel, var, width, a, b, TESscan=label, filter=['DY',], JES='Up',   **kwargs )
+                  writeDataCardHistograms(set,            channel, var, width, a, b, TESscan=label, filter=['DY',], JES='Down', **kwargs )
+                if doJER:
+                  writeDataCardHistograms(set,            channel, var, width, a, b, TESscan=label, filter=['DY',], JER='Up',   **kwargs )
+                  writeDataCardHistograms(set,            channel, var, width, a, b, TESscan=label, filter=['DY',], JER='Down', **kwargs )
+                if doUncEn:
+                  writeDataCardHistograms(samples,        channel, var, width, a, b, TESscan=label, filter=['DY',], UncEn='Up',   **kwargs )
+                  writeDataCardHistograms(samples,        channel, var, width, a, b, TESscan=label, filter=['DY',], UncEn='Down', **kwargs )
                 set.reloadFiles()
             ###if doZpt:
             ###    writeDataCardHistograms(samples_ZptDown,    channel, var, width, a, b, Zpt="Down", filter=["DY"], **kwargs )

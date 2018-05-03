@@ -8,7 +8,7 @@ import os, sys, time
 import copy
 from math import sqrt, pow, floor, ceil
 import ROOT
-from ROOT import TFile, TH1D, THStack, gDirectory, kAzure, kGreen, kRed
+from ROOT import TFile, TH1D, THStack, TPaveText, TString, gDirectory, kAzure, kGreen, kRed
 # from PlotTools import *
 ROOT.gROOT.SetBatch(ROOT.kTRUE)
 
@@ -17,8 +17,8 @@ description = """This script make plots."""
 parser = ArgumentParser(prog="plotter",description=description,epilog="Succes!")
 parser.add_argument( "-i", "--config", dest="configFile", type=str, default="", action='store',
                      metavar="CONFIG_FILE", help="name of config file containing the settings, samples, selections and variables" )
-parser.add_argument( "-s", "--category", dest="category", type=int, default=-1, action='store',
-                     metavar="CATEGORY", help="run only for this category of selection and cuts" )
+parser.add_argument( "-o", "--obs",    dest="obs", nargs='*', type=str, default=[], action='store',
+                     metavar="MASS",   help="name of mass observable" )
 parser.add_argument( "-c", "--channel", dest="channel", default="", action='store',
                      metavar="CHANNEL", help="run only for this channel" )
 parser.add_argument( "-e", "--etau", dest="etau", default=False, action='store_true',
@@ -42,8 +42,8 @@ from PlotTools.SettingTools import *
 print ">>> loading configuration file %s for plot.py"%(args.configFile)
 settings, commands = loadConfigurationFromFile(args.configFile,verbose=args.verbose)
 exec settings
-doStack = False; doDataCard = True; doTESscan = False
-if args.noWJrenorm: normalizeWJ = False
+doStack = False; doDatacard = True; doTESscan = False; doFakeRate = False
+normalizeWJ = normalizeWJ and not args.noWJrenorm
 loadSettings(globals(),settings,verbose=args.verbose)
 exec commands
 
@@ -93,7 +93,7 @@ def writeDataCardHistograms(sampleset, channel, var, binWidth, a, b, **kwargs):
     
     verbosity   = kwargs.get('verbosity',   0               )
     filter      = kwargs.get('filter',      [ ]             )
-    process     = kwargs.get('process',     "ztt"           )
+    process     = kwargs.get('process',     "ttbar"         )
     analysis    = kwargs.get('analysis',    "tid"           )
     DIR         = kwargs.get('DIR',         DATACARDS_DIR   )
     recreate    = kwargs.get('recreate',    False           )
@@ -126,44 +126,128 @@ def writeDataCardHistograms(sampleset, channel, var, binWidth, a, b, **kwargs):
       iso1      = "iso_1<0.20 && iso_2<0.15"
       baseline  = "%s && %s && q_1*q_2<0 && decayMode_3<11" % (iso1,vetos)
     
+    selectionsDC = [ ] 
+    
+    #if "emu" not in channel:
+    #  tauID = {
+    #    ('','iso_2_%s'):                                     [ 'vloose', 'loose', 'medium', 'tight', 'vtight', 'vvtight' ],
+    #    ('MVAOldV2','by%sIsolationMVArun2v1DBoldDMwLT_2'):   [ 'VLoose', 'Loose', 'Medium', 'Tight', 'VTight', 'VVTight' ],
+    #    ('MVANewV2','by%sIsolationMVArun2v2DBoldDMwLT_2'):   [ 'VLoose', 'Loose', 'Medium', 'Tight', 'VTight', 'VVTight' ],
+    #    ('cut','by%sCombinedIsolationDeltaBetaCorr3Hits_2'): [ 'VVLoose', 'VLoose', 'Loose', 'Medium', 'Tight' ],
+    #  }
+    #  for (key,ID), WPs in tauID.iteritems():
+    #    for WP in WPs:
+    #      dirnameP = '-'.join(filter(None,['pass',key,WP.lower()]))
+    #      dirnameF = '-'.join(filter(None,['fail',key,WP.lower()]))
+    #      wpvar    = ID%WP
+    #      selectionsDC.append((dirnameP,"%s && %s && q_1*q_2<0 && %s==1"%(iso1,vetos,"nbtag>0",wpvar)))
+    #      selectionsDC.append((dirnameF,"%s && %s && q_1*q_2<0 && %s!=1"%(iso1,vetos,"nbtag>0",wpvar)))
+    
     selectionsDC = [
       ### MVA-based V1 ###
-      ("pass-vloose",   "%s && %s && %s && q_1*q_2<0"%(iso1,vetos,"nbtag>0 && iso_2_vloose==1")  ),
-      ("fail-vloose",   "%s && %s && %s && q_1*q_2<0"%(iso1,vetos,"nbtag>0 && iso_2_vloose!=1")  ),
-      ("pass-loose",    "%s && %s && %s && q_1*q_2<0"%(iso1,vetos,"nbtag>0 && iso_2_loose==1")   ),
-      ("fail-loose",    "%s && %s && %s && q_1*q_2<0"%(iso1,vetos,"nbtag>0 && iso_2_loose!=1")   ),
-      ("pass-medium",   "%s && %s && %s && q_1*q_2<0"%(iso1,vetos,"nbtag>0 && iso_2_medium==1")  ),
-      ("fail-medium",   "%s && %s && %s && q_1*q_2<0"%(iso1,vetos,"nbtag>0 && iso_2_medium!=1")  ),
-      ("pass-tight",    "%s && %s && %s && q_1*q_2<0"%(iso1,vetos,"nbtag>0 && iso_2==1")         ),
-      ("fail-tight",    "%s && %s && %s && q_1*q_2<0"%(iso1,vetos,"nbtag>0 && iso_2!=1")         ),
-      ("pass-vtight",   "%s && %s && %s && q_1*q_2<0"%(iso1,vetos,"nbtag>0 && iso_2_vtight==1")  ),
-      ("fail-vtight",   "%s && %s && %s && q_1*q_2<0"%(iso1,vetos,"nbtag>0 && iso_2_vtight!=1")  ),
-      ("pass-vvtight",  "%s && %s && %s && q_1*q_2<0"%(iso1,vetos,"nbtag>0 && iso_2_vvtight==1") ),
-      ("fail-vvtight",  "%s && %s && %s && q_1*q_2<0"%(iso1,vetos,"nbtag>0 && iso_2_vvtight!=1") ),
+      ("pass-vloose",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && iso_2_vloose==1"  )),
+      ("fail-vloose",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && iso_2_vloose!=1"  )),
+      ("pass-loose",    "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && iso_2_loose==1"   )),
+      ("fail-loose",    "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && iso_2_loose!=1"   )),
+      ("pass-medium",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && iso_2_medium==1"  )),
+      ("fail-medium",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && iso_2_medium!=1"  )),
+      ("pass-tight",    "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && iso_2==1"         )),
+      ("fail-tight",    "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && iso_2!=1"         )),
+      ("pass-vtight",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && iso_2_vtight==1"  )),
+      ("fail-vtight",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && iso_2_vtight!=1"  )),
+      ("pass-vvtight",  "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && iso_2_vvtight==1" )),
+      ("fail-vvtight",  "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && iso_2_vvtight!=1" )),
+      ### MVA-based V2 ###
+      ("pass-MVAOldV2-vloose",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && byVLooseIsolationMVArun2v2DBoldDMwLT_2==1"  )),
+      ("fail-MVAOldV2-vloose",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && byVLooseIsolationMVArun2v2DBoldDMwLT_2!=1"  )),
+      ("pass-MVAOldV2-loose",    "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && byLooseIsolationMVArun2v2DBoldDMwLT_2==1"   )),
+      ("fail-MVAOldV2-loose",    "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && byLooseIsolationMVArun2v2DBoldDMwLT_2!=1"   )),
+      ("pass-MVAOldV2-medium",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && byMediumIsolationMVArun2v2DBoldDMwLT_2==1"  )),
+      ("fail-MVAOldV2-medium",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && byMediumIsolationMVArun2v2DBoldDMwLT_2!=1"  )),
+      ("pass-MVAOldV2-tight",    "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && byTightIsolationMVArun2v2DBoldDMwLT_2==1"   )),
+      ("fail-MVAOldV2-tight",    "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && byTightIsolationMVArun2v2DBoldDMwLT_2!=1"   )),
+      ("pass-MVAOldV2-vtight",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && byVTightIsolationMVArun2v2DBoldDMwLT_2==1"  )),
+      ("fail-MVAOldV2-vtight",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && byVTightIsolationMVArun2v2DBoldDMwLT_2!=1"  )),
+      ("pass-MVAOldV2-vvtight",  "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && byVVTightIsolationMVArun2v2DBoldDMwLT_2==1" )),
+      ("fail-MVAOldV2-vvtight",  "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && byVVTightIsolationMVArun2v2DBoldDMwLT_2!=1" )),
+      ### MVA-based V2 new DMs ###
+      ("pass-MVANewV2-vloose",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && byVLooseIsolationMVArun2v1DBnewDMwLT_2==1"  )),
+      ("fail-MVANewV2-vloose",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && byVLooseIsolationMVArun2v1DBnewDMwLT_2!=1"  )),
+      ("pass-MVANewV2-loose",    "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && byLooseIsolationMVArun2v1DBnewDMwLT_2==1"   )),
+      ("fail-MVANewV2-loose",    "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && byLooseIsolationMVArun2v1DBnewDMwLT_2!=1"   )),
+      ("pass-MVANewV2-medium",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && byMediumIsolationMVArun2v1DBnewDMwLT_2==1"  )),
+      ("fail-MVANewV2-medium",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && byMediumIsolationMVArun2v1DBnewDMwLT_2!=1"  )),
+      ("pass-MVANewV2-tight",    "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && byTightIsolationMVArun2v1DBnewDMwLT_2==1"   )),
+      ("fail-MVANewV2-tight",    "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && byTightIsolationMVArun2v1DBnewDMwLT_2!=1"   )),
+      ("pass-MVANewV2-vtight",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && byVTightIsolationMVArun2v1DBnewDMwLT_2==1"  )),
+      ("fail-MVANewV2-vtight",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && byVTightIsolationMVArun2v1DBnewDMwLT_2!=1"  )),
+      ("pass-MVANewV2-vvtight",  "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && byVVTightIsolationMVArun2v1DBnewDMwLT_2==1" )),
+      ("fail-MVANewV2-vvtight",  "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && byVVTightIsolationMVArun2v1DBnewDMwLT_2!=1" )),
       ### CUT-based ###
-      #("pass-cut-loose",  "%s && %s && %s && q_1*q_2<0"%(iso1,vetos,"nbtag>0 && byLooseCombinedIsolationDeltaBetaCorr3Hits_2==1")   ),
-      #("fail-cut-loose",  "%s && %s && %s && q_1*q_2<0"%(iso1,vetos,"nbtag>0 && byLooseCombinedIsolationDeltaBetaCorr3Hits_2!=1")   ),
-      #("pass-cut-medium", "%s && %s && %s && q_1*q_2<0"%(iso1,vetos,"nbtag>0 && byMediumCombinedIsolationDeltaBetaCorr3Hits_2==1")  ),
-      #("fail-cut-medium", "%s && %s && %s && q_1*q_2<0"%(iso1,vetos,"nbtag>0 && byMediumCombinedIsolationDeltaBetaCorr3Hits_2!=1")  ),
-      #("pass-cut-tight",  "%s && %s && %s && q_1*q_2<0"%(iso1,vetos,"nbtag>0 && byTightCombinedIsolationDeltaBetaCorr3Hits_2==1")   ),
-      #("fail-cut-tight",  "%s && %s && %s && q_1*q_2<0"%(iso1,vetos,"nbtag>0 && byTightCombinedIsolationDeltaBetaCorr3Hits_2!=1")   ),
+      ("pass-cut-vvloose", "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && byVVLooseCombinedIsolationDeltaBetaCorr3Hits_2==1" )),
+      ("fail-cut-vvloose", "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && byVVLooseCombinedIsolationDeltaBetaCorr3Hits_2!=1" )),
+      ("pass-cut-vloose",  "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && byVLooseCombinedIsolationDeltaBetaCorr3Hits_2==1"  )),
+      ("fail-cut-vloose",  "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && byVLooseCombinedIsolationDeltaBetaCorr3Hits_2!=1"  )),
+      ("pass-cut-loose",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && byLooseCombinedIsolationDeltaBetaCorr3Hits_2==1"   )),
+      ("fail-cut-loose",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && byLooseCombinedIsolationDeltaBetaCorr3Hits_2!=1"   )),
+      ("pass-cut-medium",  "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && byMediumCombinedIsolationDeltaBetaCorr3Hits_2==1"  )),
+      ("fail-cut-medium",  "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && byMediumCombinedIsolationDeltaBetaCorr3Hits_2!=1"  )),
+      ("pass-cut-tight",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && byTightCombinedIsolationDeltaBetaCorr3Hits_2==1"   )),
+      ("fail-cut-tight",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag>0 && byTightCombinedIsolationDeltaBetaCorr3Hits_2!=1"   )),
     ]
     if "emu" in channel:
       selectionsDC = [
-        ("emuCR",               "%s && %s && %s && q_1*q_2<0"%(iso1,vetos,"nbtag_noTau>0")),
+        ("emuCR",               "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0")),
         ###("notau-emuCR",         "%s && %s && %s && q_1*q_2<0"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3<1")),
-        ("pass-vloose-emuCR",   "%s && %s && %s && q_1*q_2<0"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byVLooseIsolationMVArun2v1DBoldDMwLT_3==1")  ),
-        ("fail-vloose-emuCR",   "%s && %s && %s && q_1*q_2<0"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byVLooseIsolationMVArun2v1DBoldDMwLT_3!=1")  ),
-        ("pass-loose-emuCR",    "%s && %s && %s && q_1*q_2<0"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byLooseIsolationMVArun2v1DBoldDMwLT_3==1")   ),
-        ("fail-loose-emuCR",    "%s && %s && %s && q_1*q_2<0"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byLooseIsolationMVArun2v1DBoldDMwLT_3!=1")   ),
-        ("pass-medium-emuCR",   "%s && %s && %s && q_1*q_2<0"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byMediumIsolationMVArun2v1DBoldDMwLT_3==1")  ),
-        ("fail-medium-emuCR",   "%s && %s && %s && q_1*q_2<0"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byMediumIsolationMVArun2v1DBoldDMwLT_3!=1")  ),
-        ("pass-tight-emuCR",    "%s && %s && %s && q_1*q_2<0"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byTightIsolationMVArun2v1DBoldDMwLT_3==1")   ),
-        ("fail-tight-emuCR",    "%s && %s && %s && q_1*q_2<0"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byTightIsolationMVArun2v1DBoldDMwLT_3!=1")   ),
-        ("pass-vtight-emuCR",   "%s && %s && %s && q_1*q_2<0"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byVTightIsolationMVArun2v1DBoldDMwLT_3==1")  ),
-        ("fail-vtight-emuCR",   "%s && %s && %s && q_1*q_2<0"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byVTightIsolationMVArun2v1DBoldDMwLT_3!=1")  ),
-        ("pass-vvtight-emuCR",  "%s && %s && %s && q_1*q_2<0"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byVVTightIsolationMVArun2v1DBoldDMwLT_3==1") ),
-        ("fail-vvtight-emuCR",  "%s && %s && %s && q_1*q_2<0"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byVVTightIsolationMVArun2v1DBoldDMwLT_3!=1") ),
+        ("pass-vloose-emuCR",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byVLooseIsolationMVArun2v1DBoldDMwLT_3==1"  )),
+        ("fail-vloose-emuCR",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byVLooseIsolationMVArun2v1DBoldDMwLT_3!=1"  )),
+        ("pass-loose-emuCR",    "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byLooseIsolationMVArun2v1DBoldDMwLT_3==1"   )),
+        ("fail-loose-emuCR",    "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byLooseIsolationMVArun2v1DBoldDMwLT_3!=1"   )),
+        ("pass-medium-emuCR",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byMediumIsolationMVArun2v1DBoldDMwLT_3==1"  )),
+        ("fail-medium-emuCR",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byMediumIsolationMVArun2v1DBoldDMwLT_3!=1"  )),
+        ("pass-tight-emuCR",    "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byTightIsolationMVArun2v1DBoldDMwLT_3==1"   )),
+        ("fail-tight-emuCR",    "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byTightIsolationMVArun2v1DBoldDMwLT_3!=1"   )),
+        ("pass-vtight-emuCR",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byVTightIsolationMVArun2v1DBoldDMwLT_3==1"  )),
+        ("fail-vtight-emuCR",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byVTightIsolationMVArun2v1DBoldDMwLT_3!=1"  )),
+        ("pass-vvtight-emuCR",  "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byVVTightIsolationMVArun2v1DBoldDMwLT_3==1" )),
+        ("fail-vvtight-emuCR",  "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byVVTightIsolationMVArun2v1DBoldDMwLT_3!=1" )),
+        ### MVA-based V2 ###
+        ("pass-MVAOldV2-vloose-emuCR",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byVLooseIsolationMVArun2v2DBoldDMwLT_3==1"  )),
+        ("fail-MVAOldV2-vloose-emuCR",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byVLooseIsolationMVArun2v2DBoldDMwLT_3!=1"  )),
+        ("pass-MVAOldV2-loose-emuCR",    "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byLooseIsolationMVArun2v2DBoldDMwLT_3==1"   )),
+        ("fail-MVAOldV2-loose-emuCR",    "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byLooseIsolationMVArun2v2DBoldDMwLT_3!=1"   )),
+        ("pass-MVAOldV2-medium-emuCR",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byMediumIsolationMVArun2v2DBoldDMwLT_3==1"  )),
+        ("fail-MVAOldV2-medium-emuCR",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byMediumIsolationMVArun2v2DBoldDMwLT_3!=1"  )),
+        ("pass-MVAOldV2-tight-emuCR",    "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byTightIsolationMVArun2v2DBoldDMwLT_3==1"   )),
+        ("fail-MVAOldV2-tight-emuCR",    "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byTightIsolationMVArun2v2DBoldDMwLT_3!=1"   )),
+        ("pass-MVAOldV2-vtight-emuCR",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byVTightIsolationMVArun2v2DBoldDMwLT_3==1"  )),
+        ("fail-MVAOldV2-vtight-emuCR",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byVTightIsolationMVArun2v2DBoldDMwLT_3!=1"  )),
+        ("pass-MVAOldV2-vvtight-emuCR",  "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byVVTightIsolationMVArun2v2DBoldDMwLT_3==1" )),
+        ("fail-MVAOldV2-vvtight-emuCR",  "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byVVTightIsolationMVArun2v2DBoldDMwLT_3!=1" )),
+        ### MVA-based V2 new DMs ###
+        ("pass-MVANewV2-vloose-emuCR",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byVLooseIsolationMVArun2v1DBnewDMwLT_3==1"  )),
+        ("fail-MVANewV2-vloose-emuCR",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byVLooseIsolationMVArun2v1DBnewDMwLT_3!=1"  )),
+        ("pass-MVANewV2-loose-emuCR",    "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byLooseIsolationMVArun2v1DBnewDMwLT_3==1"   )),
+        ("fail-MVANewV2-loose-emuCR",    "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byLooseIsolationMVArun2v1DBnewDMwLT_3!=1"   )),
+        ("pass-MVANewV2-medium-emuCR",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byMediumIsolationMVArun2v1DBnewDMwLT_3==1"  )),
+        ("fail-MVANewV2-medium-emuCR",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byMediumIsolationMVArun2v1DBnewDMwLT_3!=1"  )),
+        ("pass-MVANewV2-tight-emuCR",    "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byTightIsolationMVArun2v1DBnewDMwLT_3==1"   )),
+        ("fail-MVANewV2-tight-emuCR",    "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byTightIsolationMVArun2v1DBnewDMwLT_3!=1"   )),
+        ("pass-MVANewV2-vtight-emuCR",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byVTightIsolationMVArun2v1DBnewDMwLT_3==1"  )),
+        ("fail-MVANewV2-vtight-emuCR",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byVTightIsolationMVArun2v1DBnewDMwLT_3!=1"  )),
+        ("pass-MVANewV2-vvtight-emuCR",  "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byVVTightIsolationMVArun2v1DBnewDMwLT_3==1" )),
+        ("fail-MVANewV2-vvtight-emuCR",  "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byVVTightIsolationMVArun2v1DBnewDMwLT_3!=1" )),
+        ### CUT-based ###
+        ("pass-cut-vvloose-emuCR", "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byVVLooseCombinedIsolationDeltaBetaCorr3Hits_3==1" )),
+        ("fail-cut-vvloose-emuCR", "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byVVLooseCombinedIsolationDeltaBetaCorr3Hits_3!=1" )),
+        ("pass-cut-vloose-emuCR",  "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byVLooseCombinedIsolationDeltaBetaCorr3Hits_3==1"  )),
+        ("fail-cut-vloose-emuCR",  "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byVLooseCombinedIsolationDeltaBetaCorr3Hits_3!=1"  )),
+        ("pass-cut-loose-emuCR",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byLooseCombinedIsolationDeltaBetaCorr3Hits_3==1"   )),
+        ("fail-cut-loose-emuCR",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byLooseCombinedIsolationDeltaBetaCorr3Hits_3!=1"   )),
+        ("pass-cut-medium-emuCR",  "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byMediumCombinedIsolationDeltaBetaCorr3Hits_3==1"  )),
+        ("fail-cut-medium-emuCR",  "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byMediumCombinedIsolationDeltaBetaCorr3Hits_3!=1"  )),
+        ("pass-cut-tight-emuCR",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byTightCombinedIsolationDeltaBetaCorr3Hits_3==1"   )),
+        ("fail-cut-tight-emuCR",   "%s && %s && q_1*q_2<0 && %s"%(iso1,vetos,"nbtag_noTau>0 && againstLepton_3==1 && byTightCombinedIsolationDeltaBetaCorr3Hits_3!=1"   )),
     ]
     
     # RESTRICT
@@ -190,7 +274,7 @@ def writeDataCardHistograms(sampleset, channel, var, binWidth, a, b, **kwargs):
       selectionsDC = [ (n,shift(c,'_UncEn%s'%UncEn)) for n,c in selectionsDC ]
       print ">>> shift: %s"%(var)
     
-    # SAMPLES  
+    # SAMPLES
     samples_dict = {
     # search term     label          extracuts
       'TT':   #[   ( 'TT',     ""               ), ],
@@ -234,7 +318,7 @@ def writeDataCardHistograms(sampleset, channel, var, binWidth, a, b, **kwargs):
         else: samples_dict.pop(key,None)
     
     # PRINT
-    if verbosity>0 or not doShift:
+    if verbosity>0 or not doShift or JES or JER or UncEn:
       print ">>> selections:"
       for cutname, cut in selectionsDC:
         print ">>>   %-10s %s"%(cutname,cut)
@@ -274,6 +358,11 @@ def writeDataCardHistograms(sampleset, channel, var, binWidth, a, b, **kwargs):
         # MAKE DIR
         sampleset.refreshMemory()
         (dir,dirname) = makeDataCardTDir(outfile,category)
+        
+        # WRITE selection string
+        if recreate:
+          canvas, pave = canvasWithText(selection,title=category)
+          canvas.Write("selection")
         
         # RENORMALIZE WJ
         if not skipWJrenorm:
@@ -330,7 +419,7 @@ def writeDataCardHistograms(sampleset, channel, var, binWidth, a, b, **kwargs):
                   hist = sample.hist(var,nBins,a,b,cuts,name=name,weight=extraweight,verbosity=0)
                   hist.SetOption("E0" if sample.isData else "EHIST")
                 hist.GetXaxis().SetTitle(var)
-                hist.SetLineColor(hist.GetFillColor())
+                hist.SetLineColor(kBlack if 'data' in name else hist.GetFillColor())
                 hist.SetFillColor(0)
                 
                 for i, bin in enumerate(hist):
@@ -339,6 +428,7 @@ def writeDataCardHistograms(sampleset, channel, var, binWidth, a, b, **kwargs):
                     hist.SetBinContent(i,0)
                 
                 # WRITE HIST
+                dir.cd()
                 hist.Write(name,TH1D.kOverwrite)
                 print "->  written %8.1f events (%5d entries)" % (hist.GetSumOfWeights(),hist.GetEntries())
                 deleteHist(hist)
@@ -457,12 +547,13 @@ def main():
         
         # MAIN ROUTINES
         LOG.header("%s channel: Writing histogram for datacards" % channel)
-        keys = [ ("ttbar","tid","pfmt_1",10,0,200),
+        keys = [ ("ttbar","tid","pfmt_1",10,0,250),
                  ("ttbar","tid","m_vis",10,0,200),
                  #("ttbar","tid","ht",100,0,300),
         ]
+        if args.obs: keys = [k for k in keys if any(o in k[2] for o in args.obs)]
         for process, analysis, var, width, a, b in keys:
-            kwargs = { 'process': process, 'analysis': analysis }
+            kwargs = { 'process': process, 'analysis': analysis, 'label': "_mt250" }
             #if doNominal:
             writeDataCardHistograms(samples,              channel, var, width, a, b, recreate=True, **kwargs )
             if doTES and "tau" in channel:

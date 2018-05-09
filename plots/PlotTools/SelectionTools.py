@@ -17,8 +17,11 @@ def combineWeights(*weights,**kwargs):
     verbosity   = getVerbosity(kwargs,verbositySelectionTools)
     weights     = [ w for w in weights if w and isinstance(w,str) ]
     
-    if weights: weights = "*".join(weights)
-    else:       weights = ""
+    if weights:
+      weights = "*".join(weights)
+      weights = weights.replace('*/','/')
+    else:
+      weights = ""
     
     #print weights
     return weights
@@ -57,6 +60,18 @@ def combineCuts(*cuts,**kwargs):
 
     #print cuts
     return cuts
+    
+
+
+def stripWeights(cuts):
+    """Help function to remove weights and extract main selection string.
+    e.g. '(pt>1 && abs(eta)<1)*weight' -> 'pt>1 && abs(eta)<1.5'"""
+    matches = re.findall(r"\(([^)\?:]+)\)",cuts)
+    if len(matches)==0:
+      return cuts
+    elif len(matches)>1:
+      LOG.warning('stripWeights: %d selection string matches in "%s"! Going with first.'%(len(matches),cuts))
+    return matches[0]
     
 
 
@@ -115,7 +130,7 @@ def invertCharge(cuts,**kwargs):
     # elif cuts: cuts = "q_1*q_2>0 && %s" % cuts
     # else:      cuts = "q_1*q_2>0"
     
-    LOG.verbose("   \"%s\"\n>>>   -> \"%s\" (%s)\n>>>" % (cuts0,cuts,"OS" if OS else "SS"),verbosity,level=2)
+    LOG.verbose('  "%s"\n>>>   -> "%s" %s\n>>>'%(cuts0,cuts,"OS" if OS else "SS"),verbosity,level=2)
     return cuts
     
 
@@ -130,7 +145,7 @@ def invertIsolation(cuts,**kwargs):
     
     # MATCH PATTERNS https://regex101.com
     match_iso_1 = re.findall(r"iso_1\ *[<>]=?\ *\d+\.\d+\ *[^\|]&*\ *",cuts)
-    match_iso_2 = re.findall(r"iso_2\ *\!?[<=>]=?\ *\d+\.?\d*\ *[^\|]&*\ *",cuts)
+    match_iso_2 = re.findall(r"iso_2\ *!?[<=>]=?\ *\d+\.?\d*\ *[^\|]&*\ *",cuts)
     LOG.verbose("invertIsolation:\n>>>   match_iso_1 = %s\n>>>   match_iso_2 = \"%s\"" % (match_iso_1,match_iso_2),verbosity,level=2)
     
     # REPLACE
@@ -146,7 +161,7 @@ def invertIsolation(cuts,**kwargs):
         if len(match_iso_1) or len(match_iso_2): LOG.warning('invertIsolation: %d iso_1 and %d iso_2 matches! cuts="%s"'%(len(match_iso_1),len(match_iso_2),cuts))
     cuts    = cuts.rstrip(' ').rstrip('&').rstrip(' ')
     
-    LOG.verbose("  \"%s\"\n>>>   -> \"%s\"\n>>>" % (cuts0,cuts),verbosity,level=2)
+    LOG.verbose('  "%s"\n>>>   -> "%s"\n>>>'%(cuts0,cuts),verbosity,level=2)
     return cuts
     
 
@@ -166,7 +181,7 @@ def relaxJetSelection(cuts,**kwargs):
     btags  = re.findall(r"&*\ *nc?btag(?:20)?\ *[<=>]=?\ *\d+\ *",cuts)
     cjets  = re.findall(r"&*\ *ncjets(?:20)?\ *[<=>]=?\ *\d+\ *",cuts)
     cjets += re.findall(r"&*\ *nc?btag(?:20)?\ *[<=>]=?\ *ncjets(?:20)?\ *",cuts)
-    LOG.verbose("relaxJetSelection:\n>>>   btags = %s\n>>>   cjets = \"%s\"" % (btags,cjets),verbosity,level=2)
+    LOG.verbose('relaxJetSelection:\n>>>   btags = %s\n>>>   cjets = "%s"' % (btags,cjets),verbosity,level=2)
     
     # REPLACE
     if len(btags) and len(cjets):
@@ -180,8 +195,47 @@ def relaxJetSelection(cuts,**kwargs):
         if len(btags) or len(cjets): LOG.warning("relaxJetSelection: %d btags and %d cjets matches! cuts=%s"%(len(btags),len(cjets),cuts))
     cuts = cuts.lstrip(' ').lstrip('&').lstrip(' ')
     
-    LOG.verbose(">>>   \"%s\"\n>>>   -> \"%s\"\n>>>" % (cuts0,cuts),verbosity,level=2)
+    LOG.verbose('  "%s"\n>>>   -> "%s"\n>>>'%(cuts0,cuts),verbosity,level=2)
     return cuts
+    
+
+
+def vetoJetTauFakes(cuts,**kwargs):
+    """Helpfunction to ensure the jet to tau fakes (gen_match_2==6) are excluded in selection string.
+       Assume string contains gen_match_2 compared to any digits from 1 to 6.
+     """
+    
+    verbosity   = max(kwargs.get('verbosity',0),verbositySelectionTools)
+    removeTID   = kwargs.get('noTID', False )
+    cuts0       = cuts
+    
+    if removeTID:
+      cuts  = re.sub(r"(\*\ *\(\ *gen_match_2\ *==[^)]*\?[^)]*\))","",cuts) #.replace('**','*')
+    match   = re.findall(r"(gen_match_2\ *(!?[<=>]=?\ *\d))(?!\ *\?)",cuts)
+    if len(match)==0:
+      subcuts0 = stripWeights(cuts)
+      subcuts1 = combineCuts(subcuts0,"gen_match_2<6")
+      cuts     = cuts.replace(subcuts0,subcuts1)
+      return cuts
+    elif len(match)>1:
+      LOG.warning('vetoFakeRate: more than one "gen_match_2" match (%d) in "%s"'%(len(match),cuts))
+    match, genmatch = match[0]
+    genmatch = genmatch.replace(' ','')
+    
+    if '!=' in genmatch:
+      if '5' in genmatch: # "gen_match_2!=5"
+        cuts = cuts.replace(match,"gen_match_2<5")
+      elif not '6' in genmatch: # "gen_match_2!=*"
+        cuts = combineCuts(cuts,"gen_match_2!=6")
+    elif "=6" in genmatch: # "gen_match_2*=6"
+        LOG.warning('vetoFakeRate: selection "%s" set to "0"!'%(cuts)) 
+        cuts = "0"
+    elif '>' in genmatch: # "gen_match_2>*"
+        cuts = combineCuts(cuts,"gen_match_2!=6")
+    
+    #LOG.verbose('  "%s"\n>>>   -> "%s"\n>>>'%(cuts0,cuts),verbosity,level=2)
+    return cuts
+
 
 
 def isSelectionString(string,**kwargs):
@@ -220,9 +274,9 @@ class Selection(object):
         self.only            = kwargs.get('only',           [ ]                         )
         self.veto            = kwargs.get('veto',           [ ]                         )
         if self.only:
-          if not (isinstance(self.only,list) or isinstance(self.only,tuple)): self.only = [ self.only ]
+          if not isList(self.only): self.only = [ self.only ]
         if self.veto:
-          if not (isinstance(self.veto,list) or isinstance(self.veto,tuple)): self.veto = [ self.veto ]
+          if not isList(self.veto): self.veto = [ self.veto ]
     
     @property
     def cut(self): return self.selection

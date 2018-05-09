@@ -44,8 +44,9 @@ varlist = {
 def makeLatex(title,**kwargs):
     """Convert patterns in a string to LaTeX format."""
     
-    if title[0]=='{' and title[-1]=='}': return title[1:-1]
+    if title and title[0]=='{' and title[-1]=='}': return title[1:-1]
     units = kwargs.get('units',True)
+    split = kwargs.get('split',False)
     GeV   = False
     cm    = False
     
@@ -74,72 +75,97 @@ def makeLatex(title,**kwargs):
     #    title = title.replace("_jer","")
     
     for var in varlist:
-        if var in title:
-            title = title.replace(var,varlist[var])
-            break
+      if var in title:
+          title = title.replace(var,varlist[var])
+          #title = re.sub(r"\b%s\b"%var,varlist[var],title,flags=re.IGNORECASE)
+          break
+    
+    if split:
+      while '\n' in title:
+          title = "#splitline{%s}"%(title.replace('\n','}{',1))
+       
+      if 'splitline' not in title and len(title)>30:
+          part1 = title[:len(title)/2]
+          part2 = title[len(title)/2:]
+          if ' ' in part2:
+            title = "#splitline{"+part1+part2.replace(' ','}{',1)+"}"
+          elif ' ' in part1:
+            i = part1.rfind(' ')
+            title = "#splitline{"+title[:i]+'}{'+title[i+1:]+"}"
     
     strings = [ ]
     for string in title.split(' / '):
+        stringlow = string.lower()
         
-        if "p_" in string.lower():
+        if "p_" in stringlow:
             string = re.sub(r"(?<!i)(p)_([^{}()<>=\ ]+)",r"\1_{\2}",string,flags=re.IGNORECASE).replace('{t}','{T}')
             GeV = True
         
-        if "pt" in string.lower() and "ptweighted" not in string.lower() and "byPhotonPt" not in string.lower():
+        if "pt" in stringlow and "ptweighted" not in stringlow and "byPhotonPt" not in stringlow:
             string = re.sub(r"(?<!k)(p)t_([^{}()<>=\ ]+)",r"\1_{T}^{\2}",string,flags=re.IGNORECASE)
             string = re.sub(r"\b(p)t\b",r"\1_{T}",string,flags=re.IGNORECASE)
             GeV = True
         
-        if "m_" in string.lower():
-            string = re.sub(r"(?<!u)(m)_([^{}\(\)<>=\ ]+)",r"\1_{\2}",string,flags=re.IGNORECASE).replace('{t}','{T}')
+        if "m_" in stringlow:
+            string = re.sub(r"(?<!u)(m)_([^{}()<>=\ ]+)",r"\1_{\2}",string,flags=re.IGNORECASE).replace('{t}','{T}')
             GeV = True
         
-        if "mt_" in string.lower():
+        if "mt_" in stringlow:
             string = re.sub(r"(m)t_([^{}()<>=\ ]+)",r"\1_{T}^{\2}",string,flags=re.IGNORECASE)
             GeV = True
         
-        if "ht" in string.lower():
+        if "ht" in stringlow:
             string = re.sub(r"\b(h)t\b",r"\1_{T}",string,flags=re.IGNORECASE)
             GeV = True
         
-        if " d_" in string.lower():
+        if " d_" in stringlow:
             string = re.sub(r"(\ d)_([^{}()<>=\ ]+)",r"\1_{\2}",string,flags=re.IGNORECASE)
             cm = True
         
-        if "tau" in string.lower():
-            string = string.replace("tau","#tau").replace("Tau","#tau")
-            string = re.sub(r"tau_([^{}<>=\ ]+)",r"tau_{\1}",string,flags=re.IGNORECASE)
+        if "deltar_" in stringlow:
+            string = re.sub(r"(?<!#)deltar_([^{}()<>=\ ]+)",r"#DeltaR_{\1}",string,flags=re.IGNORECASE)
+        elif "deltar" in stringlow:
+            string = re.sub(r"(?<!#)deltar",r"#DeltaR",string,flags=re.IGNORECASE)
         
-        if "phi" in string.lower() and "dphi" not in string.lower():
+        if "dR" in string:
+            string = re.sub(r"(?<!\w)dR_([^{}()<>=\ ]+)",r"#DeltaR_{\1}",string)
+        
+        if "tau" in stringlow:
+            string = re.sub(r"(?<!^)(?<!\ )tau",r"#tau",string,flags=re.IGNORECASE)
+            string = re.sub(r"tau_([^{}()<>=\ ]+)",r"tau_{\1}",string,flags=re.IGNORECASE)
+        
+        if "phi" in stringlow and "dphi" not in stringlow:
             string = string.replace("phi","#phi")
-            string = re.sub(r"phi_([^{}<>=\ ]+)",r"phi_{\1}",string,flags=re.IGNORECASE)
+            string = re.sub(r"phi_([^{}()<>=\ ]+)",r"phi_{\1}",string,flags=re.IGNORECASE)
         
-        if "zeta" in string.lower() and "#zeta" not in string.lower():
+        if "zeta" in stringlow and "#zeta" not in stringlow:
             if "Dzeta" in string:
                 string = string.replace("Dzeta","D_{zeta}")
                 GeV = True
-            if "zeta_" in string.lower():
-                string = string.replace("zeta_","#zeta_{").replace("Zeta_","#Zeta_{") + "}"
+            if "zeta_" in stringlow:
+                string = re.sub(r"(?<!#)(zeta)_([^{}()<>=\ ]+)",r"#\1_{\2}",string,flags=re.IGNORECASE)
             else:
-                string = string.replace("zeta","#zeta").replace("Zeta","#Zeta")
+                string = re.sub(r"(?<!#)(zeta)",r"#\1",string,flags=re.IGNORECASE)
             GeV = True
         
-        if "eta" in string.lower() and "#eta" not in string.lower() and "#zeta" not in string.lower() and "deta" not in string.lower():
+        if "eta" in stringlow and "#eta" not in stringlow and "#zeta" not in stringlow and "deta" not in stringlow:
             string = string.replace("eta","#eta")
-            string = re.sub(r"eta_([^{}<>=\ ]+)",r"eta_{\1}",string,flags=re.IGNORECASE)
+            #string = re.sub(r"(?<![#dz])eta",r"#eta",string,flags=re.IGNORECASE)
+            string = re.sub(r"eta_([^{}()<>=\ ]+)",r"eta_{\1}",string)
         
         if "abs(" in string and ")" in string:
-            string = string.replace("abs(","|").replace(")","") + "|" # TODO: split at next space
+            string = re.sub(r"abs\(([^)]+)\)",r"|\1|",string)
+            #string = string.replace("abs(","|").replace(")","") + "|" # TODO: split at next space
         
-        if  "mu" in string.lower():
+        if  "mu" in stringlow:
             string = re.sub(r"mu(?![lo])",r"#mu",string,flags=re.IGNORECASE)
             #string = string.replace("mu","#mu").replace("Mu","#mu")
             #string = string.replace("si#mulation","simulation")
         
-        if "ttbar" in string.lower():
-            string = string.replace("ttbar","t#bar{t}").replace("TTbar","t#bar{t}")
+        if "ttbar" in stringlow:
+            string = re.sub(r"ttbar","t#bar{t}",string,flags=re.IGNORECASE)
         
-        if "npv" in string.lower():
+        if "npv" in stringlow:
             string = string.replace("npv","number of vertices")
         
         if '->' in string:
@@ -167,7 +193,7 @@ def makeLatex(title,**kwargs):
 
 def makeTitle(title,**kwargs):
     """Make header with LaTeX."""
-    kwargs['units'] = False
+    kwargs.update({'units':False, 'split':False})
     title = makeLatex(title,**kwargs)
     return title
     
@@ -181,10 +207,15 @@ def makeHistName(*labels,**kwargs):
     
 def makeFileName(string,**kwargs):
     """Make filename without inconvenient character."""
+    string = re.sub(r"(\d+)\.(\d+)",r"\1p\2",string)
+    if 'abs(' in string:
+      string = re.sub(r"abs\(([^\)]*)\)",r"\1",string).replace('eta_2','eta')
     string = string.replace(" and ",'-').replace(',','-').replace('(','').replace(')','').replace(':','-').replace(
-                                '|','').replace('&','').replace('m_T','mt').replace('m_t','mt').replace(
+                                '|','').replace('&','').replace('!','not').replace('pt_mu','pt').replace('m_T','mt').replace('m_t','mt').replace(
                                '>=',"geq").replace('<=',"leq").replace('>',"gt").replace('<',"lt").replace("=","eq").replace(
                                 ' ','').replace('GeV','')
+    #if 'm_t' in string.lower:
+    #  string = re.sub(r"(?<!u)(m)_([^{}\(\)<>=\ ]+)",r"\1_{\2}",string,flags=re.IGNORECASE).replace('{t}','{T}')
     #if "m_" in string.lower():
     #    string = re.sub(r"(?<!u)(m)_([^{}\(\)<>=\ ]+)",r"\1_{\2}",string,flags=re.IGNORECASE).replace('{t}','{T}')
     #if not (".png" in name or ".pdf" in name or ".jpg" in name): name += kwargs.get('ext',".png")
@@ -199,7 +230,7 @@ def shift(string, jshift, **kwargs):
 def shiftJetVariable(var, jshift, **kwargs):
     """Shift all jet variable in a given string (e.g. to propagate JEC/JER)."""
     
-    vars        = [r'pfmt_1',r'met'] if "UncEn" in jshift else\
+    vars        = [r'pfmt_1',r'met'] if "uncen" in jshift.lower() else\
                   [r'jpt_[12]',r'jeta_[12]',r'jets(?:20)?',r'nc?btag(?:20)?(?:_noTau)?',r'pfmt_1',r'met',r'dphi_ll_bj']
     verbosity   = getVerbosity(kwargs,verbosityVariableTools)
     vars        = kwargs.get('vars',  vars )
@@ -236,7 +267,7 @@ class Variable(object):
         self.title           = kwargs.get('title',          self.title                  ) # for plot axes
         self.filename        = kwargs.get('filename',       makeFileName(self.name)     ) # for file
         self.filename        = self.filename.replace('$NAME',self.name)
-        self.nBins           = None
+        self.nbins           = None
         self.min             = None
         self.max             = None
         self.xbins           = None
@@ -252,9 +283,9 @@ class Variable(object):
         self.contextbinning  = getContextFromDict(kwargs, None, key='cbinning',  regex=True ) # context-dependent binning
         self.contextposition = getContextFromDict(kwargs, None, key='cposition', regex=True ) # context-dependent position
         if self.only:
-          if not (isinstance(self.only,list) or isinstance(self.only,tuple)): self.only = [ self.only ]
+          if not isList(self.only): self.only = [ self.only ]
         if self.veto:
-          if not (isinstance(self.veto,list) or isinstance(self.veto,tuple)): self.veto = [ self.veto ]
+          if not isList(self.veto): self.veto = [ self.veto ]
     
     @property
     def var(self): return self.name
@@ -262,9 +293,9 @@ class Variable(object):
     def var(self,value): self.name = value
     
     @property
-    def N(self): return self.nBins
+    def N(self): return self.nbins
     @N.setter
-    def N(self,value): self.nBins = value
+    def N(self,value): self.nbins = value
     
     @property
     def a(self): return self.min
@@ -292,29 +323,29 @@ class Variable(object):
     
     def __repr__(self):
       """Returns string representation of Variable object."""
-      #return '<%s.%s("%s","%s",%s,%s,%s)>'%(self.__class__.__module__,self.__class__.__name__,self.name,self.title,self.nBins,self.xmin,self.xmax)
-      return '<%s("%s","%s",%s,%s,%s) at %s>'%(self.__class__.__name__,self.name,self.title,self.nBins,self.xmin,self.xmax,hex(id(self)))
+      #return '<%s.%s("%s","%s",%s,%s,%s)>'%(self.__class__.__module__,self.__class__.__name__,self.name,self.title,self.nbins,self.xmin,self.xmax)
+      return '<%s("%s","%s",%s,%s,%s) at %s>'%(self.__class__.__name__,self.name,self.title,self.nbins,self.xmin,self.xmax,hex(id(self)))
     
     def __iter__(self):
       """Start iteration over variable information."""
-      for i in [self.name,self.nBins,self.min,self.max]:
+      for i in [self.name,self.nbins,self.min,self.max]:
         yield i
     
     def printWithBinning(self):
-        return '%s(%s,%s,%s)'%(self.name,self.nBins,self.xmin,self.xmax)
+        return '%s(%s,%s,%s)'%(self.name,self.nbins,self.xmin,self.xmax)
     
     def setBinning(self,*args):
         """Set binning: (N,min,max), or xbins if it is set"""
-        numbers         = [a for a in args if isinstance(a,int) or isinstance(a,float) ]
-        xbins           = [a for a in args if isinstance(a,list) or isinstance(a,tuple) ]
+        numbers         = [a for a in args if isNumber(a) ]
+        xbins           = [a for a in args if isList(a)   ]
         if len(numbers)==3:
-          self.nBins    = numbers[0]
+          self.nbins    = numbers[0]
           self.min      = numbers[1]
           self.max      = numbers[2]
           self.xbins    = None
         elif len(xbins)>1:
           xbins         = xbins[0]
-          self.nBins    = len(xbins)-1
+          self.nbins    = len(xbins)-1
           self.min      = xbins[0]
           self.max      = xbins[-1]
           self.xbins    = array('d',list(xbins))
@@ -327,7 +358,7 @@ class Variable(object):
         if self.hasVariableBinning():
           return self.xbins
         else:
-          return (self.nBins,self.min,self.max)
+          return (self.nbins,self.min,self.max)
     
     def hasVariableBinning(self):
         """True is xbins is set."""
@@ -385,7 +416,7 @@ class Variable(object):
         return len(self.only)==0
     
     def unwrap(self):
-        return (self.name,self.nBins,self.min,self.max)
+        return (self.name,self.nbins,self.min,self.max)
     
     def latex(self):
         return makeLatex(self.name)

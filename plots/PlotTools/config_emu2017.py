@@ -6,7 +6,7 @@
 # LABELS & LUMI
 globalTag   = "_2017_V2" # extra label for opening file, saving plots to dir
 plottag     = ""  # extra label for image file
-luminosity  = 41.86
+luminosity  = 41.3 #86
 year        = 2017
 
 # VERBOSITY
@@ -30,12 +30,12 @@ doTES               = True and False # not for emu
 doEES               = True #and False
 doJTF               = True #and False
 doJER               = True #and False
-doJEC               = True #and False
+doJEC               = True #and Falsee
 doUncEn             = True #and False
 
 # SAMPLE OPTIONS
-splitDY             = True #and False
-splitTT             = True #and False
+splitDY             = True and False
+splitTT             = True and False
 splitST             = True and False
 stitchWJ            = True #and False
 stitchDY50          = True #and False
@@ -210,8 +210,6 @@ if stitchDY50:     samples.stitch("DY*J*M-50",     name_incl="DYJ", name="DY_M-5
 if mergeVV:        samples.merge( "VV","VV","WZ","WW","ZZ",         name="VV",          title="diboson"               )
 if mergeST:        samples.merge( "ST",                             name="ST",          title="single top"            )
 if mergeTT:        samples.merge( "TT",                             name="TT",          title="ttbar"                 )
-if splitDY:        samples.splitSample("DY",{'Z -> tautau':           "gen_match_3==5", 'Drell-Yan other': "gen_match_3!=5" })
-if splitTT:        samples.splitSample("TT",{'ttbar with real tau_h': "gen_match_3==5", 'ttbar other':     "gen_match_3!=5" }) #'ttbar j -> tau_h': "gen_match_2<5"
 #samples.printTable()
 #samples.printSampleObjects()
 
@@ -219,13 +217,13 @@ if splitTT:        samples.splitSample("TT",{'ttbar with real tau_h': "gen_match
 samples_TESscan = { }
 samples_TESUp, samples_TESDown, samples_EESUp, samples_EESDown, samples_JTFUp, samples_JTFDown = [ ], [ ], [ ], [ ], [ ], [ ]
 if doEES:
-  samples_EESUp   = samples.shiftSample(['TT','ST'],"_EES1p03","  +3% EES",    filter=not doStack)
-  samples_EESDown = samples.shiftSample(['TT','ST'],"_EES0p97","  -3% EES",    filter=not doStack)
+  samples_EESUp   = samples.shift(['TT','ST'],"_EES1p03","  +3% EES",    filter=not doStack)
+  samples_EESDown = samples.shift(['TT','ST'],"_EES0p97","  -3% EES",    filter=not doStack)
 if doJTF:
-  #samples_JTFUp   = samples.shiftSample(['TT','ST'],"_JTF1p15"," +15% JTF ES", filter=not doStack, title_veto="real")
-  #samples_JTFDown = samples.shiftSample(['TT','ST'],"_JTF0p85"," -15% JTF ES", filter=not doStack, title_veto="real")
-  samples_JTFUp   = samples.shiftSample(['TT','ST'],"_JTF1p10"," +10% JTF ES", filter=not doStack, title_veto="real")
-  samples_JTFDown = samples.shiftSample(['TT','ST'],"_JTF0p90"," -10% JTF ES", filter=not doStack, title_veto="real")
+  #samples_JTFUp   = samples.shift(['TT','ST'],"_JTF1p15"," +15% JTF ES", filter=not doStack, title_veto="real")
+  #samples_JTFDown = samples.shift(['TT','ST'],"_JTF0p85"," -15% JTF ES", filter=not doStack, title_veto="real")
+  samples_JTFUp   = samples.shift(['TT','ST'],"_JTF1p10"," +10% JTF ES", filter=not doStack, title_veto="real")
+  samples_JTFDown = samples.shift(['TT','ST'],"_JTF0p90"," -10% JTF ES", filter=not doStack, title_veto="real")
   #samples_JTFUp.printTable()
   #samples_JTFUp.printSampleObjects()
 

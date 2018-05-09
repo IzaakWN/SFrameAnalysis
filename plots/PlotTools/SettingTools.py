@@ -12,9 +12,12 @@ globalTag  = ""
 SAMPLE_DIR = os.path.expandvars("/scratch/ineuteli/SFrameAnalysis/AnalysisOutput/")
 
 # PLOT OPTIONS
+era                     = ""
+year                    = 0
 luminosity              = 0 # set in plot.py
 OSSS_ratio              = 0.5
 useCutTree              = True #and False
+colorset                = 'HTT'
 
 # VERBOSITY
 LOG                     = Logger("global")
@@ -23,8 +26,26 @@ verbosityPlotTools      = 1
 verbosityVariableTools  = 1
 verbositySelectionTools = 1
 verbosityWJ             = 1
+doFakeRate              = False
 # ROOT.gROOT.SetBatch(ROOT.kTRUE)
 # gErrorIgnoreLevel = kInfo;
+
+
+def isNumber(arg):
+  return isinstance(arg,float) or isinstance(arg,int)
+  
+def isList(arg):
+  return isinstance(arg,list) or isinstance(arg,tuple)
+  
+def ensureList(arg):
+  return arg if (isinstance(arg,list) or isinstance(arg,tuple)) else [arg]
+  
+def ensureDirectory(dirname):
+    """Make directory if it does not exist."""
+    if not os.path.exists(dirname):
+        os.makedirs(dirname)
+        print ">>> made directory " + dirname
+    return dirname
 
 
 

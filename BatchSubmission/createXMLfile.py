@@ -36,9 +36,7 @@ Examples:
 #cat dirs.txt | wc -l
 #split -l 200 dirs.txt dirs_split -d
 
-import os
-import sys
-import re
+import os, sys, re
 import optparse
 import thread
 import subprocess
@@ -318,6 +316,8 @@ def splitSampleListFile(filename,nChunks=2):
     print "%s does not exist!"%(filename)
     exit(1)
   list = [ ]
+  exts = filename.split('.')
+  ext  = '.'+exts[-1] if len(exts)>0 else ""
   with open(filename,'r') as file:
     list  = [ s for s in file if not s.startswith("#") and not s.isspace() ]
   nChunks = min(len(list),nChunks)
@@ -326,7 +326,8 @@ def splitSampleListFile(filename,nChunks=2):
   lasti   = 0
   for i in xrange(nChunks):
     nLines = k + (1 if i<m else 0) 
-    subfilename = filename.replace(".txt","_split%d.txt"%(i+1))
+    app    = "_split%d"%(i+1)
+    subfilename = filename.replace(ext,app+ext) if ext else filename+app
     with open(subfilename,'w') as subfile:
       print 'Made "%s" (%d)'%(subfilename,nLines)
       for s in list[lasti:lasti+nLines]: subfile.write(s)

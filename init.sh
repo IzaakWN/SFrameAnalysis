@@ -2,7 +2,7 @@
 # check out SFrame
 echo "Creating a few directories"
 mkdir AnalysisTemp
-mkdir AnalysisOut
+#mkdir AnalysisOut
 
 cd SFrame/
 source setup.sh

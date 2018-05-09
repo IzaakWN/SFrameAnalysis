@@ -594,7 +594,7 @@ void DiMuonAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
     for(int jmuon=imuon+1; jmuon<(int)goodMuons.size(); jmuon++){
       
       Float_t M  = goodMuons[imuon].M(goodMuons[jmuon]);
-      if(M<70 and 110<M) continue;
+      if(M<70 or 110<M) continue;
       if(goodMuons[imuon].charge()*goodMuons[jmuon].charge()>0) continue; // require OS
       if(goodMuons[imuon].pt()<m_secondMuonPtCut and goodMuons[jmuon].pt()<m_secondMuonPtCut) continue;
       Float_t dR = goodMuons[imuon].DeltaR(goodMuons[jmuon]);
@@ -931,7 +931,7 @@ void DiMuonAnalysis::FillBranches(const std::string& channel, const UZH::Muon& m
   
   // discriminating variables
   b_m_vis[ch]       = muon1.M(muon2);
-  b_dR_ll[ch]       = muon1.DeltaR(muon1);
+  b_dR_ll[ch]       = muon1.DeltaR(muon2);
   if(tau.pt()>20){
     b_m_mutau_1[ch] = muon1.M(tau);
     b_m_mutau_2[ch] = muon2.M(tau);

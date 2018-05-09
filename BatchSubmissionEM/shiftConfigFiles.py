@@ -33,8 +33,8 @@ def main():
     nFiles = 0
     shifts = [ ]
     
-    shifts.append(( "JTF", "JTFshift",  0.10, 2, [ "Background_TT.py", "Background_ST.py" ], False ))
-    shifts.append(( "EES", "EESshift",  0.03, 2, [ "Background_TT.py", "Background_ST.py" ], False ))
+    shifts.append(( "JTF", "JTFshift", 0.10, 2, [ "Background_TT.py", "Background_ST.py" ], False ))
+    shifts.append(( "EES", "EESshift", 0.03, 2, [ "Background_TT.py", "Background_ST.py" ], False ))
     
     if outDir: ensureDirectory(outDir)
     

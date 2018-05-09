@@ -92,7 +92,7 @@ def checkDataCardHistograms():
     # writeDataCardHistogram #
     ##########################
 
-def writeDataCardHistograms(sampleset, channel, var, binWidth, a, b, **kwargs):
+def writeDataCard(sampleset, channel, var, binWidth, a, b, **kwargs):
     """Make histogram from a variable in a tree and write to a new root file."""
     
     global SUSY_bbA, VLQ_bqX, VLQ_bqX_MB300, VLQ_bqX_MB450
@@ -102,30 +102,35 @@ def writeDataCardHistograms(sampleset, channel, var, binWidth, a, b, **kwargs):
     analysis      = kwargs.get('analysis',    "LowMassDiTau"  )
     DIR           = kwargs.get('DIR',         DATACARDS_DIR   )
     recreate      = kwargs.get('recreate',    False           )
-    label         = kwargs.get('label',       ""              ) # WEIGHTED
-    su_label      = kwargs.get('su_label',    ""              )
+    tag           = kwargs.get('tag',         ""              ) # WEIGHTED
+    extracut      = kwargs.get('extracut',    ""              )
+    extraweight   = kwargs.get('extraweight', ""              )
+    E             = kwargs.get('E',           "13TeV"         )
+    unclabel      = kwargs.get('unclabel',    ""              )
     masses        = kwargs.get('masses',      range(13,83,3)  )
     E             = kwargs.get('E',           "13TeV"         )
+    TES           = kwargs.get('TES',         ""              )
+    EES           = kwargs.get('EES',         ""              )
     JES           = kwargs.get('JES',         ""              )
     JER           = kwargs.get('JER',         ""              )
-    TES           = kwargs.get('TES',         ""              )
-    TESscan       = kwargs.get('TESscan',     ""              )
-    EES           = kwargs.get('EES',         ""              )
+    UncEn         = kwargs.get('UncEn',       ""              )
     LTF           = kwargs.get('LTF',         ""              )
     JTF           = kwargs.get('JTF',         ""              )
     Zpt           = kwargs.get('Zpt',         ""              )
     TTpt          = kwargs.get('TTpt',        ""              )
-    QCD_WJ        = kwargs.get('QCD_WJ',      ""              )
+    QCD           = kwargs.get('QCD',         ""              )
+    shiftQCD      = kwargs.get('shiftQCD',    0               ) # e.g 0.30
     nBins         = int(kwargs.get('nBins',   (b-a)/binWidth ))
     option        = 'RECREATE' if recreate else 'UPDATE'
     doShift       = TES or EES or LTF or JTF or Zpt or TTpt
-    extraweight   = "" #weight"
     
     # SELECTIONS
+    isocuts         = "iso_cuts==1"
+    triggers        = "abs(eta_1)<2.1 && trigger_cuts==1"
     iso1            = "iso_1<0.15" if "mutau" in channel else "iso_1<0.10"
     iso2            = "iso_2==1"
     vetos           = "lepton_vetos==0"
-    baseline        = "%s && %s && %s && q_1*q_2<0" % (iso1,iso2,vetos)
+    baseline        = "%s && %s && %s && q_1*q_2<0" % (isocuts,vetos,triggers)
     if "emu" in channel:
       vetos         = "extraelec_veto==0 && extramuon_veto==0"
       iso1          = "iso_1<0.20 && iso_2<0.15"
@@ -144,16 +149,8 @@ def writeDataCardHistograms(sampleset, channel, var, binWidth, a, b, **kwargs):
       #("1btag",  "%s && %s"%(baseline,"ncbtag20 == 1 && ncjets20 == 1 && nfjets == 0 && pzeta_disc>-30"), "_bbA_pt20_j20_Dzeta-30" ),
       #("1btag",  "%s && %s"%(baseline,category_bbA.replace('btag','btag20').replace('cjets','cjets20').replace('fjets','fjets20')), "_bbA_pt20_fj20" ),
       #("1btag",  "%s && %s"%(baseline,category_bbA.replace(' && nfjets == 0','')), "_bbA_fj"            ),
-      #("1btag",  "%s && %s"%(baseline,category_bbA2),                       "_bbA2"                     ),
-      #("1btag",  "%s && %s"%(baseline,category_bbA),                        "_bbA_noOpt"                ),
-      #("1btag",  "%s && %s"%(baseline,"ncbtag==1"),                         "_bbA_noVeto"               ),
-      #("1btag",  "%s && %s"%(baseline,"ncbtag20==1"),                       "_bbA_pt20_noVeto"          ),
-      #("1btag",  "%s && %s"%(baseline,"ncbtag20==1 && pzeta_disc>-80"),     "_bbA_pt20_noVeto_Dzeta-80" ),
-      #("1btag",  "%s && %s"%(baseline,"ncbtag==1 && njets<3"),              "_bbA_noVeto2"              ),
-      #("1btag",  "%s && %s"%(baseline,"ncbtag==1 && njets<4"),              "_bbA_noVeto3"              ),
-      #("1btag",  "%s && %s"%(baseline,"ncbtag>1"),                         "_bbA2_noVeto"               ),
       #("1btag",  "%s && %s && %s"%(baseline,category_bbA,"pzeta_disc>-10"), "_bbA_Dzeta-10"             ),
-      ("1btag",  "%s && %s && %s"%(baseline,category_bbA_NV,"pzeta_disc>-40 && pfmt_1<40"),              ),
+      ("1btag",  "%s && %s && %s"%(baseline,category_bbA_NV,"pzetamiss-0.85*pzetavis>-40 && pfmt_1<40"), ),
       #("1btag",  "%s && %s && %s"%(baseline,category_bbA,"met<30"),         "_bbA_met30"                ),
       #("1btag",  "%s && %s && %s"%(baseline,category_bbA,"pfmt_1<20"),      "_bbA_mt20"                 ),
       #("1b1f",   "%s && %s" % (baseline,"ncbtag > 0 && ncjets == 1 && nfjets  > 0"), "_noOpt"           ),
@@ -168,13 +165,16 @@ def writeDataCardHistograms(sampleset, channel, var, binWidth, a, b, **kwargs):
       ("1b1c",   "%s && %s && %s" % (baseline,category2J,"pfmt_1<60"),                                   ),
     ]
     
+    # OPTIMIZATIONS
+    if extracut: selectionsDC = [ "%s && %s"%(s,extracut) for s in selectionsDC ]
+    
     # FILE LOGISTICS
     if len(selectionsDC[0])>2:
-      label     = selectionsDC[0][2]+label
+      tag       = selectionsDC[0][2]+tag
       selectionsDC = [c[:2] for c in selectionsDC]
     outdir      = "%s%s/" % (DIR,"datacards" if "datacards" not in DIR else "")
     ensureDirectory(outdir)
-    outfilename = outdir + makeDataCardOutputName(process,analysis,channel,label=label)
+    outfilename = outdir + makeDataCardOutputName(process,analysis,channel,tag=tag)
     outfile     = TFile(outfilename, option)
     
     # SHIFT
@@ -186,8 +186,12 @@ def writeDataCardHistograms(sampleset, channel, var, binWidth, a, b, **kwargs):
       var = shift(var,'_jer%s'%JER)
       selectionsDC = [ (n,shift(c,'_jer%s'%JER)) for n,c in selectionsDC ]
       print ">>> shift: %s"%(var)
+    if UncEn:
+      var = shift(var,'_UncEn%s'%UncEn)
+      selectionsDC = [ (n,shift(c,'_UncEn%s'%UncEn)) for n,c in selectionsDC ]
+      print ">>> shift: %s"%(var)
     
-    # SAMPLES  
+    # SAMPLES
     samples_dict = {
     # search term     label          extracuts
       "TT":   [    ( 'TTT',    "gen_match_2==5" ),
@@ -236,9 +240,8 @@ def writeDataCardHistograms(sampleset, channel, var, binWidth, a, b, **kwargs):
     # FILTER
     if filter:
       for key in samples_dict.keys():
-        for fkey in filter:
-          if fkey in key or key in fkey: break
-        else: samples_dict.pop(key,None)
+        if not any(fkey in key or key in fkey for fkey in filter):
+          samples_dict.pop(key,None)
     
     # PRINT
     if verbosity>0 or not doShift:
@@ -249,30 +252,29 @@ def writeDataCardHistograms(sampleset, channel, var, binWidth, a, b, **kwargs):
     
     # SYSTEMATIC UNCERTAINTY
     channel0    = channel.replace("tau","t").replace("mu","m")
-    shift_QCD   = kwargs.get('shift_QCD',0) # e.g 0.30
-    hist_QCD    = None
-    name_QCD    = ""
     
     # LABELS
-    #if shift_QCD:
-    #  samples_dict['QCD'].append(( "QCD_QCD_Yield_%s_%sDown" % (channel0,E), "" ))
-    #  samples_dict['QCD'].append(( "QCD_QCD_Yield_%s_%sUp"   % (channel0,E), "" ))
+    if shiftQCD and 'QCD' in samples_dict:
+      samples_dict['QCD'].append(( "QCD_yield_QCD_%s_%sDown"   % (channel0,E), "" ))
+      samples_dict['QCD'].append(( "QCD_yield_QCD_%s_%sUp"     % (channel0,E), "" ))
     #else: samples_dict.pop('QCD',None) # only run QCD if it's also shifted
-    if TES:     su_label += "_CMS_%s_shape_t_%s_%s%s"        % (process,channel0,E,TES)
-    if JES:     su_label += "_CMS_%s_shape_jes_%s_%s%s"      % (process,channel0,E,JES)
-    if JER:     su_label += "_CMS_%s_shape_jer_%s_%s%s"      % (process,channel0,E,JER)
-    if TESscan: su_label += "_TES%s"                         % (TESscan)
-    if EES:     su_label += "_CMS_%s_shape_e_%s_%s%s"        % (process,channel0,E,EES)
-    if LTF:     su_label += "_CMS_%s_ZLShape_%s_%s%s"        % (process,channel0,E,LTF)
-    #if JTF:    su_label += "_CMS_%s_shape_jetTauFake_%s_%s%s" % (process,channel0,E,JTF) # channel dependent
-    if JTF:     su_label += "_CMS_%s_shape_jetTauFake_%s%s"  % (process,E,JTF)
-    if Zpt:     su_label += "_CMS_%s_shape_dy_%s_%s%s"       % (process,channel0,E,Zpt)
-    if TTpt:    su_label += "_CMS_%s_shape_ttbar_%s_%s%s"    % (process,channel0,E,TTpt)
-    if QCD_WJ:  su_label += "_QCD_extrap_%s_%s%s"            % (channel0,E,QCD_WJ)
+    if TES:     unclabel += "_CMS_%s_shape_t_%s_%s%s"          % (process,channel0,E,TES)
+    if JES:     unclabel += "_CMS_%s_shape_jes_%s_%s%s"        % (process,channel0,E,JES)
+    if JER:     unclabel += "_CMS_%s_shape_jer_%s_%s%s"        % (process,channel0,E,JER)
+    if UncEn:   unclabel += "_CMS_%s_shape_uncEn_%s_%s%s"      % (process,channel0,E,UncEn)
+    if EES:     unclabel += "_CMS_%s_shape_e_%s_%s%s"          % (process,channel0,E,EES)
+    if LTF:     unclabel += "_CMS_%s_shape_ZL_%s_%s%s"         % (process,channel0,E,LTF)
+    if JTF:     unclabel += "_CMS_%s_shape_jetTauFake_%s_%s%s" % (process,channel0,E,JTF) # channel dependent
+    #if JTF:     unclabel += "_CMS_%s_shape_jetTauFake_%s%s"    % (process,E,JTF)
+    if Zpt:     unclabel += "_CMS_%s_shape_dy_%s_%s%s"         % (process,channel0,E,Zpt)
+    if TTpt:    unclabel += "_CMS_%s_shape_ttbar_%s_%s%s"      % (process,channel0,E,TTpt)
+    if QCD:     unclabel += "_yield_QCD_%s_%s%s"               % (channel0,E,QCD)
     
     # LOOP over CATEGORIES
+    skipWJrenorm = 'emu' in channel or 'WJ' not in samples_dict
+    skipTTrenorm = 'TT' not in samples_dict
     print ">>> writing %s shapes to %s (%sd)" % (var,outfilename,option)
-    if su_label: print ">>> systematic uncertainty label = " + color("%s" % (su_label.lstrip('_')), color="grey")
+    if unclabel: print ">>> systematic uncertainty label = " + color("%s" % (unclabel.lstrip('_')), color="grey")
     for category, selection in selectionsDC:
         print ">>>\n>>> " + color("_%s:_%s_" % (channel.replace(' ','_'),category.replace(' ','_')), color = "magenta", bold=True)
         
@@ -280,10 +282,24 @@ def writeDataCardHistograms(sampleset, channel, var, binWidth, a, b, **kwargs):
         sampleset.refreshMemory()
         (dir,dirname) = makeDataCardTDir(outfile,category)
         
+        # WRITE selection string
+        if recreate:
+          canvas, pave = canvasWithText(selection,title=category)
+          canvas.Write("selection")
+          canvas.Close()
+        
+        # RENORMALIZE WJ
+        if not skipWJrenorm:
+          QCDshift = shiftQCD if QCD else 0.0
+          shifts   = '_jes%s'%JES if JES else '_jer%s'%JER if JER else "_UncEn%s"%UncEn if UncEn else ""
+          samples.renormalizeWJ(baseline,QCDshift=QCDshift,shift=shifts,verbosity=verbosityWJ)
+          skipWJrenorm = True
+          print ">>> "
+        
         # TT RENORMALIZATION
-        if normalizeTT and '1bt' not in category:
+        if not skipTTrenorm:
           shifts = '_jes%s'%JES if JES else '_jer%s'%JER if JER else ""
-          sampleset.renormalizeTT(selection,baseline=baseline,shift=shifts,QCD=doQCD,verbosity=verbosityWJ)
+          sampleset.renormalizeTT(selection,baseline=baseline,shift=shifts,verbosity=verbosityWJ)
         
         # LOOP over SAMPLES
         for samplename in sorted(samples_dict):
@@ -305,10 +321,10 @@ def writeDataCardHistograms(sampleset, channel, var, binWidth, a, b, **kwargs):
                 subsample, extracuts = sampleinfo[:2]
                 extraweight = ""
                 if len(sampleinfo)>2: extraweight = sampleinfo[2]
-                printSameLine(">>>   %5s" % (subsample.ljust(16))) # TODO: make table instead
+                print ">>>   %5s"%(subsample.ljust(14)), # TODO: make table instead
                 
                 # SETUP NAMES
-                name = subsample+su_label
+                name = subsample+unclabel
                 cuts = combineCuts(selection,extracuts,"%s<%s && %s<%s"%(a,var,var,b))
                 
                 # MAKE HIST
@@ -340,6 +356,7 @@ def writeDataCardHistograms(sampleset, channel, var, binWidth, a, b, **kwargs):
                     hist.SetBinContent(i,0)
                 
                 # WRITE HIST
+                dir.cd()
                 hist.Write(name,TH1D.kOverwrite)
                 print "->  written %8.1f events (%5d entries)" % (hist.GetSumOfWeights(),hist.GetEntries())
                 deleteHist(hist)
@@ -350,7 +367,7 @@ def writeDataCardHistograms(sampleset, channel, var, binWidth, a, b, **kwargs):
     
 
 
-def makeDataCardOutputName(process, analysis, channel, E="13TeV", label=""):
+def makeDataCardOutputName(process, analysis, channel, E="13TeV", tag=""):
     """Make name of output file."""
     # https://twiki.cern.ch/twiki/bin/viewauth/CMS/SMTauTau2016
     
@@ -362,7 +379,7 @@ def makeDataCardOutputName(process, analysis, channel, E="13TeV", label=""):
     else: print ">>> makeOutputName: channel not found!"
     #var = var.replace('pfmt_1','mt')
     
-    outputname = "%s_%s.inputs-%s-%s%s.root" % (process,channel,analysis,E,label)
+    outputname = "%s_%s.inputs-%s-%s%s.root" % (process,channel,analysis,E,tag)
     return outputname
     
 
@@ -408,7 +425,7 @@ def main():
     
     # MAKE SAMPLES
     global samples, samplesB, samplesS, samplesD
-    global samplesB_EESUp, samplesB_EESDown, samplesB_JTFUp, samplesB_JTFDown
+    global samples_TESUp, samples_TESDown, samples_EESUp, samples_EESDown
     
     # USER OPTIONS
     global channels
@@ -423,67 +440,89 @@ def main():
     for channel in channels:
         print ">>>\n>>>"
         
-        samples.setChannel(channel)
-        
         # SET TREENAME
-        treename = "tree_%s" % channel
+        treename = "tree_%s"%channel
         if useCutTree and "emu" not in channel:
-          treename = "tree_%s_cut_relaxed" % channel
-        samples.setTreeName(treename)
+          treename = "tree_%s_cut_relaxed"%channel
+        samples.setChannel(channel,treename=treename)
+        if doTES:
+          samples_TESUp.setChannel(  channel,treename=treename)
+          samples_TESDown.setChannel(channel,treename=treename)
         if doEES:
-          samplesB_EESUp.setTreeName(treename)
-          samplesB_EESDown.setTreeName(treename)
+          samples_EESUp.setChannel(  channel,treename=treename)
+          samples_EESDown.setChannel(channel,treename=treename)
         if doLTF:
-          samplesB_LTFUp.setTreeName(treename)
-          samplesB_LTFDown.setTreeName(treename)
-        if doJTF:
-          samplesB_JTFUp.setTreeName(treename)
-          samplesB_JTFDown.setTreeName(treename)
+          samples_LTFUp.setChannel(  channel,treename=treename)
+          samples_LTFDown.setChannel(channel,treename=treename)
+        if doZpt:
+          samples_ZptUp.setChannel(  channel,treename=treename)
+          samples_ZptDown.setChannel(channel,treename=treename)
+        if doTTpt:
+          samples_TTptUp.setChannel(  channel,treename=treename)
+          samples_TTptDown.setChannel(channel,treename=treename)
         
-        # RENORMALIZE WJ
-        print ">>> "
-        if normalizeWJ and channel!="emu":
-            LOG.header("%s: WJ renormalization" % (channel))
-            samples.renormalizeWJ(baseline,QCD=doQCD,reset=True,verbosity=verbosityWJ)
-            # TODO renormalize WJ in other sample sets
-        else: LOG.warning("Not WJ renormalized! (normalizeWJ=%s, user flag=%s, channel=%s)" % (normalizeWJ,args.noWJrenorm,channel))
-        print ">>> "
+        ## RENORMALIZE WJ
+        #print ">>> "
+        #if normalizeWJ and channel!="emu":
+        #  LOG.header("%s: WJ renormalization" % (channel))
+        #  samples.renormalizeWJ(baseline,QCD=doQCD,reset=True,verbosity=verbosityWJ)
+        #  if doQCDshift:
+        #    samples_QCDUp.renormalizeWJ(baseline,QCD=doQCD,reset=True,verbosity=verbosityWJ)
+        #    samples_QCDDown.renormalizeWJ(baseline,QCD=doQCD,reset=True,verbosity=verbosityWJ)
+        #else: LOG.warning("Not WJ renormalized! (normalizeWJ=%s, user flag=%s, channel=%s)" % (normalizeWJ,args.noWJrenorm,channel))
+        #print ">>> "
         
         # DIRECTORIES
-        dirlabel = globalTag
-        DIR = "%s/%s%s"%(PLOTS_DIR,channel,dirlabel)
+        DIR = "%s/%s%s"%(PLOTS_DIR,channel,globalTag)
         
         # MAIN ROUTINES
         LOG.header("%s channel: Writing histogram for datacards" % channel)
         var, width, a, b = "m_sv", 5, 0, 350
+        args   = (channel, var, width, a, b)
         kwargs = { 'process': 'xtt', 'analysis': "LowMassDiTau" }
         if doNominal:
-            writeDataCardHistograms(samples,           channel, var, width, a, b, recreate=recreateDC, **kwargs )
+            writeDataCard(samples,          *args, recreate=recreateDC, **kwargs )
         if doShapes:
-          if doEES:
-            writeDataCardHistograms(samplesB_EESUp,    channel, var, width, a, b, EES="Up",   filter=['TT','ST'],  **kwargs )
-            writeDataCardHistograms(samplesB_EESDown,  channel, var, width, a, b, EES="Down", filter=['TT','ST'],  **kwargs )
-          if doJTF and "tau" in channel:
-            writeDataCardHistograms(samplesB_JTFUp,    channel, var, width, a, b, JTF="Up",   filter=['TT','ST','WJ'],  **kwargs )
-            writeDataCardHistograms(samplesB_JTFDown,  channel, var, width, a, b, JTF="Down", filter=['TT','ST','WJ'],  **kwargs )
+          if doQCDshift:
+            writeDataCard(samples,          *args, QCD="Down", filter=['WJ',], shiftQCD=-0.20, **kwargs ) # 'TT',
+            writeDataCard(samples,          *args, QCD="Up",   filter=['WJ',], shiftQCD=+0.20, **kwargs )
+          if doEES and "e" in channel:
+            writeDataCard(samples_EESUp,    *args, EES="Up",   **kwargs )
+            writeDataCard(samples_EESDown,  *args, EES="Down", **kwargs )
+          if doLTF and "tau" in channel:
+            writeDataCard(samples_LTFUp,    *args, LTF="Up",   filter=['DY'], **kwargs )
+            writeDataCard(samples_LTFDown,  *args, LTF="Down", filter=['DY'], **kwargs )
           if doTES and "tau" in channel:
-            writeDataCardHistograms(samplesB_TESUp,    channel, var, width, a, b, TES="Down", filter=['TT','ST','DY'], **kwargs )
-            writeDataCardHistograms(samplesB_TESDown,  channel, var, width, a, b, TES="Up",   filter=['TT','ST','DY'], **kwargs )
+            writeDataCard(samples_TESUp,    *args, TES="Down", filter=['TT','DY','VLQ','bbA'], **kwargs )
+            writeDataCard(samples_TESDown,  *args, TES="Up",   filter=['TT','DY','VLQ','bbA'], **kwargs )
           if doJEC:
-            writeDataCardHistograms(samples,           channel, var, width, a, b, JES="Up",   **kwargs )
-            writeDataCardHistograms(samples,           channel, var, width, a, b, JES="Down", **kwargs )
+            writeDataCard(samples,          *args, JES="Up",   **kwargs )
+            writeDataCard(samples,          *args, JES="Down", **kwargs )
           if doJER:
-            writeDataCardHistograms(samples,           channel, var, width, a, b, JER="Up",   **kwargs )
-            writeDataCardHistograms(samples,           channel, var, width, a, b, JER="Down", **kwargs )
+            writeDataCard(samples,          *args, JER="Up",   **kwargs )
+            writeDataCard(samples,          *args, JER="Down", **kwargs )
+          if doUncEn:
+            writeDataCard(samples,          *args, UncEn="Up",   **kwargs )
+            writeDataCard(samples,          *args, UncEn="Down", **kwargs )
           if doZpt:
-            writeDataCardHistograms(samplesB_ZptDown,  channel, var, width, a, b, Zpt="Down", filter=['DY'], **kwargs )
-            writeDataCardHistograms(samplesB_ZptUp,    channel, var, width, a, b, Zpt="Up",   filter=['DY'], **kwargs )
+            writeDataCard(samples_ZptDown,  *args, Zpt="Down",  filter=['DY'], **kwargs )
+            writeDataCard(samples_ZptUp,    *args, Zpt="Up",    filter=['DY'], **kwargs )
           if doTTpt:
-            writeDataCardHistograms(samplesB_TTptDown, channel, var, width, a, b, TTpt="Down", filter=['TT'], **kwargs )
-            writeDataCardHistograms(samplesB_TTptUp,   channel, var, width, a, b, TTpt="Up",   filter=['TT'], **kwargs )
-          if doQCD_WJ:
-            writeDataCardHistograms(samplesB_QCD_WJDown, channel, var, width, a, b, QCD_WJ="Down", filter=['WJ'], **kwargs )
-            writeDataCardHistograms(samplesB_QCD_WJUp,   channel, var, width, a, b, QCD_WJ="Up",   filter=['WJ'], **kwargs )
+            writeDataCard(samples_TTptDown, *args, TTpt="Down", filter=['TT'], **kwargs )
+            writeDataCard(samples_TTptUp,   *args, TTpt="Up",   filter=['TT'], **kwargs )
+            
+        # OTPIMIZATIONS
+        optimizations  = [ ]
+        optimizations += [( "_mt%s"%m,           "pfmt_1<%s"%m               ) for m in [20,30,40,50,60,70,80]]
+        optimizations += [( "_met%s"%M,          "met<%s"%M                  ) for M in [20,30,40,50,60,70,80]]
+        optimizations += [( "_dz%s"%d,           "pzeta_disc>%s"%d           ) for d in [-20,-30,-40,-50,-60,-70,-80]]
+        optimizations += [( "_dz%s_mt%s"%(m,M),  "pzeta_disc>%s && pfmt_1<%s"%(d,m) ) for m in [30,40,50,60,70] for d in [-30,-40,-50,-60,-70]]
+        optimizations += [( "_mt%s_met%s"%(m,M), "pfmt_1<%s && met<%s"%(m,M) ) for m in [30,40,50,60,70] for M in [30,40,50,60,70,80]]
+        for tag, optimization in optimizations:
+            args   = (channel, var, width, a, b)
+            kwargs = { 'process': 'xtt', 'analysis': "LowMassDiTau", }
+            writeDataCard(samples, *args, recreate=True, tag=tag, optimization=optimization, **kwargs )
+        
             
     
 

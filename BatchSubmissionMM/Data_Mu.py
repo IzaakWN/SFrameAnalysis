@@ -6,8 +6,8 @@ nEventsMax=-1
 runningJobsLimit=6000
 nProcesses=1
 queue="short.q"
-nFiles=3
-hCPU="00:30:00"
+nFiles=6
+hCPU="00:40:00"
 hVMEM="5000M"
 postFix="_2017_V2"
 dataSets = [
@@ -25,7 +25,7 @@ dataSets = [
         "SingleMuon_Run2017C-17Nov2017-v1_0002.xml", ]],
     
    ["SingleMuon_Run2017D",
-    [   "SingleMuon_Run2017D-17Nov2017-v1_0000_0.xml",
+     [   "SingleMuon_Run2017D-17Nov2017-v1_0000_0.xml",
         "SingleMuon_Run2017D-17Nov2017-v1_0000_1.xml",
         "SingleMuon_Run2017D-17Nov2017-v1_0001.xml", ]],
     

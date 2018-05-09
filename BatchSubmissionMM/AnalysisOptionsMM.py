@@ -16,7 +16,7 @@ loadPacks=[
     "GoodRunsLists.par",
     "PileupReweightingTool.par",
     "BTaggingTools.par",
-    "TauTauResonancesEM.par",
+    "TauTauResonancesMM.par",
     "ScaleFactorTool.par",
     "RecoilCorrector.par",
     "JetCorrectionTool.par",

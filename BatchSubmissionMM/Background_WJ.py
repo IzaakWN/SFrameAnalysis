@@ -6,29 +6,13 @@ nEventsMax=-1
 runningJobsLimit=6000
 nProcesses=1
 queue="short.q"
-nFiles=3
-hCPU="00:30:00"
+nFiles=5
+hCPU="00:40:00"
 hVMEM="5000M"
 postFix="_2017_V2"
 dataSets = [
-    
-   # # 94X, new JEC
-   #[ "WJetsToLNu",
-   # [   "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_0000.xml", ]],
-   #  
-   #[ "W1JetsToLNu",
-   # [   "W1JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_0000.xml", ]],
-   #
-   # [ "W2JetsToLNu",
-   #  [  "W2JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_0000.xml", ]],
-   #  
-   # [ "W3JetsToLNu",
-   #  [  "W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_0000.xml", ]],
-   #  
-   # [ "W4JetsToLNu",
-   #  [  "W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_0000.xml", ]],
-    
-    # 94X, new JEC, training v2
+     
+   # 94X, new JEC, training v2
    [ "WJetsToLNu",
     [   "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_0000.xml", ]],
     
@@ -51,7 +35,6 @@ userItems = [
     ["IsData","false"],
     ["IsSignal","false"],
     ["doRecoilCorr","false"],
-    ["MC_V1","true"],
 ]
 
 jobOptionsFile2=open("AnalysisOptionsMM.py", 'r')

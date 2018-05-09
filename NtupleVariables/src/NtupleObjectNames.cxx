@@ -305,12 +305,42 @@ namespace Ntuple {
     m_names["byTightCombinedIsolationDeltaBetaCorr3Hits"] = "byTightCombinedIsolationDeltaBetaCorr3Hits";
     m_names["byCombinedIsolationDeltaBetaCorrRaw3Hits"] = "byCombinedIsolationDeltaBetaCorrRaw3Hits";
     
+    m_names["byIsolationMVArun2v1DBoldDMwLTraw"] = "byIsolationMVArun2v1DBoldDMwLTraw";         // 2017 MC_v1
+    m_names["byIsolationMVArun2v2DBoldDMwLTraw"] = "byIsolationMVArun2v2DBoldDMwLTraw";         // 2017 MC_v2
+    m_names["byIsolationMVArun2v1DBnewDMwLTraw"] = "byIsolationMVArun2v1DBnewDMwLTraw";         // 2017 MC_v2 ?
     m_names["byIsolationMVArun2v1DBdR03oldDMwLTraw"] = "byIsolationMVArun2v1DBdR03oldDMwLTraw"; // 2017 MC_v2
-    m_names["byIsolationMVArun2v1DBnewDMwLTraw"] = "byIsolationMVArun2v1DBnewDMwLTraw";         // 2017 MC_v1
-    m_names["byIsolationMVArun2v1DBoldDMwLTraw"] = "byIsolationMVArun2v1DBoldDMwLTraw";         // 2017 MC_v1 ?
     m_names["byIsolationMVArun2v1PWnewDMwLTraw"] = "byIsolationMVArun2v1PWnewDMwLTraw";         // 2015 MC
     
-    m_names["byIsolationMVArun2v2DBoldDMwLTraw"] = "byIsolationMVArun2v2DBoldDMwLTraw";         // 2017 MC_v2
+    m_names["byVLooseIsolationMVArun2v1DBdR03oldDMwLT"] = "byVLooseIsolationMVArun2v1DBdR03oldDMwLT";
+    m_names["byVLooseIsolationMVArun2v1DBnewDMwLT"] = "byVLooseIsolationMVArun2v1DBnewDMwLT";
+    m_names["byVLooseIsolationMVArun2v1DBoldDMwLT"] = "byVLooseIsolationMVArun2v1DBoldDMwLT";
+    m_names["byVLooseIsolationMVArun2v1PWnewDMwLT"] = "byVLooseIsolationMVArun2v1PWnewDMwLT";
+    
+    m_names["byLooseIsolationMVArun2v1DBdR03oldDMwLT"] = "byLooseIsolationMVArun2v1DBdR03oldDMwLT";
+    m_names["byLooseIsolationMVArun2v1DBnewDMwLT"] = "byLooseIsolationMVArun2v1DBnewDMwLT";
+    m_names["byLooseIsolationMVArun2v1DBoldDMwLT"] = "byLooseIsolationMVArun2v1DBoldDMwLT";
+    m_names["byLooseIsolationMVArun2v1PWnewDMwLT"] = "byLooseIsolationMVArun2v1PWnewDMwLT";
+    
+    m_names["byMediumIsolationMVArun2v1DBdR03oldDMwLT"] = "byMediumIsolationMVArun2v1DBdR03oldDMwLT";
+    m_names["byMediumIsolationMVArun2v1DBnewDMwLT"] = "byMediumIsolationMVArun2v1DBnewDMwLT"; 
+    m_names["byMediumIsolationMVArun2v1DBoldDMwLT"] = "byMediumIsolationMVArun2v1DBoldDMwLT"; 
+    m_names["byMediumIsolationMVArun2v1PWnewDMwLT"] = "byMediumIsolationMVArun2v1PWnewDMwLT"; 
+    
+    m_names["byTightIsolationMVArun2v1DBdR03oldDMwLT"] = "byTightIsolationMVArun2v1DBdR03oldDMwLT";
+    m_names["byTightIsolationMVArun2v1DBnewDMwLT"] = "byTightIsolationMVArun2v1DBnewDMwLT"; 
+    m_names["byTightIsolationMVArun2v1DBoldDMwLT"] = "byTightIsolationMVArun2v1DBoldDMwLT"; 
+    m_names["byTightIsolationMVArun2v1PWnewDMwLT"] = "byTightIsolationMVArun2v1PWnewDMwLT"; 
+    
+    m_names["byVTightIsolationMVArun2v1DBdR03oldDMwLT"] = "byVTightIsolationMVArun2v1DBdR03oldDMwLT";
+    m_names["byVTightIsolationMVArun2v1DBnewDMwLT"] = "byVTightIsolationMVArun2v1DBnewDMwLT";
+    m_names["byVTightIsolationMVArun2v1DBoldDMwLT"] = "byVTightIsolationMVArun2v1DBoldDMwLT";
+    m_names["byVTightIsolationMVArun2v1PWnewDMwLT"] = "byVTightIsolationMVArun2v1PWnewDMwLT";
+    
+    m_names["byVVTightIsolationMVArun2v1DBdR03oldDMwLT"] = "byVVTightIsolationMVArun2v1DBdR03oldDMwLT";
+    m_names["byVVTightIsolationMVArun2v1DBnewDMwLT"] = "byVVTightIsolationMVArun2v1DBnewDMwLT";
+    m_names["byVVTightIsolationMVArun2v1DBoldDMwLT"] = "byVVTightIsolationMVArun2v1DBoldDMwLT";
+    m_names["byVVTightIsolationMVArun2v1PWnewDMwLT"] = "byVVTightIsolationMVArun2v1PWnewDMwLT";
+
     m_names["byVLooseIsolationMVArun2v2DBoldDMwLT"] = "byVLooseIsolationMVArun2v2DBoldDMwLT";
     m_names["byLooseIsolationMVArun2v2DBoldDMwLT"] = "byLooseIsolationMVArun2v2DBoldDMwLT";
     m_names["byMediumIsolationMVArun2v2DBoldDMwLT"] = "byMediumIsolationMVArun2v2DBoldDMwLT";
@@ -349,36 +379,6 @@ namespace Ntuple {
     
     m_names["footprintCorrection"] = "footprintCorrection";
     m_names["footprintCorrectiondR03"] = "footprintCorrectiondR03";
-    
-    m_names["byVLooseIsolationMVArun2v1DBdR03oldDMwLT"] = "byVLooseIsolationMVArun2v1DBdR03oldDMwLT";
-    m_names["byVLooseIsolationMVArun2v1DBnewDMwLT"] = "byVLooseIsolationMVArun2v1DBnewDMwLT";
-    m_names["byVLooseIsolationMVArun2v1DBoldDMwLT"] = "byVLooseIsolationMVArun2v1DBoldDMwLT";
-    m_names["byVLooseIsolationMVArun2v1PWnewDMwLT"] = "byVLooseIsolationMVArun2v1PWnewDMwLT";
-    
-    m_names["byLooseIsolationMVArun2v1DBdR03oldDMwLT"] = "byLooseIsolationMVArun2v1DBdR03oldDMwLT";
-    m_names["byLooseIsolationMVArun2v1DBnewDMwLT"] = "byLooseIsolationMVArun2v1DBnewDMwLT";
-    m_names["byLooseIsolationMVArun2v1DBoldDMwLT"] = "byLooseIsolationMVArun2v1DBoldDMwLT";
-    m_names["byLooseIsolationMVArun2v1PWnewDMwLT"] = "byLooseIsolationMVArun2v1PWnewDMwLT";
-    
-    m_names["byMediumIsolationMVArun2v1DBdR03oldDMwLT"] = "byMediumIsolationMVArun2v1DBdR03oldDMwLT";
-    m_names["byMediumIsolationMVArun2v1DBnewDMwLT"] = "byMediumIsolationMVArun2v1DBnewDMwLT"; 
-    m_names["byMediumIsolationMVArun2v1DBoldDMwLT"] = "byMediumIsolationMVArun2v1DBoldDMwLT"; 
-    m_names["byMediumIsolationMVArun2v1PWnewDMwLT"] = "byMediumIsolationMVArun2v1PWnewDMwLT"; 
-    
-    m_names["byTightIsolationMVArun2v1DBdR03oldDMwLT"] = "byTightIsolationMVArun2v1DBdR03oldDMwLT";
-    m_names["byTightIsolationMVArun2v1DBnewDMwLT"] = "byTightIsolationMVArun2v1DBnewDMwLT"; 
-    m_names["byTightIsolationMVArun2v1DBoldDMwLT"] = "byTightIsolationMVArun2v1DBoldDMwLT"; 
-    m_names["byTightIsolationMVArun2v1PWnewDMwLT"] = "byTightIsolationMVArun2v1PWnewDMwLT"; 
-    
-    m_names["byVTightIsolationMVArun2v1DBdR03oldDMwLT"] = "byVTightIsolationMVArun2v1DBdR03oldDMwLT";
-    m_names["byVTightIsolationMVArun2v1DBnewDMwLT"] = "byVTightIsolationMVArun2v1DBnewDMwLT";
-    m_names["byVTightIsolationMVArun2v1DBoldDMwLT"] = "byVTightIsolationMVArun2v1DBoldDMwLT";
-    m_names["byVTightIsolationMVArun2v1PWnewDMwLT"] = "byVTightIsolationMVArun2v1PWnewDMwLT";
-    
-    m_names["byVVTightIsolationMVArun2v1DBdR03oldDMwLT"] = "byVVTightIsolationMVArun2v1DBdR03oldDMwLT";
-    m_names["byVVTightIsolationMVArun2v1DBnewDMwLT"] = "byVVTightIsolationMVArun2v1DBnewDMwLT";
-    m_names["byVVTightIsolationMVArun2v1DBoldDMwLT"] = "byVVTightIsolationMVArun2v1DBoldDMwLT";
-    m_names["byVVTightIsolationMVArun2v1PWnewDMwLT"] = "byVVTightIsolationMVArun2v1PWnewDMwLT";
     
     m_names["againstElectronMVA6raw"] = "againstElectronMVA6raw";
     m_names["againstElectronMVA6category"] = "againstElectronMVA6category";

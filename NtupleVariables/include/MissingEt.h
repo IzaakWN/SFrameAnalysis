@@ -94,6 +94,9 @@ namespace UZH {
     void cov10( const floatingnumber& val){ *(m_cov10)=val; } 
     void cov11( const floatingnumber& val){ *(m_cov11)=val; } 
     
+    floatingnumber px() const { return *(m_et)*cos(*(m_phi)); }
+    floatingnumber py() const { return *(m_et)*sin(*(m_phi)); }
+    
     
     private:
     

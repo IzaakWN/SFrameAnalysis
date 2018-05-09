@@ -48,13 +48,21 @@ floatingnumber Particle::DeltaR(const Particle p) const {
   return sqrt( deta*deta+dphi*dphi );
 }
 
+floatingnumber Particle::M(const Particle p) const {
+  Double_t E2 = pow(*(m_e) + p.e(),2);
+  Double_t P2 = pow(*(m_pt)*cosh(*(m_eta)),2) + pow(p.pt()*cosh(p.eta()),2)
+                + 2*(*(m_pt))*p.pt()*(cos(*(m_phi)-p.phi())+sinh(*(m_eta))*sinh(p.eta()));
+  if(E2<P2)
+    return -sqrt( P2 - E2 );
+  return sqrt( E2 - P2 );
+}
+
 ostream& operator<<( ostream& out, const Particle& rhs ) {
   out << " m:"   << rhs.m()
       << " e:"   << rhs.e()
       << " pt:"  << rhs.pt()
       << " eta:" << rhs.eta()
       << " phi:" << rhs.phi();
-
   return out;
 }
 
@@ -66,7 +74,7 @@ Particle& Particle::operator*=(const floatingnumber scale) {
 }
 
 bool sortParticlePt::operator()( const Particle& p1, const Particle& p2 ) {
-  return ( p1.pt() > p2.pt() ) ? true : false;
+  return p1.pt() > p2.pt(); //( p1.pt() > p2.pt() ) ? true : false;
 }
 
 TLorentzVector* Particle::getTLV() const {

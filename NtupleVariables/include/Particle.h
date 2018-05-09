@@ -32,6 +32,8 @@ namespace UZH {
     
     floatingnumber e()   const;
     floatingnumber pt()  const;
+    floatingnumber px()  const;
+    floatingnumber py()  const;
     floatingnumber eta() const;
     floatingnumber phi() const;
     floatingnumber m()   const;
@@ -46,6 +48,7 @@ namespace UZH {
     TLorentzVector tlv() const;
     floatingnumber DeltaR(const Particle* p) const;
     floatingnumber DeltaR(const Particle p) const;
+    floatingnumber M(const Particle p) const;
     
     floatingnumber* m_e;
     floatingnumber* m_pt;
@@ -59,6 +62,8 @@ namespace UZH {
   
   inline floatingnumber Particle::e()   const { return m_e   ? *(m_e)   : 0; }
   inline floatingnumber Particle::pt()  const { return m_pt  ? *(m_pt)  : 0; }
+  inline floatingnumber Particle::px()  const { return *(m_pt)*cos(*(m_phi)) ? *(m_pt) : 0; }
+  inline floatingnumber Particle::py()  const { return *(m_pt)*sin(*(m_phi)) ? *(m_pt) : 0; }
   inline floatingnumber Particle::eta() const { return m_eta ? *(m_eta) : 0; }
   inline floatingnumber Particle::phi() const { return m_phi ? *(m_phi) : 0; }
   inline floatingnumber Particle::m()   const { return m_m   ? *(m_m)   : 0; }

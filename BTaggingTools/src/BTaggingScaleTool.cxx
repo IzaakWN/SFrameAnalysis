@@ -10,17 +10,12 @@ BTaggingScaleTool::BTaggingScaleTool( SCycleBase* parent, const char* name ) :
   
   SetLogName( name );
   
-  std::string sframe_dir = "$SFRAME_DIR"; //(std::getenv("SFRAME_DIR"));
   DeclareProperty( m_name + "_Tagger",       m_tagger = "CSVv2" );
   DeclareProperty( m_name + "_WorkingPoint", m_workingPoint = "Medium" );
-  DeclareProperty( m_name + "_CsvFile",      m_csvFile = sframe_dir + "/../BTaggingTools/csv/CSVv2_94XSF_V1_B_F.csv" );
-  DeclareProperty( m_name + "_deepCsvFile",  m_deepCsvFile = sframe_dir + "/../BTaggingTools/csv/DeepCSV_94XSF_V1_B_F.csv" );
-  
+  DeclareProperty( m_name + "_CsvFile",      m_csvFile = "$SFRAME_DIR/../BTaggingTools/csv/CSVv2_94XSF_V1_B_F.csv" );
+  DeclareProperty( m_name + "_deepCsvFile",  m_deepCsvFile = "$SFRAME_DIR/../BTaggingTools/csv/DeepCSV_94XSF_V1_B_F.csv" );
   DeclareProperty( m_name + "_MeasurementType_udsg", m_measurementType_udsg = "incl" ); 
   DeclareProperty( m_name + "_MeasurementType_bc",   m_measurementType_bc = "mujets" ); // for AK4 jets; for AK8 jets, use "lt"
-  
-  DeclareProperty( m_name + "_EffHistDirectory", m_effHistDirectory = "bTagEff" );
-  DeclareProperty( m_name + "_EffFile",          m_effFile = sframe_dir + "/../BTaggingTools/efficiencies/bTagEffs_HTT_baseline_ltau_2017.root" );
   
   // https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation94X
   CSV_WP.clear();
@@ -36,6 +31,10 @@ BTaggingScaleTool::BTaggingScaleTool( SCycleBase* parent, const char* name ) :
   m_currentWP_deepCsvCut = deepCSV_WP[m_workingPoint];
   m_effMaps.clear();
   
+  // jet categories for efficiencies
+  m_jetCategories = {"jet_ak4"}; //"jet", "subjet_softdrop"};
+  m_flavours = {"udsg", "b", "c"};
+  
 }
 
 
@@ -44,28 +43,18 @@ BTaggingScaleTool::~BTaggingScaleTool(){ }
 
 
 
-void BTaggingScaleTool::BeginInputData( const SInputData& ) throw( SError ) {
+void BTaggingScaleTool::BeginInputData( const SInputData&, std::string channel ) throw( SError ) {
   
-  // jet categories for efficiencies
-  m_jetCategories = {"jet_ak4"}; //"jet", "subjet_softdrop"};
-  m_flavours = {"udsg", "b", "c"};
-  
-  BTagEntry::OperatingPoint wp = BTagEntry::OP_LOOSE;
-  if (m_workingPoint.find("Loose") != std::string::npos) {
-    wp = BTagEntry::OP_LOOSE;
-    m_currentWP_CsvCut = CSV_WP["Loose"];
-  }
-  else if (m_workingPoint.find("Medium") != std::string::npos) {
-    //std::cout << " working point medium"<<std::endl;
-    wp = BTagEntry::OP_MEDIUM;
-    m_currentWP_CsvCut = CSV_WP["Medium"];
-  }
-  else if (m_workingPoint.find("Tight") != std::string::npos) {
-    wp = BTagEntry::OP_TIGHT;
-    m_currentWP_CsvCut = CSV_WP["Tight"];
-  }
-  else {
-    throw SError( ("Unknown working point: " + m_workingPoint).c_str(), SError::SkipCycle );
+  m_channel = channel;
+  if(channel=="emu"){
+    DeclareProperty( m_name + "_EffFile",           m_effFile = "$SFRAME_DIR/../BTaggingTools/efficiencies/bTagEffs_HTT_baseline_emu_noTau_2017.root" );
+    DeclareProperty( m_name + "_EffHistDirectory",  m_effHistDirectory = "bTagEff_noTau" );
+  }else if(channel=="mumu"){
+    DeclareProperty( m_name + "_EffFile",           m_effFile = "$SFRAME_DIR/../BTaggingTools/efficiencies/bTagEffs_HTT_baseline_emu_noTau_2017.root" );
+    DeclareProperty( m_name + "_EffHistDirectory",  m_effHistDirectory = "bTagEff_noTau" );
+  }else{
+    DeclareProperty( m_name + "_EffFile",           m_effFile = "$SFRAME_DIR/../BTaggingTools/efficiencies/bTagEffs_HTT_baseline_ltau_2017.root" );
+    DeclareProperty( m_name + "_EffHistDirectory",  m_effHistDirectory = "bTagEff" );
   }
   
   m_logger << INFO << SLogger::endmsg;
@@ -85,6 +74,26 @@ void BTaggingScaleTool::BeginInputData( const SInputData& ) throw( SError ) {
   std::string match = "$SFRAME_DIR";
   std::string replacement = std::getenv("SFRAME_DIR");
   m_csvFile.replace(0,match.length(),replacement);
+  m_deepCsvFile.replace(0,match.length(),replacement);
+  
+  // WP
+  BTagEntry::OperatingPoint wp = BTagEntry::OP_LOOSE;
+  if (m_workingPoint.find("Loose") != std::string::npos) {
+    wp = BTagEntry::OP_LOOSE;
+    m_currentWP_CsvCut = CSV_WP["Loose"];
+  }
+  else if (m_workingPoint.find("Medium") != std::string::npos) {
+    //std::cout << " working point medium"<<std::endl;
+    wp = BTagEntry::OP_MEDIUM;
+    m_currentWP_CsvCut = CSV_WP["Medium"];
+  }
+  else if (m_workingPoint.find("Tight") != std::string::npos) {
+    wp = BTagEntry::OP_TIGHT;
+    m_currentWP_CsvCut = CSV_WP["Tight"];
+  }
+  else {
+    throw SError( ("Unknown working point: " + m_workingPoint).c_str(), SError::SkipCycle );
+  }
   
   BTagCalibration m_calib(m_tagger, m_csvFile); m_logger << INFO << ".";
   m_reader.reset(      new BTagCalibrationReader(wp, "central" )); m_logger << INFO << ".";
@@ -331,18 +340,32 @@ double BTaggingScaleTool::getScaleFactor( const UZH::JetVec& vJets, const double
 
 /// function to book histograms for efficiencies
 void BTaggingScaleTool::bookHistograms() {
+  // TODO: make channel dependent
   
   const int nPtBins = 11;
   const int nEtaBins = 4;
   float ptBins[nPtBins+1] = {10, 20, 30, 50, 70, 100, 140, 200, 300, 670, 1000, 1500};
   float etaBins[nEtaBins+1] = {-2.5, -1.5, 0, 1.5, 2.5};
-  std::string directories[4] = { m_effHistDirectory, m_effHistDirectory+"_mutau", //m_effHistDirectory+"_etau",
-                                 m_effHistDirectory+"_DeepCSV", m_effHistDirectory+"_DeepCSV_mutau" };
+  std::string directory = "bTagEff"; //m_effHistDirectory;
+  std::vector<std::string> directories;
+  if(m_channel=="emu")
+    directories = {
+        directory+"_emu",         directory+"_noTau",
+        directory+"_DeepCSV_emu", directory+"_DeepCSV_noTau" };
+  else if(m_channel=="mumu")
+    directories = {
+        directory+"_mumu",        directory+"_noTau",
+        directory+"_DeepCSV_mumu", directory+"_DeepCSV_noTau" };
+  else
+    directories = {
+        directory,             //m_effHistDirectory+"_mutau", //m_effHistDirectory+"_etau",
+        directory+"_DeepCSV",  //, m_effHistDirectory+"_DeepCSV_mutau"
+    };
   
   for(const std::string &directory: directories){
-    for(std::vector<TString>::const_iterator flav = m_flavours.begin(); flav != m_flavours.end(); ++flav){
-      Book( TH2F("jet_ak4_"+*flav+"_"+m_workingPoint, "jet_ak4_"+*flav+"_"+m_workingPoint, nPtBins, ptBins, nEtaBins, etaBins), directory.c_str() );
-      Book( TH2F("jet_ak4_"+*flav+"_all",             "jet_ak4_"+*flav+"_all",             nPtBins, ptBins, nEtaBins, etaBins), directory.c_str() );
+    for(const auto& flav: m_flavours){
+      Book( TH2F("jet_ak4_"+flav+"_"+m_workingPoint, "jet_ak4_"+flav+"_"+m_workingPoint, nPtBins, ptBins, nEtaBins, etaBins), directory.c_str() );
+      Book( TH2F("jet_ak4_"+flav+"_all",             "jet_ak4_"+flav+"_all",             nPtBins, ptBins, nEtaBins, etaBins), directory.c_str() );
     }
   }
 }
@@ -352,7 +375,7 @@ void BTaggingScaleTool::bookHistograms() {
 void BTaggingScaleTool::fillEfficiencies( const UZH::JetVec& vJets, std::string channel ) {
   //std::cout << "BTaggingScaleTool::fillEfficiencies - vJets.size() = " << vJets.size() << std::endl; 
   
-  std::string directory = m_effHistDirectory;
+  std::string directory = "bTagEff"; //m_effHistDirectory;
   if(channel!="") directory=directory+"_"+channel;
   
   for(std::vector< UZH::Jet>::const_iterator itJet = vJets.begin(); itJet < vJets.end(); ++itJet){
@@ -373,14 +396,14 @@ void BTaggingScaleTool::fillEfficiencies( const UZH::JetVec& vJets, std::string 
 void BTaggingScaleTool::fillEfficienciesDeepCSV( const UZH::JetVec& vJets, std::string channel ) {
   //std::cout << "BTaggingScaleTool::fillEfficienciesDeepCSV - vJets.size() = " << vJets.size() << std::endl; 
   
-  std::string directory = m_effHistDirectory+"_DeepCSV";
+  std::string directory = "bTagEff_DeepCSV"; //m_effHistDirectory+"_DeepCSV";
   if(channel!="") directory=directory+"_"+channel;
-  for(std::vector< UZH::Jet>::const_iterator itJet = vJets.begin(); itJet < vJets.end(); ++itJet){
-    TString flavourString = flavourToString(itJet->hadronFlavour());
-    if(isTaggedDeepCSV(*itJet)){
-      Hist("jet_ak4_"+flavourString+"_"+m_workingPoint, directory.c_str())->Fill(itJet->pt(), itJet->eta());
+  for(const auto& jet: vJets){
+    TString flavourString = flavourToString(jet.hadronFlavour());
+    if(isTaggedDeepCSV(jet)){
+      Hist("jet_ak4_"+flavourString+"_"+m_workingPoint, directory.c_str())->Fill(jet.pt(), jet.eta());
     }
-    Hist(  "jet_ak4_"+flavourString+"_all",             directory.c_str())->Fill(itJet->pt(), itJet->eta());
+    Hist(  "jet_ak4_"+flavourString+"_all",             directory.c_str())->Fill(jet.pt(), jet.eta());
   }
   
 }
@@ -392,12 +415,12 @@ void BTaggingScaleTool::readEfficiencies() {
   m_logger << INFO << "Reading in b-tagging efficiencies from file " << m_effFile << SLogger::endmsg;
   auto inFile = TFile::Open(m_effFile.c_str());
   
-  for (std::vector<TString>::const_iterator flav = m_flavours.begin(); flav != m_flavours.end(); ++flav) {
-    auto hPass =   (TH2F*) inFile->Get(  m_effHistDirectory + "/" + "jet_ak4_" + *flav + "_" + m_workingPoint);
-    auto hAll  =   (TH2F*) inFile->Get(  m_effHistDirectory + "/" + "jet_ak4_" + *flav + "_all");
-    TH2F hEff  = *((TH2F*) hPass->Clone( m_effHistDirectory + "_jet_ak4_" + *flav + "_" + m_workingPoint ));
+  for (const auto& flav: m_flavours) {
+    auto hPass =   (TH2F*) inFile->Get(  m_effHistDirectory + "/" + "jet_ak4_" + flav + "_" + m_workingPoint);
+    auto hAll  =   (TH2F*) inFile->Get(  m_effHistDirectory + "/" + "jet_ak4_" + flav + "_all");
+    TH2F hEff  = *((TH2F*) hPass->Clone( m_effHistDirectory + "_jet_ak4_" + flav + "_" + m_workingPoint ));
     hEff.Divide(hAll);
-    m_effMaps[( "jet_ak4_" + *flav + "_" + m_workingPoint).Data()] = hEff;
+    m_effMaps[( "jet_ak4_" + flav + "_" + m_workingPoint).Data()] = hEff;
     m_logger << DEBUG << "effi TH2D binsx: " << hEff.GetNbinsX() << " binsy: " << hEff.GetNbinsY() << SLogger::endmsg;
   }
   
@@ -411,7 +434,9 @@ void BTaggingScaleTool::readEfficiencies() {
 double BTaggingScaleTool::getEfficiency( const double& pt, const double& eta, const int& flavour, const TString& jetCategory ) {
   double eff = 1.;
   
+  
   TH2F thisHist = m_effMaps[("jet_ak4_" + flavourToString(flavour) + "_" + m_workingPoint).Data()];
+  
   m_logger << DEBUG << /*thisHist << " " << */ thisHist.GetName() << SLogger::endmsg;
   int binx = thisHist.GetXaxis()->FindBin(pt);
   if( pt >   thisHist.GetXaxis()->GetBinLowEdge(thisHist.GetNbinsX()+1)) binx = thisHist.GetNbinsX(); // added by Izaak
@@ -458,7 +483,7 @@ bool BTaggingScaleTool::isTagged( const UZH::Jet& jet ) {
 }
 
 bool BTaggingScaleTool::isTaggedDeepCSV( const UZH::Jet& jet ) {
-  return jet.csv() > m_currentWP_deepCsvCut;
+  return jet.deepCSV() > m_currentWP_deepCsvCut;
 }
 
 bool BTaggingScaleTool::isTagged( const double csv ) {

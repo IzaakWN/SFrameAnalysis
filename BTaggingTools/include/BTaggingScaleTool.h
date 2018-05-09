@@ -22,7 +22,7 @@ class BTaggingScaleTool : public SToolBase {
   ~BTaggingScaleTool();
   
   /// function booking histograms
-  void BeginInputData( const SInputData& id ) throw( SError );
+  void BeginInputData( const SInputData& id, std::string channel="" ) throw( SError );
   
   /// function for AK4 jets
   double getScaleFactor( const double& pt, const double& eta, const int& flavour, bool isTagged, const double& sigma_bc = 0., const double& sigma_udsg = 0., const TString& jetCategory = "jet_ak4" );
@@ -56,7 +56,8 @@ class BTaggingScaleTool : public SToolBase {
 
  private:
 
-  std::string m_name; // name of the tool
+  std::string m_name;
+  std::string m_channel;
   std::string m_tagger;
   std::string m_workingPoint;
   std::string m_csvFile;

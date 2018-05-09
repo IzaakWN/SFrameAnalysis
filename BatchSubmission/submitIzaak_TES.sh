@@ -1,11 +1,11 @@
 #! /bin/bash
 
-function peval { echo ">>> $@"; eval "$@"; }
+function peval { echo -e ">>> $(tput setab 0)$(tput setaf 7)$@$(tput sgr0)"; eval "$@"; }
 
 case $1 in
   1) echo ">>> DY TES Down uneven"
      FILES=`ls TES/Background_DY_TES0p99*.py | sort -r`
-     FILES+=" "`ls TES/Background_DY_TES0p97*.py | sort -r`
+     FILES+=" "`ls TES/Background_DY_TES0p97?.py | sort -r`
      FILES+=" "`ls TES/Background_DY_TES0p95*.py | sort -r`
      FILES+=" "`ls TES/Background_DY_TES0p93*.py | sort -r`
      FILES+=" "`ls TES/Background_DY_TES0p91*.py | sort -r`
@@ -25,7 +25,7 @@ case $1 in
      ;;
   4) echo ">>> DY TES Up uneven"
      FILES=`ls TES/Background_DY_TES1p01*.py`
-     FILES+=" "`ls TES/Background_DY_TES1p03*.py`
+     FILES+=" "`ls TES/Background_DY_TES1p03?.py`
      FILES+=" "`ls TES/Background_DY_TES1p05*.py`
      ;;
   *) echo ">>> Wrong input! Use 1-4."
@@ -34,7 +34,10 @@ case $1 in
 esac
 
 echo ">>> shift files: $FILES"
+N=`echo $FILES | wc -w`; i=0
 for f in $FILES; do
+  i=$((i+1))
+  echo ">>> $(tput setab 0)$(tput setaf 7)$i/$N: $f$(tput sgr0)"
   SHIFT=`echo $f | sed 's/.*\(TES.*\)\.py/\1/'`
   peval "python -u submitSFrame.py -j $f --nosandbox --useEnv | tee nohup/nohup_DY_${SHIFT}.log"
 done;

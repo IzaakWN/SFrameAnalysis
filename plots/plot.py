@@ -50,7 +50,6 @@ plottag += args.plottag
 doStack = True; doDataCard = False
 normalizeWJ = normalizeWJ and not doFakeRate and not args.noWJrenorm
 loadSettings(globals(),settings,verbose=args.verbose)
-#setVerbose(args.verbose)
 exec commands
 
 
@@ -119,13 +118,6 @@ def plotStacks(samples, channel, **kwargs):
             plot.plot(stack=stack, position=position, staterror=staterror, logy=logy, ratio=ratio, errorbars=errorbars, data=data)
             plot.saveAs(filename)
             
-            # RESET CUTS
-            #if doSignalUpScaling:
-            #    for sample in samples:
-            #        if sample.isSignal: sample.scale = sample.scaleBU
-            
-    
-
 
 
     ##################
@@ -220,25 +212,25 @@ def main():
     for channel in channels:
         print ">>>\n>>>"
         
-        samples.setChannel(channel)
+        samples.setChannel(channel,treename=treename)
         
         # SET TREENAME
         treename = "tree_%s" % channel
         if useCutTree and "emu" not in channel:
           treename = "tree_%s_cut_relaxed" % channel
-        samples.setTreeName(treename)
+        samples.setChannel(channel,treename=treename)
         if drawShifts:
           if doTES:
-            samples_TESUp.setTreeName(treename)
-            samples_TESDown.setTreeName(treename)
+            samples_TESUp.setChannel(  channel,treename=treename)
+            samples_TESDown.setChannel(channel,treename=treename)
           if doEES:
-            samples_EESUp.setTreeName(treename)
-            samples_EESDown.setTreeName(treename)
+            samples_EESUp.setChannel(  channel,treename=treename)
+            samples_EESDown.setChannel(channel,treename=treename)
           if doJTF:
-            samples_JTFUp.setTreeName(treename)
-            samples_JTFDown.setTreeName(treename)
+            samples_JTFUp.setChannel(  channel,treename=treename)
+            samples_JTFDown.setChannel(channel,treename=treename)
           for label, samples_TESscan in sorted(samples_TESscan.iteritems()):
-            samples_TESscan.setTreeName(treename)
+            samples_TESscan.setChannel(channel,treename=treename)
         
         # RENORMALIZE WJ
         print ">>> "

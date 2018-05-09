@@ -3,10 +3,10 @@
 # Author: Izaak Neutelings (2017)
 
 print
-from argparse import ArgumentParser
 import os, sys, time
 import copy
 from math import sqrt, pow, floor, ceil
+from argparse import ArgumentParser
 import ROOT
 from ROOT import TFile, TH1D, THStack, gDirectory, kAzure, kGreen, kRed
 # from PlotTools import *
@@ -29,6 +29,8 @@ parser.add_argument( "-u", "--emu", dest="emu", default=False, action='store_tru
                      help="run only for the emu channel" )
 parser.add_argument( "-l", "--list", dest="list", default=False, action='store_true',
                      help="list all available categories" )
+parser.add_argument( "-t", "--plot-tag", dest="plottag", type=str, default="", action='store',
+                     metavar="TAG", help="" )
 parser.add_argument( "-v", "--verbose", dest="verbose", default=False, action='store_true',
                      help="make script verbose" )
 parser.add_argument( "-n", "--no-WJ-renom", dest="noWJrenorm", default=False, action='store_true',
@@ -44,8 +46,9 @@ from PlotTools.SettingTools import *
 print ">>> loading configuration file %s for plot.py"%(args.configFile)
 settings, commands = loadConfigurationFromFile(args.configFile,verbose=args.verbose)
 exec settings
+plottag += args.plottag
 doStack = True; doDataCard = False
-if args.noWJrenorm: normalizeWJ = False
+normalizeWJ = normalizeWJ and not args.noWJrenorm
 loadSettings(globals(),settings,verbose=args.verbose)
 #setVerbose(args.verbose)
 exec commands
@@ -60,9 +63,9 @@ def plotStacks(samples, channel, **kwargs):
     """Plot stacked histograms with data."""
     LOG.header("%s channel: Stacks plots %s"%(channel,samples.name))
     
-    global plotlabel
+    global plottag
     DIR         = kwargs.get('DIR', "%s/%s" % (PLOTS_DIR,channel))
-    label       = plotlabel + samples.label + kwargs.get('label', "")
+    label       = plottag + samples.label + kwargs.get('label', "")
     ensureDirectory(DIR)
     
     stack       = True #and False
@@ -70,14 +73,15 @@ def plotStacks(samples, channel, **kwargs):
     errorbars   = (not staterror)
     data        = True
     blind       = True
-    scaleup     = True
     ratio       = data
     
     # LOOP over SELECTIONS
     for selection in selections:
         print ">>>\n>>> " + color("_%s:_%s_" % (channel.replace(' ','_'),selection.name.replace(' ','_')), color = "magenta", bold=True)
         
-        samples.renormalizeTT(selection,baseline=baseline)
+        if normalizeTT:
+          samples.renormalizeTT(selection,baseline=baseline)
+        scaleup = 0.013 if "category" in selection.name else 1.
         
         # LOOP over VARIABLES
         for variable in variables:
@@ -93,11 +97,12 @@ def plotStacks(samples, channel, **kwargs):
             # TITLE
             name  = variable.name
             title = "%s: %s" % (channel,selection.name)
-            title = title.replace("category 1.2","optimized category 1").replace("category 2.2","optimized category 2")
+            title = title.replace("category 1.2","opt. 1b1f").replace("category 2.2","opt. 1b1c")
+            title = title.replace("category 1","1b1f").replace("category 2","1b1c")
             
             # LEGEND POSITION
             position = variable.position
-            if "dxy_Sig" in name or "eta_" in name[:6] or "d0" in name or "eRatio" in name:
+            if "eta_" in name[:6] or "d0" in name:
               position = "leftleft"
             logy = variable.logy
             
@@ -105,14 +110,10 @@ def plotStacks(samples, channel, **kwargs):
             QCD = doQCD and ("gen_match" not in variable.name or "npu" not in variable.name)
             
             # PLOT
-            plot = samples.plotStack(variable,selection,name=name,title=title,channel=channel,QCD=QCD)
-            plot.plot(stack=stack,position=position,staterror=staterror,logy=logy,ratio=ratio,errorbars=errorbars,data=data,blind=blind,scaleup=scaleup)
+            plot = samples.plotStack(variable,selection,name=name,title=title,channel=channel,QCD=QCD,scaleup=scaleup)
+            plot.plot(stack=stack,position=position,staterror=staterror,logy=logy,ratio=ratio,errorbars=errorbars,data=data,
+                      blind=blind,linestyle=False)
             plot.saveAs(filename)
-            
-            # RESET CUTS
-            #if doSignalUpScaling:
-            #    for sample in samples:
-            #        if sample.isSignal: sample.scale = sample.scaleBU
             
 
 
@@ -173,19 +174,12 @@ def measureOSSSratios(samples, channel, **kwargs):
         for var, nBins, a, b in variables0:
             samples.measureOSSSratio(var,nBins,a,b,cuts,relaxed=True,verbosity=1)
             #samples.measureOSSSratio(var,nBins,a,b,cuts,relaxed=False,verbosity=1)
-
-
+    
 
 
     ##################
     # Help functions #
     ##################
-
-def ensureDirectory(DIR):
-    """Make directory if it does not exist."""
-    if not os.path.exists(DIR):
-        os.makedirs(DIR)
-        print ">>> made directory " + DIR
     
 def isCategory(category):
     """Check whether selections label contain category 1 or 2."""
@@ -193,9 +187,6 @@ def isCategory(category):
     if "category 2" in category.lower(): return "category 2" 
     return False
     
-
-
-
 
 
     ##############
@@ -269,19 +260,26 @@ def main():
     for channel in channels:
         print ">>>\n>>>"
         
-        samples.setChannel(channel)
-        
         # SET TREENAME
-        treename = "tree_%s" % channel
+        treename = "tree_%s"%channel
         if useCutTree and "emu" not in channel:
-          treename = "tree_%s_cut_relaxed" % channel
-        samples.setTreeName(treename)
-        if doEES:
-          samplesB_EESUp.setTreeName(treename)
-          samplesB_EESDown.setTreeName(treename)
-        if doJTF:
-          samplesB_JTFUp.setTreeName(treename)
-          samplesB_JTFDown.setTreeName(treename)
+          treename = "tree_%s_cut_relaxed"%channel
+        samples.setChannel(channel,treename=treename)
+        #if doTES:
+        #  samples_TESUp.setChannel(  channel,treename=treename)
+        #  samples_TESDown.setChannel(channel,treename=treename)
+        #if doEES:
+        #  samples_EESUp.setChannel(  channel,treename=treename)
+        #  samples_EESDown.setChannel(channel,treename=treename)
+        #if doLTF:
+        #  samples_LTFUp.setChannel(  channel,treename=treename)
+        #  samples_LTFDown.setChannel(channel,treename=treename)
+        #if doZpt:
+        #  samples_ZptUp.setChannel(  channel,treename=treename)
+        #  samples_ZptDown.setChannel(channel,treename=treename)
+        #if doTTpt:
+        #  samples_TTptUp.setChannel(  channel,treename=treename)
+        #  samples_TTptDown.setChannel(channel,treename=treename)
         
         # RENORMALIZE WJ
         print ">>> "
@@ -289,12 +287,12 @@ def main():
             LOG.header("%s: WJ renormalization" % (channel))
             if doNominal:
               samples.renormalizeWJ(baseline, QCD=doQCD, reset=True, verbosity=verbosityWJ)
-            if doEES:
-              samplesB_EESUp.renormalizeWJ(  baseline, QCD=doQCD, reset=True, verbosity=verbosityWJ)
-              samplesB_EESDown.renormalizeWJ(baseline, QCD=doQCD, reset=True, verbosity=verbosityWJ)
-            if doJTF:
-              samplesB_JTFUp.renormalizeWJ(  baseline, QCD=doQCD, reset=True, verbosity=verbosityWJ)
-              samplesB_JTFDown.renormalizeWJ(baseline, QCD=doQCD, reset=True, verbosity=verbosityWJ)
+            #if doEES:
+            #  samples_EESUp.renormalizeWJ(  baseline, QCD=doQCD, reset=True, verbosity=verbosityWJ)
+            #  samples_EESDown.renormalizeWJ(baseline, QCD=doQCD, reset=True, verbosity=verbosityWJ)
+            #if doJTF:
+            #  samples_JTFUp.renormalizeWJ(  baseline, QCD=doQCD, reset=True, verbosity=verbosityWJ)
+            #  samples_JTFDown.renormalizeWJ(baseline, QCD=doQCD, reset=True, verbosity=verbosityWJ)
         else: LOG.warning("Not WJ renormalized! (normalizeWJ=%s, user flag=%s, channel=%s)" % (normalizeWJ,args.noWJrenorm,channel))
         print ">>> "
         
@@ -307,22 +305,22 @@ def main():
             if doNominal:
                 plotStacks(samples,         channel,DIR=DIR)
                 #measureOSSSratios(samples,channel)
-            if drawShifts:
-              if doEES and "emu" in channel:
-                plotStacks(samplesB_EESUp,  channel,DIR=DIR)
-                plotStacks(samplesB_EESDown,channel,DIR=DIR)
-              if doJTF:
-                plotStacks(samplesB_JTFUp,  channel,DIR=DIR)
-                plotStacks(samplesB_JTFDown,channel,DIR=DIR)
-              if doTES:
-                plotStacks(samplesB_TESUp,channel,DIR=DIR)
-                plotStacks(samplesB_TESDown,channel,DIR=DIR)
+            #if drawShifts:
+            #  if doEES and "emu" in channel:
+            #    plotStacks(samplesB_EESUp,  channel,DIR=DIR)
+            #    plotStacks(samplesB_EESDown,channel,DIR=DIR)
+            #  if doJTF:
+            #    plotStacks(samplesB_JTFUp,  channel,DIR=DIR)
+            #    plotStacks(samplesB_JTFDown,channel,DIR=DIR)
+            #  if doTES:
+            #    plotStacks(samplesB_TESUp,channel,DIR=DIR)
+            #    plotStacks(samplesB_TESDown,channel,DIR=DIR)
             
     
-
-
-if __name__ == '__main__':
+if __name__== '__main__':
     main()
-    print ">>>\n>>> Done with this, son.\n"
+    print ">>\n>>> Done with this, son.\n"  
+
+
 
 

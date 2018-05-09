@@ -1,9 +1,10 @@
-path2xml="/shome/ineuteli/shared/xml/xmls_MC2017_V2_newJEC"
+path2xml="/shome/ineuteli/shared/xml/xmls_MC2017_V2_trainingV2"
 path2tmp="$SFRAME_DIR/../AnalysisTemp"
 jobName="WJ"
 outDir="/scratch/$USER/SFrameAnalysis/AnalysisOutput_ltau2017/"+jobName
-cycleName="TauTauAnalysis"
 nEventsMax=-1
+#nEventsMax=200
+runningJobsLimit=6000
 nProcesses=1
 queue="short.q"
 nFiles=1
@@ -12,38 +13,38 @@ hVMEM="5000M"
 postFix="_2017_V2"
 dataSets = [
     
-    # 92X, old JEC
-#    [ "WJetsToLNu",
-#     [   "WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_0000.xml", ]],
-#      
-#    [ "W1JetsToLNu",
-#     [   "W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_0000_0.xml",
-#         "W1JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_0000_1.xml", ]],
-# 
-#     [ "W2JetsToLNu",
-#      [  "W2JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_0000.xml", ]],
-#      
-#     [ "W3JetsToLNu",
-#      [  "W3JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_0000.xml", ]],
-#      
-#     [ "W4JetsToLNu",
-#      [  "W4JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_0000.xml", ]],
+   # # 94X, new JEC
+   #[ "WJetsToLNu",
+   # [   "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_0000.xml", ]],
+   #  
+   #[ "W1JetsToLNu",
+   # [   "W1JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_0000.xml", ]],
+   #
+   # [ "W2JetsToLNu",
+   #  [  "W2JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_0000.xml", ]],
+   #  
+   # [ "W3JetsToLNu",
+   #  [  "W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_0000.xml", ]],
+   #  
+   # [ "W4JetsToLNu",
+   #  [  "W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_0000.xml", ]],
     
-    # 94X, new JEC
+    # 94X, new JEC, training v2
    [ "WJetsToLNu",
     [   "WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_0000.xml", ]],
-     
+    
    [ "W1JetsToLNu",
-    [   "W1JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_0000.xml", ]],
-
-    [ "W2JetsToLNu",
-     [  "W2JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_0000.xml", ]],
-     
-    [ "W3JetsToLNu",
-     [  "W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_0000.xml", ]],
-     
-    [ "W4JetsToLNu",
-     [  "W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_0000.xml", ]],
+    [   "W1JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_0000_0.xml",
+        "W1JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_0000_1.xml", ]],
+    
+   [ "W2JetsToLNu",
+    [   "W2JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_0000.xml", ]],
+    
+   [ "W3JetsToLNu",
+    [  "W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_0000.xml", ]],
+    
+   [ "W4JetsToLNu",
+    [  "W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8_0000.xml", ]],
     
 ]
 
@@ -52,7 +53,8 @@ userItems = [
     ["IsSignal","false"],
     ["doRecoilCorr","false"],
     ["EESshift","0.00"],
-    ["MC_V1","false"],
+    ["JTFshift","0.00"],
+    ["noTight","false"],
 ]
 
 jobOptionsFile2=open("AnalysisOptions.py", 'r')

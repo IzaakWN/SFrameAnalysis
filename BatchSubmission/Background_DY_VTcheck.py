@@ -1,4 +1,4 @@
-path2xml="/shome/ineuteli/shared/xml/xmls_MC2017_V2_trainingV2"
+path2xml="$SFRAME_DIR/../BatchSubmission/xmls_VTcheck" #"/shome/ineuteli/shared/xml/xmls_MC2017_V2_newJEC"
 path2tmp="$SFRAME_DIR/../AnalysisTemp"
 jobName="DY"
 outDir="/scratch/$USER/SFrameAnalysis/AnalysisOutput_ltau2017/"+jobName
@@ -10,26 +10,15 @@ queue="short.q"
 nFiles=2
 hCPU="00:25:00"
 hVMEM="5000M"
-postFix="_2017_V2"
+postFix="_2017_V2_VTcheck"
 dataSets = [
     
    [ "DYJetsToLL_M-50_TuneCP5",
     [   "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_0000_0.xml",
         "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_0000_1.xml", ]],
     
-   [ "DY1JetsToLL_M-50_TuneCP5",
-    [   "DY1JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_0000.xml",
-        "DY1JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_ext_0000_0.xml",
-        "DY1JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_ext_0000_1.xml", ]],
-    
-   [ "DY2JetsToLL_M-50_TuneCP5",
-    [   "DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_0000.xml",
-        "DY2JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_ext_0000.xml", ]],
-    
-   [ "DY3JetsToLL_M-50_TuneCP5",
-    [   "DY3JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_0000.xml", ]],
-    
 ]
+
 
 userItems = [
     ["IsData","false"],
@@ -39,8 +28,6 @@ userItems = [
     ["TESshift","0.00"],
     ["EESshift","0.00"],
     ["LTFshift","0.00"],
-    ["JTFshift","0.00"],
-    ["noTight","false"],
 ]
 
 jobOptionsFile2=open("AnalysisOptions.py", 'r')

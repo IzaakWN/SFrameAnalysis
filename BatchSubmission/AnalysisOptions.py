@@ -38,7 +38,8 @@ AddUserItems = [
     ["doJEC","true"],
     ["doSVFit","false"],
 ]
-  
+
+cycleName="TauTauAnalysis"  
 inputTrees=["ntuplizer/tree"]
 outputTrees=["tree_mutau","tree_etau"]
 

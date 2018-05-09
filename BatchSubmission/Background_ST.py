@@ -1,10 +1,10 @@
-path2xml="/shome/ineuteli/shared/xml/xmls_MC2017_V2_newJEC"
+path2xml="/shome/ineuteli/shared/xml/xmls_MC2017_V2_trainingV2"
 path2tmp="$SFRAME_DIR/../AnalysisTemp"
 jobName="ST"
 outDir="/scratch/$USER/SFrameAnalysis/AnalysisOutput_ltau2017/"+jobName
-cycleName="TauTauAnalysis"
 nEventsMax=-1
 #nEventsMax=200
+runningJobsLimit=6000
 nProcesses=1
 queue="short.q"
 nFiles=1
@@ -23,13 +23,10 @@ dataSets = [
     [   "ST_tW_top_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8_0000.xml", ]],
     
    [ "ST_tW_antitop_5f_inclusiveDecays",
-    [   "ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_0000.xml", ]],
+    [   "ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8_0000.xml", ]],
     
-#    [ "ST_s-channel_4f_leptonDecays",
-#     [   "ST_s-channel_4f_leptonDecays_TuneCP5_PSweights_13TeV-amcatnlo-pythia8_0000.xml", ]],
-#     
-#    [ "ST_s-channel_4f_leptonDecays",
-#     [   "ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8_0000.xml", ]],
+   [ "ST_s-channel_4f_leptonDecays",
+    [   "ST_s-channel_4f_leptonDecays_TuneCP5_PSweights_13TeV-amcatnlo-pythia8_0000.xml", ]],
     
 ]
 
@@ -37,7 +34,10 @@ userItems = [
     ["IsData","false"],
     ["IsSignal","false"],
     ["doRecoilCorr","false"],
+    ["TESshift","0.00"],
     ["EESshift","0.00"],
+    ["JTFshift","0.00"],
+    ["noTight","false"],
 ]
 
 jobOptionsFile2=open("AnalysisOptions.py", 'r')

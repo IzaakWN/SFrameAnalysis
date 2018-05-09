@@ -110,7 +110,7 @@ class TauTauAnalysis : public SCycleBase {
     virtual void BeginInputData( const SInputData& ) throw( SError ); // called at the beginning of a new input data
     virtual void EndInputData  ( const SInputData& ) throw( SError ); // called after finishing to process an input data
     virtual void BeginInputFile( const SInputData& ) throw( SError ); // called after opening each new input file
-    virtual void ExecuteEvent  ( const SInputData&, Double_t    ) throw( SError ); // called for every event
+    virtual void ExecuteEvent  ( const SInputData&, Double_t ) throw( SError ); // called for every event
     
     /// Function to book tree branches
     void FillBranches( const std::string& channel,
@@ -542,12 +542,6 @@ class TauTauAnalysis : public SCycleBase {
     std::map<std::string,Float_t>  b_pzetamiss;
     std::map<std::string,Float_t>  b_pzetavis;
     std::map<std::string,Float_t>  b_dzeta;
-    
-    std::map<std::string,Float_t>  b_vbf_mjj;
-    std::map<std::string,Float_t>  b_vbf_deta;
-    std::map<std::string,Float_t>  b_vbf_jdphi;
-    std::map<std::string,Int_t>    b_vbf_ncentral;
-    std::map<std::string,Int_t>    b_vbf_ncentral20;
 
     // Macro adding the functions for dictionary generation
     ClassDef( TauTauAnalysis, 0 );

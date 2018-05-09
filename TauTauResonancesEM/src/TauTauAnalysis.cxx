@@ -493,11 +493,6 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
     DeclareVariable( b_pzetamiss[ch],           "pzetamiss",            treeName);
     DeclareVariable( b_pzetavis[ch],            "pzetavis",             treeName);
     DeclareVariable( b_dzeta[ch],               "dzeta",                treeName);
-    DeclareVariable( b_vbf_mjj[ch],             "vbf_mjj",              treeName);
-    DeclareVariable( b_vbf_deta[ch],            "vbf_deta",             treeName);
-    DeclareVariable( b_vbf_jdphi[ch],           "vbf_jdphi",            treeName);
-    DeclareVariable( b_vbf_ncentral[ch],        "vbf_ncentral",         treeName);
-    DeclareVariable( b_vbf_ncentral20[ch],      "vbf_ncentral20",       treeName);
     
   }
   
@@ -529,7 +524,7 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
     m_grl = *( dynamic_cast< Root::TGoodRunsList* >( grl ) );
   }
   
-  m_BTaggingScaleTool.BeginInputData( id, true );
+  m_BTaggingScaleTool.BeginInputData( id, "emu" );
   m_BTaggingScaleTool.bookHistograms(); // to measure b tag efficiencies for our selections
   m_ScaleFactorTool.BeginInputData( id );
   m_JetCorrectionTool.BeginInputData( id );
@@ -916,7 +911,7 @@ void TauTauAnalysis::FillBranches(const std::string& channel,
   b_dilepton_veto[ch]       = b_dilepton_veto_;
   b_extraelec_veto[ch]      = b_extraelec_veto_;
   b_extramuon_veto[ch]      = b_extramuon_veto_;
-  b_lepton_vetos[ch]        = ( b_dilepton_veto_ || b_extraelec_veto_ || b_extramuon_veto_ );
+  b_lepton_vetos[ch]        = ( b_dilepton_veto_ or b_extraelec_veto_ or b_extramuon_veto_ );
   
   b_iso_cuts[ch]            = b_iso_1[ch]<0.2 && b_iso_2[ch]<0.15;
   TLorentzVector muon_tlv;
@@ -961,8 +956,8 @@ void TauTauAnalysis::FillBranches(const std::string& channel,
   }
   if(maxIndex>0){
     tau = UZH::Tau( &m_tau, maxIndex );
-    b_pt_3[ch]                                           = tau.tlv().Pt();
-    b_eta_3[ch]                                          = tau.tlv().Eta();
+    b_pt_3[ch]                                           = tau.pt();
+    b_eta_3[ch]                                          = tau.eta();
     b_decayMode_3[ch]                                    = tau.decayMode(); // 0, 1, 10
     b_againstLepton_3[ch]                                = tau.againstElectronVLooseMVA6() > 0.5 and tau.againstMuonTight3() > 0.5;
     b_gen_match_3[ch]                                    = genmatch_3;
@@ -1603,37 +1598,6 @@ void TauTauAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
     b_bcsv_2[ch]    = -1;
   }
   
-  // VBF
-  if(b_njets[ch]>=2){
-    b_vbf_mjj[ch]   = (jet1 + jet2).M();
-    b_vbf_deta[ch]  = jet1.Eta() - jet2.Eta();
-    b_vbf_jdphi[ch] = deltaPhi(jet1.Phi(), jet2.Phi());
-    Float_t min_eta = jet1.Eta();
-    Float_t max_eta = jet2.Eta();
-    if(min_eta > max_eta){
-      min_eta = jet2.Eta(); 
-      max_eta = jet1.Eta(); 
-    }
-    int ncentral    = 0;
-    int ncentral20  = 0;
-    for( int ijet = 0; ijet < (int)Jets.size(); ++ijet ){
-      Float_t jeteta = Jets.at(ijet).eta();
-      Float_t jetpt  = Jets.at(ijet).pt();
-      if(min_eta < jeteta && jeteta < max_eta){
-        if(jetpt > 30.) ncentral++;
-        if(jetpt > 20.) ncentral20++;
-      }
-    }
-    b_vbf_ncentral[ch]   = ncentral;
-    b_vbf_ncentral20[ch] = ncentral20;
-  }else{
-    b_vbf_mjj[ch]        = -1;
-    b_vbf_deta[ch]       = -9;
-    b_vbf_jdphi[ch]      = -9;
-    b_vbf_ncentral[ch]   = -1;
-    b_vbf_ncentral20[ch] = -1;
-  }
-  
 }
 
 
@@ -1951,7 +1915,7 @@ void TauTauAnalysis::extraLeptonVetos(const std::string& channel, const UZH::Muo
   for(int ielectron = 0; ielectron < (int)passedElectrons.size(); ielectron++){
     for(int jelectron = 0; jelectron < ielectron; jelectron++){
       if(passedElectrons[ielectron].charge() * passedElectrons[jelectron].charge() < 0 &&
-	 passedElectrons[ielectron].tlv().DeltaR(passedElectrons[jelectron].tlv()) > 0.15)
+	 passedElectrons[ielectron].DeltaR(passedElectrons[jelectron]) > 0.15)
 	b_dilepton_veto_ = true;
     }
   }

@@ -371,9 +371,11 @@ void DiMuonAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
 //       DeclareVariable( b_weightbtag_udsgDown[ch],   "weightbtag_udsgDown",  treeName);
 //     }
     
-    DeclareVariable( b_m_vis[ch],               "m_vis",                treeName);
     DeclareVariable( b_dR_ll[ch],               "dR_ll",                treeName);
     DeclareVariable( b_ht[ch],                  "ht",                   treeName);
+    DeclareVariable( b_m_vis[ch],               "m_vis",                treeName);
+    DeclareVariable( b_m_mutau_1[ch],           "m_mutau_1",            treeName);
+    DeclareVariable( b_m_mutau_2[ch],           "m_mutau_2",            treeName);
     
     DeclareVariable( b_m_genboson[ch],          "m_genboson",           treeName);
     DeclareVariable( b_pt_genboson[ch],         "pt_genboson",          treeName);
@@ -519,6 +521,12 @@ void DiMuonAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
   
   
   // Cut 0: no cuts
+  for (auto ch: channels_){
+    b_channel[ch] = 0;
+    fillCutflow("cutflow_" + ch, "histogram_" + ch, kBeforeCuts, 1);
+    fillCutflow("cutflow_" + ch, "histogram_" + ch, kBeforeCutsUnweighted, 1 );
+    fillCutflow("cutflow_" + ch, "histogram_" + ch, kBeforeCutsWeighted, b_genweight_);
+  }
   if (m_isData){
     if(m_eventInfo.PV_N<=0) throw SError( SError::SkipEvent );
   }else{
@@ -533,7 +541,7 @@ void DiMuonAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
   }
   
   
-  // Cut 1: check for data if run/lumiblock in JSON
+  // MARK: Cut 1: JSON
   if (m_isData){
     if(!(isGoodEvent(m_eventInfo.runNumber, m_eventInfo.lumiBlock))) throw SError( SError::SkipEvent );
     for (auto ch: channels_){
@@ -542,7 +550,7 @@ void DiMuonAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
   }
   
   
-  // Cut 2: pass trigger
+  // MARK: Cut 2: trigger
   //std::cout << ">>> ExecuteEvent - Cut 2" << std::endl;
   m_trigger_Flags = passTrigger();
   if(m_trigger_Flags=="none"){
@@ -554,8 +562,8 @@ void DiMuonAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
   }
   
   
-  // Cut 4: lepton (muon)
-  //std::cout << ">>> ExecuteEvent - Cut 4 - muon" << std::endl;
+  // MARK: Cut 3: muon 1
+  //std::cout << ">>> ExecuteEvent - Cut 3: muon 1" << std::endl;
   int muon28 = 0;
   std::vector<UZH::Muon> goodMuons;
   for( int i = 0; i < m_muon.N; ++i ){
@@ -564,44 +572,50 @@ void DiMuonAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
     if(fabs(mymuon.eta()) > m_muonEtaCut) continue;
     if(fabs(mymuon.d0_allvertices()) > m_muonD0Cut) continue;
     if(fabs(mymuon.dz_allvertices()) > m_muonDzCut) continue;
-    if(mymuon.isMediumMuonGH() < 0.5) continue;   // for period GH and MC (see AN)
-    if(mymuon.SemileptonicPFIso() / mymuon.pt()) continue;
+    if(mymuon.isMediumMuonGH() < 0.5) continue;
+    if(mymuon.SemileptonicPFIso()/mymuon.pt()>0.15) continue; // tight
     goodMuons.push_back(mymuon);
     if(mymuon.pt()>m_secondMuonPtCut) muon28++;
   }
   
   if(goodMuons.size()>0){
-    fillCutflow("cutflow_mumu", "histogram_mumu", kMuon, 1);  
+    fillCutflow("cutflow_mumu", "histogram_mumu", kMuon, 1);
+    //std::cout << ">>> ExecuteEvent - Cut 4: muon 2" << std::endl;
     if(goodMuons.size()>1 and muon28>0)
       fillCutflow("cutflow_mumu", "histogram_mumu", kSecondMuon, 1);
     else throw SError( SError::SkipEvent );
   }
   else throw SError( SError::SkipEvent );
   
-  // For mumu
-  //std::cout << ">>> ExecuteEvent - Cut 6 - mumu" << std::endl;
+  // MARK: Cut 5: muon pair
+  //std::cout << ">>> ExecuteEvent - Cut 5: mumu" << std::endl;
   std::vector<lepton_pair> muon_pairs;
   for(int imuon=0; imuon<(int)goodMuons.size(); imuon++){
     for(int jmuon=imuon+1; jmuon<(int)goodMuons.size(); jmuon++){
       
       Float_t M  = goodMuons[imuon].M(goodMuons[jmuon]);
       if(M<70 and 110<M) continue;
-      if(goodMuons[imuon].charge()*goodMuons[jmuon].charge()>0) continue;
+      if(goodMuons[imuon].charge()*goodMuons[jmuon].charge()>0) continue; // require OS
       if(goodMuons[imuon].pt()<m_secondMuonPtCut and goodMuons[jmuon].pt()<m_secondMuonPtCut) continue;
       Float_t dR = goodMuons[imuon].DeltaR(goodMuons[jmuon]);
-      if(dR<0.5) continue; // remove or lower for boosted ID
+      if(dR<0.4) continue; // remove or lower for boosted ID
       
       Float_t pt_1  = goodMuons[imuon].pt();
       Float_t pt_2  = goodMuons[jmuon].pt();
       Float_t iso_1 = goodMuons[imuon].SemileptonicPFIso() / pt_1;
       Float_t iso_2 = goodMuons[jmuon].SemileptonicPFIso() / pt_2;
       
-      lepton_pair pair = {imuon, pt_1, iso_1, jmuon, pt_2, iso_2};
+      lepton_pair pair;
+      if(pt_1>pt_2){
+        pair = {imuon, pt_1, iso_1, jmuon, pt_2, iso_2};
+      }else{
+        std::cout<<">>> Warning! Muon piar: muon1 pt < muon2 pt ! Swapping..."<<std::endl;
+        pair = {jmuon, pt_2, iso_2, imuon, pt_1, iso_1};
+      }
       muon_pairs.push_back(pair);
     }
   }
   
-  // For mumu
   if(muon_pairs.size()==0){
     throw SError( SError::SkipEvent );
   }else{
@@ -739,7 +753,7 @@ void DiMuonAnalysis::FillBranches(const std::string& channel, const UZH::Muon& m
   b_q_2[ch]                 = muon2.charge();
   b_d0_2[ch]                = muon2.d0();
   b_dz_2[ch]                = muon2.dz();
-  b_iso_2[ch]               = muon2.SemileptonicPFIso() / muon1.pt();
+  b_iso_2[ch]               = muon2.SemileptonicPFIso() / muon2.pt();
   
   extraLeptonVetos(channel, muon1, muon2);
   b_extraelec_veto[ch]      = b_extraelec_veto_;
@@ -755,13 +769,14 @@ void DiMuonAnalysis::FillBranches(const std::string& channel, const UZH::Muon& m
   // MARK: Taus //
   ////////////////
   
-  float maxIso   = -1.;
+  float maxPt    = -1.;
   int maxIndex   = -1;
-  int genmatch_3 = -1;
+  int genmatch_3 = -9;
   UZH::Tau tau;
   for(int i=0; i<(m_tau.N); ++i){
     UZH::Tau tau( &m_tau, i );
-    if(tau.byIsolationMVArun2v1DBoldDMwLTraw()<maxIso) continue;
+    //if(tau.byIsolationMVArun2v1DBoldDMwLTraw()<maxIso) continue;
+    if(tau.pt()<maxPt) continue;
     if(tau.DeltaR(muon1)<0.5) continue;
     if(tau.DeltaR(muon2)<0.5) continue;
     if(abs(tau.eta()) > m_tauEtaCut) continue;
@@ -770,21 +785,18 @@ void DiMuonAnalysis::FillBranches(const std::string& channel, const UZH::Muon& m
     if(tau.decayModeFinding() < 0.5 and tau.decayMode()!=11) continue;
     if(fabs(tau.charge()) != 1) continue; // remove for boosted ID
     //if(tau.againstElectronVLooseMVA6() < 0.5 or tau.againstMuonTight3() < 0.5) continue; // same WPs as mutau; needs SFs!
-    int genmatch = -1;
-    float taupt  = tau.pt();
-    if(taupt < m_tauPtCut) continue;
-    if(!m_isData and genmatch<0) genmatch = genMatch(tau.eta(),tau.phi());
+    if(tau.pt() < m_tauPtCut) continue;
     maxIndex   = i;
-    maxIso     = tau.byIsolationMVArun2v1DBoldDMwLTraw();
-    genmatch_3 = genmatch;
+    maxPt      = tau.pt(); // preference for highest pt
   }
   if(maxIndex>0){
     tau = UZH::Tau( &m_tau, maxIndex );
-    b_pt_3[ch]                                           = tau.tlv().Pt();
-    b_eta_3[ch]                                          = tau.tlv().Eta();
+    if(!m_isData) genmatch_3 = genMatch(tau.eta(),tau.phi());
+    b_gen_match_3[ch]                                    = genmatch_3;
+    b_pt_3[ch]                                           = tau.pt();
+    b_eta_3[ch]                                          = tau.eta();
     b_decayMode_3[ch]                                    = tau.decayMode(); // 0, 1, 10
     b_againstLepton_3[ch]                                = tau.againstElectronVLooseMVA6() > 0.5 and tau.againstMuonTight3() > 0.5;
-    b_gen_match_3[ch]                                    = genmatch_3;
     b_byIsolationMVArun2v1DBoldDMwLTraw_3[ch]            = tau.byIsolationMVArun2v1DBoldDMwLTraw();
     b_byIsolationMVArun2v2DBoldDMwLTraw_3[ch]            = tau.byIsolationMVArun2v2DBoldDMwLTraw();
     b_byIsolationMVArun2v1DBnewDMwLTraw_3[ch]            = tau.byIsolationMVArun2v1DBnewDMwLTraw();
@@ -920,6 +932,13 @@ void DiMuonAnalysis::FillBranches(const std::string& channel, const UZH::Muon& m
   // discriminating variables
   b_m_vis[ch]       = muon1.M(muon2);
   b_dR_ll[ch]       = muon1.DeltaR(muon1);
+  if(tau.pt()>20){
+    b_m_mutau_1[ch] = muon1.M(tau);
+    b_m_mutau_2[ch] = muon2.M(tau);
+  }else{
+    b_m_mutau_1[ch] = -1;
+    b_m_mutau_2[ch] = -1;
+  }
   
   // discriminating variables
   TVector3 leg1(muon1.px(), muon1.py(), 0.);

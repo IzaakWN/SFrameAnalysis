@@ -96,7 +96,7 @@ class DiMuonAnalysis : public SCycleBase {
       Float_t pt_2;
       Float_t iso_2;
 
-      //overload comparators
+      //overload comparators http://cpp.sh/2lahm
       bool operator<(const lepton_pair& another) const {
         if (pt_1 != another.pt_1)
           return pt_1 > another.pt_1;   // take pair with highest lepton 1 pt
@@ -461,6 +461,8 @@ class DiMuonAnalysis : public SCycleBase {
     std::map<std::string,Float_t>  b_met;
     std::map<std::string,Float_t>  b_metphi;
     std::map<std::string,Float_t>  b_m_vis;
+    std::map<std::string,Float_t>  b_m_mutau_1;
+    std::map<std::string,Float_t>  b_m_mutau_2;
     
     //std::map<std::string,Float_t>  b_met_jesUp;
     //std::map<std::string,Float_t>  b_met_jesDown;

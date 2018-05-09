@@ -1,10 +1,9 @@
-path2xml="/shome/ineuteli/shared/xml/xmls_MC2017_V2_newJEC"
+path2xml="/shome/ineuteli/shared/xml/xmls_MC2017_V2_trainingV2"
 path2tmp="$SFRAME_DIR/../AnalysisTemp"
 jobName="WW"
 outDir="/scratch/$USER/SFrameAnalysis/AnalysisOutput_emu2017/"+jobName
-cycleName="TauTauAnalysis"
 nEventsMax=-1
-#nEventsMax=200
+runningJobsLimit=6000
 nProcesses=1
 queue="short.q"
 nFiles=2
@@ -14,9 +13,7 @@ postFix="_2017_V2"
 dataSets = [
     
    [ "WW_TuneCP5",
-    [   "WW_TuneCP5_13TeV-pythia8_0000.xml", ]],    
-#    [ "WW_TuneCUETP8M1",
-#     [   "WW_TuneCUETP8M1_13TeV-pythia8_0000.xml", ]],
+    [   "WW_TuneCP5_13TeV-pythia8_0000.xml", ]],
     
 ]
 

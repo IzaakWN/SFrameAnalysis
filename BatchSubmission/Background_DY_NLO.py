@@ -3,7 +3,6 @@ path2tmp="$SFRAME_DIR/../AnalysisTemp"
 jobName="DY"
 outDir="/scratch/$USER/SFrameAnalysis/AnalysisOutput_ltau2017/"+jobName
 nEventsMax=-1
-#nEventsMax=200
 nProcesses=1
 nFiles=3
 hCPU="03:30:00"

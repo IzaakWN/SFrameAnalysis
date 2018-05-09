@@ -3,7 +3,6 @@ path2tmp="$SFRAME_DIR/../AnalysisTemp"
 jobName="SingleMuon"
 outDir="/scratch/$USER/SFrameAnalysis/AnalysisOutput_ltau2017/"+jobName #"$SFRAME_DIR/../AnalysisOutput/"+jobName
 nEventsMax=-1
-#nEventsMax=100
 nProcesses=1
 queue="short.q"
 nFiles=3

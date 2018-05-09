@@ -3,7 +3,6 @@ path2tmp="$SFRAME_DIR/../AnalysisTemp"
 jobName="ST"
 outDir="/scratch/$USER/SFrameAnalysis/AnalysisOutput_ltau2017/"+jobName
 nEventsMax=-1
-#nEventsMax=200
 runningJobsLimit=6000
 nProcesses=1
 queue="short.q"

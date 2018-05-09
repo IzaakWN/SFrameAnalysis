@@ -9,7 +9,7 @@ queue="short.q"
 nFiles=3
 hCPU="00:30:00"
 hVMEM="5000M"
-postFix="_2017_V2"
+postFix="_JTF0p90_2017_V2"
 dataSets = [
     
    [ "ST_t-channel_top_4f_inclusiveDecays",
@@ -34,7 +34,7 @@ userItems = [
     ["IsSignal","false"],
     ["doRecoilCorr","false"],
     ["EESshift","0.00"],
-    ["JTFshift","0.00"],
+    ["JTFshift","-0.10"],
 ]
 
 jobOptionsFile2=open("AnalysisOptionsEM.py", 'r')

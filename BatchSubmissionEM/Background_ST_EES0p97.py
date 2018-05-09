@@ -9,7 +9,7 @@ queue="short.q"
 nFiles=3
 hCPU="00:30:00"
 hVMEM="5000M"
-postFix="_2017_V2"
+postFix="_EES0p97_2017_V2"
 dataSets = [
     
    [ "ST_t-channel_top_4f_inclusiveDecays",
@@ -33,7 +33,7 @@ userItems = [
     ["IsData","false"],
     ["IsSignal","false"],
     ["doRecoilCorr","false"],
-    ["EESshift","0.00"],
+    ["EESshift","-0.03"],
     ["JTFshift","0.00"],
 ]
 

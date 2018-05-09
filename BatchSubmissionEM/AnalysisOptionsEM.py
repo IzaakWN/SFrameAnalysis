@@ -26,22 +26,20 @@ loadPacks=[
 
 compilePacks=[
     "../NtupleVariables",
-    "../GoodRunsLists",
     "../PileupReweightingTool",
     "../TauTauResonancesEM",
     "../BTaggingTools",
     "../LepEff2017",
-    "../RecoilCorrections",
     "../JetCorrectionTool",
-    "../SVFitTool",
 ]
 
 AddUserItems = [
     ["RecoTreeName","tree"],
-    ["doJEC","false"],
+    ["doJEC","true"],
     ["doSVFit","false"],
 ]
-  
+
+cycleName="TauTauAnalysis"  
 inputTrees=["ntuplizer/tree"]
 outputTrees=["tree_emu"]
 

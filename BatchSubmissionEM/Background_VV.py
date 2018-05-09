@@ -1,10 +1,9 @@
-path2xml="/shome/ineuteli/shared/xml/xmls_MC2017_V2_newJEC"
+path2xml="/shome/ineuteli/shared/xml/xmls_MC2017_V2_trainingV2"
 path2tmp="$SFRAME_DIR/../AnalysisTemp"
 jobName="VV"
 outDir="/scratch/$USER/SFrameAnalysis/AnalysisOutput_emu2017/"+jobName
-cycleName="TauTauAnalysis"
 nEventsMax=-1
-#nEventsMax=200
+runningJobsLimit=6000
 nProcesses=1
 nFiles=2
 hCPU="05:30:00"

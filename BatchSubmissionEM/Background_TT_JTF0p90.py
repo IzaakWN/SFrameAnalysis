@@ -1,15 +1,15 @@
 path2xml="/shome/ineuteli/shared/xml/xmls_MC2017_V2_trainingV2"
 path2tmp="$SFRAME_DIR/../AnalysisTemp"
 jobName="TT"
-outDir="/scratch/$USER/SFrameAnalysis/AnalysisOutput_ltau2017/"+jobName
+outDir="/scratch/$USER/SFrameAnalysis/AnalysisOutput_emu2017/"+jobName
 nEventsMax=-1
 runningJobsLimit=6000
 nProcesses=1
 queue="short.q"
-nFiles=1
-hCPU="00:30:00"
+nFiles=2
+hCPU="00:40:00"
 hVMEM="5000M"
-postFix="_2017_V2"
+postFix="_JTF0p90_2017_V2"
 dataSets = [
     
    [ "TTTo2L2Nu",
@@ -44,13 +44,11 @@ userItems = [
     ["IsSignal","false"],
     ["doRecoilCorr","false"],
     ["doTTpt","true"],
-    ["TESshift","0.00"],
     ["EESshift","0.00"],
-    ["JTFshift","0.00"],
-    ["noTight","false"],
+    ["JTFshift","-0.10"],
 ]
 
-jobOptionsFile2=open("AnalysisOptions.py", 'r')
+jobOptionsFile2=open("AnalysisOptionsEM.py", 'r')
 command2=""
 for i in [o for o in jobOptionsFile2.readlines()]:
     if ("#E" + "nd") in i : break

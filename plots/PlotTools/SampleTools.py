@@ -5,39 +5,42 @@
 import re
 from ctypes import c_double
 from math import sqrt, pow
-from ROOT import TFile, TTree, TH1D, TH2D, gDirectory, TColor, \
-                 kAzure, kBlack, kBlue, kCyan, kGray, kGreen, kMagenta, kOrange, kPink, kRed, kSpring, kTeal, kWhite, kViolet, kYellow
 from copy import copy, deepcopy
 from collections import namedtuple as ntuple
-
+from ROOT import gROOT, TFile, TTree, TH1D, TH2D, gDirectory, TColor, \
+                 kAzure, kBlack, kBlue, kCyan, kGray, kGreen, kMagenta, kOrange, kPink, kRed, kSpring, kTeal, kWhite, kViolet, kYellow
+from SettingTools import *
+gROOT.Macro('PlotTools/QCDModelingEMu/QCDModelingEMu.C+')
+#gROOT.Macro('PlotTools/weightJEta1.C+')
+if doFakeRate: gROOT.Macro('PlotTools/fakeRate/fakeRate.C+')
 # for channel in ["mutau","etau","emu","mumu"]:
 #     TTscales[channel] = {"category 1":0, "category 2":0} # so TT renormalization is done once for each category
 
-#colors_HTT_dict = { 'TT':   TColor.GetColor(155,152,204),  'DY':   TColor.GetColor(248,206,104),
-#                    'TTT':  TColor.GetColor(135,206,250),  'ZL':   TColor.GetColor(100,182,232),
-#                    'TTJ':  TColor.GetColor(100,222,106),  'ZJ':   TColor.GetColor(100,222,106),
-#                    'TTL':  TColor.GetColor(155,152,204),  
-#                    'ST':   TColor.GetColor(140,180,220),  'DY10': TColor.GetColor(240,175,60)
-#                    'STJ':  TColor.GetColor(200,140,220),  'WJ':   TColor.GetColor(222,90,106),
-#                    'QCD':  TColor.GetColor(250,202,255),  'VV':   TColor.GetColor(222,140,106),
-#                    'data': kBlack,                        'sig':  kBlue
-#}
-colors_IWN_dict = { 'TT':  kRed-2,        'DY':   kGreen-2,
-                    'TTT': kRed-2,        'ZL':   kAzure+5,
-                    'TTJ': kOrange+9,     'ZJ':   kSpring-7, #kGreen-7,
-                    'TTL': kRed+1,        
-                    'ST':  kMagenta-3,    'DY10': kAzure+5,
-                    'STJ': kMagenta+3,    'WJ':   kOrange-5,
-                    'QCD': kRed-7,        'VV':   kYellow+771,
-                    'data': kBlack,       'sig':  kAzure+4,
+colors_HTT_dict = { 'TT':   TColor.GetColor(155,152,204),  'DY':   TColor.GetColor(248,206,104),
+                    'TTT':  TColor.GetColor(135,206,250),  'ZL':   TColor.GetColor(100,182,232),
+                    'TTJ':  TColor.GetColor(155,152,204),  'ZJ':   TColor.GetColor(100,222,106),
+                    'TTL':  TColor.GetColor(100,222,106),  
+                    'ST':   TColor.GetColor(140,180,220),  'DY10': TColor.GetColor(240,175,60),
+                    'STJ':  TColor.GetColor(200,140,220),  'WJ':   TColor.GetColor(222,90,106),
+                    'QCD':  TColor.GetColor(250,202,255),  'VV':   TColor.GetColor(222,140,106),
+                    'data': kBlack,                        'sig':  kBlue
 }
-col_dict = colors_IWN_dict
+colors_IWN_dict = { 'TT':   kRed-2,        'DY':   kGreen-2,
+                    'TTT':  kRed-2,        'ZL':   kAzure+5,
+                    'TTJ':  kOrange+9,     'ZJ':   kSpring-7, #kGreen-7,
+                    'TTL':  kRed+1,        
+                    'ST':   kMagenta-3,    'DY10': kAzure+5,
+                    'STJ':  kMagenta+3,    'WJ':   kOrange-5,
+                    'QCD':  kRed-7,        'VV':   kYellow+771,
+                    'data': kBlack,        'sig':  kAzure+4,
+}
+col_dict = colors_IWN_dict if 'IWN' in colorset else colors_HTT_dict
 
 colors_sample_dict = {  
     "TT":               col_dict['TT'],      'ZTT':        col_dict['DY'],
-    'TTT':              col_dict['TT'],      'ZL':         col_dict['ZL'],
+    'TTT':              col_dict['TTT'],     'ZL':         col_dict['ZL'],
     'TTL':              col_dict['TTL'],     'ZJ':         col_dict['ZJ'],
-    'TTJ':              col_dict['TTJ'],     'Drell*Yan':  col_dict['DY'],
+    'TTJ':              col_dict['TTJ'],     'Drel*Yan':   col_dict['DY'],
     'ttbar':            col_dict['TT'],      'Z*tau':      col_dict['DY'],
     'ttbar*real*tau':   col_dict['TTT'],     'Z*ll':       col_dict['ZL'],
     'ttbar*l':          col_dict['TTL'],     'Z*j*tau':    col_dict['ZJ'],
@@ -52,12 +55,22 @@ colors_sample_dict = {
     'QCD':              col_dict['QCD'],     'ZZ':         col_dict['VV'],
     'signal':           col_dict['sig'],     'VV':         col_dict['VV'],
     'VLQ':              col_dict['sig'],     'diboson':    col_dict['VV'],
-    'bbA':              col_dict['sig'],
-    'data':             col_dict['data'],
-    'single muon':      col_dict['data'],    
+    'bbA':              col_dict['sig'],     'JTF':        col_dict['QCD'],
+    'data':             col_dict['data'],    'fake*rate':  col_dict['QCD'],
+    'single muon':      col_dict['data'],    'j*tau*fake': col_dict['QCD'],
     'single electron':  col_dict['data'],    
 }
 
+sample_dict = {
+  'TT':  "ttbar",                      'DY':  "Drell-Yan",
+  'TTT': "ttbar with real tau_h",      'ZTT': "Z -> tautau",
+  'TTJ': "ttbar other",                'ZL':  "Drell-Yan with l -> tau_h",
+  'TTL': "ttbar with l -> tau_h",      'ZJ':  "Drell-Yan with j -> tau_h",
+  'ST':  "single top",                 'W':   "W + jets",
+  'STT': "single top with real tau_h", 'VV':  "diboson",
+  'STJ': "single top other",           'QCD': "QCD multijet",
+  'data_obs': "observed"
+}
 
 
 def makeSFrameSamples(samplesD,samplesB,samplesS,**kwargs):
@@ -122,7 +135,7 @@ def shiftSample(samples0,searchterms,file_app,title_app,**kwargs):
     weight      = kwargs.get('weight',      ""          )
     filter      = kwargs.get('filter',      False       )
     #samples     = getSample(samples0,searchterm)
-    if not (isinstance(searchterms,list) or isinstance(searchterms,tuple)): searchterms = [ searchterms ]
+    if not isList(searchterms): searchterms = [ searchterms ]
     
     samples     = [ ]
     for searchterm in searchterms:
@@ -220,9 +233,9 @@ def getColor(name):
     if isinstance(name,Sample): name = sample.name
     for searchterm in sorted(colors_sample_dict,key=lambda x: len(x),reverse=True):
       if re.findall(searchterm.replace('*',".*"),name):
-        LOG.verbose('getColor - "%s" gets color %s from searchterm "%s"!'%(name,colors_sample_dict[searchterm],searchterm),verbositySampleTools,level=3) 
+        LOG.verbose('getColor - "%s" gets color %s from searchterm "%s"!'%(name,colors_sample_dict[searchterm],searchterm),verbositySampleTools,level=3)
         return colors_sample_dict[searchterm]
-    LOG.warning('getColor: Could not find color for "%s"!'%name)
+    LOG.warning('getColor - could not find color for "%s"!'%name)
     return 0
 
 
@@ -237,7 +250,7 @@ class Cutflow(object):
         
     def add(self, *args, **kwargs):
         strings = [a for a in arg if isinstance(a,str)]
-        numbers = [a for a in arg if isinstance(a,int) or isinstance(a,float)]
+        numbers = [a for a in arg if isNumber(a)]
         if len(strings)==0:
           LOG.warning("Cutflow::add: Did not find name!")
           strings = [ "no name" ]
@@ -278,10 +291,10 @@ class Sample(object):
         sigma    = -1.0
         filename = ""
         for arg in args:
-            if sigma < 0 and not kwargs.get('sigma',False) and\
-               (isinstance(arg,float) or isinstance(arg,int)): sigma = arg
-            if not filename and not kwargs.get('filename',False) and\
-               isinstance(arg,str): filename = arg
+          if sigma < 0 and not kwargs.get('sigma',False) and isNumber(arg):
+            sigma = arg
+          if not filename and not kwargs.get('filename',False) and isinstance(arg,str):
+            filename = arg
         
         # INITIALIZE attributes
         self.name           = name
@@ -308,7 +321,6 @@ class Sample(object):
         self.isBackground   = kwargs.get('background',      False               )
         self.isSignal       = kwargs.get('signal',          False               )
         self.blind_dict     = kwargs.get('blind',           { }                 ) # var vs. (xmin,xmax)
-        self.split_dict     = kwargs.get('split',           { }                 )
         self.splitsamples   = [ ]
         self.color          = kwargs.get('color',           getColor(self.title))
         self.linecolor      = kwargs.get('linecolor',       kBlack              )
@@ -326,10 +338,6 @@ class Sample(object):
         # CHECK NUMBER OF EVENTS
         if 0 < self.N < self.N_exp*0.97:
             LOG.warning('SampleSet::SampleSet: Sample "%s" has significantly less events (%d) than expected (%d).'%(self.N,self.N_exp))
-        
-        # SPLIT
-        if self.split_dict:
-            self.split(self.split_dict,**kwargs)
         
     
     def __str__(self):
@@ -349,7 +357,7 @@ class Sample(object):
     
     def __mul__(self, scale):
         """Multiply selection with some weight (that can be string or Selection object)."""
-        if isinstance(scale,float) or isinstance(scale,int):
+        if isNumber(scale):
           self.setScale(scale)
           return self
         return None
@@ -471,6 +479,7 @@ class Sample(object):
           file = TFile(self.file.GetName())
           newdict['file'] = file
         newsample.__dict__.update(newdict)
+        #LOG.verbose('Sample::clone: "%s", weight = "%s"'%(newsample.name,newsample.weight),1)
         return newsample
         
     def setColor(self,*args):
@@ -544,8 +553,12 @@ class Sample(object):
         
     def addWeight(self, weight):
         """Combine weight."""
-        #print ">>> addWeight: combine weights %s" % self.weight
-        self.weight = combineWeights(self.weight, weight)
+        #LOG.verbose('Sample::addWeight: combine weights "%s" with "%s"'%(self.weight,weight),1)
+        if isinstance(self,MergedSample):
+          for sample in self.samples:
+            sample.addWeight(weight)
+        else:
+          self.weight = combineWeights(self.weight, weight)
         
     def normalizeToLumiCrossSection(self,lumi,**kwargs):
         """Calculate and set the normalization for simulation as L*sigma/N"""
@@ -586,20 +599,21 @@ class Sample(object):
         return self.normalizeToLumiCrossSection(lumi,**kwargs)
         
     
-    def split(self,*args,**kwargs):
+    def split(self,splitlist,**kwargs):
         """Split sample for some dictionairy of cuts."""
         
         verbosity      = getVerbosity(kwargs,verbositySampleTools)
-        split_dict     = args[0] if len(args) else self.split_dict
         splitsamples   = [ ]
         
-        for i, (title, cut) in enumerate(split_dict.items()):
-            sample       = self.clone("%s_split%d"%(self.name,i),title)
+        for i, info in enumerate(splitlist): #split_dict.items()
+            name         = info[0] if len(info)>2 else "%s_split%d"%(self.name,i)
+            title        = info[1] if len(info)>2 else info[0] if len(info)>1 else name
+            cut          = info[2] if len(info)>2 else info[1] if len(info)>1 else ""
+            sample       = self.clone(name,title)
             sample.cuts  = combineCuts(self.cuts,cut)
             sample.color = getColor(sample.title)
             splitsamples.append(sample)
         
-        self.split_dict   = split_dict
         self.splitsamples = splitsamples # save list of split samples
         #return splitsamples
         
@@ -616,17 +630,23 @@ class Sample(object):
         title         = kwargs.get('title',           self.title                  )
         shift         = kwargs.get('shift',           0                           )
         smear         = kwargs.get('smear',           0                           )
-        scaleup       = kwargs.get('scaleup',         False                       )
+        scaleup       = kwargs.get('scaleup',         0.0                         )
         blind         = kwargs.get('blind',           False                       )
+        noJTF         = kwargs.get('noJTF',           False                       )
         color0        = kwargs.get('color',           self.color                  )
         linecolor     = kwargs.get('linecolor',       self.linecolor              )
         drawoption    = "E0" if self.isData else "HIST"
         drawoption    = "gOff"+kwargs.get('option',   drawoption                  )
         
         # SIGNAL
-        if scaleup and self.upscale!=1:
-            title += " (#times%d)" % (self.upscale)
-            scale *= self.upscale
+        if scaleup and self.upscale!=1.:
+            #title += " (#times%d)" % (self.upscale)
+            upscale_round = self.upscale
+            if isNumber(scaleup):
+              upscale_round *= scaleup
+            upscale_round = roundToSignificantDigit(upscale_round,multiplier=5)
+            title += ", %g pb"%(upscale_round)
+            scale *= upscale_round 
         
         # BLIND
         blindcuts = ""
@@ -635,10 +655,10 @@ class Sample(object):
             blindcuts = makeBlindCuts(var,a,b,N,xmin,xmax)
         
         # CUTS & WEIGHTS
-        weight    = combineWeights(self.weight, self.extraweight, kwargs.get('weight', ""))
-        cuts      = combineCuts(cuts, kwargs.get('cuts', ""), self.cuts, blindcuts, weight=weight)
-        
-        # UNDO SHIFTS
+        weight   = combineWeights(self.weight, self.extraweight, kwargs.get('weight', ""))
+        cuts     = combineCuts(cuts, kwargs.get('cuts', ""), self.cuts, blindcuts, weight=weight)
+        if noJTF:
+          cuts   = vetoJetTauFakes(cuts)
         if self.isData and ('Up' in var or 'Down' in var or 'Up' in cuts or 'Down' in cuts):
           var    = undoShift(var)
           cuts   = undoShift(cuts)
@@ -676,15 +696,16 @@ class Sample(object):
         
         # STYLE
         hist.SetLineColor(linecolor)
-        hist.SetFillColor(kWhite if self.isData else color0)
+        hist.SetFillColor(kWhite if self.isData or self.isSignal else color0)
         hist.SetMarkerColor(color0)
         
         # PRINT
         if verbosity>1:
             # TODO: make simple table ?
-            print ">>>\n>>> Sample - %s, %s: %s (%s)" % (color(name,color="grey"),var,self.filenameshort,self.treename)
-            print ">>>    norm=%.4f, scale=%.4f, total %.4f" % (self.norm,self.scale,scale)
-            print ">>>    weight:  %s" % (("\n>>>%s*("%(' '*18)).join(weight.rsplit('*(',max(0,weight.count("*(")-1))))
+            print ">>>\n>>> Sample - %s" % (color(name,color="grey"))
+            #print ">>>\n>>> Sample - %s, %s: %s (%s)" % (color(name,color="grey"),var,self.filenameshort,self.treename)
+            #print ">>>    norm=%.4f, scale=%.4f, total %.4f" % (self.norm,self.scale,scale)
+            #print ">>>    weight:  %s" % (("\n>>>%s*("%(' '*18)).join(weight.rsplit('*(',max(0,weight.count("*(")-1))))
             print ">>>    entries: %d (%.2f integral)" % (hist.GetEntries(),hist.Integral())
             print ">>>    %s" % (cuts.replace("*(","\n>>>%s*("%(' '*18)))
         return hist
@@ -702,21 +723,20 @@ class Sample(object):
         found       = True
         regex       = kwargs.get('regex',       False   )
         exlcusive   = kwargs.get('exclusive',   True    )
+        labels      = [self.name,self.title]+self.tags
         for searchterm in searchterms:
-            if not regex:
-                searchterm = re.sub(r"(?<!\\)\+",r"\+",searchterm) # replace + with \+
-                searchterm = re.sub(r"([^\.])\*",r"\1.*",searchterm) # replace * with .*
-            if exlcusive:
-                for samplelabel in [self.name,self.title]+self.tags:
-                    #print "Sample::isPartOf - %s in %s ? (excl.)"%(searchterm,samplelabel)
-                    matches    = re.findall(searchterm,samplelabel)
-                    if matches: break
-                else: return False # none of the labels contain the searchterm
-            else: # inclusive
-                for samplelabel in [self.name,self.title]+self.tags:
-                    #print "Sample::isPartOf - %s in %s ? (incl.)"%(searchterm,samplelabel)
-                    matches    = re.findall(searchterm,samplelabel)
-                    if matches: return True # one of the searchterm has been found
+          if not regex:
+              searchterm = re.sub(r"(?<!\\)\+",r"\+",searchterm) # replace + with \+
+              searchterm = re.sub(r"([^\.])\*",r"\1.*",searchterm) # replace * with .*
+          if exlcusive:
+              for samplelabel in labels:
+                  matches = re.findall(searchterm,samplelabel)
+                  if matches: break
+              else: return False # none of the labels contain the searchterm
+          else: # inclusive
+              for samplelabel in labels:
+                  matches = re.findall(searchterm,samplelabel)
+                  if matches: return True # one of the searchterm has been found
         return exlcusive
     
 
@@ -752,7 +772,6 @@ class MergedSample(Sample):
         self.isData       = sample.isData
         self._color       = sample.color
         self.linecolor    = sample.linecolor
-        self.split_dict   = sample.split_dict
     
     def __iter__(self):
       """Start iteration over samples."""
@@ -821,7 +840,7 @@ class MergedSample(Sample):
         
         if verbosity>1:
           print ">>>\n>>> Samples - %s, %s: %s" % (color(name,color="grey"), var, self.filenameshort)
-          print ">>>    norm=%.4f, scale=%.4f, total %.4f" % (self.norm,kwargs['scale'],self.scale)
+          #print ">>>    norm=%.4f, scale=%.4f, total %.4f" % (self.norm,kwargs['scale'],self.scale)
         
         hist = TH1D(name, title, N, a, b)
         hist.Sumw2()
@@ -830,7 +849,7 @@ class MergedSample(Sample):
                 kwargs['name']  = makeHistName(sample.name,name.replace(self.name+'_',''))    
             hist_new = sample.hist(var, N, a, b, cuts, **kwargs)
             hist.Add( hist_new )
-            LOG.verbose("    sample %s added with %.1f events (%d entries)" % (sample.name,hist_new.Integral(),hist_new.GetEntries()),verbosity,level=2)
+            #LOG.verbose("    sample %s added with %.1f events (%d entries)" % (sample.name,hist_new.Integral(),hist_new.GetEntries()),verbosity,level=2)
         
         # COLOR
         hist.SetLineColor(self.linecolor)
@@ -854,7 +873,7 @@ def unwrapMergedSamplesArgs(*args,**kwargs):
       elif isinstance(arg,Sample):
         samples.append(arg)
         args.remove(arg)
-      elif isinstance(arg,list) or isinstance(arg,tuple):
+      elif isList(arg):
         if arg and isinstance(arg[0],Sample):
           samples.append(arg[0])
           args.remove(arg[0])
@@ -917,9 +936,9 @@ class SampleSet(object):
       for sample in self.samples:
         sample.printSampleObjects()
     
-    def printTable(self):
+    def printTable(self,title=""):
       """Print table of all samples."""
-      print ">>>\n>>> samples with integrated luminosity L = %s / fb at sqrt(s) = 13 TeV" % (luminosity)
+      print ">>>\n>>> %s samples with integrated luminosity L = %s / fb at sqrt(s) = 13 TeV"%(title,luminosity)
       print ">>>  %-20s  %-40s  %12s  %10s  %11s  %10s  %s" %\
             ("sample title","name","sigma [pb]","events","sum weights","norm.","extra weight")
       for sample in self.samples:
@@ -962,7 +981,7 @@ class SampleSet(object):
         self._samplesD = value
       elif   isinstance(self._samplesD,dict): #and len(value)==1:
         self._samplesD[self.channel] = value #[0]
-      elif isinstance(self._samplesD,list) and isinstance(value,list):
+      elif isList(self._samplesD) and isList(value):
         self._samplesD = value
       LOG.warning("Sample.samplesD - Check setter for \"samplesD\" attribute!")
     
@@ -988,9 +1007,11 @@ class SampleSet(object):
         for sample in self.samples:
           sample.setTreeName(treename)
           
-    def setChannel(self,channel):
+    def setChannel(self,channel,treename=""):
         """Set channel."""
         self.channel = channel
+        if treename:
+          self.setTreeName(treename)
     
     def setColors(self):
         """TODO: Check and compare all sample's colors and set to another one if needed."""
@@ -1019,7 +1040,7 @@ class SampleSet(object):
         verbosity = getVerbosity(kwargs,verbositySampleTools)
         kwargs['verbosity'] = verbosity
         if verbosity>1:
-          LOG.warning('>>> SampleSet::refreshMemory refreshing memory (gDirectory "%s")'%(gDirectory.GetName()))
+          LOG.warning('SampleSet::refreshMemory refreshing memory (gDirectory "%s")'%(gDirectory.GetName()))
           gDirectory.ls()
         if self.nPlotsMade%10==0 and self.nPlotsMade>0:
           self.reloadFiles(**kwargs)
@@ -1040,22 +1061,29 @@ class SampleSet(object):
         """Plot stack."""
         self.refreshMemory()
         kwargs['stack'] = True
-        var = self.changeContext(*args)
-        plotargs = [ var ] if var else [ ]
-        plotargs += self.createHistograms(*args,**kwargs)
+        var             = self.changeContext(*args)
+        plotargs        = [ var ] if var else [ ]
+        plotargs       += self.createHistograms(*args,**kwargs)
         return Plot(*plotargs,**kwargs)
         
     
     def getStack(self, *args, **kwargs):
-        """Get stack."""
-        name                 = kwargs.get('name',"stack")
-        kwargs['data']       = False
-        kwargs['signal']     = False
-        kwargs['background'] = True
-        var = self.changeContext(*args)
-        histLists            = self.createHistograms(*args,**kwargs)
-        stack                = THStack(name,name)
-        for hist in histLists[1]:
+        """Get simulation stack."""
+        name                   = kwargs.get('name',"stack")
+        kwargs.update({'data':False, 'signal':False, 'background':True})
+        var                    = self.changeContext(*args)
+        histsD, histsB, histsS = self.createHistograms(*args,**kwargs)
+        return histsD[0]
+        
+    
+    def getData(self, *args, **kwargs):
+        """Get data histogram."""
+        name                   = kwargs.get('name',"stack")
+        kwargs.update({'data':True, 'signal':False, 'background':False})
+        var                    = self.changeContext(*args)
+        histsD, histsB, histsS = self.createHistograms(*args,**kwargs)
+        stack                  = THStack(name,name)
+        for hist in histsB:
             stack.Add(hist)
         return stack
 
@@ -1065,18 +1093,27 @@ class SampleSet(object):
         of sample objects with histograms as keys."""
         
         var, N, xmin, xmax, cuts = unwrapVariableSelection(*args)
+        args            = var,N,xmin,xmax,cuts
         verbosity       = getVerbosity(kwargs,verbositySampleTools)
         data            = kwargs.get('data',            True                )
-        signal          = kwargs.get('background',      True                )
+        signal          = kwargs.get('signal',          True                )
         background      = kwargs.get('background',      True                )
         weight          = kwargs.get('weight',          ""                  )
         weight_data     = kwargs.get('weight_data',     ""                  )
         split           = kwargs.get('split',           True                )
         blind           = kwargs.get('blind',           True                )
+        scaleup         = kwargs.get('scaleup',         0.0                 )
         reset           = kwargs.get('reset',           False               )
         append          = kwargs.get('append',          ""                  )
+        makeJTF         = kwargs.get('JFR',             False               )
+        noJTF           = kwargs.get('noJTF',           makeJTF             )
+        makeQCD         = kwargs.get('QCD',             False               ) and not makeJTF
         ratio_WJ_QCD    = kwargs.get('ratio_WJ_QCD_SS', False               )
+        QCDshift        = kwargs.get('QCDshift',        0.0                 )
         task            = kwargs.get('task',            "making histograms" )
+        saveToFile      = kwargs.get('saveToFile',      ""                  )
+        file            = createFile(saveToFile,text=cuts) if saveToFile else None
+        gROOT.cd()
         
         histsS          = [ ]
         histsB          = [ ]
@@ -1089,6 +1126,8 @@ class SampleSet(object):
             for sample in self.samples:
               if not signal and sample.isSignal: continue
               if not data   and sample.isData:   continue
+              if noJTF and (sample.isPartOf("WJ","W*J","W*j") or "gen_match_2==6" in sample.cuts):
+                continue
               if sample.splitsamples:
                 samples += sample.splitsamples
               else:
@@ -1106,32 +1145,141 @@ class SampleSet(object):
             
             # ADD background
             if sample.isBackground and background:
-              hist = sample.hist(var,N,xmin,xmax,cuts,append=append,weight=weight,verbosity=verbosity)
+              hist = sample.hist(*args,append=append,weight=weight,noJTF=noJTF,verbosity=verbosity)
               histsB.append(hist)
-              #samples_dict[hist] = sample
             
             # ADD signal
             elif sample.isSignal and signal:
-              hist = sample.hist(var,N,xmin,xmax,cuts,append=append,weight=weight,verbosity=verbosity)
+              hist = sample.hist(*args,append=append,weight=weight,noJTF=noJTF,verbosity=verbosity,scaleup=scaleup)
               histsS.append(hist)
-              #samples_dict[hist] = sample
             
             # ADD data
             elif sample.isData and data:
-              hist = sample.hist(var,N,xmin,xmax,cuts,append=append,weight=weight_data,blind=blind,verbosity=verbosity)
+              hist = sample.hist(*args,append=append,weight=weight_data,blind=blind,verbosity=verbosity)
               histsD.append(hist)
-              #samples_dict[hist] = sample
             
             if bar: bar.count("%s done"%sample.name)
         
         # ADD QCD
-        if kwargs.get('QCD',False):
-            hist = self.QCD(var,N,xmin,xmax,cuts,ratio_WJ_QCD_SS=ratio_WJ_QCD,append=append,weight=weight,verbosity=verbosity)
+        if makeJTF:
+            hist = self.jetFakeRate(*args,append=append,weight=weight,verbosity=verbosity,saveToFile=file)
             if hist:
-              histsB.append(hist)
-              #samples_dict[hist] = "QCD"
+              histsB.insert(0,hist)
+        elif makeQCD:
+            hist = self.QCD(*args,shift=QCDshift,ratio_WJ_QCD_SS=ratio_WJ_QCD,append=append,weight=weight,verbosity=verbosity)
+            if hist:
+              histsB.insert(0,hist)
+        
+        if len(histsD)>1:
+          LOG.warning("SampleSet::createHistograms: More than one data histogram!")
+        
+        # SAVE histograms
+        if file:
+          file.cd()
+          for hist in histsD + histsB + histsS:
+            hist.GetXaxis().SetTitle(var)
+            hist.Write(hist.GetName())
+            #file.Write(hist.GetName())
+          file.Close()
+          gROOT.cd()
         
         return [ histsD, histsB, histsS ] #, samples_dict
+        
+    
+    def jetFakeRate(self,*args,**kwargs):
+        """Estimate tau fake rate template.
+           - selection:
+               all events passing VLoose tau ID, but failing Tight
+               MC events passing gen_match<6
+           - fake rate:
+               weight*( data - MC )
+           - NOTE: discard all MC events with gen_match==6
+        """
+        
+        verbosity            = getVerbosity(kwargs,verbositySampleTools)
+        var, N, a, b, cuts0  = unwrapVariableSelection(*args)
+        if verbosity > 1:
+            print header("estimating fakeRate for variable %s" % (var))
+        name            = kwargs.get('name',            makeHistName("JTF",var) )
+        append          = kwargs.get('append',          ""                      )+"_JFR"
+        title           = kwargs.get('title',           "j -> tau fakes"        )
+        weight          = kwargs.get('weight',          ""                      )
+        weight_data     = kwargs.get('weight',          ""                      )
+        file            = kwargs.get('saveToFile',      None                    )
+        anisolated      = False
+        weight_FR       = "getFakeRate(pt_2,decayMode_2)" #"getFakeRate(pt_2,decayMode_2,iso_2_vloose,iso_2_loose,iso_2_medium,iso_2,iso_2_vtight,iso_2_vvtight)"
+        
+        # CUTS
+        cuts        = vetoJetTauFakes(cuts0)
+        isomatch    = re.findall(r"iso_2\ *==\ *1",cuts)
+        anisomatch  = re.findall(r"iso_2_vloose\ *==\ *1 && iso_2\ *!=\ *1",cuts)
+        if len(isomatch)==0 and len(anisomatch)==1:
+          LOG.warning('SampleSet::jetFakeRate: Using anti-isolated selection "%s" for fake rate!'%(cuts))
+          isomatch   = anisomatch
+          anisolated = True 
+        elif len(isomatch)==0:
+          LOG.error('SampleSet::jetFakeRate: Cannot apply fake rate method to selections "%s" without tau isolation!'%(cuts))
+        elif len(isomatch)>1:
+          LOG.warning('SampleSet::jetFakeRate: Selection string "%s" has two tau isolations!'%(cuts))
+        isomatch    = isomatch[0]
+        if not anisolated:
+          cuts        = cuts.replace(isomatch,"iso_2_vloose==1 && iso_2!=1")
+          weight      = combineWeights(weight_FR,weight)
+          weight_data = weight_FR
+
+        ## HISTOGRAMS
+        #histsD_JFR, histsB_JFR, histsS_JFR = self.createHistograms(var,N,a,b,cuts,weight=weight,weight_data=weight_data,append=append,
+        #                                                          signal=False,background=False,QCD=False,task="calculating JFR",split=False,blind=False,noJTF=True)
+        #hist_JTF = histsD_JFR[0].Clone(name)
+        #hist_JTF.SetTitle(title)
+        #hist_JTF.SetFillColor(getColor('JTF'))
+        #histMC_JFR = histsD_JFR[0].Clone("MC_JFR")
+        #histMC_JFR.Reset()
+        
+        # HISTOGRAMS
+        histsD_JFR, histsB_JFR, histsS_JFR = self.createHistograms(var,N,a,b,cuts,weight=weight,weight_data=weight_data,append=append,
+                                                                   signal=False,QCD=False,task="calculating JFR",split=False,blind=False,noJTF=True)
+        
+        # CHECK histograms
+        if not histsD_JFR:
+            LOG.warning("SampleSet::jetFakeRate: No data to make DATA driven JFR!")
+            return None
+        histD_JFR = histsD_JFR[0]
+        if not histsB_JFR:
+            LOG.warning("SampleSet::jetFakeRate: No MC to make JFR!")
+            return None
+        
+        # JTF HIST
+        histMC_JFR = histsB_JFR[0].Clone("MC_JFR")
+        histMC_JFR.SetTitle("sum of all MC in JFR CR")
+        for hist in histsB_JFR[1:]: histMC_JFR.Add(hist)
+        hist_JTF = substractHistsFromData(histD_JFR,histMC_JFR,name=name,title=title)
+        if not hist_JTF: LOG.warning("SampleSet::jetFakeRate: Could not make JTF! JTF histogram is none!", pre="  ")
+        hist_JTF.SetFillColor(getColor('JTF'))
+        
+        # SAVE histograms
+        if file:
+          dir = file.mkdir('jetTauFake')
+          dir.cd()
+          canvas, pave = canvasWithText(cuts)
+          pave.AddText("weight: "+weight)
+          canvas.Write("selections")
+          for hist in histsS_JFR+histsB_JFR+histsD_JFR+[histMC_JFR]:
+            hist.GetXaxis().SetTitle(var)
+            hist.Write(hist.GetName())
+            #dir.Write(hist.GetName())
+          gROOT.cd()
+        
+        # PRINT
+        if verbosity>1:
+          MC_JFR   = histMC_JFR.Integral()
+          data_JFR = histD_JFR.Integral()
+          JFR      = hist_JTF.Integral()
+          print ">>> SampleSet::jetFakeRate: - data = %.1f, MC = %.1f, JFR = %.1f"%(data_JFR,MC_JFR,JFR)
+        
+        close(histsS_JFR+histsB_JFR+histsD_JFR+[histMC_JFR])
+        return hist_JTF
+        
         
     
     def QCD(self,*args,**kwargs):
@@ -1214,31 +1362,31 @@ class SampleSet(object):
         # HISTOGRAMS
         histD  = None
         histWJ = None
-        histsD_SS, histsB_SS, histsS_SS = self.createHistograms(var,N,a,b,cuts,signal=False,QCD=False,task="calculating QCD",append=append,split=False,blind=False)
+        histsD_SS, histsB_SS, histsS_SS = self.createHistograms(var,N,a,b,cuts,weight=weight,weight_data=weight_data,append=append,
+                                                                signal=False,QCD=False,task="calculating QCD",split=False,blind=False)
         
         # GET WJ
         if doRatio_WJ_QCD:
           for hist in histsB_SS:
             if ("WJ" in hist.GetName() or re.findall(r"w.*jets",hist.GetName(),re.IGNORECASE)):
               if histWJ:
-                LOG.warning("SampleSet::QCD - more than one W+jets sample in SS region, going with first instance!", pre="  ")
+                LOG.warning("SampleSet::QCD: more than one W+jets sample in SS region, going with first instance!", pre="  ")
                 break
               else: histWJ = hist
           if not histWJ:
-            LOG.warning("SampleSet::QCD - Did not find W+jets sample!", pre="  ")
+            LOG.warning("SampleSet::QCD: Did not find W+jets sample!", pre="  ")
         
         # CHECK data
         if not histsD_SS:
-            LOG.warning("No data to make DATA driven QCD!")
+            LOG.warning("SampleSet::QCD: No data to make DATA driven QCD!")
             return None
         histD_SS = histsD_SS[0]
         
-        # STACK
-        stack_SS = THStack("stack_SS","stack_SS")
-        for hist in histsB_SS: stack_SS.Add(hist)
-        histQCD = substractStackFromHist(stack_SS,histD_SS,name=name+append,title="QCD multijet")
-        if not histQCD: LOG.warning("Could not make QCD! QCD histogram is none!", pre="  ")
-        histQCD.SetOption('HIST')
+        # QCD HIST
+        histMC_SS  = histsB_SS[0].Clone("MC_SS")
+        for hist in histsB_SS[1:]: histMC_SS.Add(hist)
+        histQCD = substractHistsFromData(histsD_SS[0],histMC_SS,name=name+append,title="QCD multijet")
+        if not histQCD: LOG.warning("SampleSet::QCD: Could not make QCD! QCD histogram is none!", pre="  ")
         
         # YIELD only
         if relax:
@@ -1247,11 +1395,11 @@ class SampleSet(object):
               scaleup = QCD_OS_SR/QCD_SS # normalizing to OS_SR
               LOG.verbose("   QCD - scaleup = QCD_OS_SR/QCD_SS_SB = %.1f/%.1f = %.3f" % (QCD_OS_SR,QCD_SS,scaleup),verbosity,level=2)
             else:
-              LOG.warning("SampleSet::QCD - QCD_SS_SB.Integral() == 0!")
+              LOG.warning("SampleSet::QCD: QCD_SS_SB.Integral() == 0!")
         scale   = scaleup*(1.0+shift) # scale up QCD 6% in OS region by default
         histQCD.Scale(scale)
         histQCD.SetFillColor(getColor('QCD'))
-        MC_SS   = stack_SS.GetStack().Last().Integral()
+        MC_SS   = histMC_SS.Integral()
         data_SS = histD_SS.Integral()
         QCD_SS  = histQCD.Integral()
         
@@ -1264,7 +1412,7 @@ class SampleSet(object):
         else:
             LOG.verbose("   QCD - data_SS = %.1f, MC_SS = %.1f, QCD_SS = %.1f, scale=%.3f"%(data_SS,MC_SS,QCD_SS,scale),verbosity,level=2)
         
-        close(histsS_SS+histsB_SS+histsD_SS)
+        close(histsS_SS+histsB_SS+histsD_SS+[histMC_SS])
         return histQCD
         
     
@@ -1274,18 +1422,20 @@ class SampleSet(object):
            This method assume that the variable of this Plot object is a transverse mass and is plotted
            from 80 GeV to at least 100 GeV."""
         
-        var, nBins, xmin, xmax = "pfmt_1", 200, 80, 200
+        var, nbins, xmin, xmax = "pfmt_1", 200, 80, 200
         if isinstance(cuts,Selection): cuts = cuts.selection
         samples     = self.samples
         verbosity   = getVerbosity(kwargs,verbositySampleTools)
-        shifts      = kwargs.get('shift', False)
+        shifts      = kwargs.get('shift',    False )
+        weight      = kwargs.get('weight',   ""    )
+        QCDshift    = kwargs.get('QCDshift', 0.0   )
         
         # SHIFT
         if shifts:
           var  = shift(var, shifts)
           cuts = shift(cuts,shifts)
         
-        LOG.verbose("%srenormalizing WJ with mt > 80 GeV sideband for variable %s%s"%(kwargs.get('pre',"  "),var,(" for %s"%self.name) if self.name else ""),True)
+        LOG.verbose("%srenormalizing WJ with mt > 80 GeV sideband for variable %s(%d,%d,%d) %s"%(kwargs.get('pre',"  "),var,nbins,xmin,xmax,("for %s"%self.name) if self.name else ""),True)
         
         # CHECK mt
         if not re.search(r"m_?t",var,re.IGNORECASE):
@@ -1293,7 +1443,7 @@ class SampleSet(object):
             return
         
         # CHECK a, b (assume histogram range goes from 80 to >100 GeV)
-        LOG.verbose("  nBins=%s, (a,b)=(%s,%s)"%(nBins,xmin,xmax), verbosity, level=2)
+        LOG.verbose("  nbins=%s, (a,b)=(%s,%s)"%(nbins,xmin,xmax), verbosity, level=2)
         LOG.verbose('  cuts = "%s"'%(cuts), verbosity, level=1)
         if xmin is not 80:
             LOG.warning("SampleSet::renormalizeWJ: renormalizing WJ with %s > %s GeV, instead of mt > 80 GeV!" % (var,xmin), pre="  ")
@@ -1307,7 +1457,7 @@ class SampleSet(object):
         histWJ  = None
         histsWJ = [ ]
         stack   = THStack("stack_QCD","stack_QCD")
-        histsD, histsB, histsS = self.createHistograms(var,nBins,xmin,xmax,cuts,reset=True,signal=False,QCD=True,ratio_WJ_QCD_SS=R,split=False,blind=False)
+        histsD, histsB, histsS = self.createHistograms(var,nbins,xmin,xmax,cuts,reset=True,signal=False,QCD=True,QCDshift=QCDshift,ratio_WJ_QCD_SS=R,split=False,blind=False,weight=weight)
         
         # CHECK MC and DATA
         if not histsB:
@@ -1326,13 +1476,13 @@ class SampleSet(object):
         histsWJ = [ ]
         LOG.verbose(" ",verbosity,level=2)
         for hist in histsB:
-            if hist.Integral(1,nBins)<=0:
+            if hist.Integral(1,nbins)<=0:
                 LOG.warning("SampleSet::renormalizeWJ: ignored %s with an integral of %s <= 0 !" % (hist.GetName(),hist.Integral()), pre="  ")
             if "WJ" in hist.GetName() or re.findall(r"w.jets",hist.GetName(),re.IGNORECASE):
                 histsWJ.append(hist)
             if "qcd" in hist.GetName().lower():
                 QCD   = True
-                I_QCD = hist.IntegralAndError(1,nBins,e_QCD)
+                I_QCD = hist.IntegralAndError(1,nbins,e_QCD)
             LOG.verbose("   adding to stack %s (%.1f events)" % (hist.GetName(),hist.Integral()),verbosity,level=2)
             stack.Add(hist)
         
@@ -1355,15 +1505,15 @@ class SampleSet(object):
         e_MC    = Double()
         e_D     = Double()
         e_WJ    = Double()
-        I_MC    = stack.GetStack().Last().IntegralAndError(1,nBins,e_MC)
-        I_D     = histD.IntegralAndError(1,nBins,e_D)
-        I_WJ    = histWJ.IntegralAndError(1,nBins,e_WJ)
+        I_MC    = stack.GetStack().Last().IntegralAndError(1,nbins,e_MC)
+        I_D     = histD.IntegralAndError(1,nbins,e_D)
+        I_WJ    = histWJ.IntegralAndError(1,nbins,e_WJ)
         purity  = 100.0*I_WJ/I_MC
         close(histsD+histsB+histsS)
         if I_MC < 10:
             LOG.warning("SampleSet::renormalizeWJ: could not renormalize WJ: integral of MC is %s < 10!" % I_MC, pre="  ")
             return 0.
-        print ">>>   data: %.1f, MC: %.1f, WJ: %.1f, QCD: %.1f, R: %.3f, WJ purity: %.2f%%)" % (I_D,I_MC,I_WJ,I_QCD,R,purity)
+        print ">>>    data: %.1f, MC: %.1f, WJ: %.1f, QCD: %.1f, R: %.3f, WJ purity: %.2f%%)" % (I_D,I_MC,I_WJ,I_QCD,R,purity)
         if I_D < 10:
             LOG.warning("SampleSet::renormalizeWJ: could not renormalize WJ: integral of data is %s < 10!" % I_D, pre="  ")
             return 0.
@@ -1382,7 +1532,7 @@ class SampleSet(object):
             LOG.warning("SampleSet::renormalizeWJ: could not renormalize WJ: scale = %.2f < 0!" % scale, pre="  ")
             return scale
         WJ.resetScale(scale)
-        print ">>>   WJ renormalization scale = %s (new total scale: %.3f, new WJ purity: %.2f%%)" % (color("%.3f"%scale,color='green'),WJ.scale,purity)
+        print ">>>    WJ renormalization scale = %s (new total scale: %.3f, new WJ purity: %.2f%%)" % (color("%.3f"%scale,color='green'),WJ.scale,purity)
         return scale
         
     
@@ -1390,12 +1540,13 @@ class SampleSet(object):
         """Renormalize TT by requireing that MC and data has the same number of events in some control region.
            ..."""
         
-        var, nBins, xmin, xmax = 'pfmt_1', 100, 0, 400
+        var, nbins, xmin, xmax = 'pfmt_1', 100, 0, 400
         if isinstance(cuts,Selection): cuts = cuts.selection
         samples         = self.samples
         verbosity       = getVerbosity(kwargs,verbositySampleTools)
-        shifts          = kwargs.get('shift',    False                                        )
-        baseline        = kwargs.get('baseline', "iso_cuts==1 && lepton_vetos==0 && q_1*q_2<0")
+        shifts          = kwargs.get('shift',    False                                         )
+        weight          = kwargs.get('weight',   ""                                            )
+        baseline        = kwargs.get('baseline', "iso_cuts==1 && lepton_vetos==0 && q_1*q_2<0" )
         LOG.verbose("%srenormalizing TT with %s"%(kwargs.get('pre',"  "),var),True)
         
         # SHIFT
@@ -1417,7 +1568,7 @@ class SampleSet(object):
           category = '1b1c'
         if not category:
           #LOG.warning("SampeSet::renormalizeTT: Did not recognize category for selections %s! Reverting to original scale (1)."%(cuts),pre="  ")
-          LOG.verbose("SampeSet::renormalizeTT: did not recognize category for selections %s! Reverting to original scale (1)."%(cuts),1,pre="  ")
+          LOG.verbose('SampeSet::renormalizeTT: did not recognize category for selections "%s"! Reverting to original scale (1).'%(cuts),1,pre="  ")
           TT = self.get("TT",unique=True)
           TT.resetScale()
           return 1.
@@ -1425,7 +1576,7 @@ class SampleSet(object):
         TTcuts = TTcuts1 if category=='1b1f' else TTcuts2
         
         # PREVIOUS
-        if self.TTscale[category]!=1:
+        if self.TTscale[category]!=1.:
           LOG.verbose('SampeSet::renormalizeTT: found previous scale %f!'%(self.TTscale[category]),1,pre="  ")
           return self.TTscale[category]
         
@@ -1434,8 +1585,8 @@ class SampleSet(object):
         histD   = None
         histTT  = None
         histsTT = [ ]
-        stack   = THStack("stack_QCD","stack_QCD")
-        histsD, histsB, histsS = self.createHistograms(var,nBins,xmin,xmax,TTcuts,reset=True,signal=False,QCD=True,split=False,blind=False)
+        stack   = THStack("stack_TT","stack_TT")
+        histsD, histsB, histsS = self.createHistograms(var,nbins,xmin,xmax,TTcuts,reset=True,signal=False,QCD=True,split=False,blind=False)
         
         # CHECK MC and DATA
         if not histsB:
@@ -1452,12 +1603,12 @@ class SampleSet(object):
         histsTT = [ ]
         LOG.verbose(" ",verbosity,level=2)
         for hist in histsB:
-            if hist.Integral(1,nBins)<=0:
+            if hist.Integral(1,nbins)<=0:
                 LOG.warning("SampleSet::renormalizeTT: ignored %s with an integral of %s <= 0 !" % (hist.GetName(),hist.Integral()), pre="  ")
             if "TT" in hist.GetName() or re.findall(r"ttbar",hist.GetName(),re.IGNORECASE):
                 histsTT.append(hist)
             if "qcd" in hist.GetName().lower():
-                I_QCD = hist.IntegralAndError(1,nBins,e_QCD)
+                I_QCD = hist.IntegralAndError(1,nbins,e_QCD)
             LOG.verbose("   adding to stack %s (%.1f events)" % (hist.GetName(),hist.Integral()),verbosity,level=2)
             stack.Add(hist)
         
@@ -1480,15 +1631,15 @@ class SampleSet(object):
         e_MC    = Double()
         e_D     = Double()
         e_TT    = Double()
-        I_MC    = stack.GetStack().Last().IntegralAndError(1,nBins,e_MC)
-        I_D     = histD.IntegralAndError(1,nBins,e_D)
-        I_TT    = histTT.IntegralAndError(1,nBins,e_TT)
+        I_MC    = stack.GetStack().Last().IntegralAndError(1,nbins,e_MC)
+        I_D     = histD.IntegralAndError(1,nbins,e_D)
+        I_TT    = histTT.IntegralAndError(1,nbins,e_TT)
         purity  = 100.0*I_TT/I_MC
         close(histsD+histsB+histsS)
         if I_MC < 10:
             LOG.warning("SampleSet::renormalizeTT: could not renormalize TT: integral of MC is %s < 10!" % I_MC, pre="  ")
             return 0.
-        print ">>>   data: %.1f, MC: %.1f, TT: %.1f, QCD: %.1f, TT purity: %.3g%%)" % (I_D,I_MC,I_TT,I_QCD,purity)
+        print ">>>    data: %.1f, MC: %.1f, TT: %.1f, QCD: %.1f, TT purity: %.3g%%)" % (I_D,I_MC,I_TT,I_QCD,purity)
         if I_D < 10:
             LOG.warning("SampleSet::renormalizeTT: could not renormalize TT: integral of data is %s < 10!" % I_D, pre="  ")
             return 0.
@@ -1509,7 +1660,7 @@ class SampleSet(object):
         
         self.TTscale[category] = scale
         TT.resetScale(scale)
-        print ">>>   TT renormalization scale = %.3f (new total scale: %.3f, TT purity: %.3g%%)" % (scale,TT.scale,purity)
+        print ">>>    TT renormalization scale = %s (new total scale: %.3f, TT purity: %.3g%%)" % (color("%.3f"%scale,color='green'),TT.scale,purity)
         return scale
     
     def measurePurity(self,**kwargs):
@@ -1520,7 +1671,7 @@ class SampleSet(object):
            requirements of a lepton pair."""
         
         verbosity = getVerbosity(kwargs,verbositySampleTools)
-        var, nBins, xmin, xmax, cuts = unwrapVariableSelection(*args)
+        var, nbins, xmin, xmax, cuts = unwrapVariableSelection(*args)
         
         samples         = self.samples        
         name            = kwargs.get('name',    makeHistName("QCD",var) )
@@ -1537,8 +1688,8 @@ class SampleSet(object):
         cutsSS = invertCharge(cuts,OS=False)
         
         # HISTOGRAMS
-        histsD_OS, histsMC_OS, histsS = self.createHistograms(var,nBins,xmin,xmax,cutsOS,weight=weight,append="_OS",signal=False,task="calculating QCD",QCD=False,split=False,verbosity=verbosity)
-        histsD_SS, histsMC_SS, histsS = self.createHistograms(var,nBins,xmin,xmax,cutsSS,weight=weight,append="_SS",signal=False,task="calculating QCD",QCD=False,split=False,verbosity=verbosity)
+        histsD_OS, histsMC_OS, histsS = self.createHistograms(var,nbins,xmin,xmax,cutsOS,weight=weight,append="_OS",signal=False,task="calculating QCD",QCD=False,split=False,verbosity=verbosity)
+        histsD_SS, histsMC_SS, histsS = self.createHistograms(var,nbins,xmin,xmax,cutsSS,weight=weight,append="_SS",signal=False,task="calculating QCD",QCD=False,split=False,verbosity=verbosity)
         if not histsD_OS or not histsD_SS:
             print warning("No data to make DATA driven QCD!")
             return None
@@ -1554,13 +1705,13 @@ class SampleSet(object):
         #    name_OS = makeHistName(sample.label+"_SS", var)
         #    name_SS = makeHistName(sample.label+"_OS", var)
         #    if sample.isBackground:
-        #        histOS = sample.hist(var, nBins, xmin, xmax, cutsOS, weight=weight, name=name_OS, verbosity=verbosity-1)
-        #        histSS = sample.hist(var, nBins, xmin, xmax, cutsSS, weight=weight, name=name_SS, verbosity=verbosity-1)
+        #        histOS = sample.hist(var, nbins, xmin, xmax, cutsOS, weight=weight, name=name_OS, verbosity=verbosity-1)
+        #        histSS = sample.hist(var, nbins, xmin, xmax, cutsSS, weight=weight, name=name_SS, verbosity=verbosity-1)
         #        histsMC_OS.append(histOS)
         #        histsMC_SS.append(histSS)
         #    elif sample.isData:
-        #        histsD_OS.append(sample.hist(var, nBins, xmin, xmax, cutsOS, name=name_OS, verbosity=verbosity-1))
-        #        histsD_SS.append(sample.hist(var, nBins, xmin, xmax, cutsSS, name=name_SS, verbosity=verbosity-1))
+        #        histsD_OS.append(sample.hist(var, nbins, xmin, xmax, cutsOS, name=name_OS, verbosity=verbosity-1))
+        #        histsD_SS.append(sample.hist(var, nbins, xmin, xmax, cutsSS, name=name_SS, verbosity=verbosity-1))
         #    if self.loadingbar: bar.count("%s done"%sample.label)
         #if not histsD_OS or not histsD_SS:
         #    print warning("No data to make DATA driven QCD!")
@@ -1573,10 +1724,10 @@ class SampleSet(object):
         for hist in histsMC_SS: stack_SS.Add(hist)
         e_MC_OS,   e_MC_SS   = Double(), Double()
         e_data_OS, e_data_SS = Double(), Double()
-        MC_OS   = stack_OS.GetStack().Last().IntegralAndError(1,nBins+1,e_MC_OS)
-        MC_SS   = stack_SS.GetStack().Last().IntegralAndError(1,nBins+1,e_MC_SS)
-        data_OS = histsD_OS[0].IntegralAndError(1,nBins+1,e_data_OS)
-        data_SS = histsD_SS[0].IntegralAndError(1,nBins+1,e_data_SS)
+        MC_OS   = stack_OS.GetStack().Last().IntegralAndError(1,nbins+1,e_MC_OS)
+        MC_SS   = stack_SS.GetStack().Last().IntegralAndError(1,nbins+1,e_MC_SS)
+        data_OS = histsD_OS[0].IntegralAndError(1,nbins+1,e_data_OS)
+        data_SS = histsD_SS[0].IntegralAndError(1,nbins+1,e_data_SS)
         
         # CHECK
         if verbosity>1:
@@ -1609,14 +1760,14 @@ class SampleSet(object):
         """Scan cut on a range of some variable, integrating the signal and background histograms,
            calculating the S/(1+sqrt(B)) and finally drawing a histogram with these values."""
     
-    def measureSFFromVar(self,var,nBins,a,b,**kwargs):
+    def measureSFFromVar(self,var,nbins,a,b,**kwargs):
         """Method to create a SF for a given var, s.t. the data and MC agree."""
     
     def resetScales(self,*searchterms,**kwargs):
         """Reset scale of sample."""
         scale = kwargs.get('scale',1)
         samples = self.get(*searchterms,**kwargs)
-        if isinstance(samples,list) or isinstance(samples,tuple):
+        if isList(samples):
           for sample in samples:
             sample.resetScale(scale=scale)
         elif isinstance(samples,Sample):
@@ -1631,6 +1782,11 @@ class SampleSet(object):
         results = self.get(*searchterms,**kwargs)
         found = isinstance(results,Sample) or len(results)!=0
         return found
+    
+    def remove(self,*searchterms,**kwargs):
+        samples = self.get(*searchterms,**kwargs)
+        for sample in samples:
+          self.samples.remove(sample)
     
     def get(self,*searchterms,**kwargs):
         return getSample(self.samples,*searchterms,**kwargs)
@@ -1662,19 +1818,19 @@ class SampleSet(object):
             self.samples.remove(sample)
         self.samples.insert(index0,mergedsample)
     
-    def splitSample(self,*args,**kwargs):
+    def split(self,*args,**kwargs):
         """Split sample for some dictionairy of cuts."""
         searchterms      = [ arg for arg in args if isinstance(arg,str)  ]
-        split_dict       = [ arg for arg in args if isinstance(arg,dict) ][0]
+        splitlist        = [ arg for arg in args if isList(arg)          ][0]
         kwargs['unique'] = True
         sample           = self.get(*searchterms,**kwargs)
         if sample:
-          sample.split(split_dict,**kwargs)
+          sample.split(splitlist,**kwargs)
         else:
           LOG.warning('SampleSet::splitSample - Could not find sample with searchterms "%s"'%('", "').join(searchterms))
           
-    def shiftSample(self,searchterms,file_app,title_app,**kwargs):
-        """Shift samples in samples set by creating new samples with new filename/titlename/weight."""
+    def shift(self,searchterms,file_app,title_app,**kwargs):
+        """Shift samples in samples set by creating new samples with new filename/titlename."""
         filter          = kwargs.get('filter',      False       )
         share           = kwargs.get('share',       False       )
         title_tag       = kwargs.get('title_tag',   False       )
@@ -1682,12 +1838,13 @@ class SampleSet(object):
         kwargs.setdefault('name', file_app.lstrip('_'))
         kwargs.setdefault('label', file_app)
         
-        if not (isinstance(searchterms,list) or isinstance(searchterms,tuple)): searchterms = [ searchterms ]
+        searchterms     = ensureList(searchterms)
+        all             = searchterms==["*"]
         samplesD        = { }
         samplesB        = [ ]
         samplesS        = [ ]
         for sample in self.samplesB:
-          if sample.isPartOf(*searchterms,exclusive=False):
+          if all or sample.isPartOf(*searchterms,exclusive=False):
             newsample = sample.clone(samename=True,deep=True)
             newsample.appendFileName(file_app,title_app=title_app,title_veto=title_veto)
             samplesB.append(newsample)
@@ -1695,9 +1852,45 @@ class SampleSet(object):
             newsample = sample if share else sample.clone(samename=True,deep=True)
             samplesB.append(newsample)
         for sample in self.samplesS:
-          if sample.isPartOf(*searchterms,exclusive=False):
+          if all or sample.isPartOf(*searchterms,exclusive=False):
             newsample = sample.clone(samename=True,deep=True)
             newsample.appendFileName(file_app,title_app=title_app,title_veto=title_veto)
+            samplesS.append(newsample)
+          elif not filter:
+            newsample = sample if share else sample.clone(samename=True,deep=True)
+            samplesS.append(newsample)
+        if not filter:
+            samplesD = self.samplesD
+        
+        return SampleSet(samplesD,samplesB,samplesS,**kwargs)
+          
+    def shiftWeight(self,searchterms,newweight,title_app,**kwargs):
+        """Shift samples in samples set by creating new samples with new weight."""
+        filter          = kwargs.get('filter',      False       )
+        share           = kwargs.get('share',       False       )
+        extra           = kwargs.get('extra',       True        ) # replace extra weight
+        
+        if not isList(searchterms): searchterms = [ searchterms ]
+        samplesD        = { }
+        samplesB        = [ ]
+        samplesS        = [ ]
+        for sample in self.samplesB:
+          if sample.isPartOf(*searchterms,exclusive=False):
+            newsample = sample.clone(samename=True,deep=True)
+            #LOG.verbose('SampleSet::shiftWeight: "%s" - weight "%s", extra weight "%s"'%(newsample.name,newsample.weight,newsample.extraweight),1)
+            if extra:
+              newsample.extraweight = newweight
+            else:
+              newsample.addWeight(newweight)
+            #LOG.verbose('SampleSet::shiftWeight: "%s" - weight "%s", extra weight "%s"'%(newsample.name,newsample.weight,newsample.extraweight),1)
+            samplesB.append(newsample)
+          elif not filter:
+            newsample = sample if share else sample.clone(samename=True,deep=True)
+            samplesB.append(newsample)
+        for sample in self.samplesS:
+          if sample.isPartOf(*searchterms,exclusive=False):
+            newsample = sample.clone(samename=True,deep=True)
+            newsample.addWeight(newweight)
             samplesS.append(newsample)
           elif not filter:
             newsample = sample if share else sample.clone(samename=True,deep=True)
@@ -1928,7 +2121,6 @@ def crossSections(*searchterms,**kwargs):
 
 import PlotTools
 from PlotTools      import *
-from SettingTools   import *
 from SelectionTools import *
 from VariableTools  import *
 from PrintTools     import *

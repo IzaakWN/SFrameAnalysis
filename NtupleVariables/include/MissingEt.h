@@ -61,6 +61,13 @@ namespace UZH {
     floatingnumber* m_cov10;
     floatingnumber* m_cov11;
     
+    
+    floatingnumber px() const { return *(m_et)*cos(*(m_phi)); }
+    floatingnumber py() const { return *(m_et)*sin(*(m_phi)); }
+    void shift( const TLorentzVector shift );
+    MissingEt& operator-=( const TLorentzVector shift );
+    MissingEt& operator+=( const TLorentzVector shift );
+    
     // there must be consistent with ...NtupleObject.cxx, otherwise you'll get a segfault
     floatingnumber sumEt() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MissingEtNtupleObject::ksumEt)) std::cout<<"sumEt not connected!"<<std::endl;*/ return *(m_sumEt); } 
     floatingnumber corrPx() const { /*if(!m_ana->getConnectSucceeded(Ntuple::MissingEtNtupleObject::kcorrPx)) std::cout<<"corrPx not connected!"<<std::endl;*/ return *(m_corrPx); } 
@@ -93,9 +100,6 @@ namespace UZH {
     void cov00( const floatingnumber& val){ *(m_cov00)=val; } 
     void cov10( const floatingnumber& val){ *(m_cov10)=val; } 
     void cov11( const floatingnumber& val){ *(m_cov11)=val; } 
-    
-    floatingnumber px() const { return *(m_et)*cos(*(m_phi)); }
-    floatingnumber py() const { return *(m_et)*sin(*(m_phi)); }
     
     
     private:

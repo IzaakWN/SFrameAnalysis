@@ -74,23 +74,9 @@ TLorentzVector ${Object}::tlv() const {
   return tlv;
 }
 }}
-${{Only:MissingEt:
-TLorentzVector* ${Object}::getTLV() const {
-  TLorentzVector* tlv = new TLorentzVector();
-  tlv->SetPxPyPzE(*(m_et)*cos(*(m_phi)), *(m_et)*sin(*(m_phi)), 0, *(m_et));
-  return tlv;
-}
-
-TLorentzVector ${Object}::tlv() const {
-  TLorentzVector tlv;
-  //tlv.SetPtEtaPhiE(*(m_et), 0.0, *(m_phi), *(m_et));
-  tlv.SetPxPyPzE(*(m_et)*cos(*(m_phi)), *(m_et)*sin(*(m_phi)), 0, *(m_et));
-  return tlv;
-}
-}}
 ${{Only:Jet:
-floatingnumber ${Object}::deepCSV( ) const { return *(m_deep_csv_b)+*(m_deep_csv_bb); }
-void ${Object}::scaleJES( const floatingnumber ssigma ) {
+floatingnumber Jet::deepCSV( ) const { return *(m_deep_csv_b)+*(m_deep_csv_bb); }
+void Jet::scaleJES( const floatingnumber ssigma ) {
   m_scalefactor = ssigma;
   if( fabs( ssigma ) < 1e-6 ) return; 
   *(m_e)  *= ( 1.0 + ssigma );
@@ -100,6 +86,42 @@ void ${Object}::scaleJES( const floatingnumber ssigma ) {
   //  *(m_py) *= ( 1.0 + ssigma );
   //  *(m_pz) *= ( 1.0 + ssigma );
   //}
+}
+}}
+${{Only:MissingEt:
+TLorentzVector* MissingEt::getTLV() const {
+  TLorentzVector* tlv = new TLorentzVector();
+  tlv->SetPxPyPzE(*(m_et)*cos(*(m_phi)), *(m_et)*sin(*(m_phi)), 0, *(m_et));
+  return tlv;
+}
+
+TLorentzVector MissingEt::tlv() const {
+  TLorentzVector tlv;
+  //tlv.SetPtEtaPhiE(*(m_et), 0.0, *(m_phi), *(m_et));
+  tlv.SetPxPyPzE(*(m_et)*cos(*(m_phi)), *(m_et)*sin(*(m_phi)), 0, *(m_et));
+  return tlv;
+}
+
+void MissingEt::shift( const TLorentzVector shift ) {
+  (*this)-=shift;
+}
+
+MissingEt& MissingEt::operator-=( const TLorentzVector shift_tlv ) {
+  Float_t metpx = *(m_et)*cos(*(m_phi)) - shift_tlv.Px(); // substract shift
+  Float_t metpy = *(m_et)*sin(*(m_phi)) - shift_tlv.Py();
+  Float_t metet = sqrt( metpx*metpx + metpy*metpy );
+  *(m_et)  = metet;
+  *(m_phi) = atan2(metpy,metpx);
+  return *this;
+}
+
+MissingEt& MissingEt::operator+=( const TLorentzVector shift_tlv ) {
+  Float_t metpx = *(m_et)*cos(*(m_phi)) + shift_tlv.Px(); // substract shift
+  Float_t metpy = *(m_et)*sin(*(m_phi)) + shift_tlv.Py();
+  Float_t metet = sqrt( metpx*metpx + metpy*metpy );
+  *(m_et)  = metet;
+  *(m_phi) = atan2(metpy,metpx);
+  return *this;
 }
 }}
 ${{Only:GenParticle:

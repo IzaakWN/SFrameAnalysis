@@ -101,3 +101,25 @@ TLorentzVector MissingEt::tlv() const {
   return tlv;
 }
 
+void MissingEt::shift( const TLorentzVector shift ) {
+  (*this)-=shift;
+}
+
+MissingEt& MissingEt::operator-=( const TLorentzVector shift_tlv ) {
+  Float_t metpx = *(m_et)*cos(*(m_phi)) - shift_tlv.Px(); // substract shift
+  Float_t metpy = *(m_et)*sin(*(m_phi)) - shift_tlv.Py();
+  Float_t metet = sqrt( metpx*metpx + metpy*metpy );
+  *(m_et)  = metet;
+  *(m_phi) = atan2(metpy,metpx);
+  return *this;
+}
+
+MissingEt& MissingEt::operator+=( const TLorentzVector shift_tlv ) {
+  Float_t metpx = *(m_et)*cos(*(m_phi)) + shift_tlv.Px(); // substract shift
+  Float_t metpy = *(m_et)*sin(*(m_phi)) + shift_tlv.Py();
+  Float_t metet = sqrt( metpx*metpx + metpy*metpy );
+  *(m_et)  = metet;
+  *(m_phi) = atan2(metpy,metpx);
+  return *this;
+}
+

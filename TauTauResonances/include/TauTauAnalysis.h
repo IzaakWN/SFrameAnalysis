@@ -257,6 +257,8 @@ class TauTauAnalysis : public SCycleBase {
     bool    m_doJEC;
     bool    m_doTES;
     double  m_TESshift;
+    bool    m_doMES;
+    double  m_MESshift;
     bool    m_doEES;
     double  m_EESshift;
     double  m_EESshiftEndCap;

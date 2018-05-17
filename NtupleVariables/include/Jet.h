@@ -87,7 +87,7 @@ namespace UZH {
     
     floatingnumber deepCSV( ) const;
     floatingnumber getJetSF() const { return m_scalefactor; }
-    void           scaleJES(  const floatingnumber scale);
+    void           scaleJES(  const floatingnumber scale );
     
     // there must be consistent with ...NtupleObject.cxx, otherwise you'll get a segfault
     bool IDLoose() const { /*if(!m_ana->getConnectSucceeded(Ntuple::JetNtupleObject::kIDLoose)) std::cout<<"IDLoose not connected!"<<std::endl;*/ return (m_IDLoose); } 

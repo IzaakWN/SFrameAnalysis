@@ -109,18 +109,17 @@ class TauTauAnalysis : public SCycleBase {
       Float_t tau_iso;
       Float_t tau_pt;
       Float_t dR;
-      // comparators
+      
+      // comparators http://cpp.sh/2lahm
       bool operator<(const ltau_pair& another) const {
-      //if (dR > 0.3 && another.dR > 0.3 && dR != another.dR)
-      //  return dR < another.dR;           // take pair with lowest dR, if dR > 0.3
-        if (lep_iso != another.lep_iso)
-          return lep_iso < another.lep_iso; // take pair with best (lowest) leption iso
-        if (lep_pt != another.lep_pt)
+        if(lep_pt != another.lep_pt)
           return lep_pt > another.lep_pt;   // take pair with highest lepton pt
-        if (tau_iso != another.tau_iso)
-          return tau_iso > another.tau_iso; // take pair with best (highest) tau iso
-        if (tau_pt != another.tau_pt)
+        if(tau_pt != another.tau_pt)
           return tau_pt > another.tau_pt;   // take pair with highest tau pt
+        if(lep_iso != another.lep_iso)
+          return lep_iso < another.lep_iso; // take pair with best (lowest) leption iso
+        if(tau_iso != another.tau_iso)
+          return tau_iso > another.tau_iso; // take pair with best (highest) tau iso
         return ilepton < another.ilepton;
       }
     };

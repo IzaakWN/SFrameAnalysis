@@ -17,19 +17,19 @@ from VariableTools  import *
 from PrintTools     import *
 
 # CMS style
-CMS_lumi.cmsText = "CMS"
-CMS_lumi.extraText = "Preliminary"
+CMS_lumi.cmsText      = "CMS"
+CMS_lumi.extraText    = "Preliminary"
 CMS_lumi.cmsTextSize  = 0.65
 CMS_lumi.lumiTextSize = 0.60
-CMS_lumi.relPosX = 0.13
-CMS_lumi.outOfFrame = True
-CMS_lumi.lumi_13TeV = "%s fb^{-1}"%luminosity if luminosity else ""
+CMS_lumi.relPosX      = 0.13
+CMS_lumi.outOfFrame   = True
+CMS_lumi.lumi_13TeV   = "%s fb^{-1}"%luminosity if luminosity else ""
 tdrstyle.setTDRStyle()
 
 # https://root.cern.ch/doc/master/classTColor.html
 # http://imagecolorpicker.com/nl
 # TColor::GetColor(R,B,G)
-legendTextSize = 0.034 #0.036
+legendtextsize = 0.040
 colors     = [ kRed+1, kAzure+5, kGreen+2, kOrange+1, kMagenta-4, kYellow+1,
                kRed-9, kAzure-4, kGreen-2, kOrange+6, kMagenta+3, kYellow+2 ]
 fillcolors = [ kRed-2, kAzure+5,
@@ -51,16 +51,13 @@ def makeCanvas(**kwargs):
     
     global luminosity
     square              = kwargs.get('square',              False       )
-    scaleleftmargin     = kwargs.get('scaleleftmargin',     1           )
-    scalerightmargin    = kwargs.get('scalerightmargin',    1           )
-    scaletopmargin      = kwargs.get('scaletopmargin',      1           )
-    scalebottommargin   = kwargs.get('scaletopmargin',      1           )
+    scaleleftmargin     = kwargs.get('scaleleftmargin',     1.          )
+    scalerightmargin    = kwargs.get('scalerightmargin',    1.          )
+    scaletopmargin      = kwargs.get('scaletopmargin',      1.          )
+    scalebottommargin   = kwargs.get('scaletopmargin',      1.          )
     pads                = kwargs.get('pads',                [ ]         ) # pass list as reference
     double              = kwargs.get('ratio', False ) or kwargs.get('residue', False )
     
-    CMS_lumi.cmsTextSize  = 0.65
-    CMS_lumi.lumiTextSize = 0.60
-    CMS_lumi.relPosX      = 0.11
     CMS_lumi.lumi_13TeV   = "%s, %s fb^{-1}"%(era,luminosity) if era else "%s fb^{-1}"%(luminosity) if luminosity else ""
     if not CMS_lumi.lumi_13TeV:
       scaletopmargin *= 0.7
@@ -71,77 +68,82 @@ def makeCanvas(**kwargs):
         scalerightmargin  *= 3.6
     elif double:
         W = 800; H  = 750
-        scaleleftmargin       *= 1.14
-        scalerightmargin      *= 0.80
-        scaletopmargin        *= 0.80
-        scalebottommargin     *= 0.92
-        CMS_lumi.cmsTextSize   = 0.65
-        CMS_lumi.lumiTextSize  = 0.60
-        CMS_lumi.relPosX       = 0.105
+        #scaleleftmargin       *= 0.98
+        #scalerightmargin      *= 0.64
+        #scaletopmargin        *= 0.80
+        #scalebottommargin     *= 0.92
+        CMS_lumi.cmsTextSize   = 0.68
+        CMS_lumi.lumiTextSize  = 0.64
+        CMS_lumi.relPosX       = 0.10
     else:
-      scaletopmargin    *= 1.1
-    
-    T, B = 0.08*scaletopmargin,  0.14*scalebottommargin
-    L, R = 0.12*scaleleftmargin, 0.04*scalerightmargin
+        scaletopmargin        *= 1.1
+        CMS_lumi.cmsTextSize   = 0.68
+        CMS_lumi.lumiTextSize  = 0.64
+        CMS_lumi.relPosX       = 0.12
     
     canvas = TCanvas("canvas","canvas",100,100,W,H)
     canvas.SetFillColor(0)
     canvas.SetFillStyle(0)
     canvas.SetBorderMode(0)
     canvas.SetFrameBorderMode(0)
-    canvas.SetTopMargin(  T ); canvas.SetBottomMargin( B )
-    canvas.SetLeftMargin( L ); canvas.SetRightMargin(  R )
     
     if double:
+        canvas.SetTopMargin(  0.0 ); canvas.SetBottomMargin( 0.0 )
+        canvas.SetLeftMargin( 0.0 ); canvas.SetRightMargin(  0.0 )
         canvas.Divide(2)
         canvas.cd(1)
-        gPad.SetPad("pad1","pad1", 0, 0.33, 1, 0.95)
-        gPad.SetLeftMargin(0.125);  gPad.SetRightMargin(0.03)
-        gPad.SetTopMargin(0.02);    gPad.SetBottomMargin(0.00001)
+        gPad.SetPad("pad1","pad1", 0, 0.33, 1.0, 1.0)
+        gPad.SetLeftMargin(0.128);  gPad.SetRightMargin(0.03)
+        gPad.SetTopMargin(0.095);   gPad.SetBottomMargin(0.00001)
         gPad.SetFillColor(0) #SetFillColorAlpha(0,1.0)
         gPad.SetFillStyle(0) # 4000
         gPad.SetBorderMode(0)
         gPad.Draw()
         canvas.cd(2)
         gPad.SetPad("pad2","pad2", 0, 0.05, 1, 0.30)
-        gPad.SetLeftMargin(0.125);  gPad.SetRightMargin(0.03)
+        gPad.SetLeftMargin(0.128);  gPad.SetRightMargin(0.03)
         gPad.SetTopMargin(0.00001); gPad.SetBottomMargin(0.22)
         gPad.SetFillColor(0) #SetFillColorAlpha(0,1.0)
         gPad.SetFillStyle(0) # 4000
         gPad.SetBorderMode(0)
         gPad.Draw()
         canvas.cd(1)
+    else:
+        T, B = 0.08*scaletopmargin,  0.14*scalebottommargin
+        L, R = 0.14*scaleleftmargin, 0.05*scalerightmargin
+        canvas.SetTopMargin(  T ); canvas.SetBottomMargin( B )
+        canvas.SetLeftMargin( L ); canvas.SetRightMargin(  R )
     
     return canvas
     
 
 
 def makeLegend(*hists,**kwargs):
-    """Make legend."""
+    """Make legend for a list of histograms."""
     
-    global legendTextSize
-    title       = kwargs.get('title',           ""              )
-    entries     = kwargs.get('entries',         [ ]             )
-    position    = kwargs.get('position',        ""              ).lower()
-    transparent = kwargs.get('transparent',     False           )
-    histsB      = kwargs.get('histsB',          [ ]             )
-    histsS      = kwargs.get('histsS',          [ ]             )
-    histsD      = kwargs.get('histsD',          [ ]             )
-    errorband   = kwargs.get('error',           None            )
+    global legendtextsize
+    title       = kwargs.get('title',           ""                  )
+    entries     = kwargs.get('entries',         [ ]                 )
+    position    = kwargs.get('position',        ""                  ).lower()
+    transparent = kwargs.get('transparent',     False               )
+    histsB      = kwargs.get('histsB',          [ ]                 )
+    histsS      = kwargs.get('histsS',          [ ]                 )
+    histsD      = kwargs.get('histsD',          [ ]                 )
+    errorband   = kwargs.get('error',           None                )
     errortitle  = kwargs.get('errortitle',      errorband.GetTitle() if errorband else "" )
-    x1          = kwargs.get('x1',              0               )
-    x2          = kwargs.get('x2',              0               )
-    y1          = kwargs.get('y1',              0               )
-    y2          = kwargs.get('y2',              0               )
-    width       = kwargs.get('width',           0               )
-    height      = kwargs.get('height',          0               )
-    style0      = kwargs.get('style0',          'l'             )
-    style1      = kwargs.get('style',           'l'             )
-    stack       = kwargs.get('stack',           False           )
-    textsize    = kwargs.get('textsize',        legendTextSize  )
-    text        = kwargs.get('text',            ""              )
+    x1          = kwargs.get('x1',              0                   )
+    x2          = kwargs.get('x2',              0                   )
+    y1          = kwargs.get('y1',              0                   )
+    y2          = kwargs.get('y2',              0                   )
+    width       = kwargs.get('width',           -1                  )
+    height      = kwargs.get('height',          -1                  )
+    style0      = kwargs.get('style0',          'l'                 )
+    style1      = kwargs.get('style',           'l'                 )
+    stack       = kwargs.get('stack',           False               )
+    textsize    = kwargs.get('textsize',        legendtextsize      )
+    text        = kwargs.get('text',            ""                  )
     
-    if not hists: hists = histsB+histsS+histsD
+    if not hists: hists = histsD+histsB+histsS
     styleB      = 'f' if histsB and histsD else 'l'
     styleS      = 'l'
     styleD      = 'lep'
@@ -156,30 +158,35 @@ def makeLegend(*hists,**kwargs):
     elif len(entries)==0:
       entries = [ h.GetTitle() for h in hists ]
     
+    # count number of lines in legend
     nLines = len(entries)+sum([e.count("splitline") for e in entries])
     if title: nLines += 1 + title.count("splitline")
     else:     nLines += 0.80
     if text:  nLines += 1 + text.count("splitline")
     
-    
-    if width==0:  width  = 0.18 if textsize>legendTextSize else 0.16
-    if height==0: height = 1.05*textsize*nLines
-    x2 = 0.86; x1 = x2 - width
-    y2 = 0.90; y1 = y2 - height
+    # set default width, height and
+    if width<0:  width  = 0.22 if textsize>legendtextsize else 0.20
+    if height<0: height = 1.10*textsize*nLines
+    x2 = 0.86-gPad.GetRightMargin(); x1 = x2 - width
+    y2 = 0.96-gPad.GetTopMargin();   y1 = y2 - height
     
     if position:
-      if   "leftleft"     in position: x1 = 0.16;         x2 = x1 + width
-      elif "rightright"   in position: x2 = 1 - 0.10;     x1 = x2 - width
-      elif "centerright"  in position: x1 = 0.60-width/2; x2 = 0.60+width/2
-      elif "centerleft"   in position: x1 = 0.46-width/2; x2 = 0.46+width/2
-      elif "left"         in position: x1 = 0.20;         x2 = x1 + width
-      elif "right"        in position: x2 = 1 - 0.15;     x1 = x2 - width
-      elif "center"       in position: x1 = 0.55-width/2; x2 = 0.55+width/2
-      if   "bottombottom" in position: y1 = 0.15;         y2 = y1 + height
-      elif "bottom"       in position: y1 = 0.20;         y2 = y1 + height
-      elif "toptop"       in position: y2 = 0.95;         y1 = y2 - height
-      elif "top"          in position: y1 = 0.93;         y2 = y1 - height
+      if   'leftleft'     in position: x1 = 0.02+gPad.GetLeftMargin();   x2 = x1 + width
+      elif 'rightright'   in position: x2 = 0.92-gPad.GetRightMargin();  x1 = x2 - width
+      elif 'center'  in position:
+        if 'right'  in position: center = (1+gPad.GetLeftMargin()-gPad.GetRightMargin())/2 + 0.06
+        elif 'left' in position: center = (1+gPad.GetLeftMargin()-gPad.GetRightMargin())/2 - 0.06
+        else:                    center = (1+gPad.GetLeftMargin()-gPad.GetRightMargin())/2
+        x1 = center-width/2; x2 = center+width/2
+      elif 'left'         in position: x1 = 0.08+gPad.GetLeftMargin();   x2 = x1 + width
+      elif 'right'        in position: x2 = 0.85-gPad.GetRightMargin();  x1 = x2 - width
+      if   'bottombottom' in position: y1 = 0.02+gPad.GetBottomMargin(); y2 = y1 + height
+      elif 'bottom'       in position: y1 = 0.08+gPad.GetBottomMargin(); y2 = y1 + height
+      elif 'toptop'       in position: y2 = 0.98-gPad.GetTopMargin();    y1 = y2 - height
+      elif 'top'          in position: y1 = 0.95-gPad.GetTopMargin();    y2 = y1 - height
+    #y1 += yoffset; y2 += yoffset
     legend = TLegend(x1,y1,x2,y2)
+    legend.SetMargin(0.20)
     
     if transparent: legend.SetFillStyle(0) # 0 = transparent
     else: legend.SetFillColor(kWhite)
@@ -202,7 +209,7 @@ def makeLegend(*hists,**kwargs):
       #  print title[:i]
       #  print title[i+2:]
       #  legend.SetHeader(title[:i])
-      #  if i<len(title): legend.AddEntry(0,title[i+1:],'')
+      #  if i<len(tit   le): legend.AddEntry(0,title[i+1:],'')
     else:
       legend.SetHeader("")
     legend.SetTextFont(42) # no bold for entries
@@ -259,7 +266,10 @@ def canvasWithText(*lines,**kwargs):
 
     
 def makeAxes(frame, *args, **kwargs):
-    """Make axis for main pad of ratio plot."""
+    """Make axis for for a simple plot or the main pad of ratio plot."""
+    
+    if isinstance(frame,Ratio):
+      return makeAxesRatio(frame, *args, **kwargs)
     
     args         = list(args)
     xmin         = frame.GetXaxis().GetXmin()
@@ -273,31 +283,33 @@ def makeAxes(frame, *args, **kwargs):
     if len(binning)>1:
         xmin, xmax = binning[:2]
     
-    hists        = args
+    hists          = args
     hists.append(frame)
-    main         = kwargs.get('main',            False              ) # main pad in ratio plot
-    xmin         = kwargs.get('xmin',            xmin               )
-    xmax         = kwargs.get('xmax',            xmax               )
-    ymin         = kwargs.get('ymin',            ymin               )
-    ymax         = kwargs.get('ymax',            ymax               )
-    ymargin      = kwargs.get('ymargin',         1.16               )
-    negativeY    = kwargs.get('negativeY',       True               )
-    xlabel       = makeLatex(kwargs.get('xlabel', frame.GetTitle()) )
-    ylabel       = kwargs.get('ylabel',          ""                 )
-    logx         = kwargs.get('logx',            False              )
-    logy         = kwargs.get('logy',            False              )
-    ycenter      = kwargs.get('center',          False              )
+    main           = kwargs.get('main',            False              ) # main pad in ratio plot
+    xmin           = kwargs.get('xmin',            xmin               )
+    xmax           = kwargs.get('xmax',            xmax               )
+    ymin           = kwargs.get('ymin',            ymin               )
+    ymax           = kwargs.get('ymax',            ymax               )
+    ymargin        = kwargs.get('ymargin',         1.16               )
+    negativeY      = kwargs.get('negativeY',       True               )
+    xlabel         = makeLatex(kwargs.get('xlabel', frame.GetTitle()) )
+    ylabel         = kwargs.get('ylabel',          ""                 )
+    logx           = kwargs.get('logx',            False              )
+    logy           = kwargs.get('logy',            False              )
+    ycenter        = kwargs.get('center',          False              )
     
     if main:
-      xlabelsize = kwargs.get('xlabelsize',     0.0                 )
-      xtitlesize = kwargs.get('xtitlesize',     0.0                 )
-      ylabelsize = kwargs.get('ylabelsize',     0.056               )
-      ytitlesize = kwargs.get('ytitlesize',     0.068               )
+      xlabelsize   = kwargs.get('xlabelsize',     0.0                 )
+      xtitlesize   = kwargs.get('xtitlesize',     0.0                 )
+      ylabelsize   = kwargs.get('ylabelsize',     0.056               )
+      ytitlesize   = kwargs.get('ytitlesize',     0.068               )
+      ytitleoffset = kwargs.get('ytitleoffset',   1.01                )
     else:
-      xlabelsize = kwargs.get('xlabelsize',     0.052               )
-      xtitlesize = kwargs.get('xtitlesize',     0.062               )
-      ylabelsize = kwargs.get('ylabelsize',     0.052               )
-      ytitlesize = kwargs.get('ytitlesize',     0.062               )
+      xlabelsize   = kwargs.get('xlabelsize',     0.050               )
+      xtitlesize   = kwargs.get('xtitlesize',     0.060               )
+      ylabelsize   = kwargs.get('ylabelsize',     0.050               )
+      ytitlesize   = kwargs.get('ytitlesize',     0.060               )
+      ytitleoffset = kwargs.get('ytitleoffset',   1.25                )
     
     if isinstance(frame,THStack):
         maxs = [ frame.GetMaximum() ]
@@ -343,7 +355,7 @@ def makeAxes(frame, *args, **kwargs):
       frame.GetYaxis().CenterTitle(True)
     frame.GetYaxis().SetLabelSize(ylabelsize)
     frame.GetYaxis().SetTitleSize(ytitlesize)
-    frame.GetYaxis().SetTitleOffset(1.01)
+    frame.GetYaxis().SetTitleOffset(ytitleoffset)
     frame.GetYaxis().SetTitle(ylabel)
     TGaxis.SetExponentOffset(-0.074,0.005,'y')
     
@@ -408,7 +420,18 @@ def makeAxesRatio(frame, *args, **kwargs):
     return xmin, xmax, ymin, ymax
     
 
-
+def columnize(zlist):
+    """Reorder of list suchs that a TLegend column is transposed from left-to-righ-top-to-bottom
+    to top-to-bottom-left-to-right. E.g. [1,2,3,4,5,6,7] -> [1,5,2,6,3,7,4]."""
+    newlist = [ ]
+    ihalf = int(ceil(len(zlist)/2.))
+    for i,j in zip(zlist[:ihalf],zlist[ihalf:]):
+      newlist.append(i)
+      newlist.append(j)
+    if len(zlist)%2!=0:
+      newlist.append(zlist[ihalf-1])
+    return newlist
+    
 def roundToSignificantDigit(x,digits=1,multiplier=1):
     """Round off number x to first signicant digit."""
     x = float(x)/multiplier
@@ -446,8 +469,8 @@ def findClosestDivisor(n,m):
    return int(xlow)
 
 def symmetricYRange(self, frame, **kwargs):
-    """Make symmetric Y range around some center value.
-       Made for ratio plots with variable y axis."""
+    """Make symmetric y-range around some center value.
+       Made for ratio plots with variable y-axis."""
     
     center = kwargs.get('center',0) 
     min = center
@@ -479,9 +502,21 @@ def symmetricYRange(self, frame, **kwargs):
     return [ center-width, center+width ]    
     
 
+def getTGraphYRange(graph,ymin=+999989,ymax=-999989):
+    """Get full y-range of a given TGraph object."""
+    N = graph.GetN()
+    x, y = Double(), Double()
+    for i in xrange(0,N):
+      graph.GetPoint(i,x,y)
+      yup  = y+graph.GetErrorYhigh(i)
+      ylow = y-graph.GetErrorYlow(i)
+      if yup >ymax: ymax = yup
+      if ylow<ymin: ymin = ylow
+    return (ymin,ymax)
+
 
 def rebin(hist,nbins,*args):
-    """Rebinning historgram."""
+    """Smart (?) rebinning of a histogram."""
     bins   = [a for a in args if isNumber(a)]
     nbins0 = hist.GetNbinsX()
     xmin0  = hist.GetXaxis().GetXmin()
@@ -516,7 +551,7 @@ def rebin(hist,nbins,*args):
 
 
 def setFillStyle(*hists,**kwargs):
-    """Make fill style."""
+    """Set the fill style for a list of histograms."""
     global fillcolors
     fillcolors0 = kwargs.get('colors', fillcolors )
     for i, hist in enumerate(hists):
@@ -524,7 +559,7 @@ def setFillStyle(*hists,**kwargs):
         hist.SetFillColor(color0)
 
 def setLineStyle(*hists,**kwargs):
-    """Make line color."""
+    """Set the line style for a list of histograms."""
     global colors, styles
     colors0      = kwargs.get('colors',         colors  )
     style        = kwargs.get('style',          True    )
@@ -539,7 +574,7 @@ def setLineStyle(*hists,**kwargs):
         if not isinstance(hist,TLine): hist.SetMarkerSize(0)
 
 def setMarkerStyle(*hists,**kwargs):
-    """Make marker style."""
+    """Set the marker style for a list of histograms."""
     global colors
     colors0      = kwargs.get('colors',         colors  )
     size         = kwargs.get('size',           0.6     )
@@ -554,7 +589,7 @@ def setMarkerStyle(*hists,**kwargs):
         hist.SetMarkerSize(size)
 
 def setErrorBandStyle(hist_error,**kwargs):
-    """Set error band style."""
+    """Set the error band style for a histogram."""
     # https://root.cern.ch/doc/v608/classTAttFill.html#F2
     # 3001 small dots, 3003 large dots, 3004 hatched
     
@@ -572,7 +607,7 @@ def setErrorBandStyle(hist_error,**kwargs):
 
 
 def makeErrorBand(hists,**kwargs):
-    """Make histogram of error band for a set of histograms, or stack."""
+    """Make an error band histogram for a list of histograms, or stack."""
     
     if isinstance(hists,THStack): hists = [hists.GetStack.Last()]
     elif not isList(hists):       hists = [hists]
@@ -697,25 +732,84 @@ def makeAsymmErrorFromShifts(hist0,histsDown0,histsCentral0,histsUp0,hist_stater
     # Draw('2 SAME')
     
     return errors
-
-
-def groupHists(*args,**kwargs):
-    """Substract stacked MC histograms from a data histogram,
-       bin by bin if the difference is larger than zero."""
     
-    hists   = [a for a in args if isinstance(a,TH1)]
-    strings = [a for a in args if isinstance(a,str)]
+
+
+def groupHistsInList(hists,searchterms,name,title,**kwargs):
+    """Group histograms in a list, returns list of histograms."""
+    
+    searchterms = ensureList(searchterms)
+    hists_matched = getHist(hists,*searchterms)
+    if not hists_matched:
+      LOG.warning("groupHistsInList: No matched histograms") 
+      return hists
+    hindex = hists.index(hists_matched[0])
+    
+    histsum = hists_matched[0].Clone(name)
+    histsum.SetTitle(title)
+    for i, hist in enumerate(hists_matched):
+      if i>0: histsum.Add(hist)
+      hists.remove(hist)
+    hists.insert(hindex,histsum)
+    
+    return hists
+    
+def groupHists(*args,**kwargs):
+    """Find histograms corresponding to some search term, return the sum histgram."""
+    
+    strings     = [ ]
+    hists       = [ ]
+    searchterms = [ ]
+    
+    for arg in args:
+      if isinstance(a,str):
+        strings.append(arg)
+      elif isinstance(a,TH1):
+        hists.append(arg)
+      elif isListOfHists(arg):
+        hists = arg
+      elif isList(arg) and not any(not isinstance(s,str) for s in arg):
+        searchterms = arg
+    
     if not hists:
       LOG.warning("groupHists - Could not group histograms, because none are given!")
-    name    = strings[0] if len(strings)>0 else hists[0].GetName() 
-    title   = strings[1] if len(strings)>1 else hists[0].GetTitle()
+    name        = strings[0] if len(strings)>0 else hists[0].GetName()
+    title       = strings[1] if len(strings)>1 else hists[0].GetTitle()
+    if len(strings)>2:
+      searchterms = [ strings[2] ]
     
     verbosity   = kwargs.get('verbosity',   0             )
     name        = kwargs.get('name',        name          )
     title       = kwargs.get('title',       title         )
-    histsum     = hists[0].Clone(name)
+    
+    hists_matched = getHist(hists,*searchterms) if searchterms else hists
+    histsum     = hists_matched[0].Clone(name)
     histsum.SetTitle(title)
+    for hist in hists_matched[1:]: histsum.Add(hist)
     return histsum
+
+def getHist(hists,*searchterms,**kwargs):
+    """Help function to get all histograms corresponding to some name and optional searchterm."""
+    matches   = [ ]
+    unique    = kwargs.get('unique',      False   )
+    regex     = kwargs.get('regex',       False   )
+    exclusive = kwargs.get('excl',        False   )
+    for hist in hists:
+      yes = True
+      for searchterm in searchterms:
+        if not regex:
+          searchterm = re.sub(r"(?<!\\)\+",r"\+",  searchterm) # replace + with \+
+          searchterm = re.sub(r"([^\.])\*",r"\1.*",searchterm) # replace * with .*
+        yes = yes and re.search(searchterm,hist.GetName())
+        if yes and not exclusive: break
+        elif not yes: break
+      if yes: matches.append(hist)
+    if not matches:
+      LOG.warning("Could not find a sample with search terms %s..." % (', '.join(searchterms)))
+    elif unique:
+      if len(matches)>1: LOG.warning("Found more than one match to %s. Using first match only: %s" % (", ".join(searchterms),", ".join([h.name for h in matches])))
+      return matches[0]
+    return matches
     
 
 
@@ -814,7 +908,7 @@ def integrateHist(*args,**kwargs):
 
 
 def norm(*hists,**kwargs):
-    """ Normalize histogram."""
+    """Normalize histogram."""
     if isList(hists[0]): hists = hists[0]
     for hist in hists:
         I = hist.Integral()
@@ -822,7 +916,7 @@ def norm(*hists,**kwargs):
         else: LOG.warning("norm: Could not normalize; integral = 0!")
     
 def close(*hists,**kwargs):
-    """ Close histograms."""
+    """Close histograms."""
     verbosity = getVerbosity(kwargs,verbosityPlotTools)
     if len(hists)>0 and isList(hists):
       hists = hists[0]
@@ -1096,7 +1190,7 @@ class Plot(object):
         legend      = kwargs.get('legend',          True                )
         entries     = kwargs.get('entries',         [ ]                 )
         text        = kwargs.get('text',            [ ]                 ) # extra text for legend
-        textsize    = kwargs.get('textsize', legendTextSize*(1 if self.histsD else 1.2))
+        textsize    = kwargs.get('textsize', legendtextsize*(1 if self.histsD else 1.2))
         errortitle  = kwargs.get('errortitle',      "stat. unc."        )
         position    = kwargs.get('position',        ""                  )
         autostyle   = kwargs.get('autostyle',       True                )
@@ -1161,11 +1255,12 @@ class Plot(object):
         self.makeAxes(self.frame, *(self.histsB+self.histsD), xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax,
                       xlabel=xlabel, ylabel=ylabel, ymargin=ymargin, main=ratio, logy=logy, logx=logx)
         if legend:
+            if not ratio: textsize *= 0.80
             self.makeLegend(title=title, entries=entries, position=position, text=text, textsize=textsize)
         
         # CMS LUMI
         if CMS_lumi.lumi_13TeV:
-          CMS_lumi.CMS_lumi(self.canvas,13,0)
+          CMS_lumi.CMS_lumi(gPad,13,0)
         
         # RATIO
         if ratio:
@@ -1242,7 +1337,7 @@ class Plot(object):
           self.xmin, self.xmax, self.ymin, self.ymax = makeAxes(frame,*args,**kwargs)
         
     def setLineStyle(self, *hists, **kwargs):
-        """Make line style."""
+        """Set the line style for a list of histograms."""
         reset = kwargs.get('reset',  True  )
         if not hists: hists = self.hists[:]
         if not reset: hists = [h for h in hists if h.GetFillColor() in [kBlack,kWhite]]
@@ -1251,7 +1346,7 @@ class Plot(object):
           setLineStyle(*hists,**kwargs)
           
     def setMarkerStyle(self, *hists, **kwargs):
-        """Make line style."""
+        """Set the marker style for a list of histograms."""
         reset = kwargs.get('reset',  True  )
         if not hists: hists = self.hists[:]
         hists = [h for h in hists if h.GetMarkerColor()!=kBlack]
@@ -1260,7 +1355,7 @@ class Plot(object):
           setMarkerStyle(*hists,**kwargs)
     
     def setFillStyle(self, *hists, **kwargs):
-        """Make fill style."""
+        """Set the fill style for a list of histograms."""
         reset     = kwargs.get('reset',     False  )
         blackline = kwargs.get('blackline', True   )
         if not hists: hists = self.hists[:]

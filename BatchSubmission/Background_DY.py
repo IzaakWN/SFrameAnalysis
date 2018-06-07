@@ -4,10 +4,11 @@ jobName="DY"
 outDir="/scratch/$USER/SFrameAnalysis/AnalysisOutput_ltau2017/"+jobName
 nEventsMax=-1
 runningJobsLimit=6000
+nResubmissions=6
 nProcesses=1
 queue="short.q"
-nFiles=2
-hCPU="00:25:00"
+nFiles=3
+hCPU="00:05:00"
 hVMEM="5000M"
 postFix="_2017_V2"
 dataSets = [
@@ -36,6 +37,7 @@ userItems = [
     ["doRecoilCorr","false"],
     ["doZpt","false"], # only to LO DY!
     ["TESshift","0.00"],
+    ["MESshift","0.00"],
     ["EESshift","0.00"],
     ["LTFshift","0.00"],
     ["JTFshift","0.00"],

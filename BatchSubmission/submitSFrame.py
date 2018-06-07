@@ -220,7 +220,7 @@ def waitForBatchJobs(runningJobs, listOfJobs, userName, timeCheck):
   skip  = 5 if nJobs<400 else 10
   skip2 = 5 if nJobs>400 else 1
   while not len(runningJobs)==0:
-    time.sleep(float(timeCheck))
+    time.sleep(timeCheck)
     queryString="qstat -u %s | grep %s | awk {\'print $1\'}" %(userName, userName)
     lock=thread.allocate_lock()
     lock.acquire()
@@ -229,7 +229,7 @@ def waitForBatchJobs(runningJobs, listOfJobs, userName, timeCheck):
     lock.release()
     jobList = qstatProcess.stdout.read()
     jobList = jobList.split("\n")
-    for j in runningJobs:
+    for j in runningJobs[:]:
       jobId=j[0]
       if (jobId not in jobList):
         for l in listOfJobs:
@@ -249,16 +249,17 @@ def waitForBatchJobs(runningJobs, listOfJobs, userName, timeCheck):
       #  usageFile = getTempDirLog(job) + "/" + getCycleName(job) + ".tmp"  
       #  open(usageFile,'a').write(usageOutput)
     if nRunningJobs != len(runningJobs):
+      if len(runningJobs)==0: break
       nRunningJobs = len(runningJobs)
       if ((nRunningJobs%skip )==0 or not(nJobs*0.25<nRunningJobs<nJobs*0.75)) and\
          ((nRunningJobs%skip2)==0 or not(nJobs*0.07<nRunningJobs<nJobs*0.93)):
-        print "waiting for %d job(s) in the queue" %(len(runningJobs))
-
+        print "waiting for %d job(s) in the queue" %(nRunningJobs)
+    
 
 
 def checkRunningJobs(runningJobs, listOfJobs, timeCheck):
-  time.sleep(float(timeCheck))
-  for r in runningJobs:
+  time.sleep(timeCheck)
+  for r in runningJobs[:]:
     if not r[0].is_alive():
       for l in listOfJobs:
         if r[1]==(l[2]+l[3]):
@@ -268,7 +269,7 @@ def checkRunningJobs(runningJobs, listOfJobs, timeCheck):
 
 
 def checkCompletion(dataSets, listOfJobs, outDir, cycleName, postFix,keepTemp):
-  for d in dataSets:
+  for d in dataSets[:]:
     checkReady=True
     mergeFiles=""
     mergeDebug=""
@@ -291,12 +292,6 @@ def checkCompletion(dataSets, listOfJobs, outDir, cycleName, postFix,keepTemp):
         #  mergeDebug+=open(usageFile).read()
         #  os.system("rm -f " +usageFile)
         mergeFiles+=fileBaseNameRoot+l[3]+".root "
-        # fileToMerge=fileBaseNameRoot.partition("pythia8")[0]+fileBaseNameRoot.partition("pythia8")[1]+'*'
-        # fileToMerge=fileToMerge.partition("Run2016")[0]+fileToMerge.partition("Run2016")[1]+'*'
-        # fileToMerge=fileToMerge.partition("Run2017")[0]+fileToMerge.partition("Run2017")[1]+'*'
-        # fileToMerge=fileToMerge.partition("Run2018")[0]+fileToMerge.partition("Run2018")[1]+'*'
-        # fileToMerge=fileToMerge.partition("madgraph")[0]+fileToMerge.partition("madgraph")[1]+'*'
-        # while "**" in fileToMerge: fileToMerge=fileToMerge.replace("**",'*')
         fileToMerge=partitionFileNames(fileBaseNameRoot)
         # print "l[6] %s ,l[1] %s, l[2] %s ,l[3] %s , fileBaseNameRoot %s ," %(l[6],l[1],l[2],l[3],fileBaseNameRoot)
       elif l[0]==d[0] and l[4]=="":
@@ -309,19 +304,9 @@ def checkCompletion(dataSets, listOfJobs, outDir, cycleName, postFix,keepTemp):
         mergeCmd="hadd -f %s.root %s " %(mergeFileBaseName, mergeFiles)
       else:
         #mergeCmd="hadd -f %s.root %s && rm -rf %s" %(mergeFileBaseName, mergeFiles, mergeFiles)
-        # fileToMerge=fileBaseNameRoot.partition("pythia8")[0]+fileBaseNameRoot.partition("pythia8")[1]+'*'
-        # fileToMerge=fileToMerge.partition("Run2016")[0]+fileToMerge.partition("Run2016")[1]+'*'
-        # fileToMerge=fileToMerge.partition("Run2017")[0]+fileToMerge.partition("Run2017")[1]+'*'
-        # fileToMerge=fileToMerge.partition("Run2018")[0]+fileToMerge.partition("Run2018")[1]+'*'
-        # fileToMerge=fileToMerge.partition("madgraph")[0]+fileToMerge.partition("madgraph")[1]+'*'
-        # while "**" in fileToMerge: fileToMerge=fileToMerge.replace("**",'*')
         fileToMerge=partitionFileNames(fileBaseNameRoot)
         mergeCmd='hadd -f %s.root %s.root && rm -rf %s.root'  %(mergeFileBaseName,  fileToMerge,  fileToMerge)
-        #mergeCmd_mt = 'hadd -f %s/%s_mutau.root %s/%s_mutau*.root && rm -rf %s/%s_mutau*.root'  %(outDir, d[0], fileBaseName, d[0], fileBaseName, d[0])
-        #mergeCmd_et = 'hadd -f %s/%s_eletau.root %s/%s_eletau*.root && rm -rf %s/%s_eletau*.root'  %(outDir, d[0], fileBaseName, d[0], fileBaseName, d[0])
         print "mergeCmd is\n%s \n" %mergeCmd
-        #print "mergeCmd_private_mt is %s " %mergeCmd_mt
-        #print "mergeCmd_private_et is %s " %mergeCmd_et
       
       # LS
       lock=thread.allocate_lock()
@@ -441,6 +426,12 @@ def main():
   parser.add_option("--dccp", dest="usedccp",
                     action="store_true", default=False,
                     help="copy files from dCache before running [default = %default]")
+#   parser.add_option("--nFiles", action="store",
+#                     dest="nFiles", default=0,
+#                     help="number of files per job [default = %default]")
+#   parser.add_option("--maxResubmissions", action="store",
+#                     dest="maxResubmissions", default=0,
+#                     help="max. number of resubmissions [default = %default]")
 
   (options, args)=parser.parse_args()
   jobOptions=options.jobOptions
@@ -705,6 +696,11 @@ def main():
     compilePacks=[]
   print "%-30s : compilePacks=%s" % ("additional packages to compile", compilePacks)
   
+  # resubmit
+  if not "nResubmissions" in dir():
+    nResubmissions = 0
+  print "%-30s : nResubmissions=%s" %("max. number of resubmissions", nResubmissions)
+  
   # set batch queue
   if not "queue" in dir():
     queue="all.q"
@@ -739,7 +735,8 @@ def main():
   
   # set delay for process check
   if not "timeCheck" in dir():
-    timeCheck="30"
+    timeCheck=30
+  timeCheck=float(timeCheck)
   print "%-30s : timeCheck=%s" %("delay for process check", timeCheck)
 
   if not "rootSetup" in dir():
@@ -891,16 +888,16 @@ def main():
         submitOut = compileProcess.stdout.read()
         runningJobs.append([submitOut.split(" ")[2], cycleName])
       waitForBatchJobs(runningJobs, listOfJobs, userName, timeCheck)
-
-    print "sending jobs ..."
+    
+    print "\nsending jobs ..."
     runningJobs=[]
     iJobs=0
     skip=1
-    if   len(listOfJobs)>=1000: skip = 100
-    elif len(listOfJobs)>= 500: skip =  50
-    elif len(listOfJobs)>= 160: skip =  20
-    elif len(listOfJobs)>=  50: skip =  10
-    elif len(listOfJobs)>=  20: skip =   5
+    if   nJobs>=1000: skip = 100
+    elif nJobs>= 500: skip =  50
+    elif nJobs>= 160: skip =  20
+    elif nJobs>=  50: skip =  10
+    elif nJobs>=  20: skip =   5
     for j in listOfJobs:
       
       batchScript = BatchScript(useHost, useOS, path2sframe, useEnv, cmssw, hCPU, hVMEM, cycleName, tempDirLog)
@@ -968,7 +965,7 @@ def main():
         lock.release()
         submitOut = runProcess.stdout.read()
         runningJobs.append([submitOut.split(" ")[2], j[2]+j[3]])
-      if not (iJobs%skip):
+      if iJobs%skip==0:
         print "submitting job %d of %d"%(iJobs,nJobs),
         while runningJobsLimit>0:
           #subProcess=subprocess.Popen('qstat -u $USER | awk \'{print $5}\' | grep r |wc -l' , stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
@@ -980,15 +977,57 @@ def main():
           if nSubmitted<runningJobsLimit: break
           print "|",
           sys.stdout.flush()
-          time.sleep(float(timeCheck*2))
-        print
-        
+          time.sleep(timeCheck*2.0)
+        print    
       iJobs+=1
     waitForBatchJobs(runningJobs, listOfJobs, userName, timeCheck)
+    
+    # FIND FAILED JOBS
+    retry = 0
+    while retry<nResubmissions:
+      retry    += 1
+      print "\nall jobs ended! Checking for missing root files..."
+      resubmitListOfJobs = [ ]
+      for j in listOfJobs:
+        rootFile = "%s/%s%s.root"%(tempDirRoot,j[2],j[3])
+        if not os.path.exists(rootFile):
+          #print '  rootFile "%s" does not exist!'%rootFile
+          resubmitListOfJobs.append(j)
+      if len(resubmitListOfJobs)==0: break
+      
+      # RESUBMIT
+      iJobs       = 0
+      nResJobs    = len(resubmitListOfJobs)
+      runningJobs = [ ]
+      skip        = 20 if nResJobs>=100 else 10 if nResJobs>=50 else 5 if nResJobs>=20 else 2 if nResJobs>=8 else 1
+      fraction    = 100.0*nResJobs/nJobs
+      print "missing %d/%d (%.1f%%) root files! Resubmitting (retry %d/%d):"%(nResJobs,nJobs,fraction,retry,nResubmissions)
+      for j in resubmitListOfJobs:
+        lock=thread.allocate_lock()
+        lock.acquire()
+        nameOfJob=j[2]+j[3]
+        nameOfJob=nameOfJob.split('.')[1]+nameOfJob.split('.')[2]
+        runProcess=subprocess.Popen("qsub -q %s -notify -N %s %s.sh"%(queue,nameOfJob,j[2]+j[3]), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        runProcess.wait()
+        runProcessStatus=runProcess.poll()
+        if runProcessStatus==1:
+          print "Error code %d when running\n   qsub -notify -N %s %s.sh\nExiting!" %(runProcessStatus, nameOfJob, j[2]+j[3])
+          lock.release()
+          sys.exit()
+        else:
+          lock.release()
+          submitOut = runProcess.stdout.read()
+          runningJobs.append([submitOut.split(" ")[2], j[2]+j[3]])
+        if iJobs%skip==0: print "resubmitting job %d of %d"%(iJobs,nResJobs)
+        iJobs+=1
+      waitForBatchJobs(runningJobs,resubmitListOfJobs,userName,timeCheck)
+    
+    # CHECK COMPLETION
     while not len(dataSets)==0:
       print "\nwaiting for %d data sets to finish" %(len(dataSets))
-      checkCompletion(dataSets, listOfJobs, outDir, cycleName, postFix,keepTemp)
-      time.sleep(float(timeCheck))
+      checkCompletion(dataSets, listOfJobs, outDir, cycleName, postFix, keepTemp)
+      time.sleep(timeCheck/2.0)
+    
   elif not mergeOnly:
     # process list of jobs
     runningJobs=[]
@@ -1006,7 +1045,7 @@ def main():
     while not len(dataSets)==0:
       print "\nwaiting for %d data sets to finish" %(len(dataSets))
       checkCompletion(dataSets, listOfJobs, outDir, cycleName, postFix,keepTemp)
-      time.sleep(float(timeCheck))
+      time.sleep(timeCheck)
   else:
     runningJobs=[]
     for j in listOfJobs:

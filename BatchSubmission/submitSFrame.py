@@ -13,9 +13,7 @@
 
 sFrameExecutable="sframe_main"
 
-import os
-import sys
-import glob
+import os, sys, glob, time
 import optparse
 import tempfile
 import platform
@@ -29,11 +27,10 @@ if platform.python_version() < "2.5.1":
 from multiprocessing import Process
 import thread
 import subprocess
-import time
 import shutil
 import socket
 starttime=time.time()
-startdate=time.strftime("%a %d/%m/%Y %H:%M:%S",time.gmtime())
+startdate=time.strftime("%a %d/%m/%Y %H:%M:%S",time.localtime())
 succesRates=[ ]
 
 
@@ -250,10 +247,13 @@ def waitForBatchJobs(runningJobs, listOfJobs, userName, timeCheck):
       #  open(usageFile,'a').write(usageOutput)
     if nRunningJobs != len(runningJobs):
       if len(runningJobs)==0: break
+      diff = nRunningJobs-len(runningJobs)
       nRunningJobs = len(runningJobs)
-      if ((nRunningJobs%skip )==0 or not(nJobs*0.25<nRunningJobs<nJobs*0.75)) and\
-         ((nRunningJobs%skip2)==0 or not(nJobs*0.07<nRunningJobs<nJobs*0.93)):
-        print "waiting for %d job(s) in the queue" %(nRunningJobs)
+      if nJobs*0.07<nRunningJobs<nJobs*0.93:
+        if nJobs*0.25<nRunningJobs<nJobs*0.75:
+          if (nRunningJobs%skip)!=0  and diff<2*skip:  continue
+        elif (nRunningJobs%skip2)!=0 and diff<2*skip2: continue
+      print "waiting for %d job(s) in the queue" %(nRunningJobs)
     
 
 
@@ -381,7 +381,7 @@ def getFileLumi(inputline):
 def main():
   # parse the command line
   parser=optparse.OptionParser(usage="%prog -j jobOption.py")
-  parser.add_option("-j", "--jobOptions", dest="jobOptions",
+  parser.add_option('-j', "--jobOptions", dest="jobOptions",
                     action="store", default="Datasets.py",
                     help="joboptions to process [default = %default]")
   parser.add_option("--keepTemp", action="store_true",
@@ -390,7 +390,7 @@ def main():
   parser.add_option("--fixTemp", action="store_true",
                     dest="fixTemp", default=False,
                     help="use only given temporary directory [default = %default]")
-  parser.add_option("-m", "--mergeOnly", action="store_true",
+  parser.add_option('-m', "--mergeOnly", action="store_true",
                     dest="mergeOnly", default=False,
                     help="do not run jobs but merge files in path2tmpsh [default = %default]")
   parser.add_option("--nobatch", action="store_false",
@@ -414,24 +414,27 @@ def main():
   parser.add_option("--nosandbox", action="store_false",
                     dest="useSandbox", default=True,
                     help="do not use sandbox [default = %default]")
-  parser.add_option("-e", "--useEnvironment", dest="useEnv",
+  parser.add_option('-e', "--useEnvironment", dest="useEnv",
                     action="store_true", default=False,
                     help="get ROOT and python setup from environment [default = %default]")
-  parser.add_option("-c", "--usecmssw", dest="cmssw",
+  parser.add_option('-c', "--usecmssw", dest="cmssw",
                     action="store", default="CMSSW_7_3_0",
                     help="CMSSW version to use for ROOT/python setup [default = %default]")
-  parser.add_option("-s", "--syst", dest="systematics",
+  parser.add_option('-s', "--syst", dest="systematics",
                     action="store", default="",
                     help="systematics string [default = %default]")
   parser.add_option("--dccp", dest="usedccp",
                     action="store_true", default=False,
                     help="copy files from dCache before running [default = %default]")
-#   parser.add_option("--nFiles", action="store",
-#                     dest="nFiles", default=0,
-#                     help="number of files per job [default = %default]")
-#   parser.add_option("--maxResubmissions", action="store",
-#                     dest="maxResubmissions", default=0,
-#                     help="max. number of resubmissions [default = %default]")
+  parser.add_option('-l',"--hCPU", action="store",
+                    dest="hCPU", default="",
+                    help="hard CPU limit")
+  parser.add_option('-n', "--nFiles", type=int, action="store",
+                    dest="nFiles", default=False,
+                    help="number of files per job")
+  parser.add_option('-r',"--maxResubmissions", type=int, action="store",
+                    dest="maxResubmissions", default=False,
+                    help="max. number of resubmissions")
 
   (options, args)=parser.parse_args()
   jobOptions=options.jobOptions
@@ -501,11 +504,9 @@ def main():
 
   # set user items
   if not "userItems" in dir():
-    userItems=[
-              ["TriggerTreeString", "TriggerTree"],
-              ["RecoTreeString", "RecoTree"],
-              ["InfoTreeString", "InfoTree"],
-              ]
+    userItems=[ ["TriggerTreeString", "TriggerTree"],
+                ["RecoTreeString", "RecoTree"],
+                ["InfoTreeString", "InfoTree"], ]
   print "%-30s : userItems=%s" %("user items", userItems)
 
   # check cycle name
@@ -634,13 +635,15 @@ def main():
   # check number of files per job
   if not "nFiles" in dir():
     nFiles=10
+  if options.nFiles:
+    nFiles = options.nFiles
   print "%-30s : nFiles=%d" %("number of files per job", nFiles)
-
+  
   # check number of files per job
   if not "nMaxFilesDataset" in dir():
     nMaxFilesDataset=-1
   print "%-30s : nMaxFilesDataset=%d" %("max number of files per dataset", nMaxFilesDataset)
-
+  
   # set maximum number of events
   if not "nEventsMax" in dir():
     nEventsMax=-1
@@ -699,7 +702,9 @@ def main():
   # resubmit
   if not "nResubmissions" in dir():
     nResubmissions = 0
-  print "%-30s : nResubmissions=%s" %("max. number of resubmissions", nResubmissions)
+  if options.maxResubmissions:
+    nResubmissions = options.maxResubmissions
+  print "%-30s : nResubmissions=%s" %("max number of resubmissions", nResubmissions)
   
   # set batch queue
   if not "queue" in dir():
@@ -709,6 +714,8 @@ def main():
   # set hard CPU limit
   if not "hCPU" in dir():
     hCPU="00:30:00"
+  if options.hCPU:
+    hCPU = options.hCPU
   print "%-30s : hCPU=%s" %("hard CPU limit", hCPU)
   
   # set hard VMEM limit
@@ -891,19 +898,18 @@ def main():
     
     print "\nsending jobs ..."
     runningJobs=[]
-    iJobs=0
     skip=1
     if   nJobs>=1000: skip = 100
     elif nJobs>= 500: skip =  50
     elif nJobs>= 160: skip =  20
     elif nJobs>=  50: skip =  10
     elif nJobs>=  20: skip =   5
-    for j in listOfJobs:
+    for iJobs, j in enumerate(listOfJobs,1):
       
       batchScript = BatchScript(useHost, useOS, path2sframe, useEnv, cmssw, hCPU, hVMEM, cycleName, tempDirLog)
       
       if (useSandbox):
-        batchScript.add("cp %s/SFrameSandbox.tar.gz ${TMPDIR}\n" %(tempDirSh)) #copy sandbox archive to work dir
+        batchScript.addLine("cp %s/SFrameSandbox.tar.gz ${TMPDIR}\n" %(tempDirSh)) #copy sandbox archive to work dir
         tmppath2sframe = "${TMPDIR}/SFrame" # change sframe path to new location
         batchScript.addLine("cd ${TMPDIR}\n")
         batchScript.addLine("echo \"Creating soft-links\"\n")
@@ -965,7 +971,7 @@ def main():
         lock.release()
         submitOut = runProcess.stdout.read()
         runningJobs.append([submitOut.split(" ")[2], j[2]+j[3]])
-      if iJobs%skip==0:
+      if iJobs%skip==0 or iJobs==1:
         print "submitting job %d of %d"%(iJobs,nJobs),
         while runningJobsLimit>0:
           #subProcess=subprocess.Popen('qstat -u $USER | awk \'{print $5}\' | grep r |wc -l' , stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
@@ -978,15 +984,12 @@ def main():
           print "|",
           sys.stdout.flush()
           time.sleep(timeCheck*2.0)
-        print    
-      iJobs+=1
+        print
     waitForBatchJobs(runningJobs, listOfJobs, userName, timeCheck)
     
     # FIND FAILED JOBS
-    retry = 0
-    while retry<nResubmissions:
-      retry    += 1
-      print "\nall jobs ended! Checking for missing root files..."
+    for retry in range(1,nResubmissions+1):
+      print "\nall jobs ended (%s)! Checking for missing root files..."%(time.strftime("%H:%M",time.localtime()))
       resubmitListOfJobs = [ ]
       for j in listOfJobs:
         rootFile = "%s/%s%s.root"%(tempDirRoot,j[2],j[3])
@@ -996,30 +999,31 @@ def main():
       if len(resubmitListOfJobs)==0: break
       
       # RESUBMIT
-      iJobs       = 0
       nResJobs    = len(resubmitListOfJobs)
       runningJobs = [ ]
       skip        = 20 if nResJobs>=100 else 10 if nResJobs>=50 else 5 if nResJobs>=20 else 2 if nResJobs>=8 else 1
       fraction    = 100.0*nResJobs/nJobs
+      if fraction>98.0:
+        print 'ERROR! Missing %d/%d (%.1f%%) root files! Please check the "%s" code! Exiting...'%(nResJobs,nJobs,fraction,cycleName)
+        exit(1)
       print "missing %d/%d (%.1f%%) root files! Resubmitting (retry %d/%d):"%(nResJobs,nJobs,fraction,retry,nResubmissions)
-      for j in resubmitListOfJobs:
+      for iJobs, j in enumerate(resubmitListOfJobs,1):
         lock=thread.allocate_lock()
         lock.acquire()
         nameOfJob=j[2]+j[3]
-        nameOfJob=nameOfJob.split('.')[1]+nameOfJob.split('.')[2]
-        runProcess=subprocess.Popen("qsub -q %s -notify -N %s %s.sh"%(queue,nameOfJob,j[2]+j[3]), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        nameOfJob=nameOfJob.split('.')[1]+nameOfJob.split('.')[2]+"_resub%d"%(retry)
+        runProcess=subprocess.Popen("qsub -q %s -js 100 -notify -N %s %s.sh"%(queue,nameOfJob,j[2]+j[3]), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         runProcess.wait()
         runProcessStatus=runProcess.poll()
         if runProcessStatus==1:
-          print "Error code %d when running\n   qsub -notify -N %s %s.sh\nExiting!" %(runProcessStatus, nameOfJob, j[2]+j[3])
+          print "Error code %d when running\n   qsub -q %s -js 100 -notify -N %s %s.sh\nExiting!" %(queue,runProcessStatus, nameOfJob, j[2]+j[3])
           lock.release()
           sys.exit()
         else:
           lock.release()
           submitOut = runProcess.stdout.read()
           runningJobs.append([submitOut.split(" ")[2], j[2]+j[3]])
-        if iJobs%skip==0: print "resubmitting job %d of %d"%(iJobs,nResJobs)
-        iJobs+=1
+        if iJobs%skip==0 or iJobs==1: print "resubmitting job %d of %d"%(iJobs,nResJobs)
       waitForBatchJobs(runningJobs,resubmitListOfJobs,userName,timeCheck)
     
     # CHECK COMPLETION
@@ -1130,7 +1134,7 @@ def accountTime(jobOptions,jobName,nJobs):
     file.write("number of jobs: %s\n" % (nJobs))
     file.write(succesRates)
     file.write("start: %s\n" % (startdate))
-    file.write("done:  %s\n" % (time.strftime("%a %d/%m/%Y %H:%M:%S",time.gmtime())))
+    file.write("done:  %s\n" % (time.strftime("%a %d/%m/%Y %H:%M:%S",time.localtime())))
     file.write("took:  %d hours, %d minutes and %.1f seconds\n" % (hours,minutes,seconds))
     file.write("\n")
   print "\nDone after %d hours, %d minutes and %.1f seconds." % (hours,minutes,seconds)

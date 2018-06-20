@@ -48,6 +48,7 @@ namespace UZH {
     TLorentzVector tlv() const;
     floatingnumber DeltaR(const Particle* p) const;
     floatingnumber DeltaR(const Particle p) const;
+    floatingnumber DeltaR(const Double_t eta, const Double_t phi) const;
     floatingnumber M(const Particle p) const;
     
     floatingnumber* m_e;

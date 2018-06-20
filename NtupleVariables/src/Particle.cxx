@@ -29,22 +29,20 @@ floatingnumber Particle::calculateE() {
 }
 
 floatingnumber Particle::DeltaR(const Particle* p) const {
-  Double_t deta = *(m_eta) - p->eta();
-  Double_t dphi = *(m_phi) - p->phi();
-  double pi = TMath::Pi();
-  double twopi = 2*pi;
-  while (dphi >= pi) dphi -= twopi;
-  while (dphi < -pi) dphi += twopi;
-  return sqrt( deta*deta+dphi*dphi );
+  return DeltaR(p->eta(),p->phi());
 }
 
 floatingnumber Particle::DeltaR(const Particle p) const {
-  Double_t deta = *(m_eta) - p.eta();
-  Double_t dphi = *(m_phi) - p.phi();
+  return DeltaR(p.eta(),p.phi());
+}
+
+floatingnumber Particle::DeltaR(const Double_t eta, const Double_t phi) const {
+  Double_t deta = *(m_eta) - eta;
+  Double_t dphi = *(m_phi) - phi;
   double pi = TMath::Pi();
   double twopi = 2*pi;
-  while (dphi >= pi) dphi -= twopi;
-  while (dphi < -pi) dphi += twopi;
+  while(dphi >= pi) dphi -= twopi;
+  while(dphi < -pi) dphi += twopi;
   return sqrt( deta*deta+dphi*dphi );
 }
 

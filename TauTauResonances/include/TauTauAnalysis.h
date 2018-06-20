@@ -28,6 +28,7 @@
 #include "../PileupReweightingTool/include/PileupReweightingTool.h"
 #include "../BTaggingTools/include/BTaggingScaleTool.h"
 #include "../LepEff2017/interface/ScaleFactorTool.h"
+#include "../RochesterTool/interface/RochesterTool.h"
 #include "../RecoilCorrections/interface/RecoilCorrector.h"
 #include "../SVFitTools/interface/SVFitTool.h"
 #include "../SVFitTools/interface/SVfitStandaloneAlgorithm.h"
@@ -220,6 +221,7 @@ class TauTauAnalysis : public SCycleBase {
     PileupReweightingTool   m_PileupReweightingTool_F;
     BTaggingScaleTool       m_BTaggingScaleTool;
     ScaleFactorTool         m_ScaleFactorTool;
+    RochesterTool           m_RochesterTool;
     RecoilCorrectorTool     m_RecoilCorrector;
     JetCorrectionTool       m_JetCorrectionTool;
     SVFitTool               m_SVFitTool;
@@ -259,6 +261,8 @@ class TauTauAnalysis : public SCycleBase {
     double  m_TESshift;
     bool    m_doMES;
     double  m_MESshift;
+    int     m_RCset;
+    int     m_RCmember;
     bool    m_doEES;
     double  m_EESshift;
     double  m_EESshiftEndCap;
@@ -308,6 +312,7 @@ class TauTauAnalysis : public SCycleBase {
     
     int mu_tau;
     int ele_tau;
+    TRandom3* m_random;
     std::string m_jsonName;
     std::string m_dataPUFileName;
     std::string m_dataPUFileName_80p0;
@@ -515,6 +520,7 @@ class TauTauAnalysis : public SCycleBase {
     std::map<std::string,Int_t>    b_lepton_vetos; // 0 pass (no veto); 1 fail (veto)
     std::map<std::string,Int_t>    b_iso_cuts;     // 0 fail; 1 pass
     std::map<std::string,Int_t>    b_trigger_cuts; // 0 fail; 1 pass
+    std::map<std::string,Int_t>    b_triggers;     // 0 fail; +1 IsoMu24; +2 IsoMu27
     
     std::map<std::string,Float_t>  b_jpt_1;
     std::map<std::string,Float_t>  b_jeta_1;
@@ -600,6 +606,8 @@ class TauTauAnalysis : public SCycleBase {
     std::map<std::string,Float_t>  b_m_mub;
     
     std::map<std::string,Float_t>  b_dR_ll;
+    std::map<std::string,Float_t>  b_dphi_ll;
+    std::map<std::string,Float_t>  b_deta_ll;
     //std::map<std::string,Float_t>  b_dphi_ll_bj;
     std::map<std::string,Float_t>  b_mt_tot;
     std::map<std::string,Float_t>  b_ht;

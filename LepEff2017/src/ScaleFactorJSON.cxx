@@ -3,6 +3,12 @@
 
 
 ScaleFactorJSON::ScaleFactorJSON(TString jsonFileName, TString jsonWP) {
+    
+    // Expand $SFRAME_DIR
+    std::string match = "$SFRAME_DIR";
+    std::string replacement = std::getenv("SFRAME_DIR");
+    jsonFileName.Replace(0,match.length(),replacement);
+    
     m_jsonFileName = jsonFileName;
     m_jsonWP       = jsonWP;
     init_ScaleFactor(jsonFileName,jsonWP);

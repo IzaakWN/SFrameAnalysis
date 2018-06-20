@@ -10,12 +10,12 @@ ScaleFactorTool::ScaleFactorTool(SCycleBase* parent, const char* name ):
   // https://twiki.cern.ch/twiki/bin/view/CMS/MuonReferenceEffs2017
   // https://twiki.cern.ch/twiki/bin/view/CMS/Egamma2017DataRecommendations#Efficiency_Scale_Factors
   
-  DeclareProperty( m_name+"_File_Mu27Trig",     m_File_Mu27Trig         = "$SFRAME_DIR/../LepEff2017/data/Muon/Run2017BtoF/EfficienciesAndSF_RunBtoF_Nov17Nov2017.root"       );
-  DeclareProperty( m_name+"_Hist_Mu27Trig",     m_Hist_Mu27Trig         = "IsoMu27_PtEtaBins/abseta_pt_ratio"                                                                 );
-  DeclareProperty( m_name+"_File_MuId",         m_File_MuId             = std::string(std::getenv("SFRAME_DIR"))+ "/../LepEff2017/data/Muon/Run2017BtoF/RunBCDEF_SF_ID.json"  );
-  DeclareProperty( m_name+"_File_MuIso",        m_File_MuIso            = std::string(std::getenv("SFRAME_DIR"))+ "/../LepEff2017/data/Muon/Run2017BtoF/RunBCDEF_SF_ISO.json" );
-  DeclareProperty( m_name+"_WP_MuId",           m_WP_MuId               = "NUM_MediumID_DEN_genTracks"                                                                        );
-  DeclareProperty( m_name+"_WP_MuIso",          m_WP_MuIso              = "NUM_TightRelIso_DEN_MediumID"                                                                      );
+  DeclareProperty( m_name+"_File_Mu27Trig",     m_File_Mu27Trig         = "$SFRAME_DIR/../LepEff2017/data/Muon/Run2017BtoF/EfficienciesAndSF_RunBtoF_Nov17Nov2017.root" );
+  DeclareProperty( m_name+"_Hist_Mu27Trig",     m_Hist_Mu27Trig         = "IsoMu27_PtEtaBins/abseta_pt_ratio"                                                           );
+  DeclareProperty( m_name+"_File_MuId",         m_File_MuId             = "$SFRAME_DIR/../LepEff2017/data/Muon/Run2017BtoF/RunBCDEF_SF_ID.json"                         );
+  DeclareProperty( m_name+"_File_MuIso",        m_File_MuIso            = "$SFRAME_DIR/../LepEff2017/data/Muon/Run2017BtoF/RunBCDEF_SF_ISO.json"                        );
+  DeclareProperty( m_name+"_WP_MuId",           m_WP_MuId               = "NUM_MediumID_DEN_genTracks"                                                                  );
+  DeclareProperty( m_name+"_WP_MuIso",          m_WP_MuIso              = "NUM_TightRelIso_DEN_MediumID"                                                                );
   
 //   DeclareProperty( m_name+"_Mu22Trig",          m_File_Mu22Trig          = "$SFRAME_DIR/../LepEff2017/data/Muon/Run2016BtoH/Muon_Mu22OR_eta2p1_eff.root"                 );
 //   DeclareProperty( m_name+"_Mu24Trig",          m_File_Mu24Trig          = "$SFRAME_DIR/../LepEff2017/data/Muon/Run2016BtoH/Muon_IsoMu24_OR_TkIsoMu24_2016BtoH_eff.root" );

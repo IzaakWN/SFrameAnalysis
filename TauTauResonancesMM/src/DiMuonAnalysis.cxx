@@ -21,6 +21,7 @@ DiMuonAnalysis::DiMuonAnalysis() : SCycleBase(),
     m_PileupReweightingTool( this ),
     m_BTaggingScaleTool( this ),
     m_ScaleFactorTool( this ),
+    m_RochesterTool(this),
     m_RecoilCorrector( this ),
     m_JetCorrectionTool( this )
 {
@@ -48,10 +49,6 @@ DiMuonAnalysis::DiMuonAnalysis() : SCycleBase(),
   DeclareProperty( "doTTpt",                m_doTTpt                = false             );
   DeclareProperty( "TESshift",              m_TESshift              = 0.0               );
   DeclareProperty( "doTES",                 m_doTES                 = false             );
-  DeclareProperty( "LTFshift",              m_LTFshift              = 0.0               );
-  DeclareProperty( "doLTF",                 m_doLTF                 = false             );
-  DeclareProperty( "JTFshift",              m_JTFshift              = 0.0               );
-  DeclareProperty( "doJTF",                 m_doJTF                 = false             );
   DeclareProperty( "doTight",               m_doTight               = false             ); // fill branches with less events
   DeclareProperty( "noTight",               m_noTight               = false             ); // override doTight
   
@@ -117,6 +114,7 @@ void DiMuonAnalysis::BeginCycle() throw( SError ){
   
   // MARK: Triggers
   // 2017: run 294927 to 306126
+  //m_triggers.push_back( "HLT_IsoMu24_v"                                           );
   m_triggers.push_back( "HLT_IsoMu27_v"                                           );
   //m_triggers.push_back( "HLT_IsoTkMu27_v"                                         );
   //m_triggers.push_back( "HLT_IsoMu27_eta2p1"                                      );
@@ -158,9 +156,7 @@ void DiMuonAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
   m_logger << INFO << "GenParticleName:     " << m_genParticleName     << SLogger::endmsg;
   
   m_doTES   = m_TESshift != 0.0 and !m_isData;
-  m_doLTF   = m_LTFshift != 0.0 and !m_isData;
-  m_doJTF   = m_JTFshift != 0.0 and !m_isData;
-  m_doTight = m_doTight or m_doTES or m_doLTF; // need fail region for EES, JTF
+  m_doTight = m_doTight or m_doTES; // need fail region for EES, JTF
   m_doTight = m_doTight and !m_noTight;        // noTight overrides doTight
   m_logger << INFO << "IsData:              " << (m_isData   ?   "TRUE" : "FALSE") << SLogger::endmsg;
   m_logger << INFO << "IsSignal:            " << (m_isSignal ?   "TRUE" : "FALSE") << SLogger::endmsg;
@@ -169,10 +165,6 @@ void DiMuonAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
   m_logger << INFO << "doTTpt:              " << (m_doTTpt   ?   "TRUE" : "FALSE") << SLogger::endmsg;
   m_logger << INFO << "doTES:               " << (m_doTES    ?   "TRUE" : "FALSE") << SLogger::endmsg;
   m_logger << INFO << "TESshift:            " << m_TESshift            << SLogger::endmsg;
-  m_logger << INFO << "doLTF:               " << (m_doLTF    ?   "TRUE" : "FALSE") << SLogger::endmsg;
-  m_logger << INFO << "LTFshift:            " << m_LTFshift            << SLogger::endmsg;
-  m_logger << INFO << "doJTF:               " << (m_doJTF    ?   "TRUE" : "FALSE") << SLogger::endmsg;
-  m_logger << INFO << "JTFshift:            " << m_JTFshift            << SLogger::endmsg;
   m_logger << INFO << "noTight:             " << (m_noTight  ?   "TRUE" : "FALSE") << SLogger::endmsg;
   m_logger << INFO << "doTight:             " << (m_doTight  ?   "TRUE" : "FALSE") << SLogger::endmsg;
   
@@ -241,6 +233,7 @@ void DiMuonAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
     DeclareVariable( b_pfmt_2[ch],              "pfmt_2",               treeName);
     DeclareVariable( b_iso_2[ch],               "iso_2",                treeName);
     
+    DeclareVariable( b_m_3[ch],                 "m_3",                  treeName);
     DeclareVariable( b_pt_3[ch],                "pt_3",                 treeName);
     DeclareVariable( b_eta_3[ch],               "eta_3",                treeName);
     DeclareVariable( b_decayMode_3[ch],         "decayMode_3",          treeName);
@@ -312,66 +305,67 @@ void DiMuonAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
     DeclareVariable( b_met[ch],                 "met",                  treeName);
     DeclareVariable( b_metphi[ch],              "metphi",               treeName);
     
-//     if (m_doJEC){
-//       DeclareVariable( b_njets_jesUp[ch],           "njets_jesUp",          treeName);
-//       DeclareVariable( b_njets_jesDown[ch],         "njets_jesDown",        treeName);
-//       DeclareVariable( b_njets_jerUp[ch],           "njets_jerUp",          treeName);
-//       DeclareVariable( b_njets_jerDown[ch],         "njets_jerDown",        treeName);
-//       DeclareVariable( b_njets20_jesUp[ch],         "njets20_jesUp",        treeName);
-//       DeclareVariable( b_njets20_jesDown[ch],       "njets20_jesDown",      treeName);
-//       DeclareVariable( b_njets20_jerUp[ch],         "njets20_jerUp",        treeName);
-//       DeclareVariable( b_njets20_jerDown[ch],       "njets20_jerDown",      treeName);
-//       DeclareVariable( b_ncjets_jesUp[ch],          "ncjets_jesUp",         treeName);
-//       DeclareVariable( b_ncjets_jesDown[ch],        "ncjets_jesDown",       treeName);
-//       DeclareVariable( b_ncjets_jerUp[ch],          "ncjets_jerUp",         treeName);
-//       DeclareVariable( b_ncjets_jerDown[ch],        "ncjets_jerDown",       treeName);
-//       DeclareVariable( b_nbtag_jesUp[ch],           "nbtag_jesUp",          treeName);
-//       DeclareVariable( b_nbtag_jesDown[ch],         "nbtag_jesDown",        treeName);
-//       DeclareVariable( b_nbtag_jerUp[ch],           "nbtag_jerUp",          treeName);
-//       DeclareVariable( b_nbtag_jerDown[ch],         "nbtag_jerDown",        treeName);
-//       DeclareVariable( b_nfjets_jesUp[ch],          "nfjets_jesUp",         treeName);
-//       DeclareVariable( b_nfjets_jesDown[ch],        "nfjets_jesDown",       treeName);
-//       DeclareVariable( b_nfjets_jerUp[ch],          "nfjets_jerUp",         treeName);
-//       DeclareVariable( b_nfjets_jerDown[ch],        "nfjets_jerDown",       treeName);
-//       
-//       DeclareVariable( b_jpt_1_jesUp[ch],           "jpt_1_jesUp",          treeName);
-//       DeclareVariable( b_jpt_1_jesDown[ch],         "jpt_1_jesDown",        treeName);
-//       DeclareVariable( b_jpt_1_jerUp[ch],           "jpt_1_jerUp",          treeName);
-//       DeclareVariable( b_jpt_1_jerDown[ch],         "jpt_1_jerDown",        treeName);
-//       DeclareVariable( b_jeta_1_jesUp[ch],          "jeta_1_jesUp",         treeName);
-//       DeclareVariable( b_jeta_1_jesDown[ch],        "jeta_1_jesDown",       treeName);
-//       DeclareVariable( b_jeta_1_jerUp[ch],          "jeta_1_jerUp",         treeName);
-//       DeclareVariable( b_jeta_1_jerDown[ch],        "jeta_1_jerDown",       treeName);
-//       DeclareVariable( b_jpt_2_jesUp[ch],           "jpt_2_jesUp",          treeName);
-//       DeclareVariable( b_jpt_2_jesDown[ch],         "jpt_2_jesDown",        treeName);
-//       DeclareVariable( b_jpt_2_jerUp[ch],           "jpt_2_jerUp",          treeName);
-//       DeclareVariable( b_jpt_2_jerDown[ch],         "jpt_2_jerDown",        treeName);
-//       DeclareVariable( b_jeta_2_jesUp[ch],          "jeta_2_jesUp",         treeName);
-//       DeclareVariable( b_jeta_2_jesDown[ch],        "jeta_2_jesDown",       treeName);
-//       DeclareVariable( b_jeta_2_jerUp[ch],          "jeta_2_jerUp",         treeName);
-//       DeclareVariable( b_jeta_2_jerDown[ch],        "jeta_2_jerDown",       treeName);
-//       
-//       DeclareVariable( b_met_jesUp[ch],             "met_jesUp",            treeName);
-//       DeclareVariable( b_met_jesDown[ch],           "met_jesDown",          treeName);
-//       DeclareVariable( b_met_jerUp[ch],             "met_jerUp",            treeName);
-//       DeclareVariable( b_met_jerDown[ch],           "met_jerDown",          treeName);
-//       DeclareVariable( b_met_UncEnUp[ch],           "met_UncEnUp",          treeName);
-//       DeclareVariable( b_met_UncEnDown[ch],         "met_UncEnDown",        treeName);
-//       
-//       DeclareVariable( b_pfmt_1_jesUp[ch],          "pfmt_1_jesUp",         treeName);
-//       DeclareVariable( b_pfmt_1_jesDown[ch],        "pfmt_1_jesDown",       treeName);
-//       DeclareVariable( b_pfmt_1_jerUp[ch],          "pfmt_1_jerUp",         treeName);
-//       DeclareVariable( b_pfmt_1_jerDown[ch],        "pfmt_1_jerDown",       treeName);
-//       DeclareVariable( b_pfmt_1_UncEnUp[ch],        "pfmt_1_UncEnUp",       treeName);
-//       DeclareVariable( b_pfmt_1_UncEnDown[ch],      "pfmt_1_UncEnDown",     treeName);
-//       
-//       DeclareVariable( b_weightbtag_bcUp[ch],       "weightbtag_bcUp",      treeName);
-//       DeclareVariable( b_weightbtag_bcDown[ch],     "weightbtag_bcDown",    treeName);
-//       DeclareVariable( b_weightbtag_udsgUp[ch],     "weightbtag_udsgUp",    treeName);
-//       DeclareVariable( b_weightbtag_udsgDown[ch],   "weightbtag_udsgDown",  treeName);
-//     }
+    //if (m_doJEC){
+    //  DeclareVariable( b_njets_jesUp[ch],           "njets_jesUp",          treeName);
+    //  DeclareVariable( b_njets_jesDown[ch],         "njets_jesDown",        treeName);
+    //  DeclareVariable( b_njets_jerUp[ch],           "njets_jerUp",          treeName);
+    //  DeclareVariable( b_njets_jerDown[ch],         "njets_jerDown",        treeName);
+    //  DeclareVariable( b_njets20_jesUp[ch],         "njets20_jesUp",        treeName);
+    //  DeclareVariable( b_njets20_jesDown[ch],       "njets20_jesDown",      treeName);
+    //  DeclareVariable( b_njets20_jerUp[ch],         "njets20_jerUp",        treeName);
+    //  DeclareVariable( b_njets20_jerDown[ch],       "njets20_jerDown",      treeName);
+    //  DeclareVariable( b_ncjets_jesUp[ch],          "ncjets_jesUp",         treeName);
+    //  DeclareVariable( b_ncjets_jesDown[ch],        "ncjets_jesDown",       treeName);
+    //  DeclareVariable( b_ncjets_jerUp[ch],          "ncjets_jerUp",         treeName);
+    //  DeclareVariable( b_ncjets_jerDown[ch],        "ncjets_jerDown",       treeName);
+    //  DeclareVariable( b_nbtag_jesUp[ch],           "nbtag_jesUp",          treeName);
+    //  DeclareVariable( b_nbtag_jesDown[ch],         "nbtag_jesDown",        treeName);
+    //  DeclareVariable( b_nbtag_jerUp[ch],           "nbtag_jerUp",          treeName);
+    //  DeclareVariable( b_nbtag_jerDown[ch],         "nbtag_jerDown",        treeName);
+    //  DeclareVariable( b_nfjets_jesUp[ch],          "nfjets_jesUp",         treeName);
+    //  DeclareVariable( b_nfjets_jesDown[ch],        "nfjets_jesDown",       treeName);
+    //  DeclareVariable( b_nfjets_jerUp[ch],          "nfjets_jerUp",         treeName);
+    //  DeclareVariable( b_nfjets_jerDown[ch],        "nfjets_jerDown",       treeName);
+    //  
+    //  DeclareVariable( b_jpt_1_jesUp[ch],           "jpt_1_jesUp",          treeName);
+    //  DeclareVariable( b_jpt_1_jesDown[ch],         "jpt_1_jesDown",        treeName);
+    //  DeclareVariable( b_jpt_1_jerUp[ch],           "jpt_1_jerUp",          treeName);
+    //  DeclareVariable( b_jpt_1_jerDown[ch],         "jpt_1_jerDown",        treeName);
+    //  DeclareVariable( b_jeta_1_jesUp[ch],          "jeta_1_jesUp",         treeName);
+    //  DeclareVariable( b_jeta_1_jesDown[ch],        "jeta_1_jesDown",       treeName);
+    //  DeclareVariable( b_jeta_1_jerUp[ch],          "jeta_1_jerUp",         treeName);
+    //  DeclareVariable( b_jeta_1_jerDown[ch],        "jeta_1_jerDown",       treeName);
+    //  DeclareVariable( b_jpt_2_jesUp[ch],           "jpt_2_jesUp",          treeName);
+    //  DeclareVariable( b_jpt_2_jesDown[ch],         "jpt_2_jesDown",        treeName);
+    //  DeclareVariable( b_jpt_2_jerUp[ch],           "jpt_2_jerUp",          treeName);
+    //  DeclareVariable( b_jpt_2_jerDown[ch],         "jpt_2_jerDown",        treeName);
+    //  DeclareVariable( b_jeta_2_jesUp[ch],          "jeta_2_jesUp",         treeName);
+    //  DeclareVariable( b_jeta_2_jesDown[ch],        "jeta_2_jesDown",       treeName);
+    //  DeclareVariable( b_jeta_2_jerUp[ch],          "jeta_2_jerUp",         treeName);
+    //  DeclareVariable( b_jeta_2_jerDown[ch],        "jeta_2_jerDown",       treeName);
+    //  
+    //  DeclareVariable( b_met_jesUp[ch],             "met_jesUp",            treeName);
+    //  DeclareVariable( b_met_jesDown[ch],           "met_jesDown",          treeName);
+    //  DeclareVariable( b_met_jerUp[ch],             "met_jerUp",            treeName);
+    //  DeclareVariable( b_met_jerDown[ch],           "met_jerDown",          treeName);
+    //  DeclareVariable( b_met_UncEnUp[ch],           "met_UncEnUp",          treeName);
+    //  DeclareVariable( b_met_UncEnDown[ch],         "met_UncEnDown",        treeName);
+    //  
+    //  DeclareVariable( b_pfmt_1_jesUp[ch],          "pfmt_1_jesUp",         treeName);
+    //  DeclareVariable( b_pfmt_1_jesDown[ch],        "pfmt_1_jesDown",       treeName);
+    //  DeclareVariable( b_pfmt_1_jerUp[ch],          "pfmt_1_jerUp",         treeName);
+    //  DeclareVariable( b_pfmt_1_jerDown[ch],        "pfmt_1_jerDown",       treeName);
+    //  DeclareVariable( b_pfmt_1_UncEnUp[ch],        "pfmt_1_UncEnUp",       treeName);
+    //  DeclareVariable( b_pfmt_1_UncEnDown[ch],      "pfmt_1_UncEnDown",     treeName);
+    //  
+    //  DeclareVariable( b_weightbtag_bcUp[ch],       "weightbtag_bcUp",      treeName);
+    //  DeclareVariable( b_weightbtag_bcDown[ch],     "weightbtag_bcDown",    treeName);
+    //  DeclareVariable( b_weightbtag_udsgUp[ch],     "weightbtag_udsgUp",    treeName);
+    //  DeclareVariable( b_weightbtag_udsgDown[ch],   "weightbtag_udsgDown",  treeName);
+    //}
     
     DeclareVariable( b_dR_ll[ch],               "dR_ll",                treeName);
+    DeclareVariable( b_pt_ll[ch],               "pt_ll",                treeName);
     DeclareVariable( b_ht[ch],                  "ht",                   treeName);
     DeclareVariable( b_m_vis[ch],               "m_vis",                treeName);
     DeclareVariable( b_m_mutau_1[ch],           "m_mutau_1",            treeName);
@@ -399,6 +393,8 @@ void DiMuonAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
     Book( TH1F(hname, hname, 12, 0.5, 12.5 ), dirname);
   }
   
+  Book( TH1F("muonSF", "muon SF", 100, 0, 2 ), "checks");
+  
   if (!m_isData){
     m_PileupReweightingTool.BeginInputData( id, m_dataPUFileName );
   }else{
@@ -413,6 +409,7 @@ void DiMuonAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
   m_BTaggingScaleTool.BeginInputData( id, "mumu" );
   m_BTaggingScaleTool.bookHistograms(); // to measure b tag efficiencies for our selections
   m_ScaleFactorTool.BeginInputData( id );
+  m_RochesterTool.BeginInputData( id );
   m_RecoilCorrector.BeginInputData( id );
   m_JetCorrectionTool.BeginInputData( id );
   
@@ -520,7 +517,7 @@ void DiMuonAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
   b_npu_        = -1.;
   
   
-  // Cut 0: no cuts
+  // MARK: Cut 0: no cuts
   for (auto ch: channels_){
     b_channel[ch] = 0;
     fillCutflow("cutflow_" + ch, "histogram_" + ch, kBeforeCuts, 1);
@@ -568,12 +565,16 @@ void DiMuonAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
   std::vector<UZH::Muon> goodMuons;
   for( int i = 0; i < m_muon.N; ++i ){
     UZH::Muon mymuon( &m_muon, i );
+    
+    if(mymuon.pt() < m_muonPtCut*0.80) continue;
+    float sf = m_RochesterTool.correct(mymuon,m_genParticle,m_isData,0,0); // Rochester correction to muon object
+    Hist("muonSF", "checks")->Fill(sf);
     if(mymuon.pt() < m_muonPtCut) continue;
     if(fabs(mymuon.eta()) > m_muonEtaCut) continue;
     if(fabs(mymuon.d0_allvertices()) > m_muonD0Cut) continue;
     if(fabs(mymuon.dz_allvertices()) > m_muonDzCut) continue;
     if(mymuon.isMediumMuonGH() < 0.5) continue;
-    if(mymuon.SemileptonicPFIso()/mymuon.pt()>0.15) continue; // tight
+    if(mymuon.SemileptonicPFIso()/mymuon.pt() > m_muonIsoCut) continue; // tight
     goodMuons.push_back(mymuon);
     if(mymuon.pt()>m_secondMuonPtCut) muon28++;
   }
@@ -609,39 +610,38 @@ void DiMuonAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
       if(pt_1>pt_2){
         pair = {imuon, pt_1, iso_1, jmuon, pt_2, iso_2};
       }else{
-        std::cout<<">>> Warning! Muon piar: muon1 pt < muon2 pt ! Swapping..."<<std::endl;
+        //std::cout<<">>> Warning! Muon piar: muon1 pt < muon2 pt ! Swapping..."<<std::endl;
         pair = {jmuon, pt_2, iso_2, imuon, pt_1, iso_1};
       }
       muon_pairs.push_back(pair);
     }
   }
   
-  if(muon_pairs.size()==0){
+  if(muon_pairs.size()==0)
     throw SError( SError::SkipEvent );
-  }else{
-    UZH::MissingEt met( &m_missingEt, 0 );
-    fillCutflow("cutflow_mumu", "histogram_mumu", kMuonPair, 1);
-    sort(muon_pairs.begin(), muon_pairs.end());
-    
-    // For Jets: cut and filter our selected muon and tau
-    std::vector<UZH::Jet> goodJetsAK4;
-    for ( int i = 0; i < (m_jetAK4.N); i++ ) {
-      UZH::Jet jet( &m_jetAK4, i );
-      if(fabs(jet.eta()) > m_AK4jetEtaCut) continue;
-      if(jet.pt() < m_AK4jetPtCut*0.5) continue; // loosen pt cut for smearing
-      if(!LooseJetID(jet)) continue;
-      if(jet.DeltaR(goodMuons[muon_pairs[0].i_1]) < 0.5) continue;
-      if(jet.DeltaR(goodMuons[muon_pairs[0].i_2]) < 0.5) continue;
-      goodJetsAK4.push_back(jet);
-    }
-    
-    if(!m_isData){
-      m_BTaggingScaleTool.fillEfficiencies(goodJetsAK4, "mumu"); // to measure b tag efficiencies for our selections
-      m_BTaggingScaleTool.fillEfficienciesDeepCSV(goodJetsAK4, "mumu");
-    }
-    FillBranches( "mumu", goodMuons[muon_pairs[0].i_1], goodMuons[muon_pairs[0].i_2], goodJetsAK4, met );
-    dimuon_events++;
+  
+  UZH::MissingEt met( &m_missingEt, 0 );
+  fillCutflow("cutflow_mumu", "histogram_mumu", kMuonPair, 1);
+  sort(muon_pairs.begin(), muon_pairs.end());
+  
+  // For Jets: cut and filter our selected muon and tau
+  std::vector<UZH::Jet> goodJetsAK4;
+  for ( int i = 0; i < (m_jetAK4.N); i++ ) {
+    UZH::Jet jet( &m_jetAK4, i );
+    if(fabs(jet.eta()) > m_AK4jetEtaCut) continue;
+    if(jet.pt() < m_AK4jetPtCut*0.5) continue; // loosen pt cut for smearing
+    if(!LooseJetID(jet)) continue;
+    if(jet.DeltaR(goodMuons[muon_pairs[0].i_1]) < 0.5) continue;
+    if(jet.DeltaR(goodMuons[muon_pairs[0].i_2]) < 0.5) continue;
+    goodJetsAK4.push_back(jet);
   }
+  
+  if(!m_isData){
+    m_BTaggingScaleTool.fillEfficiencies(goodJetsAK4, "mumu"); // to measure b tag efficiencies for our selections
+    m_BTaggingScaleTool.fillEfficienciesDeepCSV(goodJetsAK4, "mumu");
+  }
+  FillBranches( "mumu", goodMuons[muon_pairs[0].i_1], goodMuons[muon_pairs[0].i_2], goodJetsAK4, met );
+  dimuon_events++;
   
 }
 
@@ -718,6 +718,8 @@ void DiMuonAnalysis::FillBranches(const std::string& channel, const UZH::Muon& m
   const char* ch = channel.c_str();
   if(m_doRecoilCorr || m_doZpt) setGenBosonTLVs(); // only for HTT, DY and WJ
   
+  
+  b_channel[ch]      = 4;
   b_weight[ch]       = b_weight_;
   b_genweight[ch]    = b_genweight_;
   b_puweight[ch]     = b_puweight_;
@@ -756,8 +758,8 @@ void DiMuonAnalysis::FillBranches(const std::string& channel, const UZH::Muon& m
   b_iso_2[ch]               = muon2.SemileptonicPFIso() / muon2.pt();
   
   extraLeptonVetos(channel, muon1, muon2);
-  b_extraelec_veto[ch]      = b_extraelec_veto_;
-  b_extramuon_veto[ch]      = b_extramuon_veto_;
+  b_extraelec_veto[ch]      = (Int_t) b_extraelec_veto_;
+  b_extramuon_veto[ch]      = (Int_t) b_extramuon_veto_;
   b_lepton_vetos[ch]        = ( b_extraelec_veto_ or b_extramuon_veto_ );
   
   TLorentzVector muon1_tlv = muon1.tlv();
@@ -784,7 +786,7 @@ void DiMuonAnalysis::FillBranches(const std::string& channel, const UZH::Muon& m
     if(fabs(tau.dz()) > m_tauDzCut) continue;
     if(tau.decayModeFinding() < 0.5 and tau.decayMode()!=11) continue;
     if(fabs(tau.charge()) != 1) continue; // remove for boosted ID
-    //if(tau.againstElectronVLooseMVA6() < 0.5 or tau.againstMuonTight3() < 0.5) continue; // same WPs as mutau; needs SFs!
+    if(tau.againstElectronVLooseMVA6()<0.5 or tau.againstMuonTight3()<0.5) continue; // same WPs as mutau; needs SFs!
     if(tau.pt() < m_tauPtCut) continue;
     maxIndex   = i;
     maxPt      = tau.pt(); // preference for highest pt
@@ -793,6 +795,7 @@ void DiMuonAnalysis::FillBranches(const std::string& channel, const UZH::Muon& m
     tau = UZH::Tau( &m_tau, maxIndex );
     if(!m_isData) genmatch_3 = genMatch(tau.eta(),tau.phi());
     b_gen_match_3[ch]                                    = genmatch_3;
+    b_m_3[ch]                                            = tau.m();
     b_pt_3[ch]                                           = tau.pt();
     b_eta_3[ch]                                          = tau.eta();
     b_decayMode_3[ch]                                    = tau.decayMode(); // 0, 1, 10
@@ -825,6 +828,7 @@ void DiMuonAnalysis::FillBranches(const std::string& channel, const UZH::Muon& m
     b_byMediumCombinedIsolationDeltaBetaCorr3Hits_3[ch]  = tau.byMediumCombinedIsolationDeltaBetaCorr3Hits();
     b_byTightCombinedIsolationDeltaBetaCorr3Hits_3[ch]   = tau.byTightCombinedIsolationDeltaBetaCorr3Hits();
   }else{
+    b_m_3[ch]                                            = -9;
     b_pt_3[ch]                                           = -9;
     b_eta_3[ch]                                          = -9;
     b_decayMode_3[ch]                                    = -9;
@@ -930,8 +934,10 @@ void DiMuonAnalysis::FillBranches(const std::string& channel, const UZH::Muon& m
   b_pfmt_2[ch]      = TMath::Sqrt(2*muon2.pt()*fmet*( 1-TMath::Cos(deltaPhi(muon2.phi(), fmetphi ))));
   
   // discriminating variables
-  b_m_vis[ch]       = muon1.M(muon2);
+  TLorentzVector ll_tlv = muon1.tlv()+muon2.tlv();
+  b_m_vis[ch]       = ll_tlv.M();
   b_dR_ll[ch]       = muon1.DeltaR(muon2);
+  b_pt_ll[ch]       = ll_tlv.Pt();
   if(tau.pt()>20){
     b_m_mutau_1[ch] = muon1.M(tau);
     b_m_mutau_2[ch] = muon2.M(tau);
@@ -999,7 +1005,6 @@ void DiMuonAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
   double bcsv2 = 0;
   double bdeepcsv1 = 0;
   double bdeepcsv2 = 0;
-  TLorentzVector dtlv_jer; // difference in pt after smearing, to propagate to met
   
   Float_t ht     = muon1.e() + muon2.e(); // total scalar energy HT
   b_weightbtag_  = 1.;
@@ -1055,7 +1060,7 @@ void DiMuonAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
         Jets.at(ijet).e(jet_jer.E());  // correct UZH::Jet object's e
         if(pt<m_AK4jetPtCut) continue; // only count >20 GeV jets
         
-        dtlv_jer = jet - jet_jer;     // tlv difference
+        met -= jet_jer - jet;          // propagate smearing to MET
         jet = jet_jer;
       }
       ht += Jets.at(ijet).e();
@@ -1093,9 +1098,6 @@ void DiMuonAnalysis::FillJetBranches( const char* ch, std::vector<UZH::Jet>& Jet
         }
       }
   }
-  
-  // propagate smearing to MET
-  if(!m_isData) shiftMET(dtlv_jer,met);
   
   // jet multiplicities
   njets         = ncjets + nfjets;    njets20         = ncjets20 + nfjets20;
@@ -1358,7 +1360,7 @@ float DiMuonAnalysis::genMatchSF(const std::string& channel, const int genmatch_
   float eta = fabs(tau_eta);
   
   // electron -> tau
-  if      (genmatch_2 == 3) {
+  if      (genmatch_2 == 1) {
     if (channel=="mutau"){       // for VLoose
         if      ( eta < 1.460 ) return 1.213;
         else if ( eta > 1.558 ) return 1.375;
@@ -1369,7 +1371,7 @@ float DiMuonAnalysis::genMatchSF(const std::string& channel, const int genmatch_
     }
   }
   // muon -> tau
-  else if (genmatch_2 == 4) {
+  else if (genmatch_2 == 2) {
     if (channel=="etau"){      // for Loose
         if      ( eta < 0.4 ) return 1.012;
         else if ( eta < 0.8 ) return 1.007;
@@ -1471,8 +1473,8 @@ void DiMuonAnalysis::extraLeptonVetos(const std::string& channel, const UZH::Muo
     
     // extra muon veto
     if(mymuon.isMediumMuonGH() < 0.5) continue;   // for period GH and MC (see AN)
-    if((mymuon.pt()!=muon1.pt() and mymuon.eta()!=muon1.eta() and mymuon.phi()!=muon1.phi()) or
-       (mymuon.pt()!=muon2.pt() and mymuon.eta()!=muon2.eta() and mymuon.phi()!=muon2.phi())){
+    if(mymuon.pt()!=muon1.pt() and mymuon.eta()!=muon1.eta() and mymuon.phi()!=muon1.phi() and
+       mymuon.pt()!=muon2.pt() and mymuon.eta()!=muon2.eta() and mymuon.phi()!=muon2.phi()){
       b_extramuon_veto_ = true;
     }
   }

@@ -28,6 +28,7 @@
 #include "../PileupReweightingTool/include/PileupReweightingTool.h"
 #include "../BTaggingTools/include/BTaggingScaleTool.h"
 #include "../LepEff2017/interface/ScaleFactorTool.h"
+#include "../RochesterTool/interface/RochesterTool.h"
 #include "../RecoilCorrections/interface/RecoilCorrector.h"
 #include "../JetCorrectionTool/interface/JetCorrectionTool.h"
 
@@ -192,6 +193,7 @@ class DiMuonAnalysis : public SCycleBase {
     PileupReweightingTool   m_PileupReweightingTool;
     BTaggingScaleTool       m_BTaggingScaleTool;
     ScaleFactorTool         m_ScaleFactorTool;
+    RochesterTool           m_RochesterTool;
     RecoilCorrectorTool     m_RecoilCorrector;
     JetCorrectionTool       m_JetCorrectionTool;
     
@@ -222,17 +224,13 @@ class DiMuonAnalysis : public SCycleBase {
     bool    m_doTTpt;
     bool    m_doTES;
     double  m_TESshift;
-    bool    m_doLTF;
-    double  m_LTFshift;
-    bool    m_doJTF;
-    double  m_JTFshift;
     bool    m_doTight;
     bool    m_noTight;
-
+    
     ///
     /// CUTS
     ///
-     
+    
     // jet
     double  m_jetPtCut;
     double  m_jetEtaCut;
@@ -376,6 +374,7 @@ class DiMuonAnalysis : public SCycleBase {
     std::map<std::string,Float_t>  b_pfmt_2;
     std::map<std::string,Float_t>  b_iso_2;
     
+    std::map<std::string,Float_t>  b_m_3;
     std::map<std::string,Float_t>  b_pt_3;
     std::map<std::string,Float_t>  b_eta_3;
     std::map<std::string,Int_t>    b_decayMode_3;
@@ -478,6 +477,7 @@ class DiMuonAnalysis : public SCycleBase {
     //std::map<std::string,Float_t>  b_pfmt_1_UncEnDown;
     
     std::map<std::string,Float_t>  b_dR_ll;
+    std::map<std::string,Float_t>  b_pt_ll;
     std::map<std::string,Float_t>  b_ht;
     
     std::map<std::string,Float_t>  b_m_genboson;

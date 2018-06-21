@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE JobConfiguration PUBLIC "" "JobConfig.dtd">
+<JobConfiguration JobName="TauTauAnalysisJob" OutputLevel="INFO">
+  <Library Name="libNtupleVariables" />
+  <Library Name="libGoodRunsLists" />
+  <Library Name="libPileupReweightingTool" />
+  <Library Name="libBTaggingTools" />
+  <Library Name="libScaleFactorTool" />
+  <Library Name="libRochesterTool" />
+  <Library Name="libRecoilCorrector" />
+  <Library Name="libJetCorrectionTool" />
+  <Library Name="libTauTauResonancesMM" />
+  
+  <Package Name="SFrameCore.par" />
+  <Package Name="TauTauResonancesMM.par" />
+  <Package Name="NtupleVariables.par" />
+  <Package Name="GoodRunsLists.par" />
+  <Package Name="PileupReweightingTool.par" />
+  <Package Name="BTaggingTools.par" />
+  <Package Name="ScaleFactorTool.par" />
+  <Package Name="RochesterTool.par" />
+  <Package Name="RecoilCorrector.par" />
+  <Package Name="JetCorrectionTool.par" />
+  
+  <Cycle Name="DiMuonAnalysis" OutputDirectory="./" PostFix="" ProofServer="lite" ProofWorkDir="" RunMode="LOCAL" TargetLumi="1.0">
+    <InputData Lumi="0.0" NEventsMax="-1" Type="SingleMuon" Version="UZH" SkipValid="False">
+
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017B-17Nov2017-v1/180327_074812/0000/flatTuple_86.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017B-17Nov2017-v1/180327_074812/0000/flatTuple_401.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017B-17Nov2017-v1/180327_074812/0000/flatTuple_646.root" Lumi="1.0" />
+
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017C-17Nov2017-v1/180327_074919/0000/flatTuple_17.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017C-17Nov2017-v1/180327_074919/0000/flatTuple_405.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017C-17Nov2017-v1/180327_074919/0000/flatTuple_406.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017C-17Nov2017-v1/180327_074919/0000/flatTuple_464.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017C-17Nov2017-v1/180327_074919/0000/flatTuple_737.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017C-17Nov2017-v1/180327_074919/0000/flatTuple_902.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017C-17Nov2017-v1/180327_074919/0001/flatTuple_1071.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017C-17Nov2017-v1/180327_074919/0001/flatTuple_1498.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017C-17Nov2017-v1/180327_074919/0001/flatTuple_1507.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017C-17Nov2017-v1/180327_074919/0001/flatTuple_1521.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017C-17Nov2017-v1/180327_074919/0001/flatTuple_1813.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017C-17Nov2017-v1/180327_074919/0001/flatTuple_1824.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017C-17Nov2017-v1/180327_074919/0002/flatTuple_2011.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017C-17Nov2017-v1/180327_074919/0002/flatTuple_2042.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017C-17Nov2017-v1/180327_074919/0002/flatTuple_2065.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017C-17Nov2017-v1/180327_074919/0002/flatTuple_2276.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017C-17Nov2017-v1/180327_074919/0002/flatTuple_2279.root" Lumi="1.0" />
+
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017D-17Nov2017-v1/180327_075025/0000/flatTuple_158.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017D-17Nov2017-v1/180327_075025/0000/flatTuple_859.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017D-17Nov2017-v1/180327_075025/0000/flatTuple_995.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017D-17Nov2017-v1/180327_075025/0001/flatTuple_1001.root" Lumi="1.0" />
+
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017E-17Nov2017-v1/180327_075130/0000/flatTuple_50.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017E-17Nov2017-v1/180327_075130/0000/flatTuple_387.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017E-17Nov2017-v1/180327_075130/0000/flatTuple_510.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017E-17Nov2017-v1/180327_075130/0000/flatTuple_718.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017E-17Nov2017-v1/180327_075130/0000/flatTuple_761.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017E-17Nov2017-v1/180327_075130/0000/flatTuple_992.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017E-17Nov2017-v1/180327_075130/0001/flatTuple_1095.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017E-17Nov2017-v1/180327_075130/0001/flatTuple_1121.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017E-17Nov2017-v1/180327_075130/0001/flatTuple_1231.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017E-17Nov2017-v1/180327_075130/0001/flatTuple_1278.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017E-17Nov2017-v1/180327_075130/0001/flatTuple_1778.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017E-17Nov2017-v1/180327_075130/0001/flatTuple_1796.root" Lumi="1.0" />
+
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017F-17Nov2017-v1/180327_075236/0000/flatTuple_426.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017F-17Nov2017-v1/180327_075236/0000/flatTuple_707.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017F-17Nov2017-v1/180327_075236/0000/flatTuple_981.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017F-17Nov2017-v1/180327_075236/0000/flatTuple_982.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017F-17Nov2017-v1/180327_075236/0001/flatTuple_1093.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017F-17Nov2017-v1/180327_075236/0001/flatTuple_1359.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017F-17Nov2017-v1/180327_075236/0001/flatTuple_1611.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017F-17Nov2017-v1/180327_075236/0001/flatTuple_1808.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017F-17Nov2017-v1/180327_075236/0001/flatTuple_1813.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017F-17Nov2017-v1/180327_075236/0002/flatTuple_2125.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017F-17Nov2017-v1/180327_075236/0002/flatTuple_2156.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017F-17Nov2017-v1/180327_075236/0002/flatTuple_2200.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017F-17Nov2017-v1/180327_075236/0002/flatTuple_2209.root" Lumi="1.0" />
+<In FileName="dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat/store/user/cgalloni/Ntuple_2017_94v2_preliminary_JEC_V6_tau_iso_JECUNC/SingleMuon/SingleMuon_Run2017F-17Nov2017-v1/180327_075236/0002/flatTuple_2388.root" Lumi="1.0" />
+
+      <InputTree Name="ntuplizer/tree" />
+      <OutputTree Name="tree_mumu" />
+    </InputData>
+  <UserConfig>
+    <Item Name="RecoTreeName"   Value="tree" />
+    <Item Name="IsSignal"       Value="False" />
+    <Item Name="IsData"         Value="True" />
+  </UserConfig>
+  </Cycle>
+</JobConfiguration>
+
+
+

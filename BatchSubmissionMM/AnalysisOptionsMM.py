@@ -6,6 +6,7 @@ loadLibs=[
     "libBTaggingTools",
     "libTauTauResonancesMM",
     "libScaleFactorTool",
+    "libRochesterTool",
     "libRecoilCorrector",
     "libJetCorrectionTool",
 ]
@@ -18,6 +19,7 @@ loadPacks=[
     "BTaggingTools.par",
     "TauTauResonancesMM.par",
     "ScaleFactorTool.par",
+    "RochesterTool.par",
     "RecoilCorrector.par",
     "JetCorrectionTool.par",
 ]

@@ -30,16 +30,17 @@ varlist = {
     'beta_1':          "leading b jet eta",              'beta_2':     "subleading b jet eta",
     'pt_tt':           "pt_ltau",                        'R_pt_m_vis': "R = pt_ltau / m_vis",
     'pt_tt_sv':        "SVFit pt_ltau,sv",               'R_pt_m_sv':  "SVFit R_{sv} = pt_ltau / m_sv",
-    'm_sv':            "SVFit mass m_sv",                'dzeta':      "D_{zeta}",
+    'm_sv':            "SVFit mass m_{tautau}",          'dzeta':      "D_{zeta}",
     'dR_ll':           "#DeltaR_{ltau}",                 'pzeta_disc': "D_{zeta}",
     'pfmt_1':          "m_t(l,MET)",                     'pzetavis':   "p_{zeta}^{vis}",
     'dphi_ll_bj':      "#Deltaphi_ll',bj",               'pzetamiss':  "p_{zeta}^{miss}",
     'puweight':        "pileup weight",                  'met':        "MET",
     'chargedPionPt_2': "charged pion pt",                'metphi':     "MET phi",
     'neutralPionPt_2': "neutral pion pt",                
+    '#DM0':            "h^{#pm}",                        
+    '#DM1':            "h^{#pm}#pi^{0}",                 
+    '#DM10':           "h^{#pm}h^{#mp}h^{#pm}",           
 }
-
-
 
 def makeLatex(title,**kwargs):
     """Convert patterns in a string to LaTeX format."""
@@ -77,7 +78,7 @@ def makeLatex(title,**kwargs):
     for var in varlist:
       if var in title:
           title = title.replace(var,varlist[var])
-          #title = re.sub(r"\b%s\b"%var,varlist[var],title,flags=re.IGNORECASE)
+          #title = re.sub(r"\b%s\b"%var,varlist[var],title,re.IGNORECASE)
           break
     
     if split:
@@ -98,59 +99,62 @@ def makeLatex(title,**kwargs):
         stringlow = string.lower()
         
         if "p_" in stringlow:
-            string = re.sub(r"(?<!i)(p)_([^{}()<>=\ ]+)",r"\1_{\2}",string,flags=re.IGNORECASE).replace('{t}','{T}')
+            string = re.sub(r"(?<!i)(p)_([^{}()<>=\ ]+)",r"\1_{\2}",string,re.IGNORECASE).replace('{t}','{T}')
             GeV = True
         
         if "pt" in stringlow and "ptweighted" not in stringlow and "byPhotonPt" not in stringlow:
-            string = re.sub(r"(?<!k)(p)t_([^{}()<>=\ ]+)",r"\1_{T}^{\2}",string,flags=re.IGNORECASE)
-            string = re.sub(r"\b(p)t\b",r"\1_{T}",string,flags=re.IGNORECASE)
+            string = re.sub(r"(?<!k)(p)[tT]_([^{}()<>=\ ]+)",r"\1_{T}^{\2}",string,re.IGNORECASE)
+            string = re.sub(r"\b(p)[tT]\b",r"\1_{T}",string,re.IGNORECASE)
             GeV = True
         
         if "m_" in stringlow:
-            string = re.sub(r"(?<!u)(m)_([^{}()<>=\ ]+)",r"\1_{\2}",string,flags=re.IGNORECASE).replace('{t}','{T}')
+            string = re.sub(r"(?<!u)(m)_([^{}()<>=\ ]+)",r"\1_{\2}",string,re.IGNORECASE).replace('{t}','{T}')
             GeV = True
         
         if "mt_" in stringlow:
-            string = re.sub(r"(m)t_([^{}()<>=\ ]+)",r"\1_{T}^{\2}",string,flags=re.IGNORECASE)
+            string = re.sub(r"(m)t_([^{}()<>=\ ]+)",r"\1_{T}^{\2}",string,re.IGNORECASE)
             GeV = True
         
         if "ht" in stringlow:
-            string = re.sub(r"\b(h)t\b",r"\1_{T}",string,flags=re.IGNORECASE)
+            string = re.sub(r"\b(h)t\b",r"\1_{T}",string,re.IGNORECASE)
             GeV = True
         
         if " d_" in stringlow:
-            string = re.sub(r"(\ d)_([^{}()<>=\ ]+)",r"\1_{\2}",string,flags=re.IGNORECASE)
+            string = re.sub(r"(\ d)_([^{}()<>=\ ]+)",r"\1_{\2}",string,re.IGNORECASE)
             cm = True
         
         if "deltar_" in stringlow:
-            string = re.sub(r"(?<!#)deltar_([^{}()<>=\ ]+)",r"#DeltaR_{\1}",string,flags=re.IGNORECASE)
+            string = re.sub(r"(?<!#)deltar_([^{}()<>=\ ]+)",r"#DeltaR_{\1}",string,re.IGNORECASE)
         elif "deltar" in stringlow:
-            string = re.sub(r"(?<!#)deltar",r"#DeltaR",string,flags=re.IGNORECASE)
+            string = re.sub(r"(?<!#)deltar",r"#DeltaR",string,re.IGNORECASE)
         
         if "dR" in string:
             string = re.sub(r"(?<!\w)dR_([^{}()<>=\ ]+)",r"#DeltaR_{\1}",string)
         
         if "tau" in stringlow:
-            string = re.sub(r"(?<!^)(?<!\ )tau",r"#tau",string,flags=re.IGNORECASE)
-            string = re.sub(r"tau_([^{}()<>=\ ]+)",r"tau_{\1}",string,flags=re.IGNORECASE)
+            #string = re.sub(r"(?<!^)tau(?!\ )",r"#tau",string,re.IGNORECASE)
+            string = re.sub(r"tau",r"#tau",string,re.IGNORECASE)
+            string = re.sub(r" #tau ",r" tau ",string,re.IGNORECASE)
+            string = re.sub(r"^#tau ",r"tau ",string,re.IGNORECASE)
+            string = re.sub(r"tau_([^{}()<>=\ ]+)",r"tau_{\1}",string,re.IGNORECASE)
         
         if "phi" in stringlow and "dphi" not in stringlow:
             string = string.replace("phi","#phi")
-            string = re.sub(r"phi_([^{}()<>=\ ]+)",r"phi_{\1}",string,flags=re.IGNORECASE)
+            string = re.sub(r"phi_([^{}()<>=\ ]+)",r"phi_{\1}",string,re.IGNORECASE)
         
         if "zeta" in stringlow and "#zeta" not in stringlow:
             if "Dzeta" in string:
                 string = string.replace("Dzeta","D_{zeta}")
                 GeV = True
             if "zeta_" in stringlow:
-                string = re.sub(r"(?<!#)(zeta)_([^{}()<>=\ ]+)",r"#\1_{\2}",string,flags=re.IGNORECASE)
+                string = re.sub(r"(?<!#)(zeta)_([^{}()<>=\ ]+)",r"#\1_{\2}",string,re.IGNORECASE)
             else:
-                string = re.sub(r"(?<!#)(zeta)",r"#\1",string,flags=re.IGNORECASE)
+                string = re.sub(r"(?<!#)(zeta)",r"#\1",string,re.IGNORECASE)
             GeV = True
         
         if "eta" in stringlow and "#eta" not in stringlow and "#zeta" not in stringlow and "deta" not in stringlow:
             string = string.replace("eta","#eta")
-            #string = re.sub(r"(?<![#dz])eta",r"#eta",string,flags=re.IGNORECASE)
+            #string = re.sub(r"(?<![#dz])eta",r"#eta",string,re.IGNORECASE)
             string = re.sub(r"eta_([^{}()<>=\ ]+)",r"eta_{\1}",string)
         
         if "abs(" in string and ")" in string:
@@ -158,12 +162,12 @@ def makeLatex(title,**kwargs):
             #string = string.replace("abs(","|").replace(")","") + "|" # TODO: split at next space
         
         if  "mu" in stringlow:
-            string = re.sub(r"mu(?![lo])",r"#mu",string,flags=re.IGNORECASE)
+            string = re.sub(r"mu(?![lo])",r"#mu",string)
             #string = string.replace("mu","#mu").replace("Mu","#mu")
             #string = string.replace("si#mulation","simulation")
         
         if "ttbar" in stringlow:
-            string = re.sub(r"ttbar","t#bar{t}",string,flags=re.IGNORECASE)
+            string = re.sub(r"ttbar","t#bar{t}",string,re.IGNORECASE)
         
         if "npv" in stringlow:
             string = string.replace("npv","number of vertices")
@@ -178,7 +182,7 @@ def makeLatex(title,**kwargs):
     
     newtitle = ' / '.join(strings)
     
-    if units:
+    if units and not '/' in newtitle:
       if GeV or "mass" in newtitle or ("met" in newtitle.lower() and "phi" not in newtitle ):
         if "GeV" not in newtitle:
           newtitle += " [GeV]"
@@ -211,13 +215,14 @@ def makeFileName(string,**kwargs):
     if 'abs(' in string:
       string = re.sub(r"abs\(([^\)]*)\)",r"\1",string).replace('eta_2','eta')
     string = string.replace(" and ",'-').replace(',','-').replace('(','').replace(')','').replace(':','-').replace(
-                                '|','').replace('&','').replace('!','not').replace('pt_mu','pt').replace('m_T','mt').replace('m_t','mt').replace(
+                               '|','').replace('&','').replace('#','').replace('!','not').replace(
+                               'pt_mu','pt').replace('m_T','mt').replace('m_t','mt').replace(
                                '>=',"geq").replace('<=',"leq").replace('>',"gt").replace('<',"lt").replace("=","eq").replace(
-                                ' ','').replace('GeV','')
+                               ' ','').replace('GeV','')
     #if 'm_t' in string.lower:
-    #  string = re.sub(r"(?<!u)(m)_([^{}\(\)<>=\ ]+)",r"\1_{\2}",string,flags=re.IGNORECASE).replace('{t}','{T}')
+    #  string = re.sub(r"(?<!u)(m)_([^{}\(\)<>=\ ]+)",r"\1_{\2}",string,re.IGNORECASE).replace('{t}','{T}')
     #if "m_" in string.lower():
-    #    string = re.sub(r"(?<!u)(m)_([^{}\(\)<>=\ ]+)",r"\1_{\2}",string,flags=re.IGNORECASE).replace('{t}','{T}')
+    #    string = re.sub(r"(?<!u)(m)_([^{}\(\)<>=\ ]+)",r"\1_{\2}",string,re.IGNORECASE).replace('{t}','{T}')
     #if not (".png" in name or ".pdf" in name or ".jpg" in name): name += kwargs.get('ext',".png")
     return string
     
@@ -235,17 +240,19 @@ def shiftJetVariable(var, jshift, **kwargs):
     verbosity   = getVerbosity(kwargs,verbosityVariableTools)
     vars        = kwargs.get('vars',  vars )
     varShift    = var[:]
+    if re.search(r"(Up|Down)",var):
+      LOG.warning('shiftJetVariable: Already shifts in "%s"'%(var))
     if len(jshift)>0 and jshift[0]!='_': jshift = '_'+jshift
     if "jets20" in var: LOG.warning('shiftJetVariable: "jets20" in var')
     for jvar in vars:
         oldvarpattern = r'('+jvar+r')'
         newvarpattern = r"\1%s"%(jshift)
         varShift = re.sub(oldvarpattern,newvarpattern,varShift)
-    LOG.verbose('>>>   shiftJetVariable with "%s" shift\n>>>   "%s"\n>>>     -> "%s"'%(jshift,var,varShift), verbosity)
+    LOG.verbose('shiftJetVariable with "%s" shift\n>>>   "%s"\n>>>     -> "%s"'%(jshift,var,varShift), verbosity)
     return varShift
     
 def undoShift(string):
-    shiftless = re.sub(r"_[a-zA-Z]*(Up|Down|nom)","",string)
+    shiftless = re.sub(r"_[a-zA-Z]+(Up|Down|nom)","",string)
     return shiftless
 
 
@@ -266,7 +273,7 @@ class Variable(object):
         self.title           = strings[0] if strings else makeLatex(self.name)
         self.title           = kwargs.get('title',          self.title                  ) # for plot axes
         self.filename        = kwargs.get('filename',       makeFileName(self.name)     ) # for file
-        self.filename        = self.filename.replace('$NAME',self.name)
+        self.filename        = self.filename.replace('$NAME',self.name).replace('$VAR',self.name)
         self.nbins           = None
         self.min             = None
         self.max             = None
@@ -362,7 +369,7 @@ class Variable(object):
     
     def hasVariableBinning(self):
         """True is xbins is set."""
-        return xbins != None
+        return self.xbins != None
     
     def isPartOf(self, *searchterms, **kwargs):
         """Check if all labels are in the variable's name, title."""

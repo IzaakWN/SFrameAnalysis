@@ -12,7 +12,8 @@ RecoilCorrectorTool::RecoilCorrectorTool(SCycleBase* parent, const char* name ) 
   // std::string (std::getenv("SFRAME_DIR"))
   DeclareProperty(  m_name+"PFMETFile",     m_PFMETFile     = "$SFRAME_DIR/../RecoilCorrections/data/TypeI-PFMet_Run2016BtoH.root" );
   DeclareProperty(  m_name+"MVAMETFile",    m_MVAMETFile    = "$SFRAME_DIR/../RecoilCorrections/data/MvaMET_2016BCD.root" );          // deprecated for Moriond
-  DeclareProperty(  m_name+"ZPTFile",       m_ZPTFile       = "$SFRAME_DIR/../RecoilCorrections/data/Zpt_weights_2016_BtoH.root" );
+  //DeclareProperty(  m_name+"ZPTFile",       m_ZPTFile       = "$SFRAME_DIR/../RecoilCorrections/data/Zpt_weights_2016_BtoH.root" );
+  DeclareProperty(  m_name+"ZPTFile",       m_ZPTFile       = "$SFRAME_DIR/../RecoilCorrections/data/Zpt_weights_2016_btag.root" );
 }
 
 

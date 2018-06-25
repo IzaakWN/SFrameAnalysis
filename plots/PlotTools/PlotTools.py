@@ -172,14 +172,14 @@ def makeLegend(*hists,**kwargs):
     if position:
       L, R = gPad.GetLeftMargin(), gPad.GetRightMargin()
       T, B = gPad.GetTopMargin(),  gPad.GetBottomMargin()
-      if   'leftleft'     in position: x1 = 0.02+L; x2 = x1 + width
+      if   'leftleft'     in position: x1 = 0.07+L; x2 = x1 + width
       elif 'rightright'   in position: x2 = 0.92-R; x1 = x2 - width
       elif 'center'  in position:
         if 'right'  in position: center = (1+L-R)/2 + 0.075
         elif 'left' in position: center = (1+L-R)/2 - 0.075
         else:                    center = (1+L-R)/2
         x1 = center-width/2; x2 = center+width/2
-      elif 'left'         in position: x1 = 0.05+L; x2 = x1 + width
+      elif 'left'         in position: x1 = 0.14+L; x2 = x1 + width
       elif 'right'        in position: x2 = 0.88-R; x1 = x2 - width
       elif 'x='           in position:
         x1 = float(re.findall(r"x=(\d\.\d+)",position)[0])
@@ -322,15 +322,15 @@ def makeAxes(frame, *args, **kwargs):
         maxs = [ frame.GetMaximum() ]
         for hist in hists:
             maxs.append(hist.GetMaximum())
-        if not ymax: ymax = ceilToSignificantDigit(max(maxs)*ymargin,digits=2)
+        if ymax==None: ymax = max(maxs)*ymargin #ceilToSignificantDigit(max(maxs)*ymargin,digits=2)
     else:
         mins = [ 0 ]
         maxs = [   ]
         for hist in hists:
             if negativeY: mins.append(hist.GetMinimum())
             maxs.append(hist.GetMaximum())
-        if not ymin: ymin = min(mins)*(1.1 if ymin>0 else 0.9)
-        if not ymax: ymax = ceilToSignificantDigit(max(maxs)*ymargin,digits=2)
+        if ymin==None: ymin = min(mins)*(1.1 if ymin>0 else 0.9)
+        if ymax==None: ymax = max(maxs)*ymargin #ceilToSignificantDigit(max(maxs)*ymargin,digits=2)
     frame.GetXaxis().SetRangeUser(xmin,xmax)
     if ymin: frame.SetMinimum(ymin)
     if ymax: frame.SetMaximum(ymax)

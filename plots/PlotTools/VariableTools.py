@@ -75,6 +75,7 @@ def makeLatex(title,**kwargs):
     #if "_jer" in title:
     #    title = title.replace("_jer","")
     
+    
     for var in varlist:
       if var in title:
           title = title.replace(var,varlist[var])
@@ -152,9 +153,8 @@ def makeLatex(title,**kwargs):
                 string = re.sub(r"(?<!#)(zeta)",r"#\1",string,re.IGNORECASE)
             GeV = True
         
-        if "eta" in stringlow and "#eta" not in stringlow and "#zeta" not in stringlow and "deta" not in stringlow:
-            string = string.replace("eta","#eta")
-            #string = re.sub(r"(?<![#dz])eta",r"#eta",string,re.IGNORECASE)
+        if "eta" in stringlow: #and "#eta" not in stringlow and "#zeta" not in stringlow and "deta" not in stringlow:
+            string = re.sub(r"(?<!\#z)eta",r"#eta",string)
             string = re.sub(r"eta_([^{}()<>=\ ]+)",r"eta_{\1}",string)
         
         if "abs(" in string and ")" in string:

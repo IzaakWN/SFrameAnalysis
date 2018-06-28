@@ -6,7 +6,7 @@
 # LABELS & LUMI
 globalTag   = "_2017_V2" # extra label for opening file, saving plots to dir
 plottag     = ""  # extra label for image file
-luminosity  = 41.3 #86
+luminosity  = 41.4 #86
 year        = 2017
 
 # VERBOSITY
@@ -20,6 +20,8 @@ verbositySelectionTools = 0
 doStack             = True #and False
 drawShifts          = True #and False
 useCutTree          = True #and False
+loadMacros          = True #and False
+makePDF             = True and False
 
 # DATACARD OPTIONS
 doDatacard          = True and False
@@ -60,7 +62,6 @@ DATACARDS_DIR       = "%s/%s"%(PLOTS_DIR,"datacards")
 channels = [
     'emu',
 ]
-if not normalizeWJ and 'emu' not in channels: plotlabel+="_noWJrenorm"
 if not doShifts:
   doTES, doEES, doJTF, doJER, doJEC, doUncEn = False, False, False, False, False, False
 
@@ -195,13 +196,11 @@ samplesS = [
 ]
 
 samplesD = {
-    'mutau' :  ( "SingleMuon",      "SingleMuon_Run2017",     "single muon"     ),
-    #'etau' :  ( "SingleElectron",   "SingleElectron_Run2017", "single electron" ),
-    'emu'   :  ( "SingleMuon",      "SingleMuon_Run2017",     "single muon"     ),
+    'emu' :  ( "SingleMuon", "SingleMuon_Run2017", "single muon" ),
 }
 
 # SAMPLESET
-makeSFrameSamples(samplesD,samplesB,samplesS,weight=_weight,binN_weighted=10)
+makeSFrameSamples(samplesD,samplesB,samplesS,weight=_weight,binN_weighted=10,channel="emu")
 samples = SampleSet(samplesD,samplesB,samplesS)
 #samples.printTable()
 if stitchWJ:       samples.stitch("W*Jets",        name_incl="WJ",  name="WJ"                                         )

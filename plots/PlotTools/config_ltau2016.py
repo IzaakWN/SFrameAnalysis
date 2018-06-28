@@ -5,9 +5,9 @@
 
 # LABELS & LUMI
 globalTag   = "_Moriond" # extra label for opening file, saving plots to dir
-plottag     = "_test" # extra label for image file
-era         = "2016"
-luminosity  = 35.9
+plottag     = "" # extra label for image file
+era         = "2016" #B-F"
+luminosity  = 19.721 if "B-F" in era else 16.146 if "GH" in era else 35.9
 
 # VERBOSITY
 verbosity               = 1
@@ -30,24 +30,25 @@ drawShifts          = True and False
 useCutTree          = True #and False
 doSignalUpScaling   = True #and False
 drawData            = True #and False
-drawSignal          = True #and False
+drawSignal          = True and False
 colorset            = 'IWN'
+loadMacros          = True #and False
 
 # DATACARD OPTIONS
 doDatacard          = True and False
 recreateDC          = True #and False
-doShapes            = True #and False
 doNominal           = True #and False
-doTES               = True #and False
-doEES               = True #and False # not for mutau
-doJTF               = True #and False # not for LowMass
-doLTF               = True #and False
-doJER               = True #and False
-doJEC               = True #and False
-doUncEn             = True #and False
+doShapes            = True #and False
+doTES               = True and False
+doEES               = True and False # not for mutau
+doJTF               = True and False # not for LowMass
+doLTF               = True and False
+doJER               = True and False
+doJEC               = True and False
+doUncEn             = True and False
 doZpt               = True and False # +/-10% instead
 doTTpt              = True #and False
-doQCDshift          = True #and False
+doQCDshift          = True and False
 
 # SAMPLE OPTIONS
 stitchWJ            = True #and False
@@ -78,25 +79,27 @@ DATACARDS_DIR       = "%s/%s"%(PLOTS_DIR,"datacards")
 # CHANNELS
 channels = [
     "mutau",
-    "etau",
+#     "etau",
 ]
 
 # LABELS
 if isinstance(doJECErrors,str): plottag+="_err_%s"%doJECErrors
 elif doJECErrors==True:         plottag+="_err"
-if not drawSignal:  plottag+="_noSignal"
+#if not drawSignal:  plottag+="_noSignal"
 if not doQCD:       plottag+="_noQCD"
 if not normalizeTT: plottag+="_noTTrenorm"
 if not normalizeWJ and "emu" not in channels: plottag+="_noWJrenorm"
+if not doShapes:
+  doTES, doEES, doJTF, doJER, doJEC, doUncEn, doTTpt = False, False, False, False, False, False, False
 
 # BLIND
-blind_dict = { "m_vis":      ( 15, 70), "m_sv" :     ( 20,  80),  "dR_ll" : (  0,1.2),
+blind_dict = { #"m_vis":      ( 0, 70), "m_sv" :     ( 0,  80),  "dR_ll" : ( 0,1.2),
                #"pt_tt":     ( 80,200),  "pt_tt_sv":  ( 80, 200), 
                #"R_pt_m_vis": (2.5, 10), "R_pt_m_sv": (2.0,  10),
 }
 
 # CATEGORIES / SELECTIONS
-_weight         = "weight*trigweight_or_1"
+_weight         = "weight*trigweight_or_1*getLeptonTauFake2016(channel,gen_match_2,eta_2)/idisoweight_2" #/puweight
 if "/puweight" in _weight: plottag+="_nopuweight"
 isocuts         = "iso_cuts==1" #iso_1<0.15 && iso_2_medium==1
 vetos           = "lepton_vetos==0"
@@ -123,15 +126,22 @@ category2TT     = "ncbtag>0 && ncjets==2 && nfjets==0 && dphi_ll_bj>2 && met>60 
 if "emu" in channels: (metcut,mt1cut) = ("met<40","pfmt_1<40")
 newcuts         = "%s && %s" % (metcut,mt1cut)
 newcuts_bbA     = "pzeta_disc>-40 && pfmt_1<40"
+if "B-F" in era:
+  baseline        += " && (!isData||run<278820)"
+  plottag         += "_EraBtoF"
+if "GH" in era:
+  baseline        += " && (!isData||run>278819)"
+  plottag         += "_EraGH"
 
 selections  = [
 #     sel("no cuts",               ""                                                              ),
 #     sel("QCD CR",                "%s && %s && %s && %s && %s" % (isocuts, vetos, "q_1*q_2<0", "njets>0", triggers)),
 #     sel("baseline, same sign",   "%s" % (baseline.replace("q_1*q_2<0","q_1*q_2>0"))              ),# 
     sel("baseline",                "%s" % (baseline)                                             ),
+#     sel("baseline, pt>30",       "%s && pt_1>30" % (baseline)                                    ),
+#     sel("baseline, jet pt>40",     "%s && jpt_1>40 && jpt_2>40" % (baseline)                           ),
 #     sel("two >25 GeV jets",      "%s && %s" % (baseline, "jpt_1 > 25 && jpt_2 > 25")             ),
 #     sel("two >30 GeV jets",        "%s && %s" % (baseline, "njets>1")                            ), # jpt_1 > 30 && jpt_2 > 30
-#     sel("category bbA",          "%s && %s && %s" % (baseline, category_bbA, newcuts_bbA)        ),
 #     sel(">30 GeV forward jet",   "%s && %s" % (baseline, "njets>1 && fjpt_1>30")                 ),
 #     sel(">50 GeV forward jet",   "%s && %s" % (baseline, "njets>1 && fjpt_1>50")                 ),
 #     sel("baseline 1j",           "%s && njets==1" % (baseline)                                   ),
@@ -150,7 +160,7 @@ selections  = [
 #     sel(">1j",                   "%s"       % (emu_check.replace("njets==2","njets>1"))          ),
 #     sel(">=1j",                  "%s"       % (emu_check.replace("njets==2","njets>0").replace(" && jpt_2>30",""))),
 #     sel(">0j20",                 "%s"       % (emu_check.replace("njets==2","njets20>0").replace(" && jpt_2>30",""))),
-#     sel("1j1f, |eta|<3",         "%s && %s" % (emu_check,"(abs(jeta_1)>3 || abs(jeta_2)>3)")),
+#     sel("1j1f, |eta|<3",         "%s && %s" % (emu_check,"(abs(jeta_1)>3 || abs(jeta_2)>3)")     ),
 #     sel("category 1",            "%s && %s" % (baseline, category1)                              ),
 #     sel("category 2",            "%s && %s" % (baseline, category2)                              ),
 #     sel("category 2J",            "%s && %s" % (baseline, category2J)                            ),
@@ -162,35 +172,29 @@ selections  = [
 #     sel("category 2 TT CR",      "%s && %s" % (baseline, category2TT)                            ),
 #     sel("category 1 met",        "%s && %s && %s" % (baseline, category1, metcut)                ),
 #     sel("category 2 met, no dphi", "%s && %s && %s" % (baseline, category2J, metcut)             ),
-#     ###sel("category 1 mt1",      "%s && %s && %s" % (baseline, category1, mt1cut)               ),
-#     ###sel("category 2 mt1",      "%s && %s && %s" % (baseline, category2, mt1cut)               ),
 #     sel("category 1 SR",          "%s && %s && %s" % (baseline, category1, signalwindow)          ),
 #     sel("category 2 SR",          "%s && %s && %s" % (baseline, category2, signalwindow)          ), # && met < 60
 #     sel("category 1 SR met",      "%s && %s && %s && %s" % (baseline, category1, metcut, signalwindow)),
-#     ###sel("category 1 SR mt1",   "%s && %s && %s && %s" % (baseline, category1, mt1cut, signalwindow)),
-#     ###sel("category 2 SR mt1",   "%s && %s && %s && %s" % (baseline, category2, mt1cut, signalwindow)),
-    sel("category 1.2",          "%s && %s && %s" % (baseline, category1,  "pfmt_1<60"), filename="1b1f" ),
-    sel("category 2.2",          "%s && %s && %s" % (baseline, category2J, "pfmt_1<60"), filename="1b1c" ), # no dphi
+#     sel("category 1.2",          "%s && %s && %s" % (baseline, category1,  "pfmt_1<60"), filename="1b1f" ),
+#     sel("category 2.2",          "%s && %s && %s" % (baseline, category2J, "pfmt_1<60"), filename="1b1c" ), # no dphi
 #     sel(">= 1 b tag, >20 GeV",   "%s && %s" % (baseline, category_bbA2.replace('btag','btag20').replace('jets','jets20'))    ),
 #     sel("1 b tag, >20 GeV",      "%s && %s" % (baseline, category_bbA.replace('btag','btag20').replace('fjets','fjets20'))   ),
 #     sel("1 b tag, >20 GeV, j30",   "%s && %s" % (baseline, category_bbA.replace('btag','btag20'))                            ),
 #     sel("1 b tag, >20 GeV",        "%s && %s" % (baseline, category_bbA.replace('btag','btag20').replace('jets','jets20'))   ),
 #     sel("1 b tag, >20 GeV, fj30",  "%s && %s" % (baseline, category_bbA.replace('btag','btag20').replace('cjets','cjets20')) ),
-    sel("1 b tag",               "%s && %s" % (baseline, category_bbA_NV)                        ),
-    sel("1 b tag, jet veto",     "%s && %s" % (baseline, category_bbA)                           ),
-
+#     sel("1 b tag, no opt",       "%s && %s" % (baseline, category_bbA_NV)                        ),
+#     sel("1 b tag",               "%s && %s && %s" % (baseline, category_bbA_NV, "pzetamiss-0.85*pzetavis>-40 && pfmt_1<40")),
+#     sel("1 b tag, jet veto",     "%s && %s" % (baseline, category_bbA)                           ),
 ]
 
 
 # VARIABLES
 variables = [
-#     ##var("m_vis",                         35,   0,  70 ),
-#     ##var("m_sv",                          35,   0,  70 ),
-    var("m_sv",                            45,   0, 180, cbinning={'nbtag':(36,0,180)} ),
-    var("m_vis",                           40,   0, 160, cbinning={'nbtag':(32,0,160)} ),
+#     var("m_sv",                              50,   0, 200, cbinning={'nc?btag':(44,0,220)} ),
+#     var("m_vis",                             40,   0, 160, cbinning={'nc?btag':(36,0,180)} ),
 #     var("m_2",                             30,   0,   3 ),
-    var("met",                             40,   0, 200 ),
-    var("pfmt_1",                          40,   0, 200, title="m_T(mu,MET)", ctitle={'etau':"m_T(e,MET)"} ),
+#     var("met",                             40,   0, 200 ),
+#     var("pfmt_1",                          40,   0, 200, title="m_T(mu,MET)", ctitle={'etau':"m_T(e,MET)"} ),
 #     var("pt_1",                            50,     0,  200, title="muon pt",  ctitle={'etau':"electron pt"}  ),
 #     var("eta_1",                           26,  -2.6,  2.6, title="muon eta", ctitle={'etau':"electron eta"} ),
 #     var("pt_2",                            30,     0,  150, title="tau pt",   ctitle={'emu': "electron pt"}  ),
@@ -202,10 +206,10 @@ variables = [
 #     var("dphi_ll_bj",                      30,   0, 4.5 ),
 #     var("ncbtag20",                         5,   0,   5 ),
 #     var("ncbtag",                           5,   0,   5 ),
-#     var("njets",                            6,   0,   6 ),
-#     var("nfjets",                           5,   0,   5 ),
+    var("njets",                            6,   0,   6 ),
+    var("nfjets",                           5,   0,   5 ),
 #     var("ncjets",                           5,   0,   5 ),
-#     var("pzeta_disc",                      45, -145,  80 ),
+#     var("pzeta_disc",                      45, -145,  80, filename="dzeta", position="left" ),
 #     var("ht",                              50,   0, 500 ),
 #     var("pt_tt",                           50,   0, 160 ),
 #     var("pt_tt_sv",                        30,   0, 160 ),
@@ -227,7 +231,7 @@ variables = [
 #     ##var("mt_1",                          40,   0, 200 ),
 #     ##var("NUP",                            6,   0,   6 ),
 #     var("npu",                             21,   0,  42 ),
-#     var("npv",                             21,   0,  42 ),
+#     var("npv",                             25,   0,  50 ),
 #     var("puppimet",                        30,   0, 120 ),
 #     var("mvamet",                          30,   0, 120 ),
 #     var("iso_1",                           10,   0, 0.5 ),
@@ -241,7 +245,7 @@ variables = [
 #     variables.append(var( n,             2, 0,   2 ))
 
 samplesB = [                                                              # cross section [pb]
-    ("TT", "TT_TuneCUETP8M1",                      "ttbar",                    831.76, {'extraweight':"ttptweight_runI/ttptweight"} ), #,
+    ("TT", "TT_TuneCUETP8M1",                      "ttbar",                    831.76, {'extraweight':"1/ttptweight"} ), # "ttptweight_runI/ttptweight"
     ("ST", "ST_tW_top_5f_inclusiveDecays",         "ST tW",                     35.60  ), #  38.09
     ("ST", "ST_tW_antitop_5f_inclusiveDecays",     "ST atW",                    35.60  ), #  38.09
     ("ST", "ST_t-channel_top_4f_inclusiveDecays",     "ST t",                  136.02  ), #  80.95 # 80.95
@@ -260,15 +264,15 @@ samplesB = [                                                              # cros
     ("WJ", "W3JetsToLNu_TuneCUETP8M1",             "W + 3J",                   954.8   ),
     ("WJ", "W4JetsToLNu_TuneCUETP8M1",             "W + 4J",                   485.6   ),
     ###("DY", "DYJetsToLL_M-10to50_TuneCUETP8M1",     "Drell Yan 10-50",        18610.0   ),
-    ("DY", "DYJetsToLL_M-10to50_TuneCUETP8M1",     "Drell-Yan 10-50",        18610.0   ), # 18610
-    ("DY", "DY1JetsToLL_M-10to50_TuneCUETP8M1",    "Drell-Yan 1J 10-50",       421.5   ), # 421.5
-    ("DY", "DY2JetsToLL_M-10to50_TuneCUETP8M1",    "Drell-Yan 2J 10-50",       184.3   ), # 184.3
-    ("DY", "DY3JetsToLL_M-10to50_TuneCUETP8M1",    "Drell-Yan 3J 10-50",        95.0   ), # ???
-    ("DY", "DYJetsToLL_M-50_TuneCUETP8M1",         "Drell-Yan 50",            4954.0   ), # LO 4954.0; NLO 5765.4
-    ("DY", "DY1JetsToLL_M-50_TuneCUETP8M1",        "Drell-Yan 1J 50",         1012.5   ),
-    ("DY", "DY2JetsToLL_M-50_TuneCUETP8M1",        "Drell-Yan 2J 50",          332.8   ),
-    ("DY", "DY3JetsToLL_M-50_TuneCUETP8M1",        "Drell-Yan 3J 50",          101.8   ),
-    ("DY", "DY4JetsToLL_M-50_TuneCUETP8M1",        "Drell-Yan 4J 50",           54.8   ),
+    ("DY", "DYJetsToLL_M-10to50_TuneCUETP8M1",     "Drell-Yan 10-50",        18610.0, {'extraweight':"getZpt(pt_genboson)/zptweight"} ), # 18610
+    ("DY", "DY1JetsToLL_M-10to50_TuneCUETP8M1",    "Drell-Yan 1J 10-50",       421.5, {'extraweight':"getZpt(pt_genboson)/zptweight"} ), # 421.5
+    ("DY", "DY2JetsToLL_M-10to50_TuneCUETP8M1",    "Drell-Yan 2J 10-50",       184.3, {'extraweight':"getZpt(pt_genboson)/zptweight"} ), # 184.3
+    ("DY", "DY3JetsToLL_M-10to50_TuneCUETP8M1",    "Drell-Yan 3J 10-50",        95.0, {'extraweight':"getZpt(pt_genboson)/zptweight"} ), # ???
+    ("DY", "DYJetsToLL_M-50_TuneCUETP8M1",         "Drell-Yan 50",            4954.0, {'extraweight':"getZpt(pt_genboson)/zptweight"} ), # LO 4954.0; NLO 5765.4
+    ("DY", "DY1JetsToLL_M-50_TuneCUETP8M1",        "Drell-Yan 1J 50",         1012.5, {'extraweight':"getZpt(pt_genboson)/zptweight"} ),
+    ("DY", "DY2JetsToLL_M-50_TuneCUETP8M1",        "Drell-Yan 2J 50",          332.8, {'extraweight':"getZpt(pt_genboson)/zptweight"} ),
+    ("DY", "DY3JetsToLL_M-50_TuneCUETP8M1",        "Drell-Yan 3J 50",          101.8, {'extraweight':"getZpt(pt_genboson)/zptweight"} ),
+    ("DY", "DY4JetsToLL_M-50_TuneCUETP8M1",        "Drell-Yan 4J 50",           54.8, {'extraweight':"getZpt(pt_genboson)/zptweight"} ),
     ###("WW", "WW_TuneCUETP8M1",                      "WW",                        63.21  ), # 63.21
     ###("WZ", "WZ_TuneCUETP8M1",                      "WZ",                        22.82  ), # 10.71?
     ###("ZZ", "ZZ_TuneCUETP8M1",                      "ZZ",                        10.32  ), #  3.22?
@@ -282,9 +286,9 @@ samplesB = [                                                              # cros
 ]
 
 samplesD = {
-    "mutau" :  ( "SingleMuon",      "SingleMuon_Run2016",     "single muon",     {'blind':blind_dict} ),
-    "etau"  :  ( "SingleElectron",  "SingleElectron_Run2016", "single electron", {'blind':blind_dict} ),
-    "emu"   :  ( "SingleMuon",      "SingleMuon_Run2016",     "single muon",     {'blind':blind_dict} ),
+    "mutau": ( "SingleMuon",     "SingleMuon_Run2016",     "observed", {'blind':blind_dict} ),
+    "etau":  ( "SingleElectron", "SingleElectron_Run2016", "observed", {'blind':blind_dict} ),
+    "emu":   ( "SingleMuon",     "SingleMuon_Run2016",     "observed", {'blind':blind_dict} ),
 }
 
 samplesS   = [ ]
@@ -292,19 +296,19 @@ VLQ_bqX    = [ ]
 VLQ_bqX_MB300 = [ ]
 VLQ_bqX_MB450 = [ ]
 SUSY_bbA   = [ ]
-if 'bbA' in plottag or doDataCard:
+if 'bbA' in plottag or doDatacard:
   SUSY_bbA = [(25,0.021),(30,0.0311),(35,0.04172),(40,0.0568),(45,0.07724),(50,0.09666),(55,0.11672),(60,0.1386),(65,0.157),(70,0.175),]
-  if not doDataCard:
+  if not doDatacard:
     SUSY_bbA = [m for m in SUSY_bbA if m[0]%10==0]
   for mass, eff in SUSY_bbA:
-    samplesS.append(( "SUSY", "SUSYGluGluToBBa1ToTauTau_M-%d"%mass, "bbA m_{A}=%d"%mass, 1*eff, { 'upscale': 600./eff } ))
-if 'bbA' not in plottag or doDataCard:
+    samplesS.append(( "SUSY", "SUSYGluGluToBBa1ToTauTau_M-%d"%mass, "bbA m_{A}=%d"%mass, 1*eff, { 'upscale': 1400./eff } ))
+if 'bbA' not in plottag or doDatacard:
   VLQ_bqX       = [(20,0.7195),(28,1.    ),(40,0.7143),(50,0.7360),(60,0.7695),(70,0.8057),]
   VLQ_bqX_MB300 = [(20,0.8938),(28,0.8883),(40,0.8855),(50,0.8891),(60,0.8941),(70,0.8973),]
   VLQ_bqX_MB450 = [(20,0.9472),(28,0.9440),(40,0.9439),(50,0.9463),(60,0.9458),(70,0.9466),]
   for mass, eff in VLQ_bqX:
     samplesS.append(( "LowMass", "LowMassDiTau_M-%d_MB-%d"%(mass,170), "VLQ m_{B}=%d, m_{X}=%d"%(170,mass), 1*eff, { 'upscale': 600./eff } ))
-  if doDataCard:
+  if doDatacard:
     for mass, eff in VLQ_bqX_MB300:
       samplesS.append(( "LowMass", "LowMassDiTau_M-%d_MB-%d"%(mass,300), "VLQ m_{B}=%d, m_{X}=%d"%(300,mass), 1*eff ))
     for mass, eff in VLQ_bqX_MB450:
@@ -334,22 +338,22 @@ samples_TTptUp, samplesB_TTptDown, samples_ZptUp, samples_ZptDown = [ ], [ ], [ 
 if doTES:
   samples_TESUp   = samples.shift(['TT','DY','VLQ','bbA'], "_TES1p01"," +1.2% TES",  filter=False, title_veto="other" ) # 'ST'
   samples_TESDown = samples.shift(['TT','DY','VLQ','bbA'], "_TES0p99"," -1.2% TES",  filter=False, title_veto="other" )
-  samples_TESUp.printTable("TES Up")
+  #samples_TESUp.printTable("TES Up")
 if doEES:
   samples_EESUp   = samples.shift(['*'],  "_EES1p01"," +1% EES",    filter=False )
   samples_EESDown = samples.shift(['*'],  "_EES0p99"," -1% EES",    filter=False )
-  samples_EESUp.printTable("EES Up")
+  #samples_EESUp.printTable("EES Up")
 if doLTF:
   samples_LTFUp   = samples.shift(['DY'], "_LTF1p03"," +3% LTF ES", filter=True, title_veto="real")
   samples_LTFDown = samples.shift(['DY'], "_LTF0p97"," -3% LTF ES", filter=True, title_veto="real")
-  samples_LTFUp.printTable("LTF Up")
+  #samples_LTFUp.printTable("LTF Up")
 if doTTpt:
-  samples_TTptUp   = samples.shiftWeight(['TT'], "1/ttptweight",                                "no TT pt weight",     filter=False, extra=True )
-  samples_TTptDown = samples.shiftWeight(['TT'], "ttptweight_runI*ttptweight_runI/ttptweight" , "TT pt weight twice",  filter=False, extra=True )
-  samples_TTptUp.printTable("TTpt Up")
+  samples_TTptUp   = samples.shiftWeight(['TT'], "1/ttptweight",  "no TT pt weight",    filter=False, extra=True )
+  samples_TTptDown = samples.shiftWeight(['TT'], "ttptweight" ,   "TT pt weight once",  filter=False, extra=True )
+  #samples_TTptUp.printTable("TTpt Up")
 if doZpt:
   samples_ZptUp   = samples.shiftWeight(['DY'], "/zptweight", "no Z pt weight",      filter=True, extra=False )
   samples_ZptDown = samples.shiftWeight(['DY'], "zptweight" , "Z pt weighted twice", filter=True, extra=False )
-  samples_ZptUp.printTable("Zpt Up")
+  #samples_ZptUp.printTable("Zpt Up")
 
 

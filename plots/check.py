@@ -23,8 +23,8 @@ args = parser.parse_args()
 
 # LOAD config
 #configFile = "PlotTools/config_ltau2017.py"
-configFile = "PlotTools/config_ltau2016.py"
-#configFile = "PlotTools/config_mumu2017.py"
+#configFile = "PlotTools/config_ltau2016.py"
+configFile = "PlotTools/config_mumu2017.py"
 from PlotTools.SettingTools import *
 print ">>> loading configuration file %s for plot.py"%(configFile)
 settings, commands = loadConfigurationFromFile(configFile,verbose=args.verbose)
@@ -296,7 +296,7 @@ def compareSFrameSamples(samples1,samples2):
     
     samplesets = [
       ( 'DY', "Drell-Yan",
-       [(samples1,"HTT Z pt", "DY"), (samples2, "Z pT + 1 b tag", "DY")]),
+       [(samples1,"HTT, Z pt", "DY"), (samples2, "1 b tag, Z pT", "DY")]),
 #       ( 'DY', "Drell-Yan",
 #        [(samples1,"no Rochester", "DY"), (samples2, "Rochester", "DY")]),
 #       ( 'ZTT', "Z -> tau_{mu}tau_{h}", "gen_match_2==5",
@@ -308,16 +308,18 @@ def compareSFrameSamples(samples1,samples2):
     ]
     
     selections = [
-      sel("baseline",       "%s"%(baseline)                     ),
-#       sel("m_T<50",         "%s && %s"%(baseline,"pfmt_1<50")   ),
-#       sel("1 b tag",        "%s && %s"%(baseline,"nbtags>0")    ),
-#       sel("ZMM region",           baselineMM, title="Z -> mumu region"),
+      sel("baseline",        "%s"%(baseline)                     ),
+#       sel("m_T<50",          "%s && %s"%(baseline,"pfmt_1<50")   ),
+      sel("1 b tag",         "%s && %s"%(baseline,"nbtag>0")     ),
+      sel("1 b tag, m_T<50", "%s && %s"%(baseline,"nbtag>0 && pfmt_1<50") ),
+#       sel("ZMM region",            baselineMM, title="Z -> mumu region"),
     ]
     
     variables = [
       #var("m_2",    28, 0.20, 1.6, title="m_tau" ),
 #       var("m_2",    22, 0.70, 1.8, title="m_tau" ),
-      var("m_sv",   50,    0, 200, cbinning={'nc?btag':(44,0,220)} ),
+      var("m_sv",   50,    0, 200, cbinning={'nc?btag':(40,0,200)} ),
+      var("m_vis",  50,    0, 200, cbinning={'nc?btag':(40,0,200)} ),
 #       var("m_vis",  30,    0, 150, position="left" ),
 #       var("m_vis",  24,   50, 110, filename="$NAME_zoom",  position="right" ),
 #       var("m_vis",  20,   70, 110, filename="$NAME_zoomZ", position="right" ),
@@ -330,18 +332,19 @@ def compareSFrameSamples(samples1,samples2):
     ]
     
     # SETTINGS
-    tag       = ""
+    tag       = "_newZpt"
     outdir    = "./checks"
     ratio     = True
-    norm      = True and False
+    norm      = True #and False
     staterror = True
     JFR       = True #and False
     exts      = ['png','pdf']
+    if norm: tag += "_norm"
     
     for setinfo in samplesets:
       samplelist = [ ]
       setname, settitle, sampleset = setinfo[:3]
-      extracuts0 = "" if len(sampleinfo)<4 else sampleinfo[3]
+      extracuts0 = "" if len(setinfo)<4 else setinfo[3]
       print '>>>\n>>> compareSFrameSamples "%s"'%(setname)
       
       for sampleinfo in sampleset:
@@ -358,11 +361,12 @@ def compareSFrameSamples(samples1,samples2):
         #print ">>>\n>>> " + color("_%s:_%s_" % (channel.replace(' ','_'),selection.name.replace(' ','_')), color = "magenta", bold=True)
         
         # LOOP over VARIABLES
-        for variable in variables:        
+        for variable in variables:
           hists  = [ ]
           
           if not variable.plotForSelection(selection) or not selection.plotForVariable(variable):
             continue
+          variable.changeContext(selection.selection)
           
           for i, (sample,sampletitle,extracuts,extraweight) in enumerate(samplelist,1):
             app = "_%s"%i
@@ -389,7 +393,7 @@ def compareSFrameSamples(samples1,samples2):
    
 
 
-def plotHist2D(samples):
+def plotHist2DFromSFrameSamples(samples):
     """Compare shapes."""
     
     channel  = "mutau"
@@ -625,8 +629,8 @@ def compareSFrameHistogram():
 
 
 
-def compareSFrameHistogram2D():
-    print ">>>\n>>> compareSFrameHistogram2D()"
+def plotHist2D():
+    print ">>>\n>>> plotHist2D()"
     
     tag = ""
     globalTag = "_Moriond"
@@ -635,29 +639,38 @@ def compareSFrameHistogram2D():
     
     dirname = "checks"
     variables = [
-      ( "pt_gentau_recotau", "generator-level tau p_{T} [GeV]", 0, 100, "reconstruction-level tau p_{T} [GeV]", 0, 100 ),
+      #( "pt_gentau_recotau", "generator-level tau p_{T} [GeV]", 0, 100, "reconstruction-level tau p_{T} [GeV]", 0, 100 ),
+      ( "zptmass_histo", "Z boson mass [GeV]", 0, 10**4, "Z boson p_{T} [GeV]", 0, 10**4, "weight" ),
+      #( "zptmass_histo", "Z boson mass [GeV]", 0,   500, "Z boson p_{T} [GeV]", 0,   500, "weight" ),
     ]
-    samples = [
-      ("VLQ-170_28","../../SFrameAnalysis_Moriond/TauTauResonances/TauTauAnalysis.LowMass28_filterPass.root"),
+    filenames = [
+      ("HTT","../../SFrameAnalysis_Moriond/RecoilCorrections/data/Zpt_weights_2016_BtoH.root"),
+      #("Zb", "../../SFrameAnalysis_Moriond/RecoilCorrections/data/Zpt_weights_2016_btag.root"),
+      #("VLQ-170_28","../../SFrameAnalysis_Moriond/TauTauResonances/TauTauAnalysis.LowMass28_filterPass.root"),
       #("VLQ-170_28","../../SFrameAnalysis_Moriond/TauTauResonances/TauTauAnalysis.LowMass28.UZH.root"),
     ]
     
-    for samplename, filename in samples:
+    logx   = True #and False
+    logy   = True #and False
+    option = "COLZTEXT44" #TEXT44"
+    for name, filename in filenames:
       file = TFile( filename )
       for varinfo in variables:
         
-        var, xtitle, xmin, xmax, ytitle, ymin, ymax = varinfo
-        ztitle = "events"
+        var, xtitle, xmin, xmax, ytitle, ymin, ymax = varinfo[:7]
+        ztitle = "events" if len(varinfo)<8 else varinfo[7]
         
-        histname = "%s/%s"%(dirname,var)
+        #histname = "%s/%s"%(dirname,var)
+        histname = var
         hist = file.Get(histname)
         
         # NAME
-        canvasname = "%s/%s_%s%s"%(outdir,var,samplename,tag)
+        canvasname = "%s/%s_%s%s"%(outdir,var,name,tag)
         canvasname = makeFileName(canvasname)
         
         # PLOT
-        drawHist2D(hist,xtitle=xtitle,ytitle=ytitle,ztitle=ztitle,xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax,canvas=canvasname)
+        drawHist2D(hist,xtitle=xtitle,ytitle=ytitle,ztitle=ztitle,xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax,
+                   name=canvasname,logx=logx,logy=logy,option=option)
 
 
 
@@ -676,6 +689,9 @@ def drawHist2D(hist,**kwargs):
     ymax       = kwargs.get('ymax',       None         )
     zmin       = kwargs.get('zmin',       None         )
     zmax       = kwargs.get('zmax',       None         )
+    logx       = kwargs.get('logx',       False        )
+    logy       = kwargs.get('logy',       False        )
+    grid       = kwargs.get('grid',       False        )
     legend     = kwargs.get('legend',     True         )
     position   = kwargs.get('position',   ""           )
     text       = kwargs.get('text',       ""           )
@@ -684,8 +700,8 @@ def drawHist2D(hist,**kwargs):
     lentry     = kwargs.get('lentry',     None         )
     graphs     = kwargs.get('graph',      [ ]          )
     gentries   = kwargs.get('gentry',     [ ]          )
-    canvasname = kwargs.get('canvas',     "hist2D.png" )
-    option     = kwargs.get('option',     "COLZT"      )
+    canvasname = kwargs.get('name',       "hist2D.png" )
+    option     = kwargs.get('option',     "COLZ"       )
     #if not re.search("\.(png|pdf|gif|tiff|root|C)$",canvasname,re.IGNORECASE):
     #  canvasname += ".png"
     lmargin    = 0.14
@@ -706,7 +722,7 @@ def drawHist2D(hist,**kwargs):
     canvas.SetTopMargin(    0.07  ); canvas.SetBottomMargin(  0.14  )
     canvas.SetLeftMargin( lmargin ); canvas.SetRightMargin( rmargin )
     canvas.SetTickx(0); canvas.SetTicky(0)
-    canvas.SetGrid()
+    if grid: canvas.SetGrid()
     canvas.cd()
     
     if legend:
@@ -742,8 +758,13 @@ def drawHist2D(hist,**kwargs):
     hist.GetXaxis().SetTitle(xtitle)
     hist.GetYaxis().SetTitle(ytitle)
     hist.GetZaxis().SetTitle(ztitle)
-    hist.SetMarkerColor(kRed);
+    if "text" in option.lower():
+      gStyle.SetPaintTextFormat(".2f")
+      hist.SetMarkerColor(kRed)
+      #hist.SetMarkerSize(1)
     hist.Draw(option)
+    if logx: canvas.SetLogx()
+    if logy: canvas.SetLogy()
     
     for i, graph in enumerate(graphs):
       if not graph: continue
@@ -787,8 +808,8 @@ def drawHist2D(hist,**kwargs):
       legend.Draw()
       
     
-    #CMS_lumi.relPosX = 0.15
-    #CMS_lumi.CMS_lumi(canvas,13,0)
+    CMS_lumi.relPosX = 0.15
+    CMS_lumi.CMS_lumi(canvas,13,0)
     canvas.SaveAs(canvasname+".png")
     canvas.SaveAs(canvasname+".pdf")
     canvas.Close()
@@ -1253,90 +1274,15 @@ def drawHist2D(hist,**kwargs):
 ##             ("JES nominal",     "jpt_1_nom",        shift(baseline,   'nom'    )),
 ##             ("JES up",          "jpt_1_jesUp",      shift(baseline,   'jesUp'  )),
 ##             ("JES down",        "jpt_1_jesDown",    shift(baseline,   'jesDown')),  ]),
-##         ( "baseline, >=2 jets: JER",("met",62,-10,300),[
-##             ("nominal",         "met",                    baseline_2j           ),
-##             ("JES central",     "met",              shift(baseline_2j,'nom'    )),
-##             ("JER up",          "met_jerUp",        shift(baseline_2j,'jerUp'  )),
-##             ("JER down",        "met_jerDown",      shift(baseline_2j,'jerDown')),  ]),
-##         ( "baseline, >=2 jets: JES",("met",62,-10,300),[
-##             ("nominal",         "met",                    baseline_2j           ),
-##             ("JES central",     "met",              shift(baseline_2j,'nom'    )),
-##             ("JES up",          "met_jesUp",        shift(baseline_2j,'jesUp'  )),
-##             ("JES down",        "met_jesDown",      shift(baseline_2j,'jesDown')),  ]),
-##         ( "baseline, >=2 jets: JER",("pfmt_1",42,-10,300),[
-##             ("nominal",         "pfmt_1",                 baseline_2j           ),
-##             ("JES central",     "pfmt_1_nom",       shift(baseline_2j,'nom'    )),
-##             ("JER up",          "pfmt_1_jerUp",     shift(baseline_2j,'jerUp'  )),
-##             ("JER down",        "pfmt_1_jerDown",   shift(baseline_2j,'jerDown')),  ]),
-##         ( "baseline, >=2 jets: JES",("pfmt_1",42,-10,200),[
-##             ("nominal",         "pfmt_1",                 baseline_2j           ),
-##             ("JES central",     "pfmt_1_nom",       shift(baseline_2j,'nom'    )),
-##             ("JES up",          "pfmt_1_jesUp",     shift(baseline_2j,'jesUp'  )),
-##             ("JES down",        "pfmt_1_jesDown",   shift(baseline_2j,'jesDown')),  ]),
-##         ( "baseline, >=2 jets: JER",("jpt_1",70,-10,340),[
-##             ("nominal",         "jpt_1",                  baseline_2j           ),
-##             ("JES central",     "jpt_1_nom",        shift(baseline_2j,'nom'    )),
-##             ("JER up",          "jpt_1_jerUp",      shift(baseline_2j,'jerUp'  )),
-##             ("JER down",        "jpt_1_jerDown",    shift(baseline_2j,'jerDown')),  ]),
-##         ( "baseline, >=2 jets: JES",("jpt_1",70,-10,340),[
-##             ("nominal",         "jpt_1",                  baseline_2j           ),
-##             ("JES nominal",     "jpt_1_nom",        shift(baseline_2j,'nom'    )),
-##             ("JES up",          "jpt_1_jesUp",      shift(baseline_2j,'jesUp'  )),
-##             ("JES down",        "jpt_1_jesDown",    shift(baseline_2j,'jesDown')),  ]),
-##         ( "baseline: JES",("jpt_1_forward2p4",70,-10,340),[
-##             ("nominal",         "jpt_1",            shift("%s && %s"%(baseline_2j,"abs(jeta_1)>2.4")           ),
-##             ("JES central",     "jpt_1_nom",              "%s && %s"%(baseline_2j,"abs(jeta_1)>2.4"),'nom'    )),
-##             ("JES up",          "jpt_1_jesUp",      shift("%s && %s"%(baseline_2j,"abs(jeta_1)>2.4"),'jesUp'  )),
-##             ("JES down",        "jpt_1_jesDown",    shift("%s && %s"%(baseline_2j,"abs(jeta_1)>2.4"),'jesDown')),
-##             ]),
-##         ( "category 1: JES",("met",62,-10,300),[
-##             ("nominal",         "met",                    category1           ),
-##             ("JES central",     "met",              shift(category1,'nom'    )),
-##             ("JES up",          "met_jesUp",        shift(category1,'jesUp'  )),
-##             ("JES down",        "met_jesDown",      shift(category1,'jesDown')),  ]),
-##         ( "category 2: JES",("met",62,-10,300),[
-##             ("nominal",         "met",                    category2           ),
-##             ("JES central",     "met",              shift(category2,'nom'    )),
-##             ("JES up",          "met_jesUp",        shift(category2,'jesUp'  )),
-##             ("JES down",        "met_jesDown",      shift(category2,'jesDown')),  ]),
-##         ( "category 1: JES",("pfmt_1",62,-10,300),[
-##             ("nominal",         "pfmt_1",                 category1           ),
-##             ("JES central",     "pfmt_1_nom",       shift(category1,'nom'    )),
-##             ("JES up",          "pfmt_1_jerUp",     shift(category1,'jesUp'  )),
-##             ("JES down",        "pfmt_1_jerDown",   shift(category1,'jesDown')),  ]),
-##         ( "category 2: JES",("pfmt_1",62,-10,300),[
-##             ("nominal",         "pfmt_1",                 category2           ),
-##             ("JES central",     "pfmt_1_nom",       shift(category2,'nom'    )),
-##             ("JES up",          "pfmt_1_jerUp",     shift(category2,'jesUp'  )),
-##             ("JES down",        "pfmt_1_jerDown",   shift(category2,'jesDown')),  ]),
-##         ( "category 1: JER",("met",62,-10,300),[
-##             ("nominal",         "met",                    category1           ),
-##             ("JES central",     "met",              shift(category1,'nom'    )),
-##             ("JER up",          "met_jerUp",        shift(category1,'jerUp'  )),
-##             ("JER down",        "met_jerDown",      shift(category1,'jerDown')),  ]),
-##         ( "category 2: JER",("met",62,-10,300),[
-##             ("nominal",         "met",                    category2           ),
-##             ("JES central",     "met",              shift(category2,'nom'    )),
-##             ("JER up",          "met_jerUp",        shift(category2,'jerUp'  )),
-##             ("JER down",        "met_jerDown",      shift(category2,'jerDown')),  ]),
 ##         ( "category 1.2: JES",("m_sv",70,-10,340),[
 ##             ("nominal",                                   category12            ),
 ##             ("JES nominal",                         shift(category12, 'nom'    )),
 ##             ("JES up",                              shift(category12, 'jesUp'  )),
 ##             ("JES down",                            shift(category12, 'jesDown')),  ]),
-##         ( "category 2.2: JES",("m_sv",70,-10,340),[
-##             ("nominal",                                   category22            ),
-##             ("JES nominal",                         shift(category22, 'nom'    )),
-##             ("JES up",                              shift(category22, 'jesUp'  )),
-##             ("JES down",                            shift(category22, 'jesDown')),  ]),
 ##         ( "category 1.2: UncEn",("m_sv",70,-10,340),[
 ##             ("nominal",                                   category12            ),
 ##             ("UncEn up",                            shift(category12, 'UncEnUp'  )),
 ##             ("UncEn down",                          shift(category12, 'UncEnDown')),  ]),
-##         ( "category 2.2: UncEn",("m_sv",70,-10,340),[
-##             ("nominal",                                   category22            ),
-##             ("UncEn up",                            shift(category22, 'UncEnUp'  )),
-##             ("UncEn down",                          shift(category22, 'UncEnDown')),  ]),
 #        ( "tau MVA isolation ID",("m_vis",30,0,200),[
 #            ("tight",            "iso_2==1 && dR_ll>0.5"             ),
 #            ("loose",            "iso_2==1 && dR_ll>0.5"             ),  ]),
@@ -1345,8 +1291,6 @@ def drawHist2D(hist,**kwargs):
 #    weight0     = "" #"weight*trigweight_or_1" #*ttptweight_runI/ttptweight"
 #    samples     = [#("TT",  "TT_TuneCUETP8M1",               "ttbar",            831.76,  "ttptweight_runI/ttptweight"  ),
 #                   ("WJ",  "WJetsToLNu",                     "W + jets",         50380.0 ),
-#                   #("WJ",  "WJetsToLNu_TuneCUETP8M1",       "W + jets",         50380.0 ),
-#                   #("WJ",  "W1JetsToLNu_TuneCUETP8M1",      "W + 1J",            9644.5 ),
 #                   #("DY",  "DYJetsToLL_M-50_TuneCUETP8M1",  "Drell-Yan 50",      4954.0 ),
 #                   #("DY",  "DY1JetsToLL_M-50_TuneCUETP8M1", "Drell-Yan 1J 50",   1012.5 ),
 ##                    ("VBF", "VBFHToTauTau_M125_13TeV_powheg_pythia8", "VBF 125",    10.0 ),
@@ -1514,33 +1458,11 @@ def drawHist2D(hist,**kwargs):
 #            print ">>>   %10s: entries: %d" % (newlabel,tree2.GetEntries(cut))
 #            
 #            vars = [
-##                 ( "pfmt_1",                              80,      0, 200 ),
-##                 ( "dilepton_veto",                        2,      0, 2.0 ),
-##                 ( "extraelec_veto",                       2,      0, 2.0 ),
-##                 ( "extramuon_veto",                       2,      0, 2.0 ),
-##                 ( "lepton_vetos",                         2,      0, 2.0 ),
-##                 ( "againstElectronVLooseMVA6_2",          2,      0, 2.0 ),
-##                 ( "againstMuonTight3_2",                  2,      0, 2.0 ),
-##                 ( "lepton_vetos",                         2,      0, 2.0 ),
-##                 ( "iso_1",                               50,      0, 0.3 ),
-##                 ( "iso_2",                               50,      0, 0.3 ),
-##                 ( "pt_1",                               100,      0, 100 ),
-##                 ( "pt_2",                               100,      0, 100 ),
 #                ( "q_1",                                  5,     -2,   3 ),
 #                ( "q_2",                                  5,     -2,   3 ),
-##                 ( "abs(eta_1)",                          50,      0, 2.5 ),
-##                 ( "abs(eta_2)",                          50,      0, 2.5 ),
-##                 ( "q_1",                                100,       -4, 4 ),
-##                 ( "q_2",                                100,       -4, 4 ),
 #            ]
 #            weightvars = [
 #                ( "weight",                             100,   -0.2, 1.5 ),
-#                (("weight",     "weight*trigweight_1"), 100,   -0.2, 1.5 ),
-#                ( "trigweight_1",                       100,   -0.2, 1.5 ),
-#                (("trigweight_1_or","trigweight_or_1"), 100, -0.2, 1.5 ),
-#                ( "trigweight_2",                       100,   -0.2, 1.5 ),
-#                ( "idisoweight_1",                      100,   -0.2, 1.5 ),
-#                ( "idisoweight_2",                      100,   -0.2, 1.5 ),
 #                ( "puweight",                           100,   -0.2, 1.5 ),
 #                ( "weightbtag",                         100,   -0.2, 1.5 ),
 #                ( "ttptweight",                         100,   -0.2, 1.5 ),
@@ -1850,296 +1772,6 @@ def drawHist2D(hist,**kwargs):
 #
 #
 #
-#
-#def zptweight():
-#    print ">>>\n>>> vertexDY()"
-#    
-#    DIR  = "/shome/ineuteli/analysis/SFrameAnalysis_Moriond/RecoilCorrections/data/"
-#    file1 = TFile( DIR + "Zpt_weights.root" )
-#    file2 = TFile( DIR + "Zpt_weights_2016_BtoH.root" )
-#    
-#    histname = "zptmass_histo"
-#    hist1 = file1.Get(histname)
-#    hist2 = file2.Get(histname)
-#    var = histname
-#
-#    for hist, period in [(hist1,"ICHEP"),(hist2,"Moriond")]:
-#
-#
-#        print ">>>   %s - %s" % (histname, period)
-#        canvas = TCanvas("canvas","canvas",100,100,800,600)
-#        canvas.SetBottomMargin(0.12)
-#        canvas.SetRightMargin(0.10)
-#        canvas.SetLeftMargin(0.12)
-#        canvas.SetTopMargin(0.05)
-#        hist.Draw("colz")
-#        hist.SetTitle("")
-#        hist.GetZaxis().SetRangeUser(0.75,2.0)
-#        hist.GetXaxis().SetRangeUser(0,100)
-#        hist.GetYaxis().SetRangeUser(0,200)
-#        hist.GetXaxis().SetTitle("Z mass")
-#        hist.GetYaxis().SetTitle("Z pt")
-#        hist.GetXaxis().SetTitleSize(0.06)
-#        hist.GetYaxis().SetTitleSize(0.06)
-#        hist.GetXaxis().SetTitleOffset(0.9)
-#        hist.GetXaxis().SetLabelSize(0.045)
-#        hist.GetYaxis().SetLabelSize(0.045)
-#        gStyle.SetOptStat(0)
-#        canvas.SaveAs("%s/%s_%s.png" % (OUT_DIR,histname,period))
-#        canvas.Close()
-#        
-#    file1.Close()
-#    file2.Close()
-#    
-#
-#
-#
-#
-#def trigweight():
-#    """Compare shapes of different files."""
-#    print ">>>\n>>> trigweight()"
-#    
-#    channel  = "mutau"
-#    treename = "tree_%s" % channel
-#    vars     = [("trigweight_1","trigger weight",100,0,3), ("trigweight_1","trigger weight",100,0,3)]
-#    samples  = [
-#        #("DY",  "DYJetsToLL_M-10to50_TuneCUETP8M1", "DY M-10to50" ),
-#        ("DY",  "DYJetsToLL_M-50_TuneCUETP8M1", "DY M-50" ),
-#    ]
-#    cuts = [
-#        ("no cuts",  "channel>0"),
-#        ("baseline", "channel>0 && iso_cuts==1 && lepton_vetos==0 && q_1*q_2<0"),
-#    ]
-#    
-#    for var, varnam, N,a,b in vars:
-#        for cutname, cut in cuts:
-#            for sampledir, samplename, samplelabel in samples:
-#                
-#                file = TFile("%s/%s/TauTauAnalysis.%s_Moriond.root"%(MORIOND_DIR,sampledir,samplename))
-#                tree = file.Get(treename)
-#        
-#                hist1 = TH1F("hist1", "%s_L"%var, N, a, b)
-#                hist2 = TH1F("hist2", "%s_X"%var, N, a, b)
-#                hist3 = TH1F("hist3", "%s_B"%var, N, a, b)
-#                
-#                tree.Draw("%s >> hist1"%(var),"%s && triggers==1 && pt_1>23"%(cut),"gOff")
-#                tree.Draw("%s >> hist2"%(var),"%s && triggers==2"%(cut),"gOff")
-#                tree.Draw("%s >> hist3"%(var),"%s && triggers==3 && pt_1>23"%(cut),"gOff")
-#                
-#                maxs = [ ] 
-#                for hist in [hist1,hist2,hist3]:
-#                    I = hist.Integral()
-#                    print ">>>   %s has %d entries" % (hist.GetName(),I)
-#                    if I:
-#                        hist.Scale(1./I)
-#                        maxs.append(hist.GetMaximum())
-#                
-#                print ">>>   %s - %s" % (samplelabel,var)
-#                canvas = TCanvas("canvas","canvas",100,100,800,600)
-#                canvas.SetBottomMargin(0.12)
-#                canvas.SetRightMargin(0.05)
-#                canvas.SetLeftMargin(0.12)
-#                canvas.SetTopMargin(0.05)
-#                hist1.SetLineWidth(3)
-#                hist1.SetLineStyle(1)
-#                hist1.SetLineColor(kAzure+4)
-#                hist2.SetLineWidth(3)
-#                hist2.SetLineStyle(2)
-#                hist2.SetLineColor(kRed+3)
-#                hist3.SetLineWidth(3)
-#                hist3.SetLineStyle(3)
-#                hist3.SetLineColor(kGreen+3)
-#                hist1.Draw("hist")
-#                hist2.Draw("histsame")
-#                hist3.Draw("histsame")
-#                hist1.SetTitle("")
-#                
-#                xlabel = varname
-#                if "trigweight_1" in var: xlabel="new trigger weight"
-#                if "trigweight_2" in var: xlabel="old trigger weight"
-#                hist1.GetXaxis().SetTitle(xlabel)
-#                hist1.GetYaxis().SetTitle("A.U.")
-#                hist1.GetXaxis().SetTitleSize(0.06)
-#                hist1.GetYaxis().SetTitleSize(0.06)
-#                hist1.GetXaxis().SetTitleOffset(0.9)
-#                hist1.GetYaxis().SetTitleOffset(0.9)
-#                hist1.GetXaxis().SetLabelSize(0.045)
-#                hist1.GetYaxis().SetLabelSize(0.045)
-#                hist1.GetYaxis().SetRangeUser(0,max(maxs)*1.08)
-#                
-#                (x1,y1) = (0.57,0.88)
-#                (w,h)   = (0.18,0.24)
-#                (x2,y2) = (x1+w,y1-h)
-#                legend = TLegend(x1,y1,x2,y2)
-#                legend.SetHeader("%s: %s"%(samplelabel,cutname))
-#                legend.AddEntry(hist1," L && !X && pt_1>23", 'l')
-#                legend.AddEntry(hist2,"!L &&  X", 'l')
-#                legend.AddEntry(hist3," L &&  X", 'l')
-#                legend.SetTextFont(42)
-#                legend.SetTextSize(0.045)
-#                legend.SetBorderSize(0)
-#                legend.SetFillStyle(0)
-#                legend.Draw()
-#                
-#                gStyle.SetOptStat(0)
-#                filename = ("%s/%s_%s_%s.png"%(OUT_DIR,var,samplelabel,cutname)).replace(' ','_')
-#                canvas.SaveAs(filename)
-#                canvas.Close()
-#                ROOT.gDirectory.Delete(hist1.GetName())
-#                ROOT.gDirectory.Delete(hist2.GetName())
-#                ROOT.gDirectory.Delete(hist3.GetName())
-#                
-#                file.Close()
-#
-#
-#
-#
-#def triggers():
-#    print ">>>\n>>> triggers()"
-#    
-#    channel  = "mutau"
-#    treename = "tree_%s" % channel
-#    var      = "triggers"
-#    samples  = [
-#        #("DY",  "DYJetsToLL_M-10to50_TuneCUETP8M1", "DY M-10to50" ),
-#        ("DY",  "DYJetsToLL_M-50_TuneCUETP8M1", "DY M-50" ),
-#    ]
-#    cuts = [
-#        ("no cuts",  "channel>0"),
-#        ("baseline", "channel>0 && iso_cuts==1 && lepton_vetos==0 && q_1*q_2<0"),             
-#    ]
-#    (N,a,b)  = (3,1,4)
-#    
-#    for cutname, cut in cuts:
-#        for sampledir, samplename, samplelabel in samples:
-#            
-#            file = TFile("%s/%s/TauTauAnalysis.%s_Moriond.root"%(MORIOND_DIR,sampledir,samplename))
-#            tree = file.Get(treename)
-#            
-#            hist1 = TH1F("hist1", "triggers", N, a, b)            
-#            tree.Draw("%s >> hist1"%(var),cut,"gOff")
-#            
-#            maxs = [ ] 
-#            I = hist1.Integral()
-#            print ">>>   %s has %d entries" % (hist1.GetName(),I)
-#            if I:
-#                hist1.Scale(1./I)
-#                maxs.append(hist1.GetMaximum())
-#            
-#            print ">>>   %s - %s" % (samplelabel,var)
-#            canvas = TCanvas("canvas","canvas",100,100,800,600)
-#            canvas.SetBottomMargin(0.12)
-#            canvas.SetRightMargin(0.05)
-#            canvas.SetLeftMargin(0.12)
-#            canvas.SetTopMargin(0.05)
-#            hist1.SetLineWidth(3)
-#            hist1.SetLineStyle(1)
-#            hist1.SetLineColor(kAzure+4)
-#            hist1.Draw("hist")
-#            #hist1.SetTitle("%s: %s"%(samplelabel,cutname))
-#            
-#            hist1.GetXaxis().SetBinLabel(hist1.GetXaxis().FindBin(1),"L && !X")
-#            hist1.GetXaxis().SetBinLabel(hist1.GetXaxis().FindBin(2),"!L && X")
-#            hist1.GetXaxis().SetBinLabel(hist1.GetXaxis().FindBin(3),"L && X")
-#            
-#            #hist1.GetXaxis().SetTitle("trigger weight")
-#            hist1.GetYaxis().SetTitle("A.U.")
-#            hist1.GetXaxis().SetTitleSize(0.06)
-#            hist1.GetYaxis().SetTitleSize(0.06)
-#            hist1.GetXaxis().SetTitleOffset(0.9)
-#            hist1.GetYaxis().SetTitleOffset(0.9)
-#            hist1.GetXaxis().SetLabelSize(0.080)
-#            hist1.GetYaxis().SetLabelSize(0.045)
-#            hist1.GetYaxis().SetRangeUser(0,max(maxs)*1.08)
-#            
-#            # title = "%s: %s"%(samplelabel,cutname)
-#            # (x1,y1) = (0.48,0.88)
-#            # (w,h)   = (0.18,0.24)
-#            # (x2,y2) = (x1+w,y1-h)
-#            # legend = TLegend(x1,y1,x2,y2)
-#            # legend.SetHeader(title)
-#            # legend.SetTextFont(42)
-#            # legend.SetTextSize(0.045)
-#            # legend.SetBorderSize(0)
-#            # legend.SetFillStyle(0)
-#            # legend.Draw()
-#    
-#            gStyle.SetOptStat(0)
-#            filename = ("%s/%s_%s_%s.png"%(OUT_DIR,var,samplelabel,cutname)).replace(' ','_')
-#            canvas.SaveAs(filename)
-#            canvas.Close()
-#            ROOT.gDirectory.Delete(hist1.GetName())
-#            
-#            file.Close()
-#        
-#
-#
-#def ratioTest():
-#    
-#    pads = []
-#    canvas = makeCanvas(ratio=True,pads=pads)
-#    hist1 = TH1F("hist1","hist1",50,0,100)
-#    hist2 = TH1F("hist2","hist2",50,0,100)
-#    
-#    for i in xrange(10000):
-#        hist1.Fill(gRandom.Gaus(50,20),gRandom.Gaus(1,0.1))
-#        hist2.Fill(gRandom.Gaus(50,20),gRandom.Gaus(1,0.1))
-#    stats = makeStatisticalError(hist2)
-#    ratio = makeRatio(hist1,hist2)
-#    
-#    pads[0].cd()
-#    hist1.Draw("E")
-#    hist2.Draw("HIST SAME")
-#    stats.Draw("E2 SAME")
-#    
-#    pads[1].cd()
-#    ratio.Draw("SAME")
-#    
-#    canvas.SaveAs("ratio_test.png")
-#    
-#
-#
-#def ratioTest2():
-#    
-#    hist1  = TH1F("hist1","hist1",50,0,100)
-#    hist2  = TH1F("hist2","hist2",50,0,100)
-#    hist3  = TH1F("hist3","hist3",50,0,100)
-#    
-#    hist1u = TH1F("hist1u","hist1u",10000,-50,150)
-#    hist2u = TH1F("hist2u","hist2u",10000,-50,150)
-#    hist3u = TH1F("hist3u","hist3u",10000,-50,150)
-#    
-#    for i in xrange(10000):
-#        r = gRandom.Gaus(50,20)
-#        w = gRandom.Gaus(1,0.1)
-#        hist1.Fill(r,w)
-#        hist1u.Fill(r,w)
-#    for i in xrange(10000):
-#        r = gRandom.Gaus(50,22)
-#        w = gRandom.Gaus(0.99,0.1)
-#        hist2.Fill(r,w)
-#        hist2u.Fill(r,w)
-#    for i in xrange(10000):
-#        r = gRandom.Gaus(51,20)
-#        w = gRandom.Gaus(1,0.2)
-#        hist3.Fill(r,w)
-#        hist3u.Fill(r,w)
-#        
-#    entries = ["1: nominal","2: other gaussian","3: another gaussian"]
-#    for i,histu in enumerate([hist2u,hist3u],1):
-#        Dn = hist1u.KolmogorovTest(histu)
-#        print ">>> KolmogorovTest: Dn=%.3f for %s with %s" % (Dn,hist1u.GetName(),histu.GetName())
-#        entries[i] = "%s (KS %.2f)" % (entries[i],Dn)
-#    # for i,hist in enumerate([hist2,hist3],1):
-#    #     Dn = hist1.KolmogorovTest(hist)
-#    #     print ">>> KolmogorovTest: Dn=%.3f for %s with %s" % (Dn,hist1.GetName(),hist.GetName())
-#    
-#    comparison = Comparison(hist1,hist2,hist3)
-#    comparison.Draw(title="comparing gaussians",entries=entries,markers=False,markers_ratio=False,KS=False)
-#    comparison.saveAs("ratio_test3.png")
-#    
-#    
-#
 #def writeCutTreeToFile(oldfilename,oldtreename,newfilename,newtreename,cut,overwrite=True,newdirname=""):
 #    """Write a tree to a file. Overwrite the tree by default, If the tree already exist."""
 #    
@@ -2188,51 +1820,46 @@ def main():
     
     # MAKE ALTERNATIVE SAMPLES
     samples2B = [
-#       ("DY", "DYJetsToLL_M-50_TuneCP5",           "Drell-Yan 50",        4954.0 ), # LO 4954.0; NLO 5765.4
-#       ("DY", "DY1JetsToLL_M-50_TuneCP5",          "Drell-Yan 1J 50",     1012.5 ),
-#       ("DY", "DY2JetsToLL_M-50_TuneCP5",          "Drell-Yan 2J 50",      332.8 ),
-#       ("DY", "DY3JetsToLL_M-50_TuneCP5",          "Drell-Yan 3J 50",      101.8 ),
-      ("DY", "DYJetsToLL_M-10to50_TuneCUETP8M1",  "Drell-Yan 10-50",    18610.0 ),
-      ("DY", "DY1JetsToLL_M-10to50_TuneCUETP8M1", "Drell-Yan 1J 10-50",   421.5 ),
-      ("DY", "DY2JetsToLL_M-10to50_TuneCUETP8M1", "Drell-Yan 2J 10-50",   184.3 ),
-      ("DY", "DY3JetsToLL_M-10to50_TuneCUETP8M1", "Drell-Yan 3J 10-50",    95.0 ),
-      ("DY", "DYJetsToLL_M-50_TuneCUETP8M1",      "Drell-Yan 50",        4954.0 ),
-      ("DY", "DY1JetsToLL_M-50_TuneCUETP8M1",     "Drell-Yan 1J 50",     1012.5 ),
-      ("DY", "DY2JetsToLL_M-50_TuneCUETP8M1",     "Drell-Yan 2J 50",      332.8 ),
-      ("DY", "DY3JetsToLL_M-50_TuneCUETP8M1",     "Drell-Yan 3J 50",      101.8 ),
-      ("DY", "DY4JetsToLL_M-50_TuneCUETP8M1",     "Drell-Yan 4J 50",       54.8 ),
+      ("DY", "DYJetsToLL_M-50_TuneCP5",           "Drell-Yan 50",        4954.0 ), # LO 4954.0; NLO 5765.4
+      ("DY", "DY1JetsToLL_M-50_TuneCP5",          "Drell-Yan 1J 50",     1012.5 ),
+      ("DY", "DY2JetsToLL_M-50_TuneCP5",          "Drell-Yan 2J 50",      332.8 ),
+      ("DY", "DY3JetsToLL_M-50_TuneCP5",          "Drell-Yan 3J 50",      101.8 ),
+#       ("DY", "DYJetsToLL_M-10to50_TuneCUETP8M1",  "Drell-Yan 10-50",    18610.0 ),
+#       ("DY", "DY1JetsToLL_M-10to50_TuneCUETP8M1", "Drell-Yan 1J 10-50",   421.5 ),
+#       ("DY", "DY2JetsToLL_M-10to50_TuneCUETP8M1", "Drell-Yan 2J 10-50",   184.3 ),
+#       ("DY", "DY3JetsToLL_M-10to50_TuneCUETP8M1", "Drell-Yan 3J 10-50",    95.0 ),
+#       ("DY", "DYJetsToLL_M-50_TuneCUETP8M1",      "Drell-Yan 50",        4954.0 ),
+#       ("DY", "DY1JetsToLL_M-50_TuneCUETP8M1",     "Drell-Yan 1J 50",     1012.5 ),
+#       ("DY", "DY2JetsToLL_M-50_TuneCUETP8M1",     "Drell-Yan 2J 50",      332.8 ),
+#       ("DY", "DY3JetsToLL_M-50_TuneCUETP8M1",     "Drell-Yan 3J 50",      101.8 ),
+#       ("DY", "DY4JetsToLL_M-50_TuneCUETP8M1",     "Drell-Yan 4J 50",       54.8 ),
     ]
     samples2S = [ ]
     samples2D = {
-#         'mutau' : ( "SingleMuon", "SingleMuon_Run2017", "observed" ),
-#         'mumu'  : ( "SingleMuon", "SingleMuon_Run2017", "observed" ),
+        'mutau' : ( "SingleMuon", "SingleMuon_Run2017", "observed" ),
+        'mumu'  : ( "SingleMuon", "SingleMuon_Run2017", "observed" ),
     }
-#     makeSFrameSamples(samples2D,samples2B,samples2S,weight=_weight,binN_weighted=10,cycle="DiMuonAnalysis",tag=globalTag+"_noRC")
-#     makeSFrameSamples(samples2D,samples2B,samples2S,weight=_weight,binN_weighted=10,cycle="TauTauAnalysis",tag=globalTag+"_RC")
-    makeSFrameSamples(samples2D,samples2B,samples2S,weight=_weight,binN_weighted=8,cycle="TauTauAnalysis",tag=globalTag+"_newZpt")
-#     samples2 = SampleSet(samples2D,samples2B,samples2S,channel="mumu")
-    samples2 = SampleSet(samples2D,samples2B,samples2S,channel="mutau")
+    makeSFrameSamples(samples2D,samples2B,samples2S,weight=_weight,binN_weighted=10,cycle="DiMuonAnalysis",tag=globalTag+"_noRC")
+    ###makeSFrameSamples(samples2D,samples2B,samples2S,weight=_weight,binN_weighted=10,cycle="TauTauAnalysis",tag=globalTag+"_RC")
+    ###makeSFrameSamples(samples2D,samples2B,samples2S,weight="getZpt(pt_genboson)",binN_weighted=8,cycle="TauTauAnalysis",tag=globalTag) #+"_newZpt"
+    samples2 = SampleSet(samples2D,samples2B,samples2S,channel="mumu")
+    #samples2 = SampleSet(samples2D,samples2B,samples2S,channel="mutau")
     samples2.printTable()
     samples2.stitch("DY*J*M-50",     name_incl="DYJ", name="DY_M-50",     title="Drell-Yan" )
-    samples2.stitch("DY*J*M-10to50", name_incl="DYJ", name="DY_M-10to50", title="Drell-Yan 10<M<50GeV"  )
-    samples2.merge( 'DY',                             name="DY",          title="Drell-Yan"             )
-
+    ###samples2.stitch("DY*J*M-10to50", name_incl="DYJ", name="DY_M-10to50", title="Drell-Yan 10<M<50GeV"  )
+    ###samples2.merge( 'DY',                             name="DY",          title="Drell-Yan"             )
     
     # MAIN ROUTINES
+    plotHist2D()
+#     plotHist2DFromSFrameSamples()
 #     purity(samples)
 #     TTSFs(samples)
-#     plotHist2D(samples)
+#     plotHist2DFromSFrameSamples(samples)
 #     compareSelectionsForSFrameSample(samples)
 #     compareSFrameSamples(samples,samples2)
-    compareSFrameSamples(samples2,samples)
+#     compareSFrameSamples(samples2,samples)
     
-    #plotSampleShapes(samples,channel,DIR=OUT_DIR)
-    #plotStacks(samples,channel,DIR=OUT_DIR)
-    #compareSFrameHistograms()
-    #compareSFrameHistogram()
-    #compareSFrameHistogram2D()
-    #quicktest()
-    
+        
     print ">>>\n>>> done\n"
     
     

@@ -37,18 +37,18 @@ def combineCuts(*cuts,**kwargs):
     
     # TODO: take "or" into account with parentheses
     for cut in cuts:
-        if "||" in cuts: LOG.warning("combineCuts - Be careful with those \"or\" statements!")
+        if "||" in cuts: LOG.warning('combineCuts - Be careful with those "or" statements!')
         # [cut.strip() for i in cut.split('||')]
     
     if weight:
-      string = re.sub("\(.*\)","",weight)
+      string = re.sub("\(.+\)","",weight)
       if re.search(r"[=<>\+\-\&\|]",string):
         weight = "(%s)"%weight
     
     if cuts:
       cuts = " && ".join(cuts)
       if weight:
-        string = re.sub("\(.*\)","",cuts)
+        string = re.sub("\(.+\)","",cuts)
         if re.search(r"[=<>\+\-\&\|]",string):
           cuts = "(%s)*%s"%(cuts,weight)
         else:
@@ -66,11 +66,16 @@ def combineCuts(*cuts,**kwargs):
 def stripWeights(cuts):
     """Help function to remove weights and extract main selection string.
     e.g. '(pt>1 && abs(eta)<1)*weight' -> 'pt>1 && abs(eta)<1.5'"""
-    matches = re.findall(r"\(([^)\?:]+)\)",cuts)
+    matches = re.findall(r"\(([^)]+\(.+\|\|[^(\?:,]+\)[^(\?:,]+)\)",cuts)
+    if not matches:
+      matches = re.findall(r"^[^()\?:,]+\(.+\|\|[^(\?:,]+\)[^()\?:,]+$",cuts)
+    if not matches:
+      matches = re.findall(r"(?<!\w)\(([^)\?:,]+)\)",cuts)
+    #print matches
     if len(matches)==0:
       return cuts
     elif len(matches)>1:
-      LOG.warning('stripWeights: %d selection string matches in "%s"! Going with first.'%(len(matches),cuts))
+      LOG.warning('stripWeights: %d selection string matches in "%s"! Going with the first: "%s"'%(len(matches),cuts,matches[0]))
     return matches[0]
     
 
@@ -171,10 +176,11 @@ def relaxJetSelection(cuts,**kwargs):
          1) remove b tag requirements
          2) relax central jet requirements."""
     
+    ncjets_relaxed  = "ncjets>1" if "ncjets==2" in cuts.replace(' ','') else "ncjets>0"
     verbosity       = max(kwargs.get('verbosity',0),verbositySelectionTools)
-    channel         = kwargs.get('channel','mutau')
-    btags_relaxed   = kwargs.get('btags',"")
-    cjets_relaxed   = kwargs.get('ncjets',"ncjets>1" if "ncjets==2" in cuts.replace(' ','') else "ncjets>0")
+    channel         = kwargs.get('channel', 'mutau'        )
+    btags_relaxed   = kwargs.get('btags',   ""             )
+    cjets_relaxed   = kwargs.get('ncjets',  ncjets_relaxed )
     cuts0           = cuts
     
     # MATCH PATTERNS
@@ -182,17 +188,23 @@ def relaxJetSelection(cuts,**kwargs):
     cjets  = re.findall(r"&*\ *ncjets(?:20)?\ *[<=>]=?\ *\d+\ *",cuts)
     cjets += re.findall(r"&*\ *nc?btag(?:20)?\ *[<=>]=?\ *ncjets(?:20)?\ *",cuts)
     LOG.verbose('relaxJetSelection:\n>>>   btags = %s\n>>>   cjets = "%s"' % (btags,cjets),verbosity,level=2)
+    if len(btags)>1: LOG.warning('relaxJetSelection: More than one btags match! Only using first instance in cuts "%s"'%cuts)
+    if len(cjets)>1: LOG.warning('relaxJetSelection: More than one cjets match! Only using first instance in cuts "%s"'%cuts)
     
     # REPLACE
+    #if len(btags):
+    #    cuts = cuts.replace(btags[0],'')
+    #    if btags_relaxed: cuts = "%s && %s"%(cuts,btags_relaxed)
+    #if len(cjets):
+    #    cuts = cuts.replace(cjets[0],'')
+    #    cuts = "%s && %s"%(cuts,cjets_relaxed)
     if len(btags) and len(cjets):
-        if len(btags)>1: LOG.warning("relaxJetSelection: More than one btags match! cuts=%s"%cuts)
-        if len(cjets)>1: LOG.warning("relaxJetSelection: More than one cjets match! cuts=%s"%cuts)
         cuts = cuts.replace(btags[0],'')
         cuts = cuts.replace(cjets[0],'')
         if btags_relaxed: cuts = "%s && %s && %s" % (cuts,btags_relaxed,cjets_relaxed)
         else:             cuts = "%s && %s"       % (cuts,              cjets_relaxed)
-    elif cuts:
-        if len(btags) or len(cjets): LOG.warning("relaxJetSelection: %d btags and %d cjets matches! cuts=%s"%(len(btags),len(cjets),cuts))
+    #elif len(btags) or len(cjets):
+    #    LOG.warning("relaxJetSelection: %d btags and %d cjets matches! cuts=%s"%(len(btags),len(cjets),cuts))
     cuts = cuts.lstrip(' ').lstrip('&').lstrip(' ')
     
     LOG.verbose('  "%s"\n>>>   -> "%s"\n>>>'%(cuts0,cuts),verbosity,level=2)
@@ -228,7 +240,7 @@ def vetoJetTauFakes(cuts,**kwargs):
       elif not '6' in genmatch: # "gen_match_2!=*"
         cuts = combineCuts(cuts,"gen_match_2!=6")
     elif "=6" in genmatch: # "gen_match_2*=6"
-        LOG.warning('vetoFakeRate: selection "%s" set to "0"!'%(cuts)) 
+        LOG.warning('vetoFakeRate: selection "%s" with "%s" set to "0"!'%(cuts,genmatch)) 
         cuts = "0"
     elif '>' in genmatch: # "gen_match_2>*"
         cuts = combineCuts(cuts,"gen_match_2!=6")
@@ -263,7 +275,7 @@ class Selection(object):
         self.filename    = kwargs.get('filename', makeFileName(self.name)) # for file
         self.selection   = ""
         if len(args)==1:
-          self.title     = kwargs.get('title',    makeLatex(   self.name)) # for plot axes
+          self.title     = kwargs.get('title',    makeTitle(   self.name)) # for plot axes
           self.selection = unwrapSelection(args[0])
         elif len(args)==2:
           self.title     = args[0]
@@ -299,7 +311,7 @@ class Selection(object):
     def __add__(self, selection2):
         """Add selections by combining their selection string (can be string or Selection object)."""
         if isinstance(selection2,str):
-          selection2 = Selection(selection2,selection2) # make selection object
+          selection2 = Selection("",selection2) # make selection object
         return combine(selection2)
     
     def __mul__(self, weight):
@@ -333,9 +345,9 @@ class Selection(object):
     
     def combine(self, *selection2s):
         # TODO: check if selection2 is a string, if possible
-        name     = ", ".join([self.name]    +[s.name for s in selection2s])
-        title    = ", ".join([self.title]   +[s.title for s in selection2s])
-        filename = ", ".join([self.filename]+[s.filename for s in selection2s])
+        name     = ", ".join([self.name]    +[s.name     for s in selection2s if s.name    ])
+        title    = ", ".join([self.title]   +[s.title    for s in selection2s if s.title   ])
+        filename = ", ".join([self.filename]+[s.filename for s in selection2s if s.filename])
         cuts     = combineCuts(*([self.cut]+[s.cut for s in selection2s ]))
         sum      = Selection(name,cuts,title=title,filename=filename)
         return sum
@@ -372,6 +384,29 @@ class Selection(object):
     def shiftSelection(self,shifts,**kwargs):
         return shift(self.name,shifts,**kwargs)
     
+    def isPartOf(self, *searchterms, **kwargs):
+        """Check if all labels are in the sample's name, title or tags."""
+        searchterms = [l for l in searchterms if l!='']
+        if not searchterms: return False
+        found       = True
+        regex       = kwargs.get('regex',       False   )
+        exlcusive   = kwargs.get('exclusive',   True    )
+        labels      = [self.name,self.title]
+        for searchterm in searchterms:
+          if not regex:
+              searchterm = re.sub(r"(?<!\\)\+",r"\+",searchterm) # replace + with \+
+              searchterm = re.sub(r"([^\.])\*",r"\1.*",searchterm) # replace * with .*
+          if exlcusive:
+              for samplelabel in labels:
+                  matches = re.findall(searchterm,samplelabel)
+                  if matches: break
+              else: return False # none of the labels contain the searchterm
+          else: # inclusive
+              for samplelabel in labels:
+                  matches = re.findall(searchterm,samplelabel)
+                  if matches: return True # one of the searchterm has been found
+        return exlcusive
+    
 def sel(*args,**kwargs):
     """Shorthand for Selection class."""
     return Selection(*args,**kwargs)
@@ -384,12 +419,45 @@ def unwrapSelection(selection,**kwargs):
 
 def unwrapVariableSelection(*args,**kwargs):
     """Help function to unwrap arguments that contain variable and selection."""
-    # TODO: return variable binning xbins?
-    if   len(args)==5 or len(args)==6:
-      return args
-    elif len(args)==2 and isinstance(args[0],Variable) and isinstance(args[1],Selection):
-      return args[0].unwrap()+(unwrapSelection(args[1]),)
-    LOG.warning('unwrapVariableSelection - Could not unwrap arguments "%s", len(args)=%d. Returning None.'%(args,len(args)))
-    return None
-        
+    if len(args)==1 and isList(args[0]):
+      args = args[0]
+    if   len(args)==5:
+      xvar, nxbins, xmin, xmax, cuts = args
+      xbins = [ ]
+    elif len(args)==2 and isinstance(args[0],Variable):
+      xvar, nxbins, xmin, xmax = args[0].unwrap()
+      xbins = args[0].xbins
+      cuts = unwrapSelection(args[1]) if isinstance(args[1],Selection) else args[1]
+    elif len(args)==3 and isList(args[1]):
+      xvar, xbins, cuts = args
+      nxbins, xmin, xmax = len(xbins)-1, xbins[0], xbins[-1]
+    else:
+      LOG.error('unwrapVariableSelection - Could not unwrap arguments "%s", len(args)=%d. Returning None.'%(args,len(args)))
+    return xvar, nxbins, xmin, xmax, xbins, cuts
+    
+def unwrapVariableSelection2D(*args,**kwargs):
+    """Help function to unwrap 2D arguments that contain variable and selection."""
+    if len(args)==1 and isList(args[0]):
+      args = args[0]
+    if len(args)==9:
+      xvar, nxbins, xmin, xmax, yvar, nybins, ymin, ymax, cuts = args
+      xbins, ybins = [ ], [ ]
+    elif len(args)==5 and isList(args[1]) and isList(args[3]):
+      xvar, xbins, yvar, ybins, cuts = args
+      nxbins, xmin, xmax = len(xbins)-1, xbins[0], xbins[-1]
+      nybins, ymin, ymax = len(ybins)-1, ybins[0], ybins[-1]
+    elif len(args)==7 and isList(args[1]):
+      xvar, xbins, yvar, nybins, ymin, ymax, cuts = args
+      nxbins, xmin, xmax = len(xbins)-1, xbins[0], xbins[-1]
+    elif len(args)==7 and isList(args[5]):
+      xvar, nxbins, xmin, xmax, yvar, ybins, cuts = args
+      nybins, ymin, ymax = len(ybins)-1, ybins[0], ybins[-1]
+    else:
+      LOG.error('unwrapVariableSelection - Could not unwrap arguments "%s", len(args)=%d. Returning None.'%(args,len(args)))
+    return xvar, nxbins, xmin, xmax, xbins, yvar, nybins, ymin, ymax, ybins, cuts
+
+
+
+
+
 

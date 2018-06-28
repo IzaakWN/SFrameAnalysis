@@ -32,6 +32,84 @@ tdrstyle.setTDRStyle()
 
 
 
+def compareSampleEfficiency():
+    print ">>>\n>>> compareSampleEfficiency()"
+    
+    MORIOND_DIR  = "/scratch/ineuteli/SFrameAnalysis/AnalysisOutput_ltau2017"
+    
+    cuts = [
+        ("lepton-tau",      "channel>0"                                 ),
+        ("PU>0",            "channel>0 && npu>0"                        ),
+    ]
+    
+    samples = [ 
+        ("TT", "TTTo2L2Nu",                                "ttbar 2l2#nu",       ),
+        ("TT", "TTToHadronic",                             "ttbar hadronic",     ),
+        ("TT", "TTToSemiLeptonic",                         "ttbar semileptonic", ),
+        ("ST", "ST_t-channel_top_4f_inclusiveDecays",      "ST t-channel t",     ),
+        ("ST", "ST_t-channel_antitop_4f_inclusiveDecays",  "ST t-channel at",    ),
+        ("ST", "ST_tW_top_5f_inclusiveDecays",             "ST tW",              ),
+        ("ST", "ST_tW_antitop_5f_inclusiveDecays",         "ST atW",             ),
+        ("WW", "WW_TuneCP5",                               "WW",                 ),
+        ("WZ", "WZ_TuneCP5",                               "WZ",                 ),
+        ("ZZ", "ZZ_TuneCP5",                               "ZZ",                 ),
+        ("WJ", "WJetsToLNu",                               "W + jets",           ),
+        ("WJ", "W1JetsToLNu",                              "W + 1J",             ),
+        ("WJ", "W2JetsToLNu",                              "W + 2J",             ),
+        ("WJ", "W3JetsToLNu",                              "W + 3J",             ),
+        ("WJ", "W4JetsToLNu",                              "W + 4J",             ),
+        ("DY", "DYJetsToLL_M-50",                          "Drell Yan 50",       ),
+        ("DY", "DY1JetsToLL_M-50",                         "Drell Yan 1J 50",    ),
+        ("DY", "DY2JetsToLL_M-50",                         "Drell Yan 2J 50",    ),
+        ("DY", "DY3JetsToLL_M-50",                         "Drell Yan 3J 50",    ),
+    ]
+    
+    length = 10
+    
+    for sampledir,sample,shortname in samples:
+        
+        (SAMPLE_DIR,cutflow,cuts,channel) = (MORIOND_DIR,cuts,"mutau")
+        filename = "%s/%s/TauTauAnalysis.%s_Moriond.root" % (SAMPLE_DIR,sampledir,sample)
+        print ">>>   loading %s (%s)..." % (shortname,filename)
+        
+        table    = ""
+        cutlabel = ""
+        if "tau" in channel: cutlabel = "_relaxed"
+        
+        file = TFile(filename)
+        hist = file.Get("histogram_%s/cutflow_%s"%(channel,channel))
+        tree = file.Get("tree_%s%s"%(channel,cutlabel))
+        
+        length = max(floor(log(hist.GetBinContent(1),10)),len(shortname),8)+1
+        #formatter_s = "%%s %%%ds"%(length)
+        #formatter_d = "%%s %%%dd"%(length)
+        
+        header = ">>> %10s %10s %10s %10s"%("cut name","events","abs eff","rel eff")
+        #for label in ["cut name","events","abs eff","rel eff"]:
+        #  header = formatter_s%(header,label)
+        print header
+        
+        efficiencies_tree = getEfficienciesFromTree(tree,cuts,N=hist.GetBinContent(1))
+        for i,effs in enumerate(efficiencies_tree):
+            row = ">>> %10s %10d %10.2f %10.2f"%effs
+            #for eff in effs: row = formatter_d%(row,eff)
+            print row
+        
+        # PRINT hist table
+        #print ">>>\n>>>\n>>> %s %s" % (setname,"cutflow")    
+        #print header
+        #for i,row in enumerate(table_hist):
+        #    if i in [1,3]: continue
+        #    print row
+        
+        # PRINT tree table
+        #for i,row in enumerate(table_tree):
+        #    print row
+        
+        print ">>>"
+
+
+
 def compareSampleSetEfficiency():
     print ">>>\n>>> compareSampleSetEfficiency()"
     
@@ -553,11 +631,12 @@ def main():
     
     # MAIN CHECKS
     #compareOldToNew()
+    compareSampleEfficiency()
 #     compareDataSetEfficiencies()
 #     compareTriggerEfficiencies()
 #     compareSampleSetEfficiency()
 #     compareOldToNewEfficiency()
-    writeRunNumbers()
+#     writeRunNumbers()
     
     print ">>>\n>>> done\n"
     

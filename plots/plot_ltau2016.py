@@ -33,6 +33,8 @@ parser.add_argument( "-t", "--plot-tag", dest="plottag", type=str, default="", a
                      metavar="TAG", help="" )
 parser.add_argument( "-v", "--verbose", dest="verbose", default=False, action='store_true',
                      help="make script verbose" )
+parser.add_argument( "-p", "--pdf", dest="pdf", default=False, action='store_true',
+                     help="save plot as pdf as well" )
 parser.add_argument( "-n", "--no-WJ-renom", dest="noWJrenorm", default=False, action='store_true',
                      help="renormalize W+Jets" )
 # parser.add_argument( "-y", "--verbosity", dest="verbosity", type=int, default=0, action='store',
@@ -71,9 +73,12 @@ def plotStacks(samples, channel, **kwargs):
     stack       = True #and False
     staterror   = True
     errorbars   = (not staterror)
-    data        = True
+    data        = drawData
+    signal      = drawSignal
     blind       = True
     ratio       = data
+    exts        = [ 'png' ]
+    if args.pdf: exts.append('pdf') 
     
     # LOOP over SELECTIONS
     for selection in selections:
@@ -81,7 +86,7 @@ def plotStacks(samples, channel, **kwargs):
         
         if normalizeTT:
           samples.renormalizeTT(selection,baseline=baseline)
-        scaleup = 0.013 if "category" in selection.name else 1.
+        scaleup = 0.020 if "category" in selection.name else 0.030 if "1 b tag" in selection.name else 1.
         
         # LOOP over VARIABLES
         for variable in variables:
@@ -91,8 +96,9 @@ def plotStacks(samples, channel, **kwargs):
               print ">>> plotStacks: ignoting %s for %s"%(variable.printWithBinning(),selection); continue
             
             # NAME
-            filename = "%s/%s_%s%s.png" % (DIR,variable.filename,selection.filename,label)
-            filename = makeFileName(filename)
+            filename   = "%s/%s_%s%s.png" % (DIR,variable.filename,selection.filename,label)
+            filename   = makeFileName(filename)
+            saveToFile = False #filename.replace('.png','.root')
             
             # TITLE
             name  = variable.name
@@ -105,15 +111,16 @@ def plotStacks(samples, channel, **kwargs):
             if "eta_" in name[:6] or "d0" in name:
               position = "leftleft"
             logy = variable.logy
+            #position = "rightright"
             
             # QCD
             QCD = doQCD and ("gen_match" not in variable.name or "npu" not in variable.name)
             
             # PLOT
-            plot = samples.plotStack(variable,selection,name=name,title=title,channel=channel,QCD=QCD,scaleup=scaleup)
-            plot.plot(stack=stack,position=position,staterror=staterror,logy=logy,ratio=ratio,errorbars=errorbars,data=data,
-                      blind=blind,linestyle=False)
-            plot.saveAs(filename)
+            plot = samples.plotStack(variable,selection,name=name,title=title,channel=channel,QCD=QCD,scaleup=scaleup,saveToFile=saveToFile,signal=signal)
+            plot.plot(stack=stack,position=position,staterror=staterror,logy=logy,ratio=ratio,errorbars=errorbars,data=data,signal=signal,
+                      blind=blind,linestyle=False,textsize=0.036)
+            plot.saveAs(filename,ext=exts)
             
 
 
@@ -250,10 +257,10 @@ def main():
     global channels
     #if args.category > -1: selectCategory(args.category)
     #if args.channel:       selectChannel(args.channel)
-    #if args.etau or args.mutau:
-    #    channels = [ ]
-    #    if args.etau:  channels.append("etau")
-    #    if args.mutau: channels.append("mutau")
+    if args.etau or args.mutau:
+        channels = [ ]
+        if args.etau:  channels.append("etau")
+        if args.mutau: channels.append("mutau")
     
     
     # LOOP over CHANNELS
@@ -293,7 +300,7 @@ def main():
             #if doJTF:
             #  samples_JTFUp.renormalizeWJ(  baseline, QCD=doQCD, reset=True, verbosity=verbosityWJ)
             #  samples_JTFDown.renormalizeWJ(baseline, QCD=doQCD, reset=True, verbosity=verbosityWJ)
-        else: LOG.warning("Not WJ renormalized! (normalizeWJ=%s, user flag=%s, channel=%s)" % (normalizeWJ,args.noWJrenorm,channel))
+        else: LOG.warning("Not WJ renormalized! (normalizeWJ=%s, user flag=%s, channel=%s)"%(normalizeWJ,args.noWJrenorm,channel))
         print ">>> "
         
         # DIRECTORIES

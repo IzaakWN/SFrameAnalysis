@@ -88,7 +88,7 @@ def checkDataCardHistograms():
     # writeDataCardHistogram #
     ##########################
 
-def writeDataCard(sampleset, channel, var, binWidth, a, b, **kwargs):
+def writeDataCard(sampleset, channel, var, binWidth, xmin, xmax, **kwargs):
     """Make histogram from a variable in a tree and write to a new root file."""
     
     verbosity   = kwargs.get('verbosity',   0               )
@@ -111,8 +111,8 @@ def writeDataCard(sampleset, channel, var, binWidth, a, b, **kwargs):
     Zpt         = kwargs.get('Zpt',         ""              )
     TTpt        = kwargs.get('TTpt',        ""              )
     QCD_WJ      = kwargs.get('QCD_WJ',      ""              )
-    shiftQCD    = kwargs.get('shiftQCD',   0               ) # e.g 0.30
-    nBins       = int(kwargs.get('nBins',   (b-a)/binWidth ))
+    shiftQCD    = kwargs.get('shiftQCD',    0               ) # e.g 0.30
+    nBins       = int(kwargs.get('nBins',   (xmax-xmin)/binWidth ))
     option      = 'RECREATE' if recreate else 'UPDATE'
     doShift     = TES or EES or LTF or JTF or JES or JER or UncEn or Zpt or TTpt
     extraweight = ""
@@ -347,7 +347,7 @@ def writeDataCard(sampleset, channel, var, binWidth, a, b, **kwargs):
     
     # LOOP over CATEGORIES
     skipWJrenorm = 'emu' in channel or 'WJ' not in samples_dict
-    print ">>> writing %s shapes to %s (%sd)" % (var,outfilename,option)
+    print ">>> writing %s(%d,%s,%s) shapes to %s (%sd)" % (var,nBins,xmin,xmax,outfilename,option)
     if unclabel: print ">>> systematic uncertainty label = " + color("%s" % (unclabel.lstrip("_")), color="grey")
     for category, selection in selectionsDC:
         print ">>>\n>>> " + color("_%s:_%s_" % (channel.replace(' ','_'),category.replace(' ','_')), color = "magenta", bold=True)
@@ -360,6 +360,7 @@ def writeDataCard(sampleset, channel, var, binWidth, a, b, **kwargs):
         if recreate:
           canvas, pave = canvasWithText(selection,title=category)
           canvas.Write("selection")
+          canvas.Close()
         
         # RENORMALIZE WJ
         if not skipWJrenorm:
@@ -387,32 +388,22 @@ def writeDataCard(sampleset, channel, var, binWidth, a, b, **kwargs):
                 elif len(matches)>1: LOG.warning('  Found more than one "%s" sample!' % (samplename))
                 else: sample = matches[0]
             
-            histQCD = None
             for subsample, extracuts in samples_dict[samplename]:
                 printSameLine(">>>   %5s" % (subsample.ljust(10))) # TODO: make table instead
                 
                 # SETUP NAMES
                 name = subsample+unclabel
-                cuts = combineCuts(selection,extracuts,"%s<%s && %s<%s"%(a,var,var,b))
+                cuts = combineCuts(selection,extracuts,"%s<%s && %s<%s"%(xmin,var,var,xmax))
                 
                 # MAKE HIST
                 hist = None
-                if 'QCD' in subsample: # QCD
-                  if 'Down' in subsample and histQCD:
-                      hist = histQCD.Clone(name)
-                      hist.Scale(1-shiftQCD)
-                  elif 'Up' in subsample and histQCD:
-                      hist = histQCD.Clone(name)
-                      hist.Scale(1+shiftQCD)
-                  else:
-                      hist = sampleset.QCD(var,nBins,a,b,cuts,name=name,weight=extraweight,verbosity=0)
-                      histQCD = hist.Clone(name+"_QCD_clone") # don't calculate QCD trice!
+                if 'QCD' in subsample:
+                  hist = sampleset.QCD(var,nBins,xmin,xmax,cuts,name=name,weight=extraweight,verbosity=0)
                   if hist is None:
-                      LOG.warning("QCD histogram failed!")
-                      continue
-                  hist.SetOption("HIST")
+                    LOG.warning("QCD histogram failed!")
+                    continue
                 else:
-                  hist = sample.hist(var,nBins,a,b,cuts,name=name,weight=extraweight,verbosity=0)
+                  hist = sample.hist(var,nBins,xmin,xmax,cuts,name=name,weight=extraweight,verbosity=0)
                   hist.SetOption("E0" if sample.isData else "EHIST")
                 hist.GetXaxis().SetTitle(var)
                 hist.SetLineColor(kBlack if 'data' in name else hist.GetFillColor())
@@ -429,7 +420,6 @@ def writeDataCard(sampleset, channel, var, binWidth, a, b, **kwargs):
                 print "->  written %8.1f events (%5d entries)" % (hist.GetSumOfWeights(),hist.GetEntries())
                 deleteHist(hist)
                 
-            if histQCD: deleteHist(histQCD)
         
     outfile.Close()
     print ">>>\n>>> "
@@ -544,42 +534,42 @@ def main():
                  #("ttbar","tid","ht",100,0,300),
         ]
         if args.obs: keys = [k for k in keys if any(o in k[2] for o in args.obs)]
-        for process, analysis, var, width, a, b in keys:
-            args   = (channel, var, width, a, b)
+        for process, analysis, var, width, xmin, xmax in keys:
+            dargs   = (channel, var, width, xmin, xmax)
             kwargs = { 'process': process, 'analysis': analysis, 'label': "_mt250" }
             #if doNominal:
-            writeDataCard(samples,              *args, recreate=True, **kwargs )
+            writeDataCard(samples,              *dargs, recreate=True, **kwargs )
             if doTES and "tau" in channel:
-                writeDataCard(samples_TESUp,    *args, TES='Down', filter=['TT','DY','ST'], **kwargs )
-                writeDataCard(samples_TESDown,  *args, TES='Up',   filter=['TT','DY','ST'], **kwargs )
+                writeDataCard(samples_TESUp,    *dargs, TES='Down', filter=['TT','DY','ST'], **kwargs )
+                writeDataCard(samples_TESDown,  *dargs, TES='Up',   filter=['TT','DY','ST'], **kwargs )
             if doEES and "emu" in channel:
-                writeDataCard(samples_EESUp,    *args, EES='Up',   filter=['TT','ST'],  **kwargs )
-                writeDataCard(samples_EESDown,  *args, EES='Down', filter=['TT','ST'],  **kwargs )
+                writeDataCard(samples_EESUp,    *dargs, EES='Up',   filter=['TT','ST'],  **kwargs )
+                writeDataCard(samples_EESDown,  *dargs, EES='Down', filter=['TT','ST'],  **kwargs )
             if doJTF:
               if "tau" in channel:
-                writeDataCard(samples_JTFUp,    *args, JTF='Up',   filter=['TT','DY','ST','WJ'],  **kwargs )
-                writeDataCard(samples_JTFDown,  *args, JTF='Down', filter=['TT','DY','ST','WJ'],  **kwargs )
+                writeDataCard(samples_JTFUp,    *dargs, JTF='Up',   filter=['TT','DY','ST','WJ'],  **kwargs )
+                writeDataCard(samples_JTFDown,  *dargs, JTF='Down', filter=['TT','DY','ST','WJ'],  **kwargs )
               else:
-                writeDataCard(samples_JTFUp,    *args, JTF='Up',   filter=['TT','ST'],  **kwargs )
-                writeDataCard(samples_JTFDown,  *args, JTF='Down', filter=['TT','ST'],  **kwargs )
+                writeDataCard(samples_JTFUp,    *dargs, JTF='Up',   filter=['TT','ST'],  **kwargs )
+                writeDataCard(samples_JTFDown,  *dargs, JTF='Down', filter=['TT','ST'],  **kwargs )
             if doJEC:
-                writeDataCard(samples,          *args, JES='Up',   **kwargs )
-                writeDataCard(samples,          *args, JES='Down', **kwargs )
+                writeDataCard(samples,          *dargs, JES='Up',   **kwargs )
+                writeDataCard(samples,          *dargs, JES='Down', **kwargs )
             if doJER:
-                writeDataCard(samples,          *args, JER='Up',   **kwargs )
-                writeDataCard(samples,          *args, JER='Down', **kwargs )
+                writeDataCard(samples,          *dargs, JER='Up',   **kwargs )
+                writeDataCard(samples,          *dargs, JER='Down', **kwargs )
             if doUncEn:
-                writeDataCard(samples,          *args, UncEn='Up',   **kwargs )
-                writeDataCard(samples,          *args, UncEn='Down', **kwargs )
+                writeDataCard(samples,          *dargs, UncEn='Up',   **kwargs )
+                writeDataCard(samples,          *dargs, UncEn='Down', **kwargs )
             ###if doZpt:
-            ###    writeDataCard(samples_ZptDown,    *args, Zpt='Down', filter=["DY"], **kwargs )
-            ###    writeDataCard(samples_ZptUp,      *args, Zpt='Up',   filter=["DY"], **kwargs )
+            ###    writeDataCard(samples_ZptDown,    *dargs, Zpt='Down', filter=["DY"], **kwargs )
+            ###    writeDataCard(samples_ZptUp,      *dargs, Zpt='Up',   filter=["DY"], **kwargs )
             ###if doTTpt:
-            ###    writeDataCard(samples_TTptDown,   *args, TTpt='Down', filter=["ttbar"], **kwargs )
-            ###    writeDataCard(samples_TTptUp,     *args, TTpt='Up',   filter=["ttbar"], **kwargs )
+            ###    writeDataCard(samples_TTptDown,   *dargs, TTpt='Down', filter=["ttbar"], **kwargs )
+            ###    writeDataCard(samples_TTptUp,     *dargs, TTpt='Up',   filter=["ttbar"], **kwargs )
             ###if doQCD_WJ:
-            ###    writeDataCard(samples_QCD_WJDown, *args, QCD_WJ='Down', filter=["W + jets"], **kwargs )
-            ###    writeDataCard(samples_QCD_WJUp,   *args, QCD_WJ='Up',   filter=["W + jets"], **kwargs )
+            ###    writeDataCard(samples_QCD_WJDown, *dargs, QCD_WJ='Down', filter=["W + jets"], **kwargs )
+            ###    writeDataCard(samples_QCD_WJUp,   *dargs, QCD_WJ='Up',   filter=["W + jets"], **kwargs )
             
     
 

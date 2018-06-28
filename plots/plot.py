@@ -15,31 +15,35 @@ ROOT.gROOT.SetBatch(ROOT.kTRUE)
 argv = sys.argv
 description = '''This script make plots.'''
 parser = ArgumentParser(prog="plotter",description=description,epilog="Succes!")
-parser.add_argument( "-i", "--config", dest="configFile", type=str, default="", action='store',
+parser.add_argument( "-i", "--config",      dest="configFile", type=str, default="", action='store',
                      metavar="CONFIG_FILE", help="name of config file containing the settings, samples, selections and variables" )
-parser.add_argument( "-s", "--category", dest="category", type=int, default=-1, action='store',
-                     metavar="CATEGORY", help="run only for this category of selection and cuts" )
-parser.add_argument( "-c", "--channel", dest="channel", default="", action='store',
-                     metavar="CHANNEL", help="run only for this channel" )
-parser.add_argument( "-e", "--etau", dest="etau", default=False, action='store_true',
-                     help="run only for the etau channel" )
-parser.add_argument( "-m", "--mutau", dest="mutau", default=False, action='store_true',
-                     help="run only for the mutau channel" )
-parser.add_argument( "-u", "--emu", dest="emu", default=False, action='store_true',
-                     help="run only for the emu channel" )
-parser.add_argument( "-l", "--list", dest="list", default=False, action='store_true',
-                     help="list all available categories" )
-parser.add_argument( "-t", "--plot-tag", dest="plottag", type=str, default="", action='store',
-                     metavar="TAG", help="" )
-parser.add_argument( "-v", "--verbose", dest="verbose", default=False, action='store_true',
-                     help="make script verbose" )
+parser.add_argument( "-s", "--category",    dest="category", type=int, default=-1, action='store',
+                     metavar="CATEGORY",    help="run only for this category of selection and cuts" )
+parser.add_argument( "-c", "--channel",     dest="channel", default="", action='store',
+                     metavar="CHANNEL",     help="run only for this channel" )
+parser.add_argument( "-e", "--etau",        dest="etau", default=False, action='store_true',
+                                            help="run only for the etau channel" )
+parser.add_argument( "-m", "--mutau",       dest="mutau", default=False, action='store_true',
+                                            help="run only for the mutau channel" )
+parser.add_argument( "-u", "--emu",         dest="emu", default=False, action='store_true',
+                                            help="run only for the emu channel" )
+parser.add_argument( "-d", "--mumu",        dest="mumu", default=False, action='store_true',
+                                            help="run only for the dimuon channel" )
+parser.add_argument( "-l", "--list",        dest="list", default=False, action='store_true',
+                                            help="list all available categories" )
+parser.add_argument( "-t", "--tag",         dest="plottag", type=str, default="", action='store',
+                     metavar="TAG",         help="" )
 parser.add_argument( "-n", "--no-WJ-renom", dest="noWJrenorm", default=False, action='store_true',
-                     help="renormalize W+Jets" )
+                                            help="renormalize W+Jets" )
+parser.add_argument( "-p", "--pdf",         dest="pdf", default=False, action='store_true',
+                                            help="make pdf version each plot" )
+parser.add_argument( "-v", "--verbose",     dest="verbose", default=False, action='store_true',
+                                            help="make script verbose" )
 # parser.add_argument( "-y", "--verbosity", dest="verbosity", type=int, default=0, action='store',
 #                      metavar="VERBOSITY_LEVEL", help="set verbosity level to VERBOSITY_LEVEL" )
 args = parser.parse_args()
 if not args.configFile:
-    args.configFile = "PlotTools/config_emu2017.py" if args.emu else "PlotTools/config_ltau2017.py"
+    args.configFile = "PlotTools/config_emu2017.py" if args.emu else "PlotTools/config_mumu2017.py" if args.mumu else "PlotTools/config_ltau2017.py"
 
 # LOAD config
 from PlotTools.SettingTools import *
@@ -49,6 +53,7 @@ exec settings
 plottag += args.plottag
 doStack = True; doDataCard = False
 normalizeWJ = normalizeWJ and not doFakeRate and not args.noWJrenorm
+makePDF = makePDF or args.pdf
 loadSettings(globals(),settings,verbose=args.verbose)
 exec commands
 
@@ -72,6 +77,7 @@ def plotStacks(samples, channel, **kwargs):
     errorbars   = (not staterror)
     data        = True
     ratio       = data
+    pdf         = makePDF
     
     # LOOP over SELECTIONS
     for selection in selections:
@@ -96,12 +102,16 @@ def plotStacks(samples, channel, **kwargs):
             # NAME
             filename = "%s/%s_%s%s.png" % (DIR,variable.filename,selection.filename,label)
             filename = makeFileName(filename)
-            saveToFile = filename.replace('.png','.root')
+            saveToFile = "" #filename.replace('.png','.root')
+            
+            # PDFs
+            exts  = ['png','pdf'] if pdf else [ ]
             
             # TITLE
             name  = variable.name
-            title = "%s: %s" % (channel,selection.name)
+            title = "%s: %s" % (channel,selection.title)
             title = title.replace("category 1.2","optimized category 1").replace("category 2.2","optimized category 2")
+            if title.count("mumu")>1: title = selection.title
             
             # LEGEND POSITION
             position = variable.position
@@ -116,7 +126,8 @@ def plotStacks(samples, channel, **kwargs):
             # PLOT
             plot = samples.plotStack(variable, selection, name=name, title=title, channel=channel, QCD=QCD, JFR=JFR, saveToFile=saveToFile)
             plot.plot(stack=stack, position=position, staterror=staterror, logy=logy, ratio=ratio, errorbars=errorbars, data=data)
-            plot.saveAs(filename)
+            plot.saveAs(filename, ext=exts)
+            plot.close()
             
 
 
@@ -210,13 +221,11 @@ def main():
     
     # LOOP over CHANNELS
     for channel in channels:
-        print ">>>\n>>>"
-        
-        samples.setChannel(channel,treename=treename)
+        print ">>>"
         
         # SET TREENAME
-        treename = "tree_%s" % channel
-        if useCutTree and "emu" not in channel:
+        treename = "tree_%s"%channel
+        if useCutTree and "tau" in channel:
           treename = "tree_%s_cut_relaxed" % channel
         samples.setChannel(channel,treename=treename)
         if drawShifts:
@@ -229,8 +238,9 @@ def main():
           if doJTF:
             samples_JTFUp.setChannel(  channel,treename=treename)
             samples_JTFDown.setChannel(channel,treename=treename)
-          for label, samples_TESscan in sorted(samples_TESscan.iteritems()):
-            samples_TESscan.setChannel(channel,treename=treename)
+          if doTESscan:
+            for label, samples_TESscan in sorted(samples_TESscan.iteritems()):
+              samples_TESscan.setChannel(channel,treename=treename)
         
         # RENORMALIZE WJ
         print ">>> "

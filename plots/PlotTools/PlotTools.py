@@ -15,6 +15,7 @@ from SettingTools   import *
 from SelectionTools import *
 from VariableTools  import *
 from PrintTools     import *
+#ROOT.gROOT.SetBatch(ROOT.kTRUE)
 whiteTransparent  =  TColor(4000, 0.9, 0.9, 0.9, "kWhiteTransparent", 0.5)
 kWhiteTransparent = 4000
 
@@ -159,7 +160,7 @@ def makeLegend(*hists,**kwargs):
     # count number of lines in legend
     nLines = len(entries)+sum([e.count("splitline") for e in entries])
     if title:     nLines += 1 + title.count("splitline")
-    else:         nLines += 0.80
+    #else:         nLines += 0.80
     if text:      nLines += 1 + sum([t.count("splitline")+1 for t in text]) 
     if errorband: nLines += 1
     
@@ -173,7 +174,7 @@ def makeLegend(*hists,**kwargs):
       L, R = gPad.GetLeftMargin(), gPad.GetRightMargin()
       T, B = gPad.GetTopMargin(),  gPad.GetBottomMargin()
       if   'leftleft'     in position: x1 = 0.07+L; x2 = x1 + width
-      elif 'rightright'   in position: x2 = 0.92-R; x1 = x2 - width
+      elif 'rightright'   in position: x2 = 0.94-R; x1 = x2 - width
       elif 'center'  in position:
         if 'right'  in position: center = (1+L-R)/2 + 0.075
         elif 'left' in position: center = (1+L-R)/2 - 0.075
@@ -216,8 +217,8 @@ def makeLegend(*hists,**kwargs):
       #  print title[i+2:]
       #  legend.SetHeader(title[:i])
       #  if i<len(tit   le): legend.AddEntry(0,title[i+1:],'')
-    else:
-      legend.SetHeader("")
+    #else:
+    #  legend.SetHeader("")
     legend.SetTextFont(42) # no bold for entries
     
     if hists:
@@ -291,35 +292,36 @@ def makeAxes(frame, *args, **kwargs):
     
     hists          = args
     hists.append(frame)
-    main           = kwargs.get('main',            False              ) # main pad in ratio plot
-    xmin           = kwargs.get('xmin',            xmin               )
-    xmax           = kwargs.get('xmax',            xmax               )
-    ymin           = kwargs.get('ymin',            ymin               )
-    ymax           = kwargs.get('ymax',            ymax               )
-    ymargin        = kwargs.get('ymargin',         1.16               )
-    negativeY      = kwargs.get('negativeY',       True               )
-    xtitle         = makeLatex(kwargs.get('xtitle', frame.GetTitle()) )
-    ytitle         = kwargs.get('ytitle',          ""                 )
-    logx           = kwargs.get('logx',            False              )
-    logy           = kwargs.get('logy',            False              )
-    grid           = kwargs.get('grid',            False              )
-    ycenter        = kwargs.get('center',          False              )
+    main           = kwargs.get('main',              False                    ) # main pad in ratio plot
+    xmin           = kwargs.get('xmin',              xmin                     )
+    xmax           = kwargs.get('xmax',              xmax                     )
+    ymin           = kwargs.get('ymin',              ymin                     )
+    ymax           = kwargs.get('ymax',              ymax                     )
+    ymargin        = kwargs.get('ymargin',           1.16                     )
+    negativeY      = kwargs.get('negativeY',         True                     )
+    xtitle         = makeLatex(kwargs.get('xtitle', frame.GetTitle())       )
+    ytitle         = kwargs.get('ytitle',            ""                       )
+    logx           = kwargs.get('logx',              False                    )
+    logy           = kwargs.get('logy',              False                    )
+    grid           = kwargs.get('grid',              False                    )
+    ycenter        = kwargs.get('center',            False                    )
     
     if main:
-      xlabelsize   = kwargs.get('xlabelsize',     0.0                 )
-      xtitlesize   = kwargs.get('xtitlesize',     0.0                 )
-      ylabelsize   = kwargs.get('ylabelsize',     0.056               )
-      ytitlesize   = kwargs.get('ytitlesize',     0.068               )
-      ytitleoffset = kwargs.get('ytitleoffset',   1.08                )
+      xlabelsize   = kwargs.get('xlabelsize',        0.0                      )
+      xtitlesize   = kwargs.get('xtitlesize',        0.0                      )
+      ylabelsize   = kwargs.get('ylabelsize',        0.060 if logy else 0.056 )
+      ytitlesize   = kwargs.get('ytitlesize',        0.070                    )
+      ytitleoffset = kwargs.get('ytitleoffset',      1.060                    )
     else:
-      xlabelsize   = kwargs.get('xlabelsize',     0.050               )
-      xtitlesize   = kwargs.get('xtitlesize',     0.060               )
-      ylabelsize   = kwargs.get('ylabelsize',     0.050               )
-      ytitlesize   = kwargs.get('ytitlesize',     0.060               )
-      ytitleoffset = kwargs.get('ytitleoffset',   1.25                )
+      xlabelsize   = kwargs.get('xlabelsize',        0.050                    )
+      xtitlesize   = kwargs.get('xtitlesize',        0.060                    )
+      ylabelsize   = kwargs.get('ylabelsize',        0.050                    )
+      ytitlesize   = kwargs.get('ytitlesize',        0.060                    )
+      ytitleoffset = kwargs.get('ytitleoffset',      1.250                    )
     
     if isinstance(frame,THStack):
-        maxs = [ frame.GetMaximum() ]
+        maxs  = [ frame.GetMaximum() ]
+        #frame = frame.GetStack().Last()
         for hist in hists:
             maxs.append(hist.GetMaximum())
         if ymax==None: ymax = max(maxs)*ymargin #ceilToSignificantDigit(max(maxs)*ymargin,digits=2)
@@ -331,28 +333,29 @@ def makeAxes(frame, *args, **kwargs):
             maxs.append(hist.GetMaximum())
         if ymin==None: ymin = min(mins)*(1.1 if ymin>0 else 0.9)
         if ymax==None: ymax = max(maxs)*ymargin #ceilToSignificantDigit(max(maxs)*ymargin,digits=2)
+    
+    if logy:
+      #if not ymin: ymin = 0.1
+      #if ymin==0: ymin = min(0.1,10**(magnitude(ymax)-3))
+      gPad.Update(); gPad.SetLogy()
+    if logx:
+      if not xmin: xmin = 0.1
+      gPad.Update(); gPad.SetLogx()
+    if grid:
+      gPad.SetGrid()
     frame.GetXaxis().SetRangeUser(xmin,xmax)
     if ymin: frame.SetMinimum(ymin)
     if ymax: frame.SetMaximum(ymax)
     if ymax>=10000: ylabelsize *= 0.95
-    
-    if logy:
-      #if ymin==0: ymin = min(0.1,10**(magnitude(ymax)-3))
-      gPad.Update(); gPad.SetLogy()
-    if logx:
-      #if xmin==0: xmin = min(0.1,10**(magnitude(xmax)-3))
-      gPad.Update(); gPad.SetLogx()
-    if grid:
-      gPad.SetGrid()
     
     if not ytitle:
       #ytitle = "Events"
       if "multiplicity" in xtitle:
         ytitle = "Events"
       elif frame.GetXaxis().IsVariableBinSize():
-        ytitle = "Events / bin"
+        ytitle = "Events / bin size"
       else:
-        ytitle = ("Events / %.3f"%frame.GetXaxis().GetBinWidth(0)).rstrip("0").rstrip(".")
+        ytitle = ("Events / %.2f"%frame.GetXaxis().GetBinWidth(0)).rstrip("0").rstrip(".")
         units = re.findall(r' \[(.+)\]',xtitle) #+ re.findall(r' (.+)',xtitle)
         if units:
           ytitle = ytitle.rstrip(" 1")
@@ -395,16 +398,18 @@ def makeAxesRatio(frame, *args, **kwargs):
     if len(binning)>1:
         xmin, xmax = binning[:2]
     
-    xmin        = kwargs.get('xmin',            xmin                )
-    xmax        = kwargs.get('xmax',            xmax                )
-    ratiorange  = kwargs.get('ratiorange',      0.5                 )
-    ymin        = kwargs.get('ymin',            None                )
-    ymax        = kwargs.get('ymax',            None                )
-    xtitle      = makeLatex(kwargs.get('xtitle', frame.GetTitle())  )
-    ytitle      = kwargs.get('ytitle',          "ratio"             ) #"data / M.C."
-    logx        = kwargs.get('logx',            False               )
-    logy        = kwargs.get('logy',            False               )
-    grid        = kwargs.get('grid',            False               )
+    xmin         = kwargs.get('xmin',            xmin                )
+    xmax         = kwargs.get('xmax',            xmax                )
+    ratiorange   = kwargs.get('ratiorange',      0.5                 )
+    ymin         = kwargs.get('ymin',            None                )
+    ymax         = kwargs.get('ymax',            None                )
+    xtitle       = makeLatex(kwargs.get('xtitle', frame.GetTitle())  )
+    ytitle       = kwargs.get('ytitle',          "ratio"             ) #"data / M.C."
+    logx         = kwargs.get('logx',            False               )
+    logy         = kwargs.get('logy',            False               )
+    grid         = kwargs.get('grid',            False               )
+    ytitlesize   = kwargs.get('ytitlesize',      0.140               )
+    ytitleoffset = kwargs.get('ytitleoffset',    0.510               )
     
     if ymin==None and ratiorange:
       ymin = 1-ratiorange
@@ -414,7 +419,7 @@ def makeAxesRatio(frame, *args, **kwargs):
       #if ymin==0: ymin = min(0.1,10**(magnitude(ymax)-3))
       gPad.Update(); gPad.SetLogy()
     if logx:
-      #if xmin==0: xmin = min(0.1,10**(magnitude(xmax)-3))
+      if not xmin: xmin = 0.1
       gPad.Update(); gPad.SetLogx()
     if grid:
       gPad.SetTicks(1,1)
@@ -423,6 +428,7 @@ def makeAxesRatio(frame, *args, **kwargs):
     
     # X axis
     frame.GetXaxis().SetTitle(xtitle)
+    frame.GetXaxis().SetLabelOffset(-0.02 if logx else 0.0)
     frame.GetXaxis().SetLabelSize(0.12)
     frame.GetXaxis().SetTitleSize(0.14)
     frame.GetXaxis().SetTitleOffset(0.94)
@@ -433,8 +439,8 @@ def makeAxesRatio(frame, *args, **kwargs):
     # Y axis
     frame.GetYaxis().SetRangeUser(ymin,ymax)
     frame.GetYaxis().SetLabelSize(0.112)
-    frame.GetYaxis().SetTitleSize(0.14)
-    frame.GetYaxis().SetTitleOffset(0.53)
+    frame.GetYaxis().SetTitleSize(ytitlesize)
+    frame.GetYaxis().SetTitleOffset(ytitleoffset)
     frame.GetYaxis().SetNdivisions(505)
     frame.GetYaxis().CenterTitle(True)
     frame.GetYaxis().SetTitle(ytitle)
@@ -536,6 +542,24 @@ def getTGraphYRange(graph,ymin=+999989,ymax=-999989):
       if ylow<ymin: ymin = ylow
     return (ymin,ymax)
 
+
+def divideByBinSize(hist,**kwargs):
+  """Divide each bin by its bin width."""
+  # TODO: check errors in MC (sumw2) and data (kPoisson)
+  if hist.GetSumw2().GetSize()>0:
+    for i in xrange(0,hist.GetXaxis().GetNbins()+1):
+      binc  = hist.GetBinContent(i)
+      bine  = hist.GetBinError(i)
+      width = hist.GetBinWidth(i)
+      hist.SetBinContent(i,binc/width)
+      hist.SetBinError(i,bine/sqrt(width))
+  else:
+    for i in xrange(0,hist.GetXaxis().GetNbins()+1):
+      binc  = hist.GetBinContent(i)
+      bine  = hist.GetBinError(i)
+      width = hist.GetBinWidth(i)
+      hist.SetBinContent(i,binc/width)
+  
 
 def rebin(hist,nbins,*args):
     """Smart (?) rebinning of a histogram."""
@@ -651,7 +675,7 @@ def setErrorBandStyle(hist_error,**kwargs):
 def makeErrorBand(hists,**kwargs):
     """Make an error band histogram for a list of histograms, or stack."""
     
-    if isinstance(hists,THStack): hists = [hists.GetStack.Last()]
+    if isinstance(hists,THStack): hists = [hists.GetStack().Last()]
     elif not isList(hists):       hists = [hists]
     
     name        = kwargs.get('name',        "error_"+hists[0].GetName() )
@@ -1057,7 +1081,7 @@ def normalize(*hists,**kwargs):
 def close(*hists,**kwargs):
     """Close histograms."""
     verbosity = getVerbosity(kwargs,verbosityPlotTools)
-    if len(hists)>0 and isList(hists[0]):
+    if len(hists)==1 and isList(hists[0]):
       hists = hists[0]
     for hist in hists:
       if isinstance(hist,THStack):
@@ -1073,7 +1097,12 @@ def deleteHist(*hists,**kwargs):
     verbosity = getVerbosity(kwargs,verbosityPlotTools) 
     for hist in hists:
       if verbosity>1: print '>>> deleteHist: deleting histogram "%s"'%(hist.GetName())
-      gDirectory.Delete(hist.GetName())
+      #try:
+      if hist:
+        gDirectory.Delete(hist.GetName())
+      #except AttributeError:
+      #  print ">>> AttributeError: "
+      #  raise AttributeError
       del hist
     
 
@@ -1248,7 +1277,7 @@ class Plot(object):
           self.xmax             = kwargs.get('xmax',        frame.GetXaxis().GetXmax()  )
           self.xtitle           = kwargs.get('xtitle',      self.var         )
           self.logy             = kwargs.get('logy',        False            )
-        self.ytitle             = kwargs.get('ytitle',      ""               )
+        self.ytitle             = kwargs.get('ytitle',      frame.GetYaxis().GetTitle() )
         
         self.errorband          = None
         self.error              = None
@@ -1419,16 +1448,17 @@ class Plot(object):
             hargs       = [self.stack, self.histsD[0]] if stack else self.histsB
             roption     = "E" if drawData else "HISTE" if errorbars else "HIST"
             denominator = ratio if isinstance(ratio,int) and ratio>1 else -1 
+            rtitle      = "Ratio" if len(self.histsD[0])==0 else "Obs./Exp."
             self.ratio  = Ratio(*hargs, staterror=staterror, error=self.error, denominator=denominator, drawZero=(not drawData))
             self.ratio.Draw(roption, xmin=xmin, xmax=xmax, data=len(self.histsD))
-            self.makeAxes(self.ratio, xmin=xmin, xmax=xmax, ymin=rmin, ymax=rmax,
-                          ratiorange=ratiorange, xtitle=xtitle, ytitle="ratio", grid=grid)
+            self.makeAxes(self.ratio, xmin=xmin, xmax=xmax, ymin=rmin, ymax=rmax, logx=logx,
+                          ratiorange=ratiorange, xtitle=xtitle, ytitle=rtitle, grid=grid)
         
     
     def saveAs(self,*filenames,**kwargs):
         """Save plot, close canvas and delete the histograms."""
         save  = kwargs.get('save',  True    )
-        close = kwargs.get('close', True    )
+        close = kwargs.get('close', False   )
         exts  = kwargs.get('ext',   [ ]     )
         printSameLine("")
         if save:
@@ -1552,7 +1582,7 @@ class Plot2D(object):
         """Central method of Plot class: make plot with canvas, axis, error, ratio..."""
         
         hist            = self.hist
-        option          = kwargs.get('option',            'COLZ',                     )
+        option          = kwargs.get('option',            'COLZ',                     ) # COLZTEXT44
         title           = kwargs.get('title',             ""                          )
         xtitle          = kwargs.get('xtitle',            hist.GetXaxis().GetTitle()  )
         ytitle          = kwargs.get('ytitle',            hist.GetYaxis().GetTitle()  )
@@ -1576,12 +1606,11 @@ class Plot2D(object):
         position        = kwargs.get('position',          ""                          )
         square          = kwargs.get('square',            False                       )
         residue         = kwargs.get('residue',           False                       )
-        leftmargin      = kwargs.get('leftmargin',        1.                          )
-        rightmargin     = kwargs.get('rightmargin',       1.                          )
+        lmargin         = kwargs.get('lmargin',           0.14                        )
+        rmargin         = kwargs.get('rmargin',           0.16 if ztitle else 0.12    )
         profile         = kwargs.get('profile',           ""                          )
         profiles        = [ ]
-        lmargin    = 0.13
-        rmargin    = 0.19 if ztitle else 0.12
+        zoffset         = 0.97*rmargin/0.16
         if zmin: hist.SetMinimum(zmin)
         if zmax: hist.SetMaximum(zmax)
         if not isinstance(lines,list): lines = [lines]
@@ -1605,6 +1634,8 @@ class Plot2D(object):
         canvas.SetGrid()
         canvas.cd()
         self.canvas = canvas
+        if logy: canvas.Update(); canvas.SetLogy()
+        if logx: canvas.Update(); canvas.SetLogx()
         
         # LEGEND
         if legend:
@@ -1640,16 +1671,20 @@ class Plot2D(object):
         hist.GetXaxis().SetLabelSize(0.048)
         hist.GetYaxis().SetLabelSize(0.048)
         hist.GetZaxis().SetLabelSize(0.044)
-        hist.GetXaxis().SetLabelOffset(0.010)
+        hist.GetXaxis().SetLabelOffset(-0.004 if logx else 0.01)
         hist.GetXaxis().SetTitleOffset(0.97)
-        hist.GetYaxis().SetTitleOffset(1.12)
-        hist.GetZaxis().SetTitleOffset(1.25)
+        hist.GetYaxis().SetTitleOffset(1.15)
+        hist.GetZaxis().SetTitleOffset(zoffset)
         hist.GetZaxis().CenterTitle(True)
         hist.GetXaxis().SetTitle(makeLatex(xtitle))
         hist.GetYaxis().SetTitle(makeLatex(ytitle))
         hist.GetZaxis().SetTitle(makeLatex(ztitle))
         hist.GetXaxis().SetRangeUser(xmin,xmax)
         hist.GetYaxis().SetRangeUser(ymin,ymax)
+        if "text" in option.lower():
+          gStyle.SetPaintTextFormat(".2f")
+          hist.SetMarkerColor(kRed)
+          #hist.SetMarkerSize(1)
         if zmin: hist.SetMinimum(zmin)
         if zmax: hist.SetMaximum(zmax)
         hist.Draw(option)
@@ -1720,8 +1755,8 @@ class Plot2D(object):
     def saveAs(self, *filenames, **kwargs):
         """Save plot, close canvas and delete the histograms."""
         printSameLine("")
-        close = kwargs.get('close', True )
-        exts  = kwargs.get('ext',   [ ]  )
+        close = kwargs.get('close', False )
+        exts  = kwargs.get('ext',   [ ]   )
         printSameLine("")
         for filename0 in filenames:
           if exts:

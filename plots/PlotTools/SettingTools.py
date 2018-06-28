@@ -18,6 +18,7 @@ luminosity              = 0 # set in plot.py
 OSSS_ratio              = 0.5
 useCutTree              = True #and False
 colorset                = 'HTT'
+loadMacros              = False
 
 # VERBOSITY
 LOG                     = Logger("global")

@@ -2536,13 +2536,14 @@ def merge(sampleList,*searchterms,**kwargs):
     # GET samples containing names and searchterm
     mergeList = [ s for s in sampleList if s.isPartOf(*searchterms,exclusive=False) ]
     if len(mergeList) < 2:
-        LOG.warning('Could not merge "%s": less than two "%s" samples'%(name0,name0))
+        LOG.warning('Could not merge "%s": less than two "%s" samples (%d)'%(name0,name0,len(mergeList)))
+        return sampleList
     fill = max([ len(s.name) for s in mergeList ])+2 # number of spaces
     
     # ADD samples with name0 and searchterm
     mergedsample = MergedSample(name0,title0)
     for sample in mergeList:
-        samplename = ("\"%s\""%(sample.name)).ljust(fill)
+        samplename = ('"%s"'%(sample.name)).ljust(fill)
         LOG.verbose("   merging %s to %s: %s"%(samplename,name0,sample.filenameshort),verbosity,level=2)
         mergedsample.add(sample)
     

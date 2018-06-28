@@ -121,29 +121,29 @@ def makeLegend(*hists,**kwargs):
     """Make legend for a list of histograms."""
     
     global legendtextsize
-    title       = kwargs.get('title',           ""                  )
-    entries     = kwargs.get('entries',         [ ]                 )
-    position    = kwargs.get('position',        ""                  ).lower()
-    transparent = kwargs.get('transparent',     True                )
-    histsB      = kwargs.get('histsB',          [ ]                 )
-    histsS      = kwargs.get('histsS',          [ ]                 )
-    histsD      = kwargs.get('histsD',          [ ]                 )
-    errorband   = kwargs.get('error',           None                )
-    errortitle  = kwargs.get('errortitle',      errorband.GetTitle() if errorband else "" )
-    x1          = kwargs.get('x1',              0                   )
-    x2          = kwargs.get('x2',              0                   )
-    y1          = kwargs.get('y1',              0                   )
-    y2          = kwargs.get('y2',              0                   )
-    width       = kwargs.get('width',           -1                  )
-    height      = kwargs.get('height',          -1                  )
-    style0      = kwargs.get('style0',          'l'                 )
-    style1      = kwargs.get('style',           'l'                 )
-    stack       = kwargs.get('stack',           False               )
-    textsize    = kwargs.get('textsize',        legendtextsize      )
-    text        = kwargs.get('text',            ""                  )
+    title       = kwargs.get('title',        ""                                )
+    entries     = kwargs.get('entries',      [ ]                               )
+    position    = kwargs.get('position',     ""                                ).lower()
+    transparent = kwargs.get('transparent',  True                              )
+    histsB      = kwargs.get('histsB',       [ ]                               )
+    histsS      = kwargs.get('histsS',       [ ]                               )
+    histsD      = kwargs.get('histsD',       [ ]                               )
+    errorband   = kwargs.get('error',        None                              )
+    errortitle  = kwargs.get('errortitle',   errorband.GetTitle() if errorband else "" )
+    x1          = kwargs.get('x1',           0                                 )
+    x2          = kwargs.get('x2',           0                                 )
+    y1          = kwargs.get('y1',           0                                 )
+    y2          = kwargs.get('y2',           0                                 )
+    width       = kwargs.get('width',        -1                                )
+    height      = kwargs.get('height',       -1                                )
+    style0      = kwargs.get('style0',       'l'                               )
+    style1      = kwargs.get('style',        'l'                               )
+    stack       = kwargs.get('stack',        False                             )
+    textsize    = kwargs.get('textsize',     legendtextsize                    )
+    text        = kwargs.get('text',         ""                                )
     
     if not hists: hists = histsD+histsB+histsS
-    styleB      = 'f' if histsB and histsD else 'l'
+    styleB      = kwargs.get('styleB',       'f' if histsB and histsD else 'l' )
     styleS      = 'l'
     styleD      = 'lep'
     if not isList(text): text = [ text ]
@@ -299,12 +299,15 @@ def makeAxes(frame, *args, **kwargs):
     ymax           = kwargs.get('ymax',              ymax                     )
     ymargin        = kwargs.get('ymargin',           1.16                     )
     negativeY      = kwargs.get('negativeY',         True                     )
-    xtitle         = makeLatex(kwargs.get('xtitle', frame.GetTitle())       )
+    xtitle         = kwargs.get('xtitle',            frame.GetTitle()         )
     ytitle         = kwargs.get('ytitle',            ""                       )
     logx           = kwargs.get('logx',              False                    )
     logy           = kwargs.get('logy',              False                    )
     grid           = kwargs.get('grid',              False                    )
     ycenter        = kwargs.get('center',            False                    )
+    
+    if kwargs.get('latex',True):
+      xtitle = makeLatex(xtitle)
     
     if main:
       xlabelsize   = kwargs.get('xlabelsize',        0.0                      )
@@ -403,13 +406,16 @@ def makeAxesRatio(frame, *args, **kwargs):
     ratiorange   = kwargs.get('ratiorange',      0.5                 )
     ymin         = kwargs.get('ymin',            None                )
     ymax         = kwargs.get('ymax',            None                )
-    xtitle       = makeLatex(kwargs.get('xtitle', frame.GetTitle())  )
+    xtitle       = kwargs.get('xtitle',          frame.GetTitle()    )
     ytitle       = kwargs.get('ytitle',          "ratio"             ) #"data / M.C."
     logx         = kwargs.get('logx',            False               )
     logy         = kwargs.get('logy',            False               )
     grid         = kwargs.get('grid',            False               )
     ytitlesize   = kwargs.get('ytitlesize',      0.140               )
     ytitleoffset = kwargs.get('ytitleoffset',    0.510               )
+    
+    if kwargs.get('latex',True):
+      xtitle = makeLatex(xtitle)
     
     if ymin==None and ratiorange:
       ymin = 1-ratiorange
@@ -1269,14 +1275,20 @@ class Plot(object):
           self.var              = kwargs.get('var',         variable.name    )
           self.xmin             = kwargs.get('xmin',        variable.xmin    )
           self.xmax             = kwargs.get('xmax',        variable.xmax    )
+          self.ymin             = kwargs.get('ymin',        variable.ymin    )
+          self.ymax             = kwargs.get('ymax',        variable.ymax    )
           self.xtitle           = kwargs.get('xtitle',      variable.title   )
           self.logy             = kwargs.get('logy',        variable.logy    )
+          self.latex            = kwargs.get('latex',       False            )
         else: 
           self.var              = kwargs.get('var',         frame.GetXaxis().GetTitle() )
           self.xmin             = kwargs.get('xmin',        frame.GetXaxis().GetXmin()  )
           self.xmax             = kwargs.get('xmax',        frame.GetXaxis().GetXmax()  )
+          self.ymin             = kwargs.get('ymin',        None             )
+          self.ymax             = kwargs.get('ymax',        None             )
           self.xtitle           = kwargs.get('xtitle',      self.var         )
           self.logy             = kwargs.get('logy',        False            )
+          self.latex            = kwargs.get('latex',       True             )
         self.ytitle             = kwargs.get('ytitle',      frame.GetYaxis().GetTitle() )
         
         self.errorband          = None
@@ -1354,10 +1366,11 @@ class Plot(object):
         title           = kwargs.get('title',               self.title          )
         xtitle          = kwargs.get('xtitle',              vartitle            )
         ytitle          = kwargs.get('ytitle',              self.ytitle         )
+        latex           = kwargs.get('latex',               self.latex          )
         xmin            = kwargs.get('xmin',                self.xmin           )
         xmax            = kwargs.get('xmax',                self.xmax           )
-        ymin            = kwargs.get('ymin',                None                )
-        ymax            = kwargs.get('ymax',                None                )
+        ymin            = kwargs.get('ymin',                self.ymin           )
+        ymax            = kwargs.get('ymax',                self.ymax           )
         rmin            = kwargs.get('rmin',                None                )
         rmax            = kwargs.get('rmax',                None                )
         ratiorange      = kwargs.get('ratiorange',          0.46                )
@@ -1433,7 +1446,7 @@ class Plot(object):
         
         # AXES & LEGEND
         self.makeAxes(self.frame, *(self.histsB+self.histsD), xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax,
-                      xtitle=xtitle, ytitle=ytitle, ymargin=ymargin, main=ratio, logy=logy, logx=logx, grid=grid)
+                      xtitle=xtitle, ytitle=ytitle, ymargin=ymargin, main=ratio, logy=logy, logx=logx, grid=grid, latex=latex)
         if legend:
             if not ratio: textsize *= 0.80
             self.makeLegend(title=title, entries=entries, position=position, text=text, textsize=textsize)
@@ -1452,7 +1465,7 @@ class Plot(object):
             self.ratio  = Ratio(*hargs, staterror=staterror, error=self.error, denominator=denominator, drawZero=(not drawData))
             self.ratio.Draw(roption, xmin=xmin, xmax=xmax, data=len(self.histsD))
             self.makeAxes(self.ratio, xmin=xmin, xmax=xmax, ymin=rmin, ymax=rmax, logx=logx,
-                          ratiorange=ratiorange, xtitle=xtitle, ytitle=rtitle, grid=grid)
+                          ratiorange=ratiorange, xtitle=xtitle, ytitle=rtitle, grid=grid, latex=latex)
         
     
     def saveAs(self,*filenames,**kwargs):
@@ -1499,6 +1512,7 @@ class Plot(object):
         kwargs['histsD'] = self.histsD
         if self.stack:
           kwargs['histsB'] = self.histsB[::-1]
+          kwargs['styleB'] = 'f'
         else:
           kwargs['histsB'] = self.histsB
         kwargs['histsS'] = self.histsS

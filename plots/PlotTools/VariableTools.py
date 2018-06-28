@@ -184,7 +184,7 @@ def makeLatex(title,**kwargs):
     
     if units and not '/' in newtitle:
       if isinstance(units,str):
-        if re.search(r"[(\[].*[)\]]",newtitle)
+        if re.search(r"[(\[].*[)\]]",newtitle):
           newtitle += " "+units
         else:
           newtitle += " [%s]"%units
@@ -211,7 +211,7 @@ def makeHistName(*labels,**kwargs):
     hist_name = '_'.join(labels)
     hist_name = hist_name.replace("+","-").replace(" - ","-").replace(".","p").replace(" ","_").replace(
                                   "(","-").replace(")","-").replace("[","-").replace("]","-").replace(
-                                  "<","lt").replace(">","gt").replace("=","e").replace("*","x")
+                                  "/","").replace("<","lt").replace(">","gt").replace("=","e").replace("*","x")
     return hist_name
     
 def makeFileName(string,**kwargs):
@@ -274,17 +274,20 @@ class Variable(object):
     
     def __init__(self, name, *args, **kwargs):
         strings              = [a for a in args if isinstance(a,str) ]
-        self.units           = kwargs.get('units',          True                        ) # for plot axes
         self.name            = name
-        self.title           = strings[0] if strings else makeLatex(self.name,units=self.units)
+        self.title           = strings[0] if strings else self.name
         self.title           = kwargs.get('title',          self.title                  ) # for plot axes
         self.filename        = kwargs.get('filename',       makeFileName(self.name)     ) # for file
         self.filename        = self.filename.replace('$NAME',self.name).replace('$VAR',self.name)
+        self.units           = kwargs.get('units',          True                        ) # for plot axes
+        self.latex           = kwargs.get('latex',          True                        ) # for plot axes
         self.nbins           = None
         self.min             = None
         self.max             = None
         self.xbins           = None
         self.setBinning(*args)
+        self.ymin            = kwargs.get('ymin',           None                        )
+        self.ymax            = kwargs.get('ymax',           None                        )
         self.logx            = kwargs.get('logx',           False                       )
         self.logy            = kwargs.get('logy',           False                       )
         self.position        = kwargs.get('position',       ""                          ) # legend position
@@ -294,10 +297,13 @@ class Variable(object):
         self.contexttitle    = getContextFromDict(kwargs, None, key='ctitle'                ) # context-dependent title
         self.contextbinning  = getContextFromDict(kwargs, None, key='cbinning',  regex=True ) # context-dependent binning
         self.contextposition = getContextFromDict(kwargs, None, key='cposition', regex=True ) # context-dependent position
+        if self.latex:
+          self.title = makeLatex(self.title,units=self.units)
         if self.only:
           if not isList(self.only): self.only = [ self.only ]
         if self.veto:
           if not isList(self.veto): self.veto = [ self.veto ]
+        
     
     @property
     def var(self): return self.name
@@ -430,8 +436,8 @@ class Variable(object):
     def unwrap(self):
         return (self.name,self.nbins,self.min,self.max)
     
-    def latex(self):
-        return makeLatex(self.name)
+    #def latex(self):
+    #    return makeLatex(self.name)
     
     def shift(self,jshift,**kwargs):
         if len(jshift)>0 and jshift[0]!='_':

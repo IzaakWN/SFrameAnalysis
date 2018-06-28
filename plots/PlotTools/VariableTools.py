@@ -18,26 +18,26 @@ varlist = {
     'fjeta_2':         "subleading forward jet eta (|eta|>2.4)",
     'pt_3':            "tau pt",
     'eta_3':           "tau eta",
-    'jpt_1':           "leading jet pt",                 'jpt_2':       "subleading jet pt",
-    'bpt_1':           "leading b jet pt",               'bpt_2':       "subleading b jet pt",
-    'abs(jeta_1)':     "leading jet abs(eta)",           'abs(jeta_2)': "subleading jet abs(eta)",
-    'abs(beta_1)':     "leading b jet abs(eta)",         'abs(beta_2)': "subleading b jet abs(eta)",
-    'jeta_1':          "leading jet eta",                'jeta_2':      "subleading jet eta",
-    'beta_1':          "leading b jet eta",              'beta_2':      "subleading b jet eta",
+    'jpt_1':           "leading jet pt",                 'jpt_2':        "subleading jet pt",
+    'bpt_1':           "leading b jet pt",               'bpt_2':        "subleading b jet pt",
+    'abs(jeta_1)':     "leading jet abs(eta)",           'abs(jeta_2)':  "subleading jet abs(eta)",
+    'abs(beta_1)':     "leading b jet abs(eta)",         'abs(beta_2)':  "subleading b jet abs(eta)",
+    'jeta_1':          "leading jet eta",                'jeta_2':       "subleading jet eta",
+    'beta_1':          "leading b jet eta",              'beta_2':       "subleading b jet eta",
     'njets':           "multiplicity of jets",
-    'ncjets':          "multiplicity of central jets",   'nfjets':     "multiplicity of forward jets",
-    'nbtag':           "multiplicity of b tagged jets",  'ncbtag':     "multiplicity of b tagged jets",
-    'beta_1':          "leading b jet eta",              'beta_2':     "subleading b jet eta",
-    'pt_tt':           "pt_ltau",                        'R_pt_m_vis': "R = pt_ltau / m_vis",
-    'pt_tt_sv':        "SVFit pt_ltau,sv",               'R_pt_m_sv':  "SVFit R_{sv} = pt_ltau / m_sv",
-    'm_sv':            "SVFit mass m_{tautau}",          'dzeta':      "D_{zeta}",
-    'dR_ll':           "#DeltaR_{ltau}",                 'pzeta_disc': "D_{zeta}",
-    'pfmt_1':          "m_t(l,MET)",                     'pzetavis':   "p_{zeta}^{vis}",
-    'dphi_ll_bj':      "#Deltaphi_ll',bj",               'pzetamiss':  "p_{zeta}^{miss}",
-    'puweight':        "pileup weight",                  'met':        "MET",
-    'chargedPionPt_2': "charged pion pt",                'metphi':     "MET phi",
-    'neutralPionPt_2': "neutral pion pt",                
-    '#DM0':            "h^{#pm}",                        
+    'ncjets':          "multiplicity of central jets",   'nfjets':      "multiplicity of forward jets",
+    'nbtag':           "multiplicity of b tagged jets",  'ncbtag':      "multiplicity of b tagged jets",
+    'beta_1':          "leading b jet eta",              'beta_2':      "subleading b jet eta",
+    'pt_tt':           "pt_ltau",                        'R_pt_m_vis':  "R = pt_ltau / m_vis",
+    'pt_tt_sv':        "SVFit pt_ltau,sv",               'R_pt_m_sv':   "SVFit R_{sv} = pt_ltau / m_sv",
+    'm_sv':            "SVFit mass m_{tautau}",          'dzeta':       "D_{zeta}",
+    'dR_ll':           "DeltaR_{ltau}",                 'pzeta_disc':  "D_{zeta}",
+    'pfmt_1':          "m_t(l,MET)",                     'pzetavis':    "p_{zeta}^{vis}",
+    'dphi_ll_bj':      "Deltaphi_ll',bj",               'pzetamiss':   "p_{zeta}^{miss}",
+    'puweight':        "pileup weight",                  'met':         "MET",
+    'chargedPionPt_2': "charged pion pt",                'metphi':      "MET phi",
+    'neutralPionPt_2': "neutral pion pt",                'pt_genboson': "Z boson pt",
+    '#DM0':            "h^{#pm}",                        'm_genboson':  "Z boson mass",               
     '#DM1':            "h^{#pm}#pi^{0}",                 
     '#DM10':           "h^{#pm}h^{#mp}h^{#pm}",           
 }
@@ -46,8 +46,8 @@ def makeLatex(title,**kwargs):
     """Convert patterns in a string to LaTeX format."""
     
     if title and title[0]=='{' and title[-1]=='}': return title[1:-1]
-    units = kwargs.get('units',True)
-    split = kwargs.get('split',False)
+    units = kwargs.get('units', True  )
+    split = kwargs.get('split', False )
     GeV   = False
     cm    = False
     
@@ -116,7 +116,7 @@ def makeLatex(title,**kwargs):
             string = re.sub(r"(m)t_([^{}()<>=\ ]+)",r"\1_{T}^{\2}",string,re.IGNORECASE)
             GeV = True
         
-        if "ht" in stringlow:
+        if "ht" in stringlow and "weight" not in stringlow:
             string = re.sub(r"\b(h)t\b",r"\1_{T}",string,re.IGNORECASE)
             GeV = True
         
@@ -125,9 +125,9 @@ def makeLatex(title,**kwargs):
             cm = True
         
         if "deltar_" in stringlow:
-            string = re.sub(r"(?<!#)deltar_([^{}()<>=\ ]+)",r"#DeltaR_{\1}",string,re.IGNORECASE)
+            string = re.sub(r"(?<!\#)deltar_([^{}()<>=\ ]+)",r"#DeltaR_{\1}",string,re.IGNORECASE)
         elif "deltar" in stringlow:
-            string = re.sub(r"(?<!#)deltar",r"#DeltaR",string,re.IGNORECASE)
+            string = re.sub(r"(?<!\#)deltar",r"#DeltaR",string,re.IGNORECASE)
         
         if "dR" in string:
             string = re.sub(r"(?<!\w)dR_([^{}()<>=\ ]+)",r"#DeltaR_{\1}",string)
@@ -183,7 +183,12 @@ def makeLatex(title,**kwargs):
     newtitle = ' / '.join(strings)
     
     if units and not '/' in newtitle:
-      if GeV or "mass" in newtitle or ("met" in newtitle.lower() and "phi" not in newtitle ):
+      if isinstance(units,str):
+        if re.search(r"[(\[].*[)\]]",newtitle)
+          newtitle += " "+units
+        else:
+          newtitle += " [%s]"%units
+      elif GeV or "mass" in newtitle or ("met" in newtitle.lower() and "phi" not in newtitle ):
         if "GeV" not in newtitle:
           newtitle += " [GeV]"
         if cm:
@@ -268,9 +273,10 @@ class Variable(object):
     """
     
     def __init__(self, name, *args, **kwargs):
-        strings         = [a for a in args if isinstance(a,str) ]
+        strings              = [a for a in args if isinstance(a,str) ]
+        self.units           = kwargs.get('units',          True                        ) # for plot axes
         self.name            = name
-        self.title           = strings[0] if strings else makeLatex(self.name)
+        self.title           = strings[0] if strings else makeLatex(self.name,units=self.units)
         self.title           = kwargs.get('title',          self.title                  ) # for plot axes
         self.filename        = kwargs.get('filename',       makeFileName(self.name)     ) # for file
         self.filename        = self.filename.replace('$NAME',self.name).replace('$VAR',self.name)
@@ -279,7 +285,6 @@ class Variable(object):
         self.max             = None
         self.xbins           = None
         self.setBinning(*args)
-        self.units           = kwargs.get('units',          ""                          ) # for plot axes
         self.logx            = kwargs.get('logx',           False                       )
         self.logy            = kwargs.get('logy',           False                       )
         self.position        = kwargs.get('position',       ""                          ) # legend position
@@ -350,12 +355,12 @@ class Variable(object):
           self.min      = numbers[1]
           self.max      = numbers[2]
           self.xbins    = None
-        elif len(xbins)>1:
+        elif len(xbins)>0:
           xbins         = xbins[0]
           self.nbins    = len(xbins)-1
           self.min      = xbins[0]
           self.max      = xbins[-1]
-          self.xbins    = array('d',list(xbins))
+          self.xbins    = xbins #array('d',list(xbins))
         else:
           print error('Variable: bad arguments "%s" for binning!'%(args))
           exit(1)

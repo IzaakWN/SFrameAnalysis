@@ -36,11 +36,13 @@ Examples:
 #cat dirs.txt | wc -l
 #split -l 200 dirs.txt dirs_split -d
 
-import os, sys, re
+import os, sys, re, time
 import optparse
 import thread
 import subprocess
 import math
+import time
+starttime = time.time()
 
 # parse the command line
 parser=optparse.OptionParser(usage="%prog SAMPLELISTFILE") #epilog
@@ -198,7 +200,7 @@ def main():
             retryXMLFile=False
             lock=thread.allocate_lock()
             lock.acquire()
-            commandMC="sframe_input.py -r -d -o %s/%s.xml %s -t %s" %(outDir, outName, csvList, treeName)
+            commandMC="sframe_input.py -r -d -o %s/%s.xml %s -t %s"%(outDir,outName,csvList,treeName)
             if verbose: print commandMC
             processMC=subprocess.Popen(commandMC, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
             lock.release()
@@ -214,6 +216,7 @@ def main():
               if "error" in line.lower():
                 for rootfile in csvList.split(','):
                   if rootfile in line:
+                    #print line
                     nWrittenRootFiles -= 2 # ".root" in processing and error message
                     newFailedRootFiles.append(rootfile)
                     csvList=csvList.replace(rootfile,'').replace(",,",',') # remove failed file from list
@@ -346,7 +349,9 @@ def plural(list,y=False):
 
 
 if __name__ == "__main__":
+  
   main()
-  print
+  
+  print "\nDone after %d minutes and %.1f seconds.\n"%divmod(time.time()-starttime,60)
   
 

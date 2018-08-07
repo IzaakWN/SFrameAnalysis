@@ -45,9 +45,8 @@ def error(string,*trigger,**kwargs):
     
 
 
-def printVerbose(string,verbosity,**kwargs):
+def printVerbose(string,verbosity,level=False,**kwargs):
     """Print string if verbosity is true or verbosity int is lager than given level."""
-    level = kwargs.get('level',False)
     if level:
       if verbosity>=level:
         print kwargs.get('pre',"") + string

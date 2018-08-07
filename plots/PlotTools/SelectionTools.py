@@ -283,8 +283,9 @@ class Selection(object):
         if self.selection=="":
            LOG.warning('Selection::Selection - No selection string given for "%s"!'%(self.name))
         self.context     = getContextFromDict(kwargs,self.selection) # context-dependent channel selections
-        self.only            = kwargs.get('only',           [ ]                         )
-        self.veto            = kwargs.get('veto',           [ ]                         )
+        self.weight      = kwargs.get('weight',     ""      )
+        self.only        = kwargs.get('only',       [ ]     )
+        self.veto        = kwargs.get('veto',       [ ]     )
         if self.only:
           if not isList(self.only): self.only = [ self.only ]
         if self.veto:
@@ -317,6 +318,7 @@ class Selection(object):
     def __mul__(self, weight):
         """Multiply selection with some weight (that can be string or Selection object)."""
         result = None
+        weight = combineWeights(self.weight,weight)
         if isinstance(selection2,str):
           result = Selection("%s (%s)"(self.name,weight),combineCuts(self.selection,weight=weight))
         else:
@@ -442,6 +444,12 @@ def unwrapVariableSelection2D(*args,**kwargs):
     if len(args)==9:
       xvar, nxbins, xmin, xmax, yvar, nybins, ymin, ymax, cuts = args
       xbins, ybins = [ ], [ ]
+    elif len(args)==3 and isinstance(args[0],Variable) and isinstance(args[1],Variable) and isinstance(args[2],Selection):
+      xvar, nxbins, xmin, xmax = args[0].unwrap()
+      xbins = args[0].xbins
+      yvar, nybins, ymin, ymax = args[1].unwrap()
+      ybins = args[1].xbins
+      cuts  = args[2].selection
     elif len(args)==5 and isList(args[1]) and isList(args[3]):
       xvar, xbins, yvar, ybins, cuts = args
       nxbins, xmin, xmax = len(xbins)-1, xbins[0], xbins[-1]

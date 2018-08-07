@@ -16,6 +16,15 @@ varlist = {
     'fjpt_2':          "subleading forward jet pt (|eta|>2.4)",
     'fjeta_1':         "leading forward jet eta (|eta|>2.4)",
     'fjeta_2':         "subleading forward jet eta (|eta|>2.4)",
+    'njets':           "multiplicity of jets",
+    'ncjets':          "multiplicity of central jets",   'nfjets':      "multiplicity of forward jets",
+    'nbtag':           "multiplicity of b tagged jets",  'ncbtag':      "multiplicity of b tagged jets",
+    'njets20':         "multiplicity of jets with pt>20 GeV",
+    'ncjets20':        "multiplicity of central jets with pt>20 GeV",   'nfjets20': "multiplicity of forward jets with pt>20 GeV",
+    'nbtag20':         "multiplicity of b tagged jets with pt>20 GeV",  'ncbtag20': "multiplicity of b tagged jets with pt>20 GeV",
+    'njets40':         "multiplicity of jets with pt>40 GeV",
+    'ncjets40':        "multiplicity of central jets with pt>40 GeV",   'nfjets40': "multiplicity of forward jets with pt>40 GeV",
+    'nbtag40':         "multiplicity of b tagged jets with pt>40 GeV",  'ncbtag40': "multiplicity of b tagged jets with pt>40 GeV",
     'pt_3':            "tau pt",
     'eta_3':           "tau eta",
     'jpt_1':           "leading jet pt",                 'jpt_2':        "subleading jet pt",
@@ -24,23 +33,22 @@ varlist = {
     'abs(beta_1)':     "leading b jet abs(eta)",         'abs(beta_2)':  "subleading b jet abs(eta)",
     'jeta_1':          "leading jet eta",                'jeta_2':       "subleading jet eta",
     'beta_1':          "leading b jet eta",              'beta_2':       "subleading b jet eta",
-    'njets':           "multiplicity of jets",
-    'ncjets':          "multiplicity of central jets",   'nfjets':      "multiplicity of forward jets",
-    'nbtag':           "multiplicity of b tagged jets",  'ncbtag':      "multiplicity of b tagged jets",
     'beta_1':          "leading b jet eta",              'beta_2':      "subleading b jet eta",
     'pt_tt':           "pt_ltau",                        'R_pt_m_vis':  "R = pt_ltau / m_vis",
     'pt_tt_sv':        "SVFit pt_ltau,sv",               'R_pt_m_sv':   "SVFit R_{sv} = pt_ltau / m_sv",
     'm_sv':            "SVFit mass m_{tautau}",          'dzeta':       "D_{zeta}",
-    'dR_ll':           "DeltaR_{ltau}",                 'pzeta_disc':  "D_{zeta}",
+    'dR_ll':           "DeltaR_{ltau}",                  'pzeta_disc':  "D_{zeta}",
     'pfmt_1':          "m_t(l,MET)",                     'pzetavis':    "p_{zeta}^{vis}",
-    'dphi_ll_bj':      "Deltaphi_ll',bj",               'pzetamiss':   "p_{zeta}^{miss}",
+    'dphi_ll_bj':      "Deltaphi_ll',bj",                'pzetamiss':   "p_{zeta}^{miss}",
     'puweight':        "pileup weight",                  'met':         "MET",
     'chargedPionPt_2': "charged pion pt",                'metphi':      "MET phi",
     'neutralPionPt_2': "neutral pion pt",                'pt_genboson': "Z boson pt",
-    '#DM0':            "h^{#pm}",                        'm_genboson':  "Z boson mass",               
-    '#DM1':            "h^{#pm}#pi^{0}",                 
-    '#DM10':           "h^{#pm}h^{#mp}h^{#pm}",           
+    'DM0':            "h^{#pm}",                         'm_genboson':  "Z boson mass",               
+    'DM1':            "h^{#pm}h^{0}",                  
+    'DM10':           "h^{#pm}h^{#mp}h^{#pm}",           
+    'DM11':           "h^{#pm}h^{#mp}h^{#pm}h^{0}",           
 }
+varlist_sorted = sorted(varlist,key=lambda x: len(x),reverse=True)
 
 def makeLatex(title,**kwargs):
     """Convert patterns in a string to LaTeX format."""
@@ -76,7 +84,7 @@ def makeLatex(title,**kwargs):
     #    title = title.replace("_jer","")
     
     
-    for var in varlist:
+    for var in varlist_sorted:
       if var in title:
           title = title.replace(var,varlist[var])
           #title = re.sub(r"\b%s\b"%var,varlist[var],title,re.IGNORECASE)
@@ -109,7 +117,7 @@ def makeLatex(title,**kwargs):
             GeV = True
         
         if "m_" in stringlow:
-            string = re.sub(r"(?<!u)(m)_([^{}()<>=\ ]+)",r"\1_{\2}",string,re.IGNORECASE).replace('{t}','{T}')
+            string = re.sub(r"(?<!u)(m)_([^{}()<>=\ \^]+)",r"\1_{\2}",string,re.IGNORECASE).replace('{t}','{T}')
             GeV = True
         
         if "mt_" in stringlow:
@@ -139,8 +147,11 @@ def makeLatex(title,**kwargs):
             string = re.sub(r"^#tau ",r"tau ",string,re.IGNORECASE)
             string = re.sub(r"tau_([^{}()<>=\ ]+)",r"tau_{\1}",string,re.IGNORECASE)
         
-        if "phi" in stringlow and "dphi" not in stringlow:
-            string = string.replace("phi","#phi")
+        if "phi" in stringlow:
+            if "dphi" in stringlow:
+              string = string.replace("dphi","#Delta#phi")
+            else:
+              string = string.replace("phi","#phi")
             string = re.sub(r"phi_([^{}()<>=\ ]+)",r"phi_{\1}",string,re.IGNORECASE)
         
         if "zeta" in stringlow and "#zeta" not in stringlow:
@@ -154,6 +165,7 @@ def makeLatex(title,**kwargs):
             GeV = True
         
         if "eta" in stringlow: #and "#eta" not in stringlow and "#zeta" not in stringlow and "deta" not in stringlow:
+            string = string.replace("deta","#Deltaeta")
             string = re.sub(r"(?<!\#z)eta",r"#eta",string)
             string = re.sub(r"eta_([^{}()<>=\ ]+)",r"eta_{\1}",string)
         
@@ -219,11 +231,13 @@ def makeFileName(string,**kwargs):
     string = re.sub(r"(\d+)\.(\d+)",r"\1p\2",string)
     if 'abs(' in string:
       string = re.sub(r"abs\(([^\)]*)\)",r"\1",string).replace('eta_2','eta')
-    string = string.replace(" and ",'-').replace(',','-').replace('(','').replace(')','').replace(':','-').replace(
-                               '|','').replace('&','').replace('#','').replace('!','not').replace(
-                               'pt_mu','pt').replace('m_T','mt').replace('m_t','mt').replace(
-                               '>=',"geq").replace('<=',"leq").replace('>',"gt").replace('<',"lt").replace("=","eq").replace(
-                               ' ','').replace('GeV','')
+    if 'm_t' in string:
+      string = re.sub(r"m_t(?!au)",r"mt",string)
+    string = string.replace(" and ",'-').replace(',','-').replace('(','').replace(')','').replace('{','').replace('}','').replace(':','-').replace(
+                            '|','').replace('&','').replace('#','').replace('!','not').replace(
+                            'pt_mu','pt').replace('m_T','mt').replace(
+                            '>=',"geq").replace('<=',"leq").replace('>',"gt").replace('<',"lt").replace("=","eq").replace(
+                            ' ','').replace('GeV','')
     #if 'm_t' in string.lower:
     #  string = re.sub(r"(?<!u)(m)_([^{}\(\)<>=\ ]+)",r"\1_{\2}",string,re.IGNORECASE).replace('{t}','{T}')
     #if "m_" in string.lower():
@@ -285,24 +299,30 @@ class Variable(object):
         self.min             = None
         self.max             = None
         self.xbins           = None
+        self.noData          = False # also draw data
         self.setBinning(*args)
+        self.binlabels       = kwargs.get('binlabels',      [ ]                         )
         self.ymin            = kwargs.get('ymin',           None                        )
         self.ymax            = kwargs.get('ymax',           None                        )
+        self.ymargin         = kwargs.get('ymargin',        1.16                        )
         self.logx            = kwargs.get('logx',           False                       )
         self.logy            = kwargs.get('logy',           False                       )
         self.position        = kwargs.get('position',       ""                          ) # legend position
+        self.ncolumns        = kwargs.get('ncolumns',       1                           ) # legend position
         #self.plot            = kwargs.get('plots',          True                        )
         self.only            = kwargs.get('only',           [ ]                         )
         self.veto            = kwargs.get('veto',           [ ]                         )
         self.contexttitle    = getContextFromDict(kwargs, None, key='ctitle'                ) # context-dependent title
-        self.contextbinning  = getContextFromDict(kwargs, None, key='cbinning',  regex=True ) # context-dependent binning
-        self.contextposition = getContextFromDict(kwargs, None, key='cposition', regex=True ) # context-dependent position
+        self.contextbinning  = getContextFromDict(kwargs, args, key='cbinning',  regex=True ) # context-dependent binning
+        self.contextposition = getContextFromDict(kwargs, self.position, key='cposition', regex=True ) # context-dependent position
         if self.latex:
           self.title = makeLatex(self.title,units=self.units)
         if self.only:
           if not isList(self.only): self.only = [ self.only ]
         if self.veto:
           if not isList(self.veto): self.veto = [ self.veto ]
+        if self.binlabels and len(self.binlabels)<self.nbins:
+          LOG.warning("Variable::init: len(binlabels)=%d < %d=nbins"%(len(self.binlabels),self.nbins))
         
     
     @property
@@ -368,7 +388,7 @@ class Variable(object):
           self.max      = xbins[-1]
           self.xbins    = xbins #array('d',list(xbins))
         else:
-          print error('Variable: bad arguments "%s" for binning!'%(args))
+          print error('Variable: bad arguments "%s" for binning!'%(args,))
           exit(1)
     
     def getBinning(self):
@@ -404,12 +424,13 @@ class Variable(object):
         return exlcusive
     
     def changeContext(self,*args):
-        """Change the contextual title for a set of arguments, if it is available"""
+        """Change the contextual title, binning or position for a set of arguments, if it is available"""
         if self.contexttitle:
           title = self.contexttitle.getContext(*args)
           if title!=None: self.title = title
         if self.contextbinning:
           binning = self.contextbinning.getContext(*args)
+          if isinstance(binning,list): binning = (binning,)
           if binning!=None: self.setBinning(*binning)
         if self.contextposition:
           position = self.contextposition.getContext(*args)

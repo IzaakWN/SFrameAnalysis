@@ -13,31 +13,34 @@ from SettingTools import *
 if loadMacros:
   ###gROOT.Macro('PlotTools/QCDModelingEMu/QCDModelingEMu.C+')
   ###gROOT.Macro('PlotTools/weightJEta1.C+')
-  if doFakeRate: gROOT.Macro('PlotTools/fakeRate/fakeRate.C+')
+  if doFakeRate:
+    gROOT.Macro('PlotTools/fakeRate/fakeRate.C+')
+    #gROOT.ProcessLine('TString MVArerunv2 = "MVArerunv2"; TString MVArerunv1new = "MVArerunv1new";')
   gROOT.Macro('PlotTools/leptonTauFake/leptonTauFake.C+')
   gROOT.Macro('PlotTools/Zpt/zptweight.C+')
+  
  
-colors_HTT_dict = { 'TT':   kBlue-8,                       'DY':       kOrange-4,
-                    'TTT':  kAzure-9,                      'ZL':       kAzure+6,
-                    'TTJ':  kBlue-8,                       'ZJ':       kGreen-6,
-                    'TTL':  kGreen-6,                      'ZTT':      kOrange-4,
-                    'ST':   TColor.GetColor(140,180,220),  'ZTT_DM0':  kOrange+5,
-                    'STJ':  kMagenta-8,                    'ZTT_DM1':  kOrange,
-                    'QCD':  kMagenta-10,                   'ZTT_DM10': kYellow-9,
-                    'data': kBlack,                        'ZTT_DM11': kYellow-3,
-                    'WJ':   50,                            'DY10':     TColor.GetColor(240,175,60), #TColor.GetColor(222,90,106)
-                    'VV':   TColor.GetColor(222,140,106),
+colors_HTT_dict = { 'TT':   kBlue-8,                         'DY':          kOrange-4,
+                    'TTT':  kAzure-9,                        'ZL':          TColor.GetColor(100,182,232), #kAzure+5,
+                    'TTJ':  kBlue-8,                         'ZJ':          kGreen-6,
+                    'TTL':  kGreen-6,                        'ZTT':         kOrange-4,
+                    'ST':   TColor.GetColor(140,180,220),    'ZTT_DM0':     kOrange+5,
+                    'STJ':  kMagenta-8,                      'ZTT_DM1':     kOrange-4, #kOrange,
+                    'QCD':  kMagenta-10,                     'ZTT_DM10':    kYellow-9,
+                    'data': kBlack,                          'ZTT_DM11':    kOrange-6,
+                    'WJ':   50,                              'ZTT_DMother': kOrange-8,
+                    'VV':   TColor.GetColor(222,140,106),    'DY10':        TColor.GetColor(240,175,60), #TColor.GetColor(222,90,106)
                     'sig':  kBlue
 }
-colors_IWN_dict = { 'TT':   kRed-2,        'DY':   kGreen-2,
-                    'TTT':  kRed-2,        'ZL':   kAzure+5,
-                    'TTJ':  kOrange+9,     'ZJ':   kSpring-7, #kGreen-7,
-                    'TTL':  kRed+1,        'ZTT_DM0':  kOrange,
-                    'ST':   kMagenta-3,    'ZTT_DM1':  kOrange+5,
-                    'STJ':  kMagenta+3,    'ZTT_DM10': kYellow-9,
-                    'QCD':  kRed-7,        'ZTT_DM11': kYellow-3,
-                    'data': kBlack,        'DY10': kAzure+5,
-                    'WJ':   kOrange-5,
+colors_IWN_dict = { 'TT':   kRed-2,        'DY':          kGreen-2,
+                    'TTT':  kRed-2,        'ZL':          kAzure+5,
+                    'TTJ':  kOrange+9,     'ZJ':          kSpring-7, #kGreen-7,
+                    'TTL':  kRed+1,        'DY10':        kAzure+5,
+                    'ST':   kMagenta-3,    'ZTT_DM0':     kOrange,
+                    'STJ':  kMagenta+3,    'ZTT_DM1':     kOrange+5,
+                    'QCD':  kRed-7,        'ZTT_DM10':    kYellow-9,
+                    'data': kBlack,        'ZTT_DM11':    kYellow-3, #kOrange+6
+                    'WJ':   kOrange-5,     'ZTT_DMother': kOrange-6, #kOrange+6
                     'VV':   kYellow-7, #+771,
                     'sig':  kAzure+4,
 }
@@ -47,48 +50,48 @@ colors_sample_dict = { }
 def setSampleColorDict(col_dict):
     global colors_sample_dict
     colors_sample_dict = {  
-        "TT":               col_dict['TT'],      'DY':         col_dict['DY'],
-        'TTT':              col_dict['TTT'],     'ZTT':        col_dict['DY'],
-        'TTL':              col_dict['TTL'],     'ZL':         col_dict['ZL'],
-        'TTJ':              col_dict['TTJ'],     'ZJ':         col_dict['ZJ'],
-        'ttbar':            col_dict['TT'],      'Drel*Yan':   col_dict['DY'],
-        'ttbar*real*tau':   col_dict['TTT'],     'Z*tau':      col_dict['DY'],
-        'ttbar*l':          col_dict['TTL'],     'Z*ll':       col_dict['ZL'],
-        'ttbar*j':          col_dict['TTJ'],     'Z*j*tau':    col_dict['ZJ'],
-        'ttbar*other':      col_dict['TTJ'],     'D*Y*other':  col_dict['DY10'], #kSpring+3, kPink-2
-        'ST':               col_dict['ST'],      'D*Y*10*50':  col_dict['DY10'],
-        'single top':       col_dict['ST'],      'D*Y*50':     col_dict['DY'],
-        'STT':              col_dict['ST'],      'ZTT_DM0':    col_dict['ZTT_DM0'],
-        'STJ':              col_dict['STJ'],     'ZTT_DM1':    col_dict['ZTT_DM1'],
-        'single top*real':  col_dict['ST'],      'ZTT_DM10':   col_dict['ZTT_DM10'],
-        'single top*other': col_dict['STJ'],     'ZTT_DM11':   col_dict['ZTT_DM11'],
-        'QCD':              col_dict['QCD'],     'W*jets':     col_dict['WJ'],
-        'JTF':              col_dict['QCD'],     'W*J':        col_dict['WJ'],
-        'fake*rate':        col_dict['QCD'],     'W':          col_dict['WJ'],
-        'j*tau*fake':       col_dict['QCD'],     'WW':         col_dict['VV'],
-        'signal':           col_dict['sig'],     'WZ':         col_dict['VV'],
-        'VLQ':              col_dict['sig'],     'ZZ':         col_dict['VV'],
-        'bbA':              col_dict['sig'],     'VV':         col_dict['VV'],
-        'data':             col_dict['data'],    'diboson':    col_dict['VV'],
-        'single muon':      col_dict['data'],
-        'single electron':  col_dict['data'],
-        'observed':         col_dict['data'],
+        "TT":               col_dict['TT'],         'DY':          col_dict['DY'],
+        'TTT':              col_dict['TTT'],        'ZTT':         col_dict['DY'],
+        'TTL':              col_dict['TTL'],        'ZL':          col_dict['ZL'],
+        'TTJ':              col_dict['TTJ'],        'ZJ':          col_dict['ZJ'],
+        'ttbar':            col_dict['TT'],         'Drel*Yan':    col_dict['DY'],
+        'ttbar*real*tau':   col_dict['TTT'],        'Z*tau':       col_dict['DY'],
+        'ttbar*l':          col_dict['TTL'],        'Z*ll':        col_dict['ZL'],
+        'ttbar*j':          col_dict['TTJ'],        'Z*j*tau':     col_dict['ZJ'],
+        'ttbar*other':      col_dict['TTJ'],        'D*Y*l*tau':   col_dict['ZL'],
+        'ST':               col_dict['ST'],         'D*Y*other':   col_dict['ZJ'], #kSpring+3, kPink-2
+        'single top':       col_dict['ST'],         'D*Y*10*50':   col_dict['DY10'],
+        'STT':              col_dict['ST'],         'D*Y*50':      col_dict['DY'],
+        'STJ':              col_dict['STJ'],        'ZTT_DM0':     col_dict['ZTT_DM0'],     'Z*tau*DM0':   col_dict['ZTT_DM0'],
+        'single top*real':  col_dict['ST'],         'ZTT_DM1':     col_dict['ZTT_DM1'],     'Z*tau*DM1':   col_dict['ZTT_DM1'],
+        'single top*other': col_dict['STJ'],        'ZTT_DM10':    col_dict['ZTT_DM10'],    'Z*tau*DM10':  col_dict['ZTT_DM10'],
+        'QCD':              col_dict['QCD'],        'ZTT_DM11':    col_dict['ZTT_DM11'],    'Z*tau*DM11':  col_dict['ZTT_DM11'],
+        'JTF':              col_dict['QCD'],        'ZTT_DMother': col_dict['ZTT_DMother'], 'Z*tau*other': col_dict['DY10'],
+        'fake*rate':        col_dict['QCD'],        'W*jets':      col_dict['WJ'],
+        'j*tau*fake':       col_dict['QCD'],        'W*J':         col_dict['WJ'],
+        'signal':           col_dict['sig'],        'W':           col_dict['WJ'],
+        'VLQ':              col_dict['sig'],        'WW':          col_dict['VV'],
+        'bbA':              col_dict['sig'],        'WZ':          col_dict['VV'],
+        'data':             col_dict['data'],       'ZZ':          col_dict['VV'],
+        'single muon':      col_dict['data'],       'VV':          col_dict['VV'],
+        'single electron':  col_dict['data'],       'diboson':     col_dict['VV'],
+        'observed':         col_dict['data'],   
     }
 setSampleColorDict(colors_IWN_dict if 'IWN' in colorset else colors_HTT_dict)
 
 sample_dict = {
-  'TT':        "ttbar",                      'DY':  "Drell-Yan",
-  'TTT':       "ttbar with real tau_h",      'ZTT': "Z -> tau_{mu}tau_{h}",
-  'TTJ':       "ttbar other",                'ZTT_DM0':  "Z -> tau_{mu}tau_{h}, h^{#pm}",
-  'TTL':       "ttbar with l -> tau_h",      'ZTT_DM1':  "Z -> tau_{mu}tau_{h}, h^{#pm}#pi^{0}",
-  'ST':        "single top",                 'ZTT_DM10': "Z -> tau_{mu}tau_{h}, h^{#pm}h^{#mp}h^{#pm}",
-  'STT':       "single top with real tau_h", 'ZL':  "Drell-Yan with l -> tau_h",
-  'STJ':       "single top other",           'ZJ':  "Drell-Yan with j -> tau_h",
-  'data_obs':  "observed",                   'W':   "W + jets",
-  'XTT':       "VLQ",                        'VV':  "diboson",
-  'XTT-MB170': "VLQ m_{B}=170",              'QCD': "QCD multijet",
-  'XTT-MB300': "VLQ m_{B}=300",              'JTF': "j -> tau fakes",
-  'XTT-MB450': "VLQ m_{B}=450",              'ATT': "bbA",
+  'TT':        "ttbar",                         'DY':       "Drell-Yan",
+  'TTT':       "ttbar with real tau_h",         'ZTT':      "Z -> tau_{mu}tau_{h}",
+  'TTJ':       "ttbar other",                   'ZTT_DM0':  "Z -> tau_{mu}tau_{h}, h^{#pm}",
+  'TTL':       "ttbar with l -> tau_h",         'ZTT_DM1':  "Z -> tau_{mu}tau_{h}, h^{#pm}#pi^{0}",
+  'ST':        "single top",                    'ZTT_DM10': "Z -> tau_{mu}tau_{h}, h^{#pm}h^{#mp}h^{#pm}",
+  'STT':       "single top with real tau_h",    'ZL':       "Drell-Yan with l -> tau_h",
+  'STJ':       "single top other",              'ZJ':       "Drell-Yan with j -> tau_h",
+  'data_obs':  "observed",                      'W':        "W + jets",
+  'XTT':       "VLQ",                           'VV':       "diboson",
+  'XTT-MB170': "VLQ m_{B}=170",                 'QCD':      "QCD multijet",
+  'XTT-MB300': "VLQ m_{B}=300",                 'JTF':      "j -> tau fakes",
+  'XTT-MB450': "VLQ m_{B}=450",                 'ATT':      "bbA",
 }
 
 
@@ -149,8 +152,7 @@ def SFrameOutputPath(outdir,subdir,samplename,*args,**kwargs):
     tag        += kwargs.get('extratag', ""              )
     if args and isinstance(args,str): tag = args[0]
     file        = "%s/%s/%s.%s%s.root" % (outdir,subdir,cycle,samplename,tag)
-    LOG.verbose("file = \"%s\""%(file),     verbosity,level=3)
-    print file
+    LOG.verbose('file = "%s"'%(file),     verbosity,level=3)
     return file
     
 def shiftSample(samples0,searchterms,file_app,title_app,**kwargs):
@@ -249,12 +251,13 @@ def printComparingCutflow(efficiencies1,efficiencies2):
        ratio = "-"
        if N1: ratio = N2/N1
        print (">>> %13s:   %9d - %9d %8.2f   %6.2f - %6.2f   %7.3f - %7.3f  " % (name1,N1,N2,ratio,releff1,releff2,abseff1,abseff2))
-       
+    
 
 
 def getColor(name):
     """Get color for some sample name."""
-    if isinstance(name,Sample): name = sample.name
+    if isinstance(name,Sample):
+      name = "signal "+name.title if name.isSignal else name.title
     for searchterm in sorted(colors_sample_dict,key=lambda x: len(x),reverse=True):
       if re.findall(searchterm.replace('*',".*"),name): # glob -> regex wildcard # re.IGNORECASE
         LOG.verbose('getColor - "%s" gets color %s from searchterm "%s"!'%(name,colors_sample_dict[searchterm],searchterm),verbositySampleTools,level=3)
@@ -262,11 +265,11 @@ def getColor(name):
     LOG.warning('getColor - could not find color for "%s"!'%name)
     return 0
     
-    
+
 def checkMemory():
     print "gDirectory %s"%(gDirectory.GetName())
     print gDirectory.ls()
-
+    
 
 
 CutInfo = ntuple("CutInfo",['name','cut','N','N_unweighted','abseff','releff','kwargs'])
@@ -351,7 +354,7 @@ class Sample(object):
         self.isSignal       = kwargs.get('signal',          False               )
         self.blind_dict     = kwargs.get('blind',           { }                 ) # var vs. (xmin,xmax)
         self.splitsamples   = [ ]
-        self.color          = kwargs.get('color',           getColor(self.title))
+        self.color          = kwargs.get('color',           getColor(self)      )
         self.linecolor      = kwargs.get('linecolor',       kBlack              )
         self.lumi           = kwargs.get('lumi',            luminosity          )
         self.isSFrame       = kwargs.get('SFrame',          True                )
@@ -363,6 +366,8 @@ class Sample(object):
         # SFRAME
         if self.sigma>=0 and self.isSFrame and not self.isData and not isinstance(self,MergedSample):
             self.normalizeToLumiCrossSectionSFrame(self.lumi)
+        elif self.isData:
+            self.getNumberOfEventsSFrame("mutau",1,self.binN_weighted)
         
         # CHECK NUMBER OF EVENTS
         if 0 < self.N < self.N_exp*0.97:
@@ -395,20 +400,19 @@ class Sample(object):
         """Returns string that can be used as a row in a samples summary table"""
         pre    = kwargs.get('pre', "")
         return ">>>  %s%-20s  %-40s  %12.2f  %10i  %11i  %10.3f  %s" %\
-          (pre,self.title,self.name,self.sigma,self.N_unweighted,self.N,self.norm,self.extraweight) + ("  isData" if self.isData else "")
+          (pre,self.title,self.name,self.sigma,self.N_unweighted,self.N,self.norm,self.extraweight) #+ ("  isData" if self.isData else "")
     
     def printRow(self):
         print self.row()
     
-    def printSampleObjects(self,**kwargs):
+    def printSampleObjects(self,title=""):
         """Print all sample objects recursively"""
-        pre = kwargs.get('pre',"")
-        print ">>> %s%r"%(kwargs.get('pre',""),self)
+        print ">>> %s%r"%(title,self)
         if isinstance(self,MergedSample):
           for sample in self.samples:
-            sample.printSampleObjects(pre=pre+"  ")
+            sample.printSampleObjects(title+"  ")
         for sample in self.splitsamples:
-          sample.printSampleObjects(pre=pre+"  ")
+          sample.printSampleObjects(title+"  ")
     
     #@property
     #def filename(self):
@@ -513,8 +517,8 @@ class Sample(object):
         name                    = args[0] if len(args)>0 else self.name  + ("" if samename else  "_clone" )
         title                   = args[1] if len(args)>1 else self.title + ("" if samename else " (clone)")
         filename                = args[2] if len(args)>2 else self.filename
-        newsample               = type(self)(name,title,filename,**kwargs)
         splitsamples            = [s.clone(samename=samename,deep=deep) for s in self.splitsamples] if deep else self.splitsamples[:]
+        kwargs['signal']        = self.isSignal
         newsample               = type(self)(name,title,filename,**kwargs)
         newdict                 = self.__dict__.copy()
         newdict['name']         = name
@@ -530,7 +534,7 @@ class Sample(object):
         
     def setColor(self,*args):
         """Set color"""
-        self.color = args[0] if args else getColor(self.title)
+        self.color = args[0] if args else getColor(self)
         
     #def setFileName(self,filename):
     #    """Set filename."""
@@ -570,9 +574,11 @@ class Sample(object):
         for sample in self.splitsamples:
             sample.scale = scale
         
-    def resetScale(self,scale=1,**kwargs):
+    def resetScale(self,scale=1.0,**kwargs):
         """Reset scale to BU scale."""
-        self.scale = self.scaleBU*scale
+        LOG.verbose("resetScale: before scale = %s"%(self.scale),verbositySampleTools,2)
+        self.scale = self.scaleBU*scale # only scale first layer
+        LOG.verbose("            after  scale = %s"%(self.scale),verbositySampleTools,2)
         for sample in self.splitsamples:
             sample.resetScale(**kwargs)
         if isinstance(self,MergedSample):
@@ -627,6 +633,8 @@ class Sample(object):
             sample.addCuts(cuts)
         else:
           self.cuts = combineCuts(self.cuts, cuts)
+        for sample in self.splitsamples:
+            sample.addCuts(cuts)
         
     def addWeight(self, weight):
         """Add weight."""
@@ -635,7 +643,11 @@ class Sample(object):
           for sample in self.samples:
             sample.addWeight(weight)
         else:
+          LOG.verbose('addWeight: before: %s, self.weight = "%s", self.extraweight = "%s", '%(self,self.weight,self.extraweight),verbositySampleTools)
           self.weight = combineWeights(self.weight, weight)
+          LOG.verbose('           after:  %s, self.weight = "%s", self.extraweight = "%s", '%(self,self.weight,self.extraweight),verbositySampleTools)
+        for sample in self.splitsamples:
+            sample.addWeight(weight)
         
     def addExtraWeight(self, weight):
         """Add extra weight."""
@@ -643,17 +655,50 @@ class Sample(object):
           for sample in self.samples:
             sample.addExtraWeight(weight)
         else:
+          LOG.verbose('addExtraWeight: before: %s, self.weight = "%s", self.extraweight = "%s"'%(self,self.weight,self.extraweight),verbositySampleTools,2)
           self.extraweight = combineWeights(self.extraweight, weight)
+          LOG.verbose('                after:  %s, self.weight = "%s", self.extraweight = "%s"'%(self,self.weight,self.extraweight),verbositySampleTools,2)
+        for sample in self.splitsamples:
+            sample.addExtraWeight(weight)
         
     def setWeight(self, weight, extraweight=False):
-        """Set weight, discarding all previous ones."""
+        """Set weight, overwriting all previous ones."""
         if isinstance(self,MergedSample):
           for sample in self.samples:
             sample.setWeight(weight)
         else:
-          print "old: %s, self.weight = %s, self.extraweight = %s, "%(self,self.weight,self.extraweight)
+          LOG.verbose('setWeight: before: %s, self.weight = "%s", self.extraweight = "%s"'%(self,self.weight,self.extraweight),verbositySampleTools,2)
           self.weight = weight
-          print "new: %s, self.weight = %s, self.extraweight = %s, "%(self,self.weight,self.extraweight)
+          LOG.verbose('           after:  %s, self.weight = "%s", self.extraweight = "%s"'%(self,self.weight,self.extraweight),verbositySampleTools,2)
+        for sample in self.splitsamples:
+            sample.setWeight(weight)
+        
+    def setExtraWeight(self, weight):
+        """Set extra weight, overwriting all previous ones."""
+        if isinstance(self,MergedSample):
+          for sample in self.samples:
+            sample.setExtraWeight(weight)
+        else:
+          LOG.verbose('setExtraWeight: before: %s, self.weight = "%s", self.extraweight = "%s"'%(self,self.weight,self.extraweight),verbositySampleTools,2)
+          self.extraweight = weight
+          LOG.verbose('                after:  %s, self.weight = "%s", self.extraweight = "%s"'%(self,self.weight,self.extraweight),verbositySampleTools,2)
+        for sample in self.splitsamples:
+            sample.setExtraWeight(weight)
+        
+    def replaceWeight(self, oldweight, newweight):
+        """Replace weight."""
+        if isinstance(self,MergedSample):
+          for sample in self.samples:
+            sample.replaceWeight(oldweight,newweight)
+        else:
+          if oldweight in self.weight:
+            LOG.verbose('>>> replaceWeight: before "%s"'%(self.weight),verbositySampleTools)
+            self.weight = self.weight.replace(oldweight,newweight)
+            LOG.verbose('>>>                after  "%s"'%(self.weight),verbositySampleTools)
+          if oldweight in self.extraweight:
+            LOG.verbose('>>> replaceWeight: before "%s"'%(self.extraweight),verbositySampleTools)
+            self.extraweight = self.extraweight.replace(oldweight,newweight)
+            LOG.verbose('>>>                after  "%s"'%(self.extraweight),verbositySampleTools)
         
     def normalizeToLumiCrossSection(self,lumi,**kwargs):
         """Calculate and set the normalization for simulation as L*sigma/N"""
@@ -677,12 +722,8 @@ class Sample(object):
         return norm
         
     
-    def normalizeToLumiCrossSectionSFrame(self,lumi,**kwargs):
-        """Calculate and set the normalization for a SFrame sample."""
-        
-        channel             = kwargs.get('cutflow',             "mutau"             )
-        binN                = kwargs.get('binN',                1                   )
-        binN_weighted       = kwargs.get('binN_weighted',       self.binN_weighted  )
+    def getNumberOfEventsSFrame(self,channel,binN,binN_weighted):
+        """Get number of events for a SFrame sample from the cutflow histogram."""
         cutflowHist         = self.file.Get("histogram_%s/cutflow_%s"%(channel,channel))
         if not cutflowHist:
             cutflowHist     = self.file.Get("histogram_emu/cutflow_emu")
@@ -695,6 +736,13 @@ class Sample(object):
         self.N              = cutflowHist.GetBinContent(binN_weighted)
         self.N_unweighted   = cutflowHist.GetBinContent(binN)
         
+    
+    def normalizeToLumiCrossSectionSFrame(self,lumi,**kwargs):
+        """Calculate and set the normalization for a SFrame sample."""
+        channel             = kwargs.get('cutflow',        "mutau"             )
+        binN                = kwargs.get('binN',           1                   )
+        binN_weighted       = kwargs.get('binN_weighted',  self.binN_weighted  )
+        self.getNumberOfEventsSFrame(channel,binN,binN_weighted)
         return self.normalizeToLumiCrossSection(lumi,**kwargs)
         
     
@@ -704,7 +752,7 @@ class Sample(object):
         verbosity      = getVerbosity(kwargs,verbositySampleTools)
         splitsamples   = [ ]
         
-        for i, info in enumerate(splitlist): #split_dict.items()
+        for i, info in enumerate(reversed(splitlist)): #split_dict.items()
             name         = info[0] if len(info)>2 else "%s_split%d"%(self.name,i)
             title        = info[1] if len(info)>2 else info[0] if len(info)>1 else name
             cut          = info[2] if len(info)>2 else info[1] if len(info)>1 else ""
@@ -720,22 +768,25 @@ class Sample(object):
     def hist(self, *args, **kwargs):
         """Make a histogram from a tree."""
         
-        verbosity     = getVerbosity(kwargs,verbositySampleTools)
+        verbosity      = getVerbosity(kwargs,verbositySampleTools)
         var, nbins, xmin, xmax, xbins, cuts = unwrapVariableSelection(*args)
-        scale         = kwargs.get('scale',             1.0                         ) * self.scale * self.norm
-        treename      = kwargs.get('treename',          self.treename               )
-        name          = kwargs.get('name',              makeHistName(self.name,var) )
-        name         += kwargs.get('append',            ""                          )
-        title         = kwargs.get('title',             self.title                  )
-        shift         = kwargs.get('shift',             0                           )
-        smear         = kwargs.get('smear',             0                           )
-        scaleup       = kwargs.get('scaleup',           0.0                         )
-        includeUncs   = kwargs.get('includeUnc',        ""                          )
-        blind         = kwargs.get('blind',             False                       )
-        noJTF         = kwargs.get('noJTF',             False                       )
-        color0        = kwargs.get('color',             self.color                  )
-        linecolor     = kwargs.get('linecolor',         self.linecolor              )
-        divideBinSize = kwargs.get('divideByBinSize',   False                       )
+        scale          = kwargs.get('scale',             1.0                         ) * self.scale * self.norm
+        treename       = kwargs.get('treename',          self.treename               )
+        name           = kwargs.get('name',              makeHistName(self.name,var) )
+        name          += kwargs.get('append',            ""                          )
+        title          = kwargs.get('title',             self.title                  )
+        shift          = kwargs.get('shift',             0                           )
+        smear          = kwargs.get('smear',             0                           )
+        scaleup        = kwargs.get('scaleup',           0.0                         )
+        includeUncs    = kwargs.get('includeUnc',        ""                          )
+        blind          = kwargs.get('blind',             False                       )
+        noJTF          = kwargs.get('noJTF',             False                       )
+        color0         = kwargs.get('color',             self.color                  )
+        linecolor      = kwargs.get('linecolor',         self.linecolor              )
+        divideBinSize  = kwargs.get('divideByBinSize',   False                       )
+        extracuts      = kwargs.get('cuts',              ""                          )
+        weight         = kwargs.get('weight',            ""                          )
+        replaceweight  = kwargs.get('replaceweight',     None                        )
         
         drawoption    = "E0" if self.isData else "HIST"
         drawoption    = "gOff"+kwargs.get('option',   drawoption                  )
@@ -756,9 +807,17 @@ class Sample(object):
             a, b      = self.blind_dict[var]
             blindcuts = makeBlindCuts(var,a,b,nbins,xmin,xmax)
         
-        # CUTS & WEIGHTS
-        weight   = combineWeights(self.weight, self.extraweight, kwargs.get('weight',""))
-        cuts     = combineCuts(cuts, kwargs.get('cuts',""), kwargs.get('extracuts',""), self.cuts, blindcuts, weight=weight)
+        # WEIGHTS
+        weight   = combineWeights(self.weight, self.extraweight, weight)
+        if replaceweight:
+          for pair in replaceweight:
+            if pair[0] in weight:
+              print '>>> replacing weight: before "%s"'%weight
+              weight = weight.replace(pair[0],pair[1])
+              print '>>>                   after  "%s"'%weight
+        
+        # CUTS
+        cuts     = combineCuts(cuts, extracuts, kwargs.get('extracuts',""), self.cuts, blindcuts, weight=weight)
         if noJTF:
           cuts   = vetoJetTauFakes(cuts)
         if self.isData and ('Up' in var or 'Down' in var or 'Up' in cuts or 'Down' in cuts):
@@ -827,6 +886,7 @@ class Sample(object):
         name          = kwargs.get('name',            name                        )
         name         += kwargs.get('append',          ""                          )
         title         = kwargs.get('title',           self.title                  )
+        extracuts     = kwargs.get('cuts',            ""                          )
         noJTF         = kwargs.get('noJTF',           False                       )
         color0        = kwargs.get('color',           self.color                  )
         linecolor     = kwargs.get('linecolor',       self.linecolor              )
@@ -835,7 +895,7 @@ class Sample(object):
         
         # CUTS & WEIGHTS
         weight   = combineWeights(self.weight, self.extraweight, kwargs.get('weight', ""))
-        cuts     = combineCuts(cuts, kwargs.get('cuts', ""), kwargs.get('extracuts', ""), self.cuts, weight=weight)
+        cuts     = combineCuts(cuts, extracuts, kwargs.get('extracuts', ""), self.cuts, weight=weight)
         if noJTF:
           cuts   = vetoJetTauFakes(cuts)
         
@@ -981,7 +1041,7 @@ class MergedSample(Sample):
                   newsplitsample.samples[oldsplitsample.samples.index(subsample)] = samples[self.samples.index(subsample)]
             splitsamples.append(newsplitsample)
           else:
-            splitsamples.append(sample)
+            splitsamples.append(oldsplitsample)
         newdict            = self.__dict__.copy()
         newdict['name']    = name
         newdict['title']   = title
@@ -1000,9 +1060,9 @@ class MergedSample(Sample):
         name             = kwargs.get('name',               makeHistName(self.name+"_merged", var))
         name            += kwargs.get('append',             ""                      )
         title            = kwargs.get('title',              self.title              )
-        cuts             = combineCuts(cuts,                self.cuts               )
         divideBinSize    = kwargs.get('divideByBinSize',    False                   )
-        kwargs['weight'] = combineWeights(kwargs.get('weight', ""), self.weight     )# pass scale down
+        kwargs['cuts']   = combineCuts(kwargs.get('cuts'),  self.cuts               )
+        kwargs['weight'] = combineWeights(kwargs.get('weight', ""), self.weight     ) # pass weight down
         kwargs['scale']  = kwargs.get('scale', 1.0) * self.scale * self.norm # pass scale down
         kwargs['divideByBinSize'] = False
         
@@ -1040,7 +1100,7 @@ class MergedSample(Sample):
         name             = kwargs.get('name',               name                    )
         name            += kwargs.get('append',             ""                      )
         title            = kwargs.get('title',              self.title              )
-        cuts             = combineCuts(cuts,                self.cuts               )
+        kwargs['cuts']   = combineCuts(kwargs.get('cuts'),  self.cuts               )
         kwargs['weight'] = combineWeights(kwargs.get('weight', ""), self.weight     )# pass scale down
         kwargs['scale']  = kwargs.get('scale', 1.0) * self.scale * self.norm # pass scale down
         
@@ -1056,7 +1116,7 @@ class MergedSample(Sample):
         hist.SetOption("COLZ")
         for sample in self.samples:
             if 'name' in kwargs: # prevent memory leaks
-                kwargs['name']  = makeHistName(sample.name,name.replace(self.name+'_',''))    
+              kwargs['name']  = makeHistName(sample.name,name.replace(self.name+'_',''))    
             hist_new = sample.hist2D(*args, **kwargs)
             hist.Add( hist_new )
             #LOG.verbose("    sample %s added with %.1f events (%d entries)" % (sample.name,hist_new.Integral(),hist_new.GetEntries()),verbosity,level=2)
@@ -1143,9 +1203,9 @@ class SampleSet(object):
       """Returns string representation of Sample object."""
       return str([s.name for s in self.samplesB+self.samplesS]+[s.name for s in self.samplesD])
     
-    def printSampleObjects(self):
+    def printSampleObjects(self,title=""):
       for sample in self.samples:
-        sample.printSampleObjects()
+        sample.printSampleObjects(title="")
     
     def printTable(self,title=""):
       """Print table of all samples."""
@@ -1256,7 +1316,61 @@ class SampleSet(object):
         for sample in self.samples:
           if shared and sample in self.sharedsamples: continue
           sample.close(**kwargs)
-        self.closed = True 
+        self.closed = True
+          
+    def clone(self,name="",**kwargs):
+        """Shift samples in samples set by creating new samples with new filename/titlename."""
+        filter          = kwargs.get('filter',      False       )
+        share           = kwargs.get('share',       False       ) # share other samples (as opposed to cloning them)
+        app             = kwargs.get('app',         "clone"     )
+        close           = kwargs.get('close',       False       )
+        deep            = kwargs.get('deep',        True        )
+        
+        filterterms     = filter if isList(filter) else ensureList(filter) if isinstance(filter,str) else [ ]
+        shareterms      = share  if isList(share)  else ensureList(share)  if isinstance(share,str)  else [ ]
+        samplesD        = { }
+        samplesB        = [ ]
+        samplesS        = [ ]
+        sharedsamples   = [ ]
+        for sample in self.samplesB:
+          if filter and sample.isPartOf(*filterterms,exclusive=False):
+            if share:
+              newsample = sample
+              sharedsamples.append(newsample)
+            else:
+              newsample = sample.clone(samename=True,deep=deep)
+            samplesB.append(newsample)
+          elif not filter:
+            if share or (shareterms and sample.isPartOf(*shareterms,exclusive=False)):
+              newsample = sample
+              sharedsamples.append(newsample)
+            else:
+              newsample = sample.clone(samename=True,deep=deep)
+            samplesB.append(newsample)
+        for sample in self.samplesS:
+          if filter and sample.isPartOf(*filterterms,exclusive=False):
+            if share:
+              newsample = sample
+              sharedsamples.append(newsample)
+            else:
+              newsample = sample.clone(samename=True,deep=deep)
+            samplesB.append(newsample)
+          elif not filter:
+            if share or (shareterms and sample.isPartOf(*shareterms,exclusive=False)):
+              newsample = sample
+              sharedsamples.append(newsample)
+            else:
+              newsample = sample.clone(samename=True,deep=deep)
+            samplesS.append(newsample)
+        if not filter:
+          samplesD = self._samplesD
+          sharedsamples.append(samplesD)
+        
+        kwargs['shared'] = sharedsamples
+        kwargs['name']   = name
+        newset = SampleSet(samplesD,samplesB,samplesS,**kwargs)
+        newset.closed = close
+        return newset
     
     def reloadFiles(self,**kwargs):
         """Help function to reload all files in samples list."""
@@ -1335,6 +1449,7 @@ class SampleSet(object):
         divideBinSize   = kwargs.get('divideByBinSize', False               )
         weight          = kwargs.get('weight',          ""                  )
         weight_data     = kwargs.get('weight_data',     ""                  )
+        replaceweight   = kwargs.get('replaceweight',   None                )
         split           = kwargs.get('split',           True                )
         blind           = kwargs.get('blind',           True                )
         scaleup         = kwargs.get('scaleup',         0.0                 )
@@ -1377,7 +1492,12 @@ class SampleSet(object):
             
         
         bar = None
-        if self.loadingbar and verbosity<2:
+        if verbosity>1:
+            if not ("QCD" in task or "JFR" in task):
+              print header("creating histograms for variable %s"%(var))
+            print ">>> split=%s, makeQCD=%s, makeJTF=%s, noJTF=%s"%(split,makeQCD,makeJTF,noJTF)
+            print '>>>   with extra weights "%s" for MC and "%s" for data'%(weight,weight_data)
+        elif self.loadingbar and verbosity<2:
             bar = LoadingBar(len(samples),width=16,pre=">>> %s: %s: "%(var,task),counter=True,remove=True)
         for sample in samples:
             if bar:   bar.message(sample.title)
@@ -1388,7 +1508,7 @@ class SampleSet(object):
             
             # ADD background
             if sample.isBackground and background:
-              hist = sample.hist(*args,append=append,weight=weight,noJTF=noJTF,divideByBinSize=divideBinSize,verbosity=verbosity)
+              hist = sample.hist(*args,append=append,weight=weight,noJTF=noJTF,divideByBinSize=divideBinSize,replaceweight=replaceweight,verbosity=verbosity)
               histsB.append(hist)
             
             # ADD signal
@@ -1517,7 +1637,8 @@ class SampleSet(object):
         name           += append
         
         # WEIGHT
-        weightFR        = "getFakeRate(pt_2,m_2,decayMode_2)" # pt-, mass- dependent 
+        gROOT.ProcessLine('setID("MVArerun")')
+        weightFR        = 'getFakeRate(pt_2,m_2,decayMode_2)' # pt-, mass- dependent
         #weightFR        = "getFakeRate(pt_2,decayMode_2)" # pt-dependent only
         if shift:
           if "down" in shift.lower(): weightFR = weightFR.replace('getFakeRate','getFakeRateDown')
@@ -1525,23 +1646,35 @@ class SampleSet(object):
           else: LOG.warning('SampleSet::jetFakeRate: Did not recognize shift "%s"!'%(shift))
         
         # CUTS
-        cuts        = vetoJetTauFakes(cuts0)
-        isomatch    = re.findall(r"iso_2\ *==\ *1",cuts)
-        anisomatch  = re.findall(r"iso_2_vloose\ *==\ *1 && iso_2\ *!=\ *1",cuts)
+        cuts          = vetoJetTauFakes(cuts0)
+        cuts_aniso    = "iso_2_vloose==1 && iso_2!=1"
+        isomatch      = re.findall(r"iso_2\ *==\ *1",cuts)
+        anisomatch    = re.findall(r"iso_2_vloose\ *==\ *1 && iso_2\ *!=\ *1",cuts)
+        if len(isomatch)==0 and len(anisomatch)==0:
+          gROOT.ProcessLine('setID("MVArerunv1new")')
+          cuts_aniso  = "byVLooseIsolationMVArun2v1DBnewDMwLT_2==1 && byTightIsolationMVArun2v1DBnewDMwLT_2!=1"
+          isomatch    = re.findall(r"byTightIsolationMVArun2v1DBnewDMwLT_2\ *==\ *1",cuts)
+          anisomatch  = re.findall(r"byVLooseIsolationMVArun2v1DBnewDMwLT_2\ *==\ *1 && byTightIsolationMVArun2v1DBnewDMwLT_2\ *!=\ *1",cuts)
+        if len(isomatch)==0 and len(anisomatch)==0:
+          gROOT.ProcessLine('setID("MVArerunv2")')
+          cuts_aniso  = "byVLooseIsolationMVArun2v2DBoldDMwLT_2==1 && byTightIsolationMVArun2v2DBoldDMwLT_2!=1"
+          isomatch    = re.findall(r"byTightIsolationMVArun2v2DBoldDMwLT_2\ *==\ *1",cuts)
+          anisomatch  = re.findall(r"byVLooseIsolationMVArun2v2DBoldDMwLT_2\ *==\ *1 && byTightIsolationMVArun2v2DBoldDMwLT_2\ *!=\ *1",cuts)
         if len(isomatch)==0 and len(anisomatch)==1:
           LOG.warning('SampleSet::jetFakeRate: Using anti-isolated selection "%s" for fake rate!'%(cuts))
-          isomatch   = anisomatch
-          anisolated = True 
+          isomatch    = anisomatch
+          anisolated  = True
         elif len(isomatch)==0:
           LOG.error('SampleSet::jetFakeRate: Cannot apply fake rate method to selections "%s" without tau isolation!'%(cuts))
         elif len(isomatch)>1:
           LOG.warning('SampleSet::jetFakeRate: Selection string "%s" has two tau isolations!'%(cuts))
-        isomatch    = isomatch[0]
+        isomatch      = isomatch[0]
         if not anisolated:
-          cuts        = cuts.replace(isomatch,"iso_2_vloose==1 && iso_2!=1")
+          cuts        = cuts.replace(isomatch,cuts_aniso)
           weight      = combineWeights(weightFR,weight)
           weight_data = weightFR
-        #print cuts
+        if verbosity>1:
+          print '>>> SampleSet::jetFakeRate:\n>>>   cuts0="%s"\n>>>   cuts="%s"\n>>>   cuts_aniso="%s"\n>>>   weightFR="%s"'%(cuts0,cuts,cuts_aniso,weightFR)
         
         ## HISTOGRAMS
         #histsD_JFR, histsB_JFR, histsS_JFR = self.createHistograms(var,N,a,b,cuts,weight=weight,weight_data=weight_data,append=append,
@@ -1826,11 +1959,12 @@ class SampleSet(object):
         
         var, nbins, xmin, xmax = "pfmt_1", 200, 80, 200
         if isinstance(cuts,Selection): cuts = cuts.selection
-        samples     = self.samples
-        verbosity   = getVerbosity(kwargs,verbositySampleTools)
-        shifts      = kwargs.get('shift',    False )
-        weight      = kwargs.get('weight',   ""    )
-        QCDshift    = kwargs.get('QCDshift', 0.0   )
+        samples       = self.samples
+        verbosity     = getVerbosity(kwargs,verbositySampleTools)
+        shifts        = kwargs.get('shift',         False )
+        weight        = kwargs.get('weight',        ""    )
+        QCDshift      = kwargs.get('QCDshift',      0.0   )
+        replaceweight = kwargs.get('replaceweight', None  )
         
         # SHIFT
         if shifts:
@@ -1861,7 +1995,7 @@ class SampleSet(object):
         stack   = THStack("stack_QCD","stack_QCD")
         histsD, histsB, histsS = self.createHistograms(var,nbins,xmin,xmax,cuts,reset=True,signal=False,
                                                        QCD=True,QCDshift=QCDshift,QCDrelax=False,ratio_WJ_QCD_SS=R,
-                                                       split=False,blind=False,weight=weight)
+                                                       split=False,blind=False,weight=weight,replaceweight=replaceweight)
         
         # CHECK MC and DATA
         if not histsB:
@@ -2390,8 +2524,8 @@ class SampleSet(object):
           
     def shift(self,searchterms,file_app,title_app,**kwargs):
         """Shift samples in samples set by creating new samples with new filename/titlename."""
-        filter          = kwargs.get('filter',      False       )
-        share           = kwargs.get('share',       False       )
+        filter          = kwargs.get('filter',      False       ) # filter other samples
+        share           = kwargs.get('share',       False       ) # share other samples (as opposed to cloning them)
         title_tag       = kwargs.get('title_tag',   False       )
         title_veto      = kwargs.get('title_veto',  False       )
         close           = kwargs.get('close',       False       )
@@ -2426,7 +2560,7 @@ class SampleSet(object):
             if share: sharedsamples.append(newsample)
         if not filter:
             samplesD = self._samplesD
-            if share: sharedsamples.append(newsample)
+            sharedsamples.append(samplesD)
         
         kwargs['shared'] = sharedsamples
         newset = SampleSet(samplesD,samplesB,samplesS,**kwargs)
@@ -2435,8 +2569,8 @@ class SampleSet(object):
           
     def shiftWeight(self,searchterms,newweight,title_app,**kwargs):
         """Shift samples in samples set by creating new samples with new weight."""
-        filter          = kwargs.get('filter',      False       )
-        share           = kwargs.get('share',       False       )
+        filter          = kwargs.get('filter',      False       ) # filter other samples
+        share           = kwargs.get('share',       False       ) # share other samples (as opposed to cloning them)
         extra           = kwargs.get('extra',       True        ) # replace extra weight
         
         if not isList(searchterms): searchterms = [ searchterms ]
@@ -2448,7 +2582,7 @@ class SampleSet(object):
             newsample = sample.clone(samename=True,deep=True)
             #LOG.verbose('SampleSet::shiftWeight: "%s" - weight "%s", extra weight "%s"'%(newsample.name,newsample.weight,newsample.extraweight),1)
             if extra:
-              newsample.extraweight = newweight
+              newsample.setExtraWeight(newweight)
             else:
               newsample.addWeight(newweight)
             #LOG.verbose('SampleSet::shiftWeight: "%s" - weight "%s", extra weight "%s"'%(newsample.name,newsample.weight,newsample.extraweight),1)
@@ -2459,7 +2593,10 @@ class SampleSet(object):
         for sample in self.samplesS:
           if sample.isPartOf(*searchterms,exclusive=False):
             newsample = sample.clone(samename=True,deep=True)
-            newsample.addWeight(newweight)
+            if extra:
+              newsample.setExtraWeight(newweight)
+            else:
+              newsample.addWeight(newweight)
             samplesS.append(newsample)
           elif not filter:
             newsample = sample if share else sample.clone(samename=True,deep=True)
@@ -2621,7 +2758,7 @@ def stitch(sampleList,*searchterms,**kwargs):
     for sample in stitchList:
       if sample.isPartOf(name_incl):
         sample.norm = 1.0 # apply lumi-cross section normalization via weights
-        sample.addExtraWeight('*'.join(weights))
+        sample.addWeight('*'.join(weights))
         if not title0: title0 = sample.title
         break
     

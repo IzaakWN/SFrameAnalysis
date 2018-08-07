@@ -75,7 +75,7 @@ def plotStacks(samples, channel, **kwargs):
     stack       = True #and False
     staterror   = True
     errorbars   = (not staterror)
-    data        = True
+    data        = drawData
     ratio       = data
     pdf         = makePDF
     
@@ -97,7 +97,7 @@ def plotStacks(samples, channel, **kwargs):
             if not variable.plotForSelection(selection) or not selection.plotForVariable(variable):
               print ">>> plotStacks: ignoring %s for %s"%(variable.printWithBinning(),selection); continue
             if "restr" in selection.name and not variable.isPartOf('m_2'):
-              print ">>> plotStacks: ignoting %s for %s"%(variable.printWithBinning(),selection); continue
+              print ">>> plotStacks: ignoring %s for %s"%(variable.printWithBinning(),selection); continue
             
             # NAME
             filename = "%s/%s_%s%s.png" % (DIR,variable.filename,selection.filename,label)
@@ -109,7 +109,7 @@ def plotStacks(samples, channel, **kwargs):
             
             # TITLE
             name  = variable.name
-            title = "%s: %s" % (channel,selection.title)
+            title = "#bf{%s}: %s" % (channel,selection.title)
             title = title.replace("category 1.2","optimized category 1").replace("category 2.2","optimized category 2")
             if title.count("mumu")>1: title = selection.title
             
@@ -124,7 +124,7 @@ def plotStacks(samples, channel, **kwargs):
             JFR = doFakeRate
             
             # PLOT
-            plot = samples.plotStack(variable, selection, name=name, title=title, channel=channel, QCD=QCD, JFR=JFR, saveToFile=saveToFile)
+            plot = samples.plotStack(variable, selection, name=name, title=title, channel=channel, QCD=QCD, JFR=JFR, saveToFile=saveToFile, data=data)
             plot.plot(stack=stack, position=position, staterror=staterror, logy=logy, ratio=ratio, errorbars=errorbars, data=data)
             plot.saveAs(filename, ext=exts)
             plot.close()
@@ -258,7 +258,7 @@ def main():
             #if doTESscan:
             #  samples_TESscan['0.970'].renormalizeWJ("pfmt_1", 200, 80, 200, baseline, QCD=doQCD, reset=True, verbosity=verbosityWJ)
             #  samples_TESscan['1.030'].renormalizeWJ("pfmt_1", 200, 80, 200, baseline, QCD=doQCD, reset=True, verbosity=verbosityWJ)
-        else: LOG.warning("Not WJ renormalized! (normalizeWJ=%s, user flag=%s, channel=%s)" % (normalizeWJ,args.noWJrenorm,channel))
+        else: LOG.warning('Not WJ renormalized! (normalizeWJ=%s, user flag=%s, channel="%s")' % (normalizeWJ,args.noWJrenorm,channel))
         print ">>> "
         
         # DIRECTORIES

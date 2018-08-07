@@ -307,9 +307,7 @@ def writeDataCard(sampleset, channel, var, binWidth, xmin, xmax, **kwargs):
     
     # DATA
     if not doShift:
-      if  'mutau' in channel: samples_dict['single muon']     = [( 'data_obs', "" )]
-      elif 'etau' in channel: samples_dict['single electron'] = [( 'data_obs', "" )]
-      elif 'emu'  in channel: samples_dict['single muon']     = [( 'data_obs', "" )]
+      samples_dict['observed'] = [( 'data_obs', "" )]
     
     # FILTER
     if filter:

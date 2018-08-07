@@ -5,8 +5,8 @@
 
 # LABELS & LUMI
 globalTag   = "_Moriond" # extra label for opening file, saving plots to dir
-plottag     = "" # extra label for image file
-era         = "2016" #B-F"
+plottag     = "_test" # extra label for image file
+era         = "" #B-F"
 luminosity  = 19.721 if "B-F" in era else 16.146 if "GH" in era else 35.9
 
 # VERBOSITY
@@ -39,16 +39,15 @@ doDatacard          = True and False
 recreateDC          = True #and False
 doNominal           = True #and False
 doShapes            = True #and False
-doTES               = True and False
-doEES               = True and False # not for mutau
-doJTF               = True and False # not for LowMass
-doLTF               = True and False
-doJER               = True and False
-doJEC               = True and False
-doUncEn             = True and False
-doZpt               = True and False # +/-10% instead
+doTES               = True #and False
+doEES               = True #and False # not for mutau
+doLTF               = True #and False
+doJER               = True #and False
+doJEC               = True #and False
+doUncEn             = True #and False
+doZpt               = True #and False # +/-10% instead
 doTTpt              = True #and False
-doQCDshift          = True and False
+doQCDshift          = True #and False
 
 # SAMPLE OPTIONS
 stitchWJ            = True #and False
@@ -79,7 +78,7 @@ DATACARDS_DIR       = "%s/%s"%(PLOTS_DIR,"datacards")
 # CHANNELS
 channels = [
     "mutau",
-#     "etau",
+    "etau",
 ]
 
 # LABELS
@@ -109,8 +108,8 @@ vetos_etau      = "%s && againstElectronTightMVA6_2==1 && againstMuonLoose3_2==1
 vetos_emu       = "extraelec_veto==0 && extramuon_veto==0"
 ptcut           = "(pt_1>26||(channel==1 && pt_1>23))"
 triggers        = "abs(eta_1)<2.1 && trigger_cuts==1" # && ((%s && (triggers==1||triggers==3))||(triggers>1))" #% ptcut #pt_1>20 &&
-baseline        = "channel>0 && %s && %s && q_1*q_2<0 && %s" % (isocuts,vetos,triggers) # +" && bpt_1>30" #+" && jpt_1>30" && jpt_2>30
-baseline_rel    = "channel>0 && %s && %s && q_1*q_2<0 && %s" % ("iso_1>0.15 && iso_1<0.5 && iso_2_medium==1",vetos,triggers)
+baseline        = "channel>0 && %s && %s && q_1*q_2<0 && %s"%(isocuts,vetos,triggers) # +" && bpt_1>30" #+" && jpt_1>30" && jpt_2>30
+baseline_rel    = "channel>0 && %s && %s && q_1*q_2<0 && %s"%("iso_1>0.15 && iso_1<0.5 && iso_2_medium==1",vetos,triggers)
 baseline_emu    = "channel>0 && %s && iso_1<0.20 && iso_2<0.15 && q_1*q_2<0" % (vetos_emu)
 emu_check       = "channel>0 && njets==2 && jpt_1>30 && jpt_2>30 && pt_1>25 && pt_2>25 && abs(eta_1)<2.1 && abs(eta_2)<2.1 && iso_1<0.10 && q_1*q_2<0 && 70<m_vis&&m_vis<110" # && abs(eta_2)<2.1 # iso_1<0.15 && iso_2<0.15  && ncbtag==0
 if "emu" in channels: baseline = baseline_emu # emu
@@ -194,7 +193,7 @@ variables = [
 #     var("m_vis",                             40,   0, 160, cbinning={'nc?btag':(36,0,180)} ),
 #     var("m_2",                             30,   0,   3 ),
 #     var("met",                             40,   0, 200 ),
-#     var("pfmt_1",                          40,   0, 200, title="m_T(mu,MET)", ctitle={'etau':"m_T(e,MET)"} ),
+    var("pfmt_1",                          40,   0, 200, title="m_T(mu,MET)", ctitle={'etau':"m_T(e,MET)"} ),
 #     var("pt_1",                            50,     0,  200, title="muon pt",  ctitle={'etau':"electron pt"}  ),
 #     var("eta_1",                           26,  -2.6,  2.6, title="muon eta", ctitle={'etau':"electron eta"} ),
 #     var("pt_2",                            30,     0,  150, title="tau pt",   ctitle={'emu': "electron pt"}  ),
@@ -206,9 +205,12 @@ variables = [
 #     var("dphi_ll_bj",                      30,   0, 4.5 ),
 #     var("ncbtag20",                         5,   0,   5 ),
 #     var("ncbtag",                           5,   0,   5 ),
-    var("njets",                            6,   0,   6 ),
-    var("nfjets",                           5,   0,   5 ),
+#     var("njets",                            6,   0,   6 ),
+#     var("nfjets",                           5,   0,   5 ),
 #     var("ncjets",                           5,   0,   5 ),
+#     var("njets40",                          6,   0,   6 ),
+#     var("ncjets40",                         5,   0,   5 ),
+#     var("nfjets40",                         5,   0,   5 ),
 #     var("pzeta_disc",                      45, -145,  80, filename="dzeta", position="left" ),
 #     var("ht",                              50,   0, 500 ),
 #     var("pt_tt",                           50,   0, 160 ),
@@ -245,15 +247,15 @@ variables = [
 #     variables.append(var( n,             2, 0,   2 ))
 
 samplesB = [                                                              # cross section [pb]
-    ("TT", "TT_TuneCUETP8M1",                      "ttbar",                    831.76, {'extraweight':"1/ttptweight"} ), # "ttptweight_runI/ttptweight"
+    ("TT", "TT_TuneCUETP8M1",                      "ttbar",                    831.76, {'extraweight':"ttptweight_runI/ttptweight"} ), #{'extraweight':"1/ttptweight"} ), # "ttptweight_runI/ttptweight"
     ("ST", "ST_tW_top_5f_inclusiveDecays",         "ST tW",                     35.60  ), #  38.09
     ("ST", "ST_tW_antitop_5f_inclusiveDecays",     "ST atW",                    35.60  ), #  38.09
     ("ST", "ST_t-channel_top_4f_inclusiveDecays",     "ST t",                  136.02  ), #  80.95 # 80.95
     ("ST", "ST_t-channel_antitop_4f_inclusiveDecays", "ST at",                  80.95  ), # 136.02 # 136.02
     ("WW", "WWTo1L1Nu2Q_13TeV_nlo",                "WWTo1L1Nu2Q",               49.997 ),
-    ("WZ", "WZTo3LNu_TuneCUETP8M1_13TeV_nlo",      "WZTo3LNu",                   3.05  ),
     ("WZ", "WZTo1L1Nu2Q_13TeV_nlo",                "WZTo1L1Nu2Q",               10.71  ),
     ("WZ", "WZTo2L2Q_13TeV_nlo",                   "WZTo2L2Q",                   5.595 ),
+    #("WZ", "WZTo3LNu_TuneCUETP8M1_13TeV_nlo",      "WZTo3LNu",                   3.05  ),
     ("WZ", "WZJToLLLNu_nlo",                       "WZJToLLLNu",                 4.708 ),
     ("VV", "VVTo2L2Nu_13TeV_nlo",                  "VVTo2L2Nu",                 11.95  ),
     ("ZZ", "ZZTo2L2Q_13TeV_nlo",                   "ZZTo2L2Q",                   3.22  ),
@@ -263,16 +265,15 @@ samplesB = [                                                              # cros
     ("WJ", "W2JetsToLNu_TuneCUETP8M1",             "W + 2J",                  3144.5   ),
     ("WJ", "W3JetsToLNu_TuneCUETP8M1",             "W + 3J",                   954.8   ),
     ("WJ", "W4JetsToLNu_TuneCUETP8M1",             "W + 4J",                   485.6   ),
-    ###("DY", "DYJetsToLL_M-10to50_TuneCUETP8M1",     "Drell Yan 10-50",        18610.0   ),
-    ("DY", "DYJetsToLL_M-10to50_TuneCUETP8M1",     "Drell-Yan 10-50",        18610.0, {'extraweight':"getZpt(pt_genboson)/zptweight"} ), # 18610
-    ("DY", "DY1JetsToLL_M-10to50_TuneCUETP8M1",    "Drell-Yan 1J 10-50",       421.5, {'extraweight':"getZpt(pt_genboson)/zptweight"} ), # 421.5
-    ("DY", "DY2JetsToLL_M-10to50_TuneCUETP8M1",    "Drell-Yan 2J 10-50",       184.3, {'extraweight':"getZpt(pt_genboson)/zptweight"} ), # 184.3
-    ("DY", "DY3JetsToLL_M-10to50_TuneCUETP8M1",    "Drell-Yan 3J 10-50",        95.0, {'extraweight':"getZpt(pt_genboson)/zptweight"} ), # ???
-    ("DY", "DYJetsToLL_M-50_TuneCUETP8M1",         "Drell-Yan 50",            4954.0, {'extraweight':"getZpt(pt_genboson)/zptweight"} ), # LO 4954.0; NLO 5765.4
-    ("DY", "DY1JetsToLL_M-50_TuneCUETP8M1",        "Drell-Yan 1J 50",         1012.5, {'extraweight':"getZpt(pt_genboson)/zptweight"} ),
-    ("DY", "DY2JetsToLL_M-50_TuneCUETP8M1",        "Drell-Yan 2J 50",          332.8, {'extraweight':"getZpt(pt_genboson)/zptweight"} ),
-    ("DY", "DY3JetsToLL_M-50_TuneCUETP8M1",        "Drell-Yan 3J 50",          101.8, {'extraweight':"getZpt(pt_genboson)/zptweight"} ),
-    ("DY", "DY4JetsToLL_M-50_TuneCUETP8M1",        "Drell-Yan 4J 50",           54.8, {'extraweight':"getZpt(pt_genboson)/zptweight"} ),
+    ("DY", "DYJetsToLL_M-10to50_TuneCUETP8M1",     "Drell-Yan 10-50",        18610.0, {'extraweight':"getZpt_HTT(m_genboson,pt_genboson)/zptweight"}), #{'extraweight':"getZpt(pt_genboson)/zptweight"} # 18610
+    ("DY", "DY1JetsToLL_M-10to50_TuneCUETP8M1",    "Drell-Yan 1J 10-50",       421.5, {'extraweight':"getZpt_HTT(m_genboson,pt_genboson)/zptweight"}), #{'extraweight':"getZpt(pt_genboson)/zptweight"} # 421.5
+    ("DY", "DY2JetsToLL_M-10to50_TuneCUETP8M1",    "Drell-Yan 2J 10-50",       184.3, {'extraweight':"getZpt_HTT(m_genboson,pt_genboson)/zptweight"}), #{'extraweight':"getZpt(pt_genboson)/zptweight"} # 184.3
+    ("DY", "DY3JetsToLL_M-10to50_TuneCUETP8M1",    "Drell-Yan 3J 10-50",        95.0, {'extraweight':"getZpt_HTT(m_genboson,pt_genboson)/zptweight"}), #{'extraweight':"getZpt(pt_genboson)/zptweight"} # ???
+    ("DY", "DYJetsToLL_M-50_TuneCUETP8M1",         "Drell-Yan 50",            4954.0, {'extraweight':"getZpt_HTT(m_genboson,pt_genboson)/zptweight"}), #{'extraweight':"getZpt(pt_genboson)/zptweight"} # LO 4954.0; NLO 5765.4
+    ("DY", "DY1JetsToLL_M-50_TuneCUETP8M1",        "Drell-Yan 1J 50",         1012.5, {'extraweight':"getZpt_HTT(m_genboson,pt_genboson)/zptweight"}), #{'extraweight':"getZpt(pt_genboson)/zptweight"} 
+    ("DY", "DY2JetsToLL_M-50_TuneCUETP8M1",        "Drell-Yan 2J 50",          332.8, {'extraweight':"getZpt_HTT(m_genboson,pt_genboson)/zptweight"}), #{'extraweight':"getZpt(pt_genboson)/zptweight"} 
+    ("DY", "DY3JetsToLL_M-50_TuneCUETP8M1",        "Drell-Yan 3J 50",          101.8, {'extraweight':"getZpt_HTT(m_genboson,pt_genboson)/zptweight"}), #{'extraweight':"getZpt(pt_genboson)/zptweight"} 
+    ("DY", "DY4JetsToLL_M-50_TuneCUETP8M1",        "Drell-Yan 4J 50",           54.8, {'extraweight':"getZpt_HTT(m_genboson,pt_genboson)/zptweight"}), #{'extraweight':"getZpt(pt_genboson)/zptweight"} 
     ###("WW", "WW_TuneCUETP8M1",                      "WW",                        63.21  ), # 63.21
     ###("WZ", "WZ_TuneCUETP8M1",                      "WZ",                        22.82  ), # 10.71?
     ###("ZZ", "ZZ_TuneCUETP8M1",                      "ZZ",                        10.32  ), #  3.22?
@@ -301,18 +302,22 @@ if 'bbA' in plottag or doDatacard:
   if not doDatacard:
     SUSY_bbA = [m for m in SUSY_bbA if m[0]%10==0]
   for mass, eff in SUSY_bbA:
-    samplesS.append(( "SUSY", "SUSYGluGluToBBa1ToTauTau_M-%d"%mass, "bbA m_{A}=%d"%mass, 1*eff, { 'upscale': 1400./eff } ))
+    samplesS.append(( "SUSY", "SUSYGluGluToBBa1ToTauTau_M-%d"%mass, "m_{A}=%d"%mass, 1*eff, { 'upscale': 1400./eff } ))
 if 'bbA' not in plottag or doDatacard:
   VLQ_bqX       = [(20,0.7195),(28,1.    ),(40,0.7143),(50,0.7360),(60,0.7695),(70,0.8057),]
   VLQ_bqX_MB300 = [(20,0.8938),(28,0.8883),(40,0.8855),(50,0.8891),(60,0.8941),(70,0.8973),]
   VLQ_bqX_MB450 = [(20,0.9472),(28,0.9440),(40,0.9439),(50,0.9463),(60,0.9458),(70,0.9466),]
-  for mass, eff in VLQ_bqX:
-    samplesS.append(( "LowMass", "LowMassDiTau_M-%d_MB-%d"%(mass,170), "VLQ m_{B}=%d, m_{X}=%d"%(170,mass), 1*eff, { 'upscale': 600./eff } ))
   if doDatacard:
+    for mass, eff in VLQ_bqX:
+      samplesS.append(( "LowMass", "LowMassDiTau_M-%d_MB-%d"%(mass,170), "m_{B'}=%d, m_{X}=%d"%(170,mass), 1*eff, { 'upscale': 600./eff } ))
     for mass, eff in VLQ_bqX_MB300:
-      samplesS.append(( "LowMass", "LowMassDiTau_M-%d_MB-%d"%(mass,300), "VLQ m_{B}=%d, m_{X}=%d"%(300,mass), 1*eff ))
+      samplesS.append(( "LowMass", "LowMassDiTau_M-%d_MB-%d"%(mass,300), "m_{B'}=%d, m_{X}=%d"%(300,mass), 1*eff ))
     for mass, eff in VLQ_bqX_MB450:
-      samplesS.append(( "LowMass", "LowMassDiTau_M-%d_MB-%d"%(mass,450), "VLQ m_{B}=%d, m_{X}=%d"%(450,mass), 1*eff ))
+      samplesS.append(( "LowMass", "LowMassDiTau_M-%d_MB-%d"%(mass,450), "m_{B'}=%d, m_{X}=%d"%(450,mass), 1*eff ))
+  else:
+    for mass, eff in VLQ_bqX:
+      if mass in [ 20, 40, 60 ]: continue
+      samplesS.append(( "LowMass", "LowMassDiTau_M-%d_MB-%d"%(mass,170), "m_{B'}=%d, m_{X}=%d"%(170,mass), 1*eff, { 'upscale': 600./eff } ))
 
 # SAMPLESET
 makeSFrameSamples(samplesD,samplesB,samplesS,weight=_weight,binN_weighted=8)
@@ -328,6 +333,12 @@ if mergeTT:        samples.merge( 'TT',                             name="TT",  
 if splitDY:        samples.split( 'DY', [('ZTT',"Z -> tautau","gen_match_2==5"),           ('ZJ',"Drell-Yan other","gen_match_2!=5")])
 if splitTT:        samples.split( 'TT', [('TTT',"ttbar with real tau_h","gen_match_2==5"), ('TTJ',"ttbar other","gen_match_2!=5")]) #'ttbar j -> tau_h': "gen_match_2<5"
 #if splitST:        samples.split( 'ST', [('STT',"single top with real tau_h","gen_match_2==5"), ('STJ',"single top other","gen_match_2!=5")])
+if doDatacard: # change weights for different selections:
+  sample = samples.get('TT',unique=True)
+  sample.replaceWeight("ttptweight_runI/ttptweight","1/ttptweight")  # divide out "ttptweight" from "weight"
+  sample = samples.get('DY',unique=True)
+  sample.replaceWeight("getZpt_HTT(m_genboson,pt_genboson)","getZpt(pt_genboson)")
+  print sample, sample.weight
 
 samples.printTable()
 #samples.printSampleObjects()
@@ -348,12 +359,13 @@ if doLTF:
   samples_LTFDown = samples.shift(['DY'], "_LTF0p97"," -3% LTF ES", filter=True, title_veto="real")
   #samples_LTFUp.printTable("LTF Up")
 if doTTpt:
-  samples_TTptUp   = samples.shiftWeight(['TT'], "1/ttptweight",  "no TT pt weight",    filter=False, extra=True )
-  samples_TTptDown = samples.shiftWeight(['TT'], "ttptweight" ,   "TT pt weight once",  filter=False, extra=True )
-  #samples_TTptUp.printTable("TTpt Up")
+  samples_TTptUp   = samples.shiftWeight(['TT'], "",             "TT pt weight once", filter=False, extra=True ) # included in "weight"
+  samples_TTptDown = samples.shiftWeight(['TT'], "1/ttptweight", "no TT pt weight",   filter=False, extra=True ) # divide out from "weight"
+  samples_TTptUp.printTable("TTpt Up")
 if doZpt:
-  samples_ZptUp   = samples.shiftWeight(['DY'], "/zptweight", "no Z pt weight",      filter=True, extra=False )
-  samples_ZptDown = samples.shiftWeight(['DY'], "zptweight" , "Z pt weighted twice", filter=True, extra=False )
-  #samples_ZptUp.printTable("Zpt Up")
+  samples_ZptUp   = samples.shiftWeight(['DY'], "(0.90*getZpt(pt_genboson)+0.10)/zptweight", "no Z pt weight",      filter=True, extra=True )
+  samples_ZptDown = samples.shiftWeight(['DY'], "(1.10*getZpt(pt_genboson)-0.10)/zptweight", "Z pt weighted twice", filter=True, extra=True )
+  samples_ZptUp.printTable("Zpt Up")
+  samples_ZptDown.printTable("Zpt Down")
 
 

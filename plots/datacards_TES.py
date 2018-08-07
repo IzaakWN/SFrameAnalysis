@@ -43,6 +43,7 @@ print ">>> loading configuration file %s for plot.py"%(args.configFile)
 settings, commands = loadConfigurationFromFile(args.configFile,verbose=args.verbose)
 exec settings
 doStack = False; doDatacard = True
+mergeTop, splitTT = False, False
 normalizeWJ = normalizeWJ and not doFakeRate and not args.noWJrenorm
 loadSettings(globals(),settings,verbose=args.verbose)
 exec commands
@@ -97,7 +98,7 @@ def writeDataCard(sampleset, channel, var, binWidth, xmin, xmax, **kwargs):
     analysis    = kwargs.get('analysis',    "tes"           )
     DIR         = kwargs.get('DIR',         DATACARDS_DIR   )
     recreate    = kwargs.get('recreate',    False           )
-    tag         = kwargs.get('tag',         ""              ) # WEIGHTED
+    tag         = kwargs.get('tag',         "_mtlt50"       ) # WEIGHTED
     unclabel    = kwargs.get('unclabel',    ""              )
     E           = kwargs.get('E',           "13TeV"         )
     JES         = kwargs.get('JES',         ""              )
@@ -126,12 +127,12 @@ def writeDataCard(sampleset, channel, var, binWidth, xmin, xmax, **kwargs):
     vetos       = "lepton_vetos==0"
     baselineNDM = "%s && %s && (triggers!=2 || pt_1>28) && %s && q_1*q_2<0" % (iso1,iso2,vetos)
     baseline    = "%s && %s && (triggers!=2 || pt_1>28) && %s && q_1*q_2<0 && decayMode_2<11" % (iso1,iso2,vetos)
-    if   "_mtlt50"     in tag:  ZTTregion = "pfmt_1<50"
-    elif "_ZTTregion2" in tag:  ZTTregion = "pfmt_1<50 && 50<m_vis && m_vis<100"
-    elif "_ZTTregion3" in tag:  ZTTregion = "pfmt_1<50 && 50<m_vis && m_vis<85"
-    elif "_ZTTregion"  in tag:  ZTTregion = "pfmt_1<50 && 50<m_vis && m_vis<85 && dzeta>-25" # && pt_2>30
+    if   "mtlt50"     in tag:  ZTTregion = "pfmt_1<50"
+    elif "ZTTregion2" in tag:  ZTTregion = "pfmt_1<50 && 50<m_vis && m_vis<100"
+    elif "ZTTregion3" in tag:  ZTTregion = "pfmt_1<50 && 50<m_vis && m_vis<85"
+    elif "ZTTregion"  in tag:  ZTTregion = "pfmt_1<50 && 50<m_vis && m_vis<85 && dzeta>-25" # && pt_2>30
     else:
-      LOG.error("writeDataCard: Did not recognize tag!")
+      LOG.error('writeDataCard: Did not recognize tag "%s"!'%tag)
     #tag += "_mtlt50_0photon"; ZTTregion = "pfmt_1<50 && nPhoton_2==0"
     
     selectionsDC = [
@@ -213,9 +214,7 @@ def writeDataCard(sampleset, channel, var, binWidth, xmin, xmax, **kwargs):
     
     # DATA
     if not doShift:
-      if  'mutau' in channel: samples_dict['single muon']     = [( 'data_obs', "" )]
-      elif 'etau' in channel: samples_dict['single electron'] = [( 'data_obs', "" )]
-      elif 'emu'  in channel: samples_dict['single muon']     = [( 'data_obs', "" )]
+      samples_dict['observed'] = [( 'data_obs', "" )]
     
     # FILTER
     if filter:
@@ -250,7 +249,7 @@ def writeDataCard(sampleset, channel, var, binWidth, xmin, xmax, **kwargs):
     if LTF:     unclabel += "_CMS_%s_shape_mTauFake_%s%s"      %(process,         E,LTF)
     #if JTF:     unclabel += "_CMS_%s_shape_jetTauFake_%s_%s%s" %(process,channel0,E,JTF) # channel dependent
     if JTF:     unclabel += "_CMS_%s_shape_jetTauFake_%s%s"    %(process,         E,JTF) # channel independent
-    if FR:      unclabel += "_CMS_%s_shape_jetTauFake_%s%s"    %(process,         E,FR)
+    if FR:      unclabel += "_CMS_%s_shape_jetTauFake_%s_%s%s" %(process,"$CAT",  E,FR) # category dependent
     if JES:     unclabel += "_CMS_%s_shape_jes_%s%s"           %(process,         E,JES)
     if JER:     unclabel += "_CMS_%s_shape_jer_%s%s"           %(process,         E,JER)
     if UncEn:   unclabel += "_CMS_%s_shape_uncEn_%s%s"         %(process,         E,UncEn)
@@ -260,9 +259,9 @@ def writeDataCard(sampleset, channel, var, binWidth, xmin, xmax, **kwargs):
     
     # LOOP over CATEGORIES
     print ">>> writing %s(%d,%s,%s) shapes to %s (%sd)" % (var,nBins,xmin,xmax,outfilename,option)
-    if unclabel: print ">>> systematic uncertainty label = " + color("%s" % (unclabel.lstrip("_")), color="grey")
+    if unclabel: print ">>> systematic uncertainty label = " + color(unclabel.lstrip("_"), color="grey")
     for category, selection in selectionsDC:
-        print ">>>\n>>> " + color("_%s:_%s_" % (channel.replace(' ','_'),category.replace(' ','_')), color = "magenta", bold=True)
+        print ">>>\n>>> " + color("_%s:_%s_"%(channel.replace(' ','_'),category.replace(' ','_')), color = "magenta", bold=True)
         
         # MAKE DIR
         sampleset.refreshMemory()
@@ -292,6 +291,7 @@ def writeDataCard(sampleset, channel, var, binWidth, xmin, xmax, **kwargs):
                 
                 # SETUP NAMES
                 name = subsample+unclabel
+                name = name.replace('$CAT',category)
                 cuts = combineCuts(selection,extracuts)
                 
                 # MAKE HIST
@@ -369,7 +369,8 @@ def main():
     
     # MAKE SAMPLES
     global samples, samplesB, samplesS, samplesD
-    global samples_MESUp, samples_MESDown, samples_TESscan, samples_TMESscanUp, samples_TMESscanDown
+    global samples_MESUp, samples_MESDown
+    global samples_TESscan, samples_TESscanMESUp, samples_TESscanMESDown, samples_TESscanZptUp, samples_TESscanZptDown
     global samples_LTFUp, samples_LTFDown, samples_JTFUp, samples_JTFDown
     
     # USER OPTIONS
@@ -401,9 +402,9 @@ def main():
           samples_MESDown.setChannel(channel,treename=treename)
         for label, samples_TES in sorted(samples_TESscan.iteritems()):
           samples_TES.setChannel(channel,treename=treename)
-        for label, samples_TES in sorted(samples_TMESscanUp.iteritems()):
+        for label, samples_TES in sorted(samples_TESscanMESUp.iteritems()):
           samples_TES.setChannel(channel,treename=treename)
-        for label, samples_TES in sorted(samples_TMESscanDown.iteritems()):
+        for label, samples_TES in sorted(samples_TESscanMESDown.iteritems()):
           samples_TES.setChannel(channel,treename=treename)
         
         # RENORMALIZE WJ
@@ -435,45 +436,55 @@ def main():
             dargs  = (channel, var, width, xmin, xmax)
             kwargs = { 'process': process, 'analysis': analysis, 'tag': tag }
             ###if doNominal:
-            #writeDataCard(samples,              *dargs, recreate=True, **kwargs )
-            ##writeDataCard(samples,              *dargs, filter=['DY'], **kwargs )
-            if doMES:
-                samples_MESUp.open(); samples_MESDown.open()
-                writeDataCard(samples_MESUp,    *dargs, MES='Up',   filter=['TT','DY','ST','JTF'], **kwargs )
-                writeDataCard(samples_MESDown,  *dargs, MES='Down', filter=['TT','DY','ST','JTF'], **kwargs )
-                #samples_MESUp.close(); samples_MESDown.close()
-            #if doFakeRate:
-            #    writeDataCard(samples,          *dargs, FR='Up',    filter=['JTF'],  **kwargs )
-            #    writeDataCard(samples,          *dargs, FR='Down',  filter=['JTF'],  **kwargs )
-            #elif doJTF:
-            #    writeDataCard(samples_JTFUp,    *dargs, JTF='Up',   filter=['TT','DY','ST','WJ','QCD'],  **kwargs )
-            #    writeDataCard(samples_JTFDown,  *dargs, JTF='Down', filter=['TT','DY','ST','WJ','QCD'],  **kwargs )
-            #if doLTF:
-            #    writeDataCard(samples_LTFUp,    *dargs, LTF='Up',   filter=['DY'],  **kwargs )
-            #    writeDataCard(samples_LTFDown,  *dargs, LTF='Down', filter=['DY'],  **kwargs )
-            #if doJEC:
-            #    writeDataCard(samples,          *dargs, JES='Up',   **kwargs )
-            #    writeDataCard(samples,          *dargs, JES='Down', **kwargs )
-            #if doTESscan:
-            #  for label, set in sorted(samples_TESscan.iteritems()):
-            #    set.open()
-            #    writeDataCard(set,              *dargs, TESscan=label, filter=['DY',], **kwargs ) #'QCD'
-            #    if doJEC:
-            #      writeDataCard(set,            *dargs, TESscan=label, filter=['DY',], JES='Up',   **kwargs )
-            #      writeDataCard(set,            *dargs, TESscan=label, filter=['DY',], JES='Down', **kwargs )
-            #    ###if doJER:
-            #    ###  writeDataCard(set,            *dargs, TESscan=label, filter=['DY',], JER='Up',   **kwargs )
-            #    ###  writeDataCard(set,            *dargs, TESscan=label, filter=['DY',], JER='Down', **kwargs )
-            #    ###if doUncEn:
-            #    ###  writeDataCard(samples,        *dargs, TESscan=label, filter=['DY',], UncEn='Up',   **kwargs )
-            #    ###  writeDataCard(samples,        *dargs, TESscan=label, filter=['DY',], UncEn='Down', **kwargs )
-            #    set.close()
-            if doTESscan and doMES:
-              for label, setDown in sorted(samples_TMESscanDown.iteritems()):
-                  setUp = samples_TMESscanUp[label]
+#             writeDataCard(samples,              *dargs, recreate=True, **kwargs )
+#             #writeDataCard(samples,              *dargs, filter=['DY'], **kwargs )
+#             if doMES:
+#                 samples_MESUp.open(); samples_MESDown.open()
+#                 writeDataCard(samples_MESUp,    *dargs, MES='Up',   filter=['TT','DY','ST','JTF'], **kwargs )
+#                 writeDataCard(samples_MESDown,  *dargs, MES='Down', filter=['TT','DY','ST','JTF'], **kwargs )
+#                 #samples_MESUp.close(); samples_MESDown.close()
+#             if doFakeRate:
+#                writeDataCard(samples,          *dargs, FR='Up',    filter=['JTF'],  **kwargs )
+#                writeDataCard(samples,          *dargs, FR='Down',  filter=['JTF'],  **kwargs )
+#             elif doJTF:
+#                writeDataCard(samples_JTFUp,    *dargs, JTF='Up',   filter=['TT','DY','ST','WJ','QCD'],  **kwargs )
+#                writeDataCard(samples_JTFDown,  *dargs, JTF='Down', filter=['TT','DY','ST','WJ','QCD'],  **kwargs )
+#             if doLTF:
+#                writeDataCard(samples_LTFUp,    *dargs, LTF='Up',   filter=['DY'],  **kwargs )
+#                writeDataCard(samples_LTFDown,  *dargs, LTF='Down', filter=['DY'],  **kwargs )
+#             if doZpt:
+#                writeDataCard(samples_ZptDown,    *dargs, Zpt="Down", filter=["DY"], **kwargs )
+#                writeDataCard(samples_ZptUp,      *dargs, Zpt="Up",   filter=["DY"], **kwargs )
+#             if doJEC:
+#                writeDataCard(samples,          *dargs, JES='Up',   **kwargs )
+#                writeDataCard(samples,          *dargs, JES='Down', **kwargs )
+#             if doTESscan:
+#              for label, set in sorted(samples_TESscan.iteritems()):
+#                set.open()
+#                writeDataCard(set,              *dargs, TESscan=label, filter=['DY',], **kwargs ) #'QCD'
+#                if doJEC:
+#                  writeDataCard(set,            *dargs, TESscan=label, filter=['DY',], JES='Up',   **kwargs )
+#                  writeDataCard(set,            *dargs, TESscan=label, filter=['DY',], JES='Down', **kwargs )
+#                ###if doJER:
+#                ###  writeDataCard(set,            *dargs, TESscan=label, filter=['DY',], JER='Up',   **kwargs )
+#                ###  writeDataCard(set,            *dargs, TESscan=label, filter=['DY',], JER='Down', **kwargs )
+#                ###if doUncEn:
+#                ###  writeDataCard(samples,        *dargs, TESscan=label, filter=['DY',], UncEn='Up',   **kwargs )
+#                ###  writeDataCard(samples,        *dargs, TESscan=label, filter=['DY',], UncEn='Down', **kwargs )
+#                set.close()
+#             if doTESscan and doMES:
+#               for label, setDown in sorted(samples_TESscanMESDown.iteritems()):
+#                   setUp = samples_TESscanMESUp[label]
+#                   setUp.open(); setDown.open()
+#                   writeDataCard(setUp,          *dargs, TESscan=label, filter=['DY',], MES='Up',   **kwargs )
+#                   writeDataCard(setDown,        *dargs, TESscan=label, filter=['DY',], MES='Down', **kwargs )
+#                   setUp.close(); setDown.close()
+            if doTESscan and doZpt:
+              for label, setDown in sorted(samples_TESscanZptDown.iteritems()):
+                  setUp = samples_TESscanZptUp[label]
                   setUp.open(); setDown.open()
-                  writeDataCard(setUp,          *dargs, TESscan=label, filter=['DY',], MES='Up',   **kwargs )
-                  writeDataCard(setDown,        *dargs, TESscan=label, filter=['DY',], MES='Down', **kwargs )
+                  writeDataCard(setUp,          *dargs, TESscan=label, filter=['DY',], Zpt="Up",   **kwargs )
+                  writeDataCard(setDown,        *dargs, TESscan=label, filter=['DY',], Zpt="Down", **kwargs )
                   setUp.close(); setDown.close()
             ###if doJER:
             ###    writeDataCard(samples,          *dargs, JER='Up',   **kwargs )
@@ -481,9 +492,6 @@ def main():
             ###if doUncEn:
             ###    writeDataCard(samples,          *dargs, UncEn='Up',   **kwargs )
             ###    writeDataCard(samples,          *dargs, UncEn='Down', **kwargs )
-            ###if doZpt:
-            ###    writeDataCard(samples_ZptDown,    *dargs, Zpt="Down", filter=["DY"], **kwargs )
-            ###    writeDataCard(samples_ZptUp,      *dargs, Zpt="Up",   filter=["DY"], **kwargs )
             ###if doTTpt:
             ###    writeDataCard(samples_TTptDown,   *dargs, TTpt="Down", filter=["ttbar"], **kwargs )
             ###    writeDataCard(samples_TTptUp,     *dargs, TTpt="Up",   filter=["ttbar"], **kwargs )

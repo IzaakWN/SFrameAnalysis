@@ -77,6 +77,7 @@ def plotStacks(samples, channel, **kwargs):
     signal      = drawSignal
     blind       = True
     ratio       = data
+    text        = "" if not drawSignal else "bbA" if '2HDM, bbA' in plottag else "VLQ, qXb"
     exts        = [ 'png' ]
     if args.pdf: exts.append('pdf') 
     
@@ -86,7 +87,6 @@ def plotStacks(samples, channel, **kwargs):
         
         if normalizeTT:
           samples.renormalizeTT(selection,baseline=baseline)
-        scaleup = 0.020 if "category" in selection.name else 0.030 if "1 b tag" in selection.name else 1.
         
         # LOOP over VARIABLES
         for variable in variables:
@@ -102,7 +102,7 @@ def plotStacks(samples, channel, **kwargs):
             
             # TITLE
             name  = variable.name
-            title = "%s: %s" % (channel,selection.name)
+            title = "#font[22]{%s}: %s" % (channel,selection.name)
             title = title.replace("category 1.2","opt. 1b1f").replace("category 2.2","opt. 1b1c")
             title = title.replace("category 1","1b1f").replace("category 2","1b1c")
             
@@ -113,14 +113,20 @@ def plotStacks(samples, channel, **kwargs):
             logy = variable.logy
             #position = "rightright"
             
+            # SIGNAL
+            scaleup = 0.020 if "category" in selection.name else 0.030 if "1 b tag" in selection.name else 1.
+            if name[0]=="n": scaleup *= 3.4
+            print name
+            
             # QCD
             QCD = doQCD and ("gen_match" not in variable.name or "npu" not in variable.name)
             
             # PLOT
             plot = samples.plotStack(variable,selection,name=name,title=title,channel=channel,QCD=QCD,scaleup=scaleup,saveToFile=saveToFile,signal=signal)
             plot.plot(stack=stack,position=position,staterror=staterror,logy=logy,ratio=ratio,errorbars=errorbars,data=data,signal=signal,
-                      blind=blind,linestyle=False,textsize=0.036)
+                      blind=blind,linestyle=False,textsize=0.036,text=text)
             plot.saveAs(filename,ext=exts)
+            plot.close()
             
 
 
@@ -275,28 +281,20 @@ def main():
         #if doTES:
         #  samples_TESUp.setChannel(  channel,treename=treename)
         #  samples_TESDown.setChannel(channel,treename=treename)
-        #if doEES:
-        #  samples_EESUp.setChannel(  channel,treename=treename)
-        #  samples_EESDown.setChannel(channel,treename=treename)
         #if doLTF:
         #  samples_LTFUp.setChannel(  channel,treename=treename)
         #  samples_LTFDown.setChannel(channel,treename=treename)
-        #if doZpt:
-        #  samples_ZptUp.setChannel(  channel,treename=treename)
-        #  samples_ZptDown.setChannel(channel,treename=treename)
-        #if doTTpt:
-        #  samples_TTptUp.setChannel(  channel,treename=treename)
-        #  samples_TTptDown.setChannel(channel,treename=treename)
         
         # RENORMALIZE WJ
         print ">>> "
         if normalizeWJ and "emu" not in channel:
             LOG.header("%s: WJ renormalization" % (channel))
+            scale = 0.908 if "mutau" in channel else 0.876
             if doNominal:
               samples.renormalizeWJ(baseline, QCD=doQCD, reset=True, verbosity=verbosityWJ)
-            #if doEES:
-            #  samples_EESUp.renormalizeWJ(  baseline, QCD=doQCD, reset=True, verbosity=verbosityWJ)
-            #  samples_EESDown.renormalizeWJ(baseline, QCD=doQCD, reset=True, verbosity=verbosityWJ)
+              #print ">>> rescaling WJ with %.3f"%(scale)
+              #sample = samples.get('WJ',unique=True)
+              #sample.resetScale(scale)
             #if doJTF:
             #  samples_JTFUp.renormalizeWJ(  baseline, QCD=doQCD, reset=True, verbosity=verbosityWJ)
             #  samples_JTFDown.renormalizeWJ(baseline, QCD=doQCD, reset=True, verbosity=verbosityWJ)
@@ -313,9 +311,6 @@ def main():
                 plotStacks(samples,         channel,DIR=DIR)
                 #measureOSSSratios(samples,channel)
             #if drawShifts:
-            #  if doEES and "emu" in channel:
-            #    plotStacks(samplesB_EESUp,  channel,DIR=DIR)
-            #    plotStacks(samplesB_EESDown,channel,DIR=DIR)
             #  if doJTF:
             #    plotStacks(samplesB_JTFUp,  channel,DIR=DIR)
             #    plotStacks(samplesB_JTFDown,channel,DIR=DIR)

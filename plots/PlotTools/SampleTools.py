@@ -2742,7 +2742,7 @@ def stitch(sampleList,*searchterms,**kwargs):
     kfactor           = sigma_incl_NLO / sigma_incl_LO
     norm0             = -1
     maxNUP            = -1
-    LOG.verbose("   %s k-factor = %.2f = %.2f / %.2f" % (name0,kfactor,sigma_incl_NLO,sigma_incl_LO),verbosity+2,level=2)
+    LOG.verbose("   %s k-factor = %.2f = %.2f / %.2f" % (name0,kfactor,sigma_incl_NLO,sigma_incl_LO),verbosity,level=2)
     
     # SET renormalization scales with effective luminosity
     # assume first sample in the list s the inclusive sample
@@ -2758,7 +2758,7 @@ def stitch(sampleList,*searchterms,**kwargs):
           N_eff = N_tot + N_incl*sigma/sigma_incl_LO # effective luminosity    
           matches = re.findall("(\d+)Jets",sample.filenameshort)
           LOG.verbose('   %s: N_eff = N_tot + N_incl * sigma / sigma_incl_LO = %.1f + %.1f * %.2f / %.2f = %.2f'%\
-                         (sample.name,N_tot,N_incl,sigma,sigma_incl_LO,N_eff),verbosity+2,level=2)
+                         (sample.name,N_tot,N_incl,sigma,sigma_incl_LO,N_eff),verbosity,level=2)
           if len(matches)==0: LOG.error('stitch: Could not stitch "%s": could not find right NUP for "%s"!'%(name0,sample.name))
           if len(matches)>1:  LOG.warning('stitch: More than one "\\d+Jets" match for "%s"! matches = %s'%(sample.name,matches))
           NUP = int(matches[0])
@@ -2768,7 +2768,7 @@ def stitch(sampleList,*searchterms,**kwargs):
         if NUP>maxNUP: maxNUP = NUP
         weights.append("(NUP==%i ? %s : 1)"%(NUP,norm))
         LOG.verbose('   %s, NUP==%d: norm = luminosity * kfactor * sigma * 1000 / N_eff = %.2f * %.2f * %.2f * 1000 / %.2f = %.2f'%\
-                        (name0,NUP,luminosity,kfactor,sigma,N_eff,norm),verbosity+2,level=2)
+                        (name0,NUP,luminosity,kfactor,sigma,N_eff,norm),verbosity,level=2)
         LOG.verbose("   stitching %s with normalization %7.3f and cross section %8.2f pb"%(sample.name.ljust(fill), norm, sigma),verbosity,level=2)
         #print ">>> weight.append(%s)" % weights[-1]
         

@@ -2758,7 +2758,7 @@ def stitch(sampleList,*searchterms,**kwargs):
           N_eff = N_tot + N_incl*sigma/sigma_incl_LO # effective luminosity    
           matches = re.findall("(\d+)Jets",sample.filenameshort)
           LOG.verbose('   %s: N_eff = N_tot + N_incl * sigma / sigma_incl_LO = %.1f + %.1f * %.2f / %.2f = %.2f'%\
-                         (sample.name,N_tot,N_incl,sigma,sigma_incl_LO,N_eff),verbosity,level=2)
+                         (sample.name,N_tot,N_incl,sigma,sigma_incl_LO,N_eff),verbosity,level=5)
           if len(matches)==0: LOG.error('stitch: Could not stitch "%s": could not find right NUP for "%s"!'%(name0,sample.name))
           if len(matches)>1:  LOG.warning('stitch: More than one "\\d+Jets" match for "%s"! matches = %s'%(sample.name,matches))
           NUP = int(matches[0])
@@ -2768,7 +2768,7 @@ def stitch(sampleList,*searchterms,**kwargs):
         if NUP>maxNUP: maxNUP = NUP
         weights.append("(NUP==%i ? %s : 1)"%(NUP,norm))
         LOG.verbose('   %s, NUP==%d: norm = luminosity * kfactor * sigma * 1000 / N_eff = %.2f * %.2f * %.2f * 1000 / %.2f = %.2f'%\
-                        (name0,NUP,luminosity,kfactor,sigma,N_eff,norm),verbosity,level=2)
+                        (name0,NUP,luminosity,kfactor,sigma,N_eff,norm),verbosity,level=5)
         LOG.verbose("   stitching %s with normalization %7.3f and cross section %8.2f pb"%(sample.name.ljust(fill), norm, sigma),verbosity,level=2)
         #print ">>> weight.append(%s)" % weights[-1]
         
@@ -2784,7 +2784,7 @@ def stitch(sampleList,*searchterms,**kwargs):
     # SET weight of inclusive sample
     sample_incl.norm = 1.0 # apply lumi-cross section normalization via weights
     stitchweights    = '*'.join(weights)
-    print '*'.join(weights)
+    #print stitchweights
     sample_incl.addWeight(stitchweights)
     if not title0: title0 = sample_incl.title
     

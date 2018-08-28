@@ -18,6 +18,7 @@ if loadMacros:
     #gROOT.ProcessLine('TString MVArerunv2 = "MVArerunv2"; TString MVArerunv1new = "MVArerunv1new";')
   gROOT.Macro('PlotTools/leptonTauFake/leptonTauFake.C+')
   gROOT.Macro('PlotTools/Zpt/zptweight.C+')
+  ###gROOT.Macro("prefire/prefireAnalysis.C+") # TODO: COMMENT OUT !!!
   
  
 colors_HTT_dict = { 'TT':   kBlue-8,                         'DY':          kOrange-4,
@@ -643,9 +644,9 @@ class Sample(object):
           for sample in self.samples:
             sample.addWeight(weight)
         else:
-          LOG.verbose('addWeight: before: %s, self.weight = "%s", self.extraweight = "%s", '%(self,self.weight,self.extraweight),verbositySampleTools)
+          LOG.verbose('addWeight: before: %s, self.weight = "%s", self.extraweight = "%s"'%(self,self.weight,self.extraweight),verbositySampleTools,2)
           self.weight = combineWeights(self.weight, weight)
-          LOG.verbose('           after:  %s, self.weight = "%s", self.extraweight = "%s", '%(self,self.weight,self.extraweight),verbositySampleTools)
+          LOG.verbose('           after:  %s, self.weight = "%s", self.extraweight = "%s"'%(self,self.weight,self.extraweight),verbositySampleTools,2)
         for sample in self.splitsamples:
             sample.addWeight(weight)
         
@@ -702,7 +703,7 @@ class Sample(object):
         
     def normalizeToLumiCrossSection(self,lumi,**kwargs):
         """Calculate and set the normalization for simulation as L*sigma/N"""
-        norm     = 1
+        norm     = 1.
         sigma    = kwargs.get('sigma',  self.sigma  )
         N_events = kwargs.get('N',      self.N      )
         if self.sigma<0:
@@ -1072,10 +1073,12 @@ class MergedSample(Sample):
         
         hargs  = (nbins, array('d',xbins)) if xbins else (nbins, xmin, xmax)
         hist = TH1D(name, title, *hargs)
-        hist.Sumw2()
+        
+        if self.isData: hist.SetBinErrorOption(TH1D.kPoisson)
+        else:           hist.Sumw2()
         for sample in self.samples:
             if 'name' in kwargs: # prevent memory leaks
-                kwargs['name']  = makeHistName(sample.name,name.replace(self.name+'_',''))    
+              kwargs['name']  = makeHistName(sample.name,name.replace(self.name+'_',''))    
             hist_new = sample.hist(*args, **kwargs)
             hist.Add( hist_new )
             #LOG.verbose("    sample %s added with %.1f events (%d entries)" % (sample.name,hist_new.Integral(),hist_new.GetEntries()),verbosity,level=2)
@@ -1825,7 +1828,7 @@ class SampleSet(object):
         file            = kwargs.get('saveToFile',      None                    )
         
         if relax and re.search(r"(nc?btag|n[cf]?jets)",var):
-          LOG.warning('SampleSet::QCD: do not relax cuts in QCD CR for "%s"'%(var))
+          LOG.warning('SampleSet::QCD: not relaxing cuts in QCD CR for "%s"'%(var))
           relax = False
         
         scaleup         = 1.0 if "q_1*q_2>0" else 2.0 if "emu" in self.channel else OSSS_ratio
@@ -2715,21 +2718,31 @@ def stitch(sampleList,*searchterms,**kwargs):
     LOG.verbose("",verbosity,level=2)
     LOG.verbose(" stiching %s: rescale, reweight and merge samples" % (name0),verbosity,level=1)
     
-    N_incl            = 0
-    weights           = [ ]
-    sigmaLO, sigmaNLO = crossSections(name0,*searchterms)
-    kfactor           = sigmaNLO / sigmaLO
-    LOG.verbose("   %s k-factor = %.2f" % (name0, kfactor),verbosity,level=2)
-    
     # CHECK if sample list of contains to-be-stitched-sample
     stitchList = sampleList.samples if isinstance(sampleList,SampleSet) else sampleList
     stitchList = [ s for s in stitchList if s.isPartOf(*searchterms) ]
     if len(stitchList) < 2:
-        LOG.warning("Could not stitch %s: less than two %s samples (%d)" % (name0,name0,len(stitchList)))
+        LOG.warning("stitch: Could not stitch %s: less than two %s samples (%d)" % (name0,name0,len(stitchList)))
         for s in stitchList: print ">>>   %s" % s.name
         if len(stitchList)==0: return sampleList
     fill       = max([ len(s.name) for s in stitchList ])+2
     name       = kwargs.get('name',stitchList[0].name)
+    
+    # FIND inclusive sample
+    sample_incls = [s for s in stitchList if s.isPartOf(name_incl)]
+    if len(sample_incls)==0: LOG.error('stitch: Could not find inclusive sample "%s"!'%(name0))
+    if len(sample_incls) >1: LOG.error('stitch: Found more than one inclusive sample "%s"!'%(name0))
+    sample_incl = sample_incls[0]
+    
+    # k-factor
+    N_incl            = sample_incl.N
+    weights           = [ ]
+    sigma_incl_LO     = sample_incl.sigma
+    sigma_incl_NLO    = crossSectionsNLO(name0,*searchterms)
+    kfactor           = sigma_incl_NLO / sigma_incl_LO
+    norm0             = -1
+    maxNUP            = -1
+    LOG.verbose("   %s k-factor = %.2f = %.2f / %.2f" % (name0,kfactor,sigma_incl_NLO,sigma_incl_LO),verbosity+2,level=2)
     
     # SET renormalization scales with effective luminosity
     # assume first sample in the list s the inclusive sample
@@ -2740,35 +2753,48 @@ def stitch(sampleList,*searchterms,**kwargs):
         sigma = sample.sigma # inclusive or jet-binned cross section
         
         if sample.isPartOf(name_incl):
-            N_incl = N_tot
-        elif not N_incl:
-            LOG.warning("Could not stitch %s: N_incl == 0!" % name0)
+          NUP = 0
         else:
-            N_eff = N_tot + N_incl*sigma/sigmaLO # effective luminosity
+          N_eff = N_tot + N_incl*sigma/sigma_incl_LO # effective luminosity    
+          matches = re.findall("(\d+)Jets",sample.filenameshort)
+          LOG.verbose('   %s: N_eff = N_tot + N_incl * sigma / sigma_incl_LO = %.1f + %.1f * %.2f / %.2f = %.2f'%\
+                         (sample.name,N_tot,N_incl,sigma,sigma_incl_LO,N_eff),verbosity+2,level=2)
+          if len(matches)==0: LOG.error('stitch: Could not stitch "%s": could not find right NUP for "%s"!'%(name0,sample.name))
+          if len(matches)>1:  LOG.warning('stitch: More than one "\\d+Jets" match for "%s"! matches = %s'%(sample.name,matches))
+          NUP = int(matches[0])
         
         norm = luminosity * kfactor * sigma * 1000 / N_eff
-        weights.append("(NUP==%i ? %s : 1)" % (len(weights),norm))
-        LOG.verbose("   stitching %s with normalization %7.3f and cross section %8.2f pb" % (sample.name.ljust(fill), norm, sigma),verbosity,level=2)
+        if NUP==0:     norm0 = norm
+        if NUP>maxNUP: maxNUP = NUP
+        weights.append("(NUP==%i ? %s : 1)"%(NUP,norm))
+        LOG.verbose('   %s, NUP==%d: norm = luminosity * kfactor * sigma * 1000 / N_eff = %.2f * %.2f * %.2f * 1000 / %.2f = %.2f'%\
+                        (name0,NUP,luminosity,kfactor,sigma,N_eff,norm),verbosity+2,level=2)
+        LOG.verbose("   stitching %s with normalization %7.3f and cross section %8.2f pb"%(sample.name.ljust(fill), norm, sigma),verbosity,level=2)
         #print ">>> weight.append(%s)" % weights[-1]
         
         sample.norm = norm # apply lumi-cross section normalization
         if len(stitchList)==1: return sampleList
     
+    # ADD weights for NUP > maxNUP
+    if norm0>0 and maxNUP>0:
+      weights.append("(NUP>%i ? %s : 1)"%(maxNUP,norm0))
+    else:
+      LOG.warning("   found no weight for NUP==0 (%.1f) or no maximum NUP (%d)..."%(norm0,maxNUP))
+    
     # SET weight of inclusive sample
-    for sample in stitchList:
-      if sample.isPartOf(name_incl):
-        sample.norm = 1.0 # apply lumi-cross section normalization via weights
-        sample.addWeight('*'.join(weights))
-        if not title0: title0 = sample.title
-        break
+    sample_incl.norm = 1.0 # apply lumi-cross section normalization via weights
+    stitchweights    = '*'.join(weights)
+    print '*'.join(weights)
+    sample_incl.addWeight(stitchweights)
+    if not title0: title0 = sample_incl.title
     
     # MERGE
     merge(sampleList,name0,*searchterms,title=title0,verbosity=verbosity)
     return sampleList
 
 
-def crossSections(*searchterms,**kwargs):
-    """Returns inclusive LO and NLO cross section for stitching og DY and WJ."""
+def crossSectionsNLO(*searchterms,**kwargs):
+    """Returns inclusive NLO cross section for stitching og DY and WJ."""
     # see /shome/ytakahas/work/TauTau/SFrameAnalysis/TauTauResonances/plot/config.py
     # DY cross sections  5765.4 [  4954.0, 1012.5,  332.8, 101.8,  54.8 ]
     # WJ cross sections 61526.7 [ 50380.0, 9644.5, 3144.5, 954.8, 485.6 ]
@@ -2778,9 +2804,9 @@ def crossSections(*searchterms,**kwargs):
     isDY_M50      = ""
     isWJ          = False
     
-    sigmas        = { 'DY': { 'M-50':     ( 4954.0, 5765.4),
-                              'M-10to50': (18610.0,21658.0) },
-                      'WJ':               (50380.0,61526.7) }
+    sigmas        = { 'DY': { 'M-50':      5765.4,
+                              'M-10to50': 21658.0 },
+                      'WJ':               61526.7 }
     
     for searchterm in searchterms:
         searchterm = searchterm.replace('*','')
@@ -2800,10 +2826,10 @@ def crossSections(*searchterms,**kwargs):
         return sigmas['WJ']
     elif isDY:
         if isDY_M10to50 and isDY_M50:
-            LOG.error("crossSections - Matched to both \"M-10to50\" and \"M-50\"!")
+            LOG.error('crossSections - Matched to both "M-10to50" and "M-50"!')
             exit(1)
         if not (isDY_M10to50 or isDY_M50):
-            LOG.error("crossSections - Did not match to either \"M-10to50\" or \"M-50\" for DY!")
+            LOG.error('crossSections - Did not match to either "M-10to50" or "M-50" for DY!')
             exit(1)
         return sigmas['DY'][isDY_M10to50+isDY_M50]
     else:

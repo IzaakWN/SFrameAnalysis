@@ -62,21 +62,26 @@ def combineCuts(*cuts,**kwargs):
     return cuts
     
 
-
+nakedpattern = re.compile(r"[^(]+\([^?,:]+\)[^)]+")
+cutpattern   = re.compile(r"(?<!\w)\(([^?,:]+)\)")
+bugpattern   = re.compile(r"[\w\d]+\([^\)]+$")
 def stripWeights(cuts):
     """Help function to remove weights and extract main selection string.
     e.g. '(pt>1 && abs(eta)<1)*weight' -> 'pt>1 && abs(eta)<1.5'"""
-    matches = re.findall(r"\(([^)]+\(.+\|\|[^(\?:,]+\)[^(\?:,]+)\)",cuts)
-    if not matches:
-      matches = re.findall(r"^[^()\?:,]+\(.+\|\|[^(\?:,]+\)[^()\?:,]+$",cuts)
-    if not matches:
-      matches = re.findall(r"(?<!\w)\(([^)\?:,]+)\)",cuts)
-    #print matches
-    if len(matches)==0:
+    if nakedpattern.match(cuts):
+      return cuts
+    matches = cutpattern.findall(cuts)
+    if matches:
+      cuts = matches[0]
+      while matches:
+        matches = bugpattern.findall(cuts)
+        if matches:
+          cuts = stripWeights('('+cuts.rstrip(matches[0]))
+    elif len(matches)==0:
       return cuts
     elif len(matches)>1:
       LOG.warning('stripWeights: %d selection string matches in "%s"! Going with the first: "%s"'%(len(matches),cuts,matches[0]))
-    return matches[0]
+    return cuts
     
 
 
@@ -211,7 +216,8 @@ def relaxJetSelection(cuts,**kwargs):
     return cuts
     
 
-
+tideqpattern = re.compile(r"(\*\ *\(\ *gen_match_2\ *==[^)]*\?[^)]*\))")
+tidineqpattern = re.compile(r"(gen_match_2\ *(!?[<=>]=?\ *\d))(?!\ *\?)")
 def vetoJetTauFakes(cuts,**kwargs):
     """Helpfunction to ensure the jet to tau fakes (gen_match_2==6) are excluded in selection string.
        Assume string contains gen_match_2 compared to any digits from 1 to 6.
@@ -222,12 +228,16 @@ def vetoJetTauFakes(cuts,**kwargs):
     cuts0       = cuts
     
     if removeTID:
-      cuts  = re.sub(r"(\*\ *\(\ *gen_match_2\ *==[^)]*\?[^)]*\))","",cuts) #.replace('**','*')
-    match   = re.findall(r"(gen_match_2\ *(!?[<=>]=?\ *\d))(?!\ *\?)",cuts)
+      cuts     = tideqpattern.sub("",cuts) #.replace('**','*')
+    match      = tidineqpattern.findall(cuts)
     if len(match)==0:
+      print "cuts =",cuts
       subcuts0 = stripWeights(cuts)
       subcuts1 = combineCuts(subcuts0,"gen_match_2<6")
       cuts     = cuts.replace(subcuts0,subcuts1)
+      print "subcuts1 =",subcuts1
+      print "cuts =",cuts
+      print "-------------"
       return cuts
     elif len(match)>1:
       LOG.warning('vetoFakeRate: more than one "gen_match_2" match (%d) in "%s"'%(len(match),cuts))
@@ -312,8 +322,8 @@ class Selection(object):
     def __add__(self, selection2):
         """Add selections by combining their selection string (can be string or Selection object)."""
         if isinstance(selection2,str):
-          selection2 = Selection("",selection2) # make selection object
-        return combine(selection2)
+          selection2 = Selection("sum",selection2) # make selection object
+        return self.combine(selection2)
     
     def __mul__(self, weight):
         """Multiply selection with some weight (that can be string or Selection object)."""

@@ -10,15 +10,15 @@ from SettingTools import *
 from PrintTools   import *
 #from SelectionTools import Selection
 
-               
+
 varlist = {
     'fjpt_1':          "leading forward jet pt (|eta|>2.4)",
     'fjpt_2':          "subleading forward jet pt (|eta|>2.4)",
     'fjeta_1':         "leading forward jet eta (|eta|>2.4)",
     'fjeta_2':         "subleading forward jet eta (|eta|>2.4)",
     'njets':           "multiplicity of jets",
-    'ncjets':          "multiplicity of central jets",   'nfjets':      "multiplicity of forward jets",
-    'nbtag':           "multiplicity of b tagged jets",  'ncbtag':      "multiplicity of b tagged jets",
+    'ncjets':          "multiplicity of central jets",                  'nfjets':      "multiplicity of forward jets",
+    'nbtag':           "multiplicity of b tagged jets",                 'ncbtag':      "multiplicity of b tagged jets",
     'njets20':         "multiplicity of jets with pt>20 GeV",
     'ncjets20':        "multiplicity of central jets with pt>20 GeV",   'nfjets20': "multiplicity of forward jets with pt>20 GeV",
     'nbtag20':         "multiplicity of b tagged jets with pt>20 GeV",  'ncbtag20': "multiplicity of b tagged jets with pt>20 GeV",
@@ -53,6 +53,7 @@ varlist_sorted = sorted(varlist,key=lambda x: len(x),reverse=True)
 def makeLatex(title,**kwargs):
     """Convert patterns in a string to LaTeX format."""
     
+    if not isinstance(title,str): return title
     if title and title[0]=='{' and title[-1]=='}': return title[1:-1]
     units = kwargs.get('units', True  )
     split = kwargs.get('split', False )
@@ -108,66 +109,66 @@ def makeLatex(title,**kwargs):
         stringlow = string.lower()
         
         if "p_" in stringlow:
-            string = re.sub(r"(?<!i)(p)_([^{}()<>=\ ]+)",r"\1_{\2}",string,re.IGNORECASE).replace('{t}','{T}')
+            string = re.sub(r"(?<!i)(p)_([^{}()|<>=\ ]+)",r"\1_{\2}",string,flags=re.IGNORECASE).replace('{t}','{T}')
             GeV = True
         
         if "pt" in stringlow and "ptweighted" not in stringlow and "byPhotonPt" not in stringlow:
-            string = re.sub(r"(?<!k)(p)[tT]_([^{}()<>=\ ]+)",r"\1_{T}^{\2}",string,re.IGNORECASE)
-            string = re.sub(r"\b(p)[tT]\b",r"\1_{T}",string,re.IGNORECASE)
+            string = re.sub(r"(?<!k)(p)[tT]_([^{}()|<>=\ ]+)",r"\1_{T}^{\2}",string,flags=re.IGNORECASE)
+            string = re.sub(r"\b(p)[tT]\b",r"\1_{T}",string,flags=re.IGNORECASE)
             GeV = True
         
         if "m_" in stringlow:
-            string = re.sub(r"(?<!u)(m)_([^{}()<>=\ \^]+)",r"\1_{\2}",string,re.IGNORECASE).replace('{t}','{T}')
+            string = re.sub(r"(?<!u)(m)_([^{}()|<>=\ \^]+)",r"\1_{\2}",string,flags=re.IGNORECASE).replace('{t}','{T}')
             GeV = True
         
         if "mt_" in stringlow:
-            string = re.sub(r"(m)t_([^{}()<>=\ ]+)",r"\1_{T}^{\2}",string,re.IGNORECASE)
+            string = re.sub(r"(m)t_([^{}()|<>=\ ]+)",r"\1_{T}^{\2}",string,flags=re.IGNORECASE)
             GeV = True
         
         if "ht" in stringlow and "weight" not in stringlow:
-            string = re.sub(r"\b(h)t\b",r"\1_{T}",string,re.IGNORECASE)
+            string = re.sub(r"\b(h)t\b",r"\1_{T}",string,flags=re.IGNORECASE)
             GeV = True
         
         if " d_" in stringlow:
-            string = re.sub(r"(\ d)_([^{}()<>=\ ]+)",r"\1_{\2}",string,re.IGNORECASE)
+            string = re.sub(r"(\ d)_([^{}()\|<>=\ ]+)",r"\1_{\2}",string,flags=re.IGNORECASE)
             cm = True
         
         if "deltar_" in stringlow:
-            string = re.sub(r"(?<!\#)deltar_([^{}()<>=\ ]+)",r"#DeltaR_{\1}",string,re.IGNORECASE)
+            string = re.sub(r"(?<!\#)deltar_([^{}()|<>=\ ]+)",r"#DeltaR_{\1}",string,flags=re.IGNORECASE)
         elif "deltar" in stringlow:
-            string = re.sub(r"(?<!\#)deltar",r"#DeltaR",string,re.IGNORECASE)
+            string = re.sub(r"(?<!\#)deltar",r"#DeltaR",string,flags=re.IGNORECASE)
         
         if "dR" in string:
-            string = re.sub(r"(?<!\w)dR_([^{}()<>=\ ]+)",r"#DeltaR_{\1}",string)
+            string = re.sub(r"(?<!\w)dR_([^{}()|<>=\ ]+)",r"#DeltaR_{\1}",string)
         
         if "tau" in stringlow:
             #string = re.sub(r"(?<!^)tau(?!\ )",r"#tau",string,re.IGNORECASE)
-            string = re.sub(r"tau",r"#tau",string,re.IGNORECASE)
-            string = re.sub(r" #tau ",r" tau ",string,re.IGNORECASE)
-            string = re.sub(r"^#tau ",r"tau ",string,re.IGNORECASE)
-            string = re.sub(r"tau_([^{}()<>=\ ]+)",r"tau_{\1}",string,re.IGNORECASE)
+            string = re.sub(r"tau",r"#tau",string,flags=re.IGNORECASE)
+            string = re.sub(r" #tau ",r" tau ",string,flags=re.IGNORECASE)
+            string = re.sub(r"^#tau ",r"tau ",string,flags=re.IGNORECASE)
+            string = re.sub(r"tau_([^{}()|<>=\ ]+)",r"tau_{\1}",string,flags=re.IGNORECASE)
         
         if "phi" in stringlow:
             if "dphi" in stringlow:
               string = string.replace("dphi","#Delta#phi")
             else:
               string = string.replace("phi","#phi")
-            string = re.sub(r"phi_([^{}()<>=\ ]+)",r"phi_{\1}",string,re.IGNORECASE)
+            string = re.sub(r"phi_([^{}()|<>=\ ]+)",r"phi_{\1}",string,flags=re.IGNORECASE)
         
         if "zeta" in stringlow and "#zeta" not in stringlow:
             if "Dzeta" in string:
                 string = string.replace("Dzeta","D_{zeta}")
                 GeV = True
             if "zeta_" in stringlow:
-                string = re.sub(r"(?<!#)(zeta)_([^{}()<>=\ ]+)",r"#\1_{\2}",string,re.IGNORECASE)
+                string = re.sub(r"(?<!#)(zeta)_([^{}()|<>=\ ]+)",r"#\1_{\2}",string,flags=re.IGNORECASE)
             else:
-                string = re.sub(r"(?<!#)(zeta)",r"#\1",string,re.IGNORECASE)
+                string = re.sub(r"(?<!#)(zeta)",r"#\1",string,flags=re.IGNORECASE)
             GeV = True
         
         if "eta" in stringlow: #and "#eta" not in stringlow and "#zeta" not in stringlow and "deta" not in stringlow:
             string = string.replace("deta","#Deltaeta")
-            string = re.sub(r"(?<!\#z)eta",r"#eta",string)
-            string = re.sub(r"eta_([^{}()<>=\ ]+)",r"eta_{\1}",string)
+            string = re.sub(r"(?<!\#z)(?<!\#B)eta",r"#eta",string)
+            string = re.sub(r"eta_([^{}()|<>=\ ]+)",r"eta_{\1}",string)
         
         if "abs(" in string and ")" in string:
             string = re.sub(r"abs\(([^)]+)\)",r"|\1|",string)
@@ -179,7 +180,7 @@ def makeLatex(title,**kwargs):
             #string = string.replace("si#mulation","simulation")
         
         if "ttbar" in stringlow:
-            string = re.sub(r"ttbar","t#bar{t}",string,re.IGNORECASE)
+            string = re.sub(r"ttbar","t#bar{t}",string,flags=re.IGNORECASE)
         
         if "npv" in stringlow:
             string = string.replace("npv","number of vertices")
@@ -237,7 +238,7 @@ def makeFileName(string,**kwargs):
                             '|','').replace('&','').replace('#','').replace('!','not').replace(
                             'pt_mu','pt').replace('m_T','mt').replace(
                             '>=',"geq").replace('<=',"leq").replace('>',"gt").replace('<',"lt").replace("=","eq").replace(
-                            ' ','').replace('GeV','')
+                            ' ','').replace('GeV','').replace('anti-iso',"antiIso")
     #if 'm_t' in string.lower:
     #  string = re.sub(r"(?<!u)(m)_([^{}\(\)<>=\ ]+)",r"\1_{\2}",string,re.IGNORECASE).replace('{t}','{T}')
     #if "m_" in string.lower():
@@ -299,14 +300,14 @@ class Variable(object):
         self.min             = None
         self.max             = None
         self.xbins           = None
-        self.noData          = False # also draw data
         self.setBinning(*args)
+        self.data            = kwargs.get('data',           True                        ) # also draw data
         self.binlabels       = kwargs.get('binlabels',      [ ]                         )
         self.ymin            = kwargs.get('ymin',           None                        )
         self.ymax            = kwargs.get('ymax',           None                        )
-        self.ymargin         = kwargs.get('ymargin',        1.16                        )
         self.logx            = kwargs.get('logx',           False                       )
         self.logy            = kwargs.get('logy',           False                       )
+        self.ymargin         = kwargs.get('ymargin',        1.80 if self.logy else 1.16 )
         self.position        = kwargs.get('position',       ""                          ) # legend position
         self.ncolumns        = kwargs.get('ncolumns',       1                           ) # legend position
         #self.plot            = kwargs.get('plots',          True                        )

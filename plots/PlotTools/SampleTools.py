@@ -20,7 +20,7 @@ if loadMacros:
   gROOT.Macro('PlotTools/Zpt/zptweight.C+')
   ###gROOT.Macro("prefire/prefireAnalysis.C+") # TODO: COMMENT OUT !!!
   
- 
+
 colors_HTT_dict = { 'TT':   kBlue-8,                         'DY':          kOrange-4,
                     'TTT':  kAzure-9,                        'ZL':          TColor.GetColor(100,182,232), #kAzure+5,
                     'TTJ':  kBlue-8,                         'ZJ':          kGreen-6,
@@ -355,10 +355,13 @@ class Sample(object):
         self.isSignal       = kwargs.get('signal',          False               )
         self.blind_dict     = kwargs.get('blind',           { }                 ) # var vs. (xmin,xmax)
         self.splitsamples   = [ ]
-        self.color          = kwargs.get('color',           getColor(self)      )
+        self.color          = kwargs.get('color',           None                )
         self.linecolor      = kwargs.get('linecolor',       kBlack              )
         self.lumi           = kwargs.get('lumi',            luminosity          )
         self.isSFrame       = kwargs.get('SFrame',          True                )
+        
+        if self.color==None:
+          self.color = getColor(self)
         
         # CHECK FILE
         if not isinstance(self,MergedSample) and (not self.file or not isinstance(self.file,TFile)): # self.filename
@@ -590,8 +593,8 @@ class Sample(object):
         """Close and reopen file. Use it to free up some memory."""
         verbosity = kwargs.get('verbosity', 0)
         if self.file:
-          if verbosity>1:
-            LOG.verbose('Sample::reload: closing and deleting %s with content:'%(self.file.GetName()),verbosity)
+          if verbosity>3:
+            LOG.verbose('Sample::reload: closing and deleting %s with content:'%(self.file.GetName()),verbosity,2)
             self.file.ls()
           self.file.Close()
           del self.file
@@ -615,7 +618,7 @@ class Sample(object):
         verbosity = kwargs.get('verbosity', 0 )
         if self.file:
             if verbosity>1:
-              LOG.verbose('Sample::reload: closing and deleting %s with content:'%(self.file.GetName()),verbosity)
+              LOG.verbose('Sample::close: closing and deleting %s with content:'%(self.file.GetName()),verbosity,3)
               self.file.ls()
             self.file.Close()
             del self.file
@@ -840,6 +843,7 @@ class Sample(object):
         # DRAW
         out = tree.Draw("%s >> %s" % (var,name), cuts, drawoption)
         if out<0: LOG.error('Sample::hist - Drawing histogram for "%s" sample failed!'%(title))
+        hist.SetDirectory(0)
         
         # SCALE
         if scale!=1.0:  hist.Scale(scale)
@@ -909,6 +913,7 @@ class Sample(object):
         
         # HIST
         hist = TH2F(name, title, *hargs)
+        hist.SetDirectory(0)
         if self.isData: hist.SetBinErrorOption(TH2F.kPoisson)
         else:           hist.Sumw2()
         hist.SetOption("COLZ")
@@ -985,7 +990,7 @@ class MergedSample(Sample):
     def __init__(self, *args, **kwargs):
         name, title, samples = unwrapMergedSamplesArgs(*args,**kwargs)
         self.samples = list(samples)
-        Sample.__init__(self,name,title)
+        Sample.__init__(self,name,title,**kwargs)
         if self.samples: self.initFromSample(samples[0])
         
     def initFromSample(self, sample, **kwargs):
@@ -995,7 +1000,6 @@ class MergedSample(Sample):
         self.isSignal     = sample.isSignal
         self.isBackground = sample.isBackground
         self.isData       = sample.isData
-        self._color       = sample.color
         self.linecolor    = sample.linecolor
     
     def __iter__(self):
@@ -1071,8 +1075,9 @@ class MergedSample(Sample):
           print ">>>\n>>> Samples - %s, %s: %s"%(color(name,color="grey"), var, self.filenameshort)
           #print ">>>    norm=%.4f, scale=%.4f, total %.4f" % (self.norm,kwargs['scale'],self.scale)
         
-        hargs  = (nbins, array('d',xbins)) if xbins else (nbins, xmin, xmax)
-        hist = TH1D(name, title, *hargs)
+        hargs = (nbins, array('d',xbins)) if xbins else (nbins, xmin, xmax)
+        hist  = TH1D(name, title, *hargs)
+        hist.SetDirectory(0)
         
         if self.isData: hist.SetBinErrorOption(TH1D.kPoisson)
         else:           hist.Sumw2()
@@ -1115,6 +1120,7 @@ class MergedSample(Sample):
         hargs += (nybins, array('d',ybins)) if ybins else (nybins, ymin, ymax)
         
         hist = TH2F(name, title, *hargs)
+        hist.SetDirectory(0)
         hist.Sumw2()
         hist.SetOption("COLZ")
         for sample in self.samples:
@@ -1384,13 +1390,14 @@ class SampleSet(object):
     def refreshMemory(self,**kwargs):
         """Open/reopen files to reset file memories."""
         verbosity = getVerbosity(kwargs,verbositySampleTools)
-        now       = kwargs.get('now',False)
+        now       = kwargs.get('now',  False )
+        step      = kwargs.get('step', 10    )
         kwargs['verbosity'] = verbosity
         gROOT.cd()
         if verbosity>1:
           LOG.warning('SampleSet::refreshMemory refreshing memory (gDirectory "%s")'%(gDirectory.GetName()))
           gDirectory.ls()
-        if now or (self.nPlotsMade%10==0 and self.nPlotsMade>0):
+        if now or (self.nPlotsMade%step==0 and self.nPlotsMade>0):
           self.reloadFiles(**kwargs)
           self.nPlotsMade = 0
         self.nPlotsMade +=1
@@ -1428,7 +1435,7 @@ class SampleSet(object):
         histsD, histsB, histsS = self.createHistograms(*args,**kwargs)
         stack                  = THStack(name,name)
         for hist in histsB:
-            stack.Add(hist)
+          stack.Add(hist)
         return stack
         
     
@@ -1644,12 +1651,14 @@ class SampleSet(object):
         weightFR        = 'getFakeRate(pt_2,m_2,decayMode_2)' # pt-, mass- dependent
         #weightFR        = "getFakeRate(pt_2,decayMode_2)" # pt-dependent only
         if shift:
-          if "down" in shift.lower(): weightFR = weightFR.replace('getFakeRate','getFakeRateDown')
-          elif "up" in shift.lower(): weightFR = weightFR.replace('getFakeRate','getFakeRateUp')
+          if 'down' in shift.lower(): weightFR = weightFR.replace('getFakeRate','getFakeRateDown')
+          elif 'up' in shift.lower(): weightFR = weightFR.replace('getFakeRate','getFakeRateUp')
           else: LOG.warning('SampleSet::jetFakeRate: Did not recognize shift "%s"!'%(shift))
         
         # CUTS
+        print "cuts0 =",cuts0
         cuts          = vetoJetTauFakes(cuts0)
+        print "cuts =",cuts
         cuts_aniso    = "iso_2_vloose==1 && iso_2!=1"
         isomatch      = re.findall(r"iso_2\ *==\ *1",cuts)
         anisomatch    = re.findall(r"iso_2_vloose\ *==\ *1 && iso_2\ *!=\ *1",cuts)
@@ -1708,7 +1717,7 @@ class SampleSet(object):
         histJTF = substractHistsFromData(histD_JFR,histMC_JFR,name=name,title=title)
         if not histJTF: LOG.warning("SampleSet::jetFakeRate: Could not make JTF! JTF histogram is none!", pre="  ")
         histJTF.SetFillColor(getColor('JTF'))
-        histJTF.SetOption("HIST")
+        histJTF.SetOption('HIST')
         
         # SAVE histograms
         if file:
@@ -1817,6 +1826,7 @@ class SampleSet(object):
         
         samples         = self.samples
         name            = kwargs.get('name',            makeHistName("QCD",var) )
+        title           = kwargs.get('title',           "QCD multijet"          )
         append          = kwargs.get('append',          ""                      )+"_SS"
         ratio_WJ_QCD    = kwargs.get('ratio_WJ_QCD_SS', False                   )
         doRatio_WJ_QCD  = isinstance(ratio_WJ_QCD,      c_double                )
@@ -1910,7 +1920,7 @@ class SampleSet(object):
         # QCD HIST
         histMC_SS  = histsB_SS[0].Clone("MC_SS")
         for hist in histsB_SS[1:]: histMC_SS.Add(hist)
-        histQCD = substractHistsFromData(histsD_SS[0],histMC_SS,name=name+append,title="QCD multijet")
+        histQCD = substractHistsFromData(histsD_SS[0],histMC_SS,name=name+append,title=title)
         if not histQCD: LOG.warning("SampleSet::QCD: Could not make QCD! QCD histogram is none!", pre="  ")
         
         # SAVE histograms
@@ -2668,8 +2678,9 @@ def merge(sampleList,*searchterms,**kwargs):
     """Merge samples from a sample list, that match a set of search terms."""
     
     verbosity = getVerbosity(kwargs,verbositySampleTools,1)
-    name0     = kwargs.get('name',  searchterms[0]  )
-    title0    = kwargs.get('title', name0           )
+    name0     = kwargs.get('name',  searchterms[0] )
+    title0    = kwargs.get('title', name0          )
+    color0    = kwargs.get('color', None           )
     LOG.verbose("",verbosity,level=2)
     LOG.verbose(" merging %s"%(name0),verbosity,level=1)
     
@@ -2681,7 +2692,7 @@ def merge(sampleList,*searchterms,**kwargs):
     fill = max([ len(s.name) for s in mergeList ])+2 # number of spaces
     
     # ADD samples with name0 and searchterm
-    mergedsample = MergedSample(name0,title0)
+    mergedsample = MergedSample(name0,title0,color=color0)
     for sample in mergeList:
         samplename = ('"%s"'%(sample.name)).ljust(fill)
         LOG.verbose("   merging %s to %s: %s"%(samplename,name0,sample.filenameshort),verbosity,level=2)
@@ -2758,7 +2769,7 @@ def stitch(sampleList,*searchterms,**kwargs):
           N_eff = N_tot + N_incl*sigma/sigma_incl_LO # effective luminosity    
           matches = re.findall("(\d+)Jets",sample.filenameshort)
           LOG.verbose('   %s: N_eff = N_tot + N_incl * sigma / sigma_incl_LO = %.1f + %.1f * %.2f / %.2f = %.2f'%\
-                         (sample.name,N_tot,N_incl,sigma,sigma_incl_LO,N_eff),verbosity,level=5)
+                         (sample.name,N_tot,N_incl,sigma,sigma_incl_LO,N_eff),verbosity,4)
           if len(matches)==0: LOG.error('stitch: Could not stitch "%s": could not find right NUP for "%s"!'%(name0,sample.name))
           if len(matches)>1:  LOG.warning('stitch: More than one "\\d+Jets" match for "%s"! matches = %s'%(sample.name,matches))
           NUP = int(matches[0])
@@ -2768,8 +2779,8 @@ def stitch(sampleList,*searchterms,**kwargs):
         if NUP>maxNUP: maxNUP = NUP
         weights.append("(NUP==%i ? %s : 1)"%(NUP,norm))
         LOG.verbose('   %s, NUP==%d: norm = luminosity * kfactor * sigma * 1000 / N_eff = %.2f * %.2f * %.2f * 1000 / %.2f = %.2f'%\
-                        (name0,NUP,luminosity,kfactor,sigma,N_eff,norm),verbosity,level=5)
-        LOG.verbose("   stitching %s with normalization %7.3f and cross section %8.2f pb"%(sample.name.ljust(fill), norm, sigma),verbosity,level=2)
+                        (name0,NUP,luminosity,kfactor,sigma,N_eff,norm),verbosity,4)
+        LOG.verbose("   stitching %s with normalization %7.3f and cross section %8.2f pb"%(sample.name.ljust(fill), norm, sigma),verbosity,2)
         #print ">>> weight.append(%s)" % weights[-1]
         
         sample.norm = norm # apply lumi-cross section normalization
@@ -2784,7 +2795,7 @@ def stitch(sampleList,*searchterms,**kwargs):
     # SET weight of inclusive sample
     sample_incl.norm = 1.0 # apply lumi-cross section normalization via weights
     stitchweights    = '*'.join(weights)
-    #print stitchweights
+    LOG.verbose("   stitch weights = %s"%(stitchweights),verbosity,4)
     sample_incl.addWeight(stitchweights)
     if not title0: title0 = sample_incl.title
     
@@ -2794,8 +2805,10 @@ def stitch(sampleList,*searchterms,**kwargs):
 
 
 def crossSectionsNLO(*searchterms,**kwargs):
-    """Returns inclusive NLO cross section for stitching og DY and WJ."""
+    """Returns inclusive (N)NLO cross section for stitching og DY and WJ."""
     # see /shome/ytakahas/work/TauTau/SFrameAnalysis/TauTauResonances/plot/config.py
+    # https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat13TeV#List_of_processes
+    # https://ineuteli.web.cern.ch/ineuteli/crosssections/2017/FEWZ/
     # DY cross sections  5765.4 [  4954.0, 1012.5,  332.8, 101.8,  54.8 ]
     # WJ cross sections 61526.7 [ 50380.0, 9644.5, 3144.5, 954.8, 485.6 ]
     
@@ -2804,7 +2817,7 @@ def crossSectionsNLO(*searchterms,**kwargs):
     isDY_M50      = ""
     isWJ          = False
     
-    sigmas        = { 'DY': { 'M-50':      5765.4,
+    sigmasNLO     = { 'DY': { 'M-50':      5765.4,
                               'M-10to50': 21658.0 },
                       'WJ':               61526.7 }
     
@@ -2819,11 +2832,15 @@ def crossSectionsNLO(*searchterms,**kwargs):
         if "WJ" in searchterm:
             isWJ = True
     
+    if isDY_M50 and "2017" in globalTag:
+      LOG.warning("crossSectionsNLO: changing NNLO cross section for DY M>50")
+      sigmasNLO['DY']['M-50'] = 3*2004.76
+    
     if isDY and isWJ:
         LOG.error("crossSections - Detected both isDY and isWJ!")
         exit(1)
     elif isWJ:
-        return sigmas['WJ']
+        return sigmasNLO['WJ']
     elif isDY:
         if isDY_M10to50 and isDY_M50:
             LOG.error('crossSections - Matched to both "M-10to50" and "M-50"!')
@@ -2831,7 +2848,7 @@ def crossSectionsNLO(*searchterms,**kwargs):
         if not (isDY_M10to50 or isDY_M50):
             LOG.error('crossSections - Did not match to either "M-10to50" or "M-50" for DY!')
             exit(1)
-        return sigmas['DY'][isDY_M10to50+isDY_M50]
+        return sigmasNLO['DY'][isDY_M10to50+isDY_M50]
     else:
         LOG.error("crossSections - Did not find a DY or WJ match!")
         exit(1)

@@ -25,7 +25,7 @@ TauTauAnalysis::TauTauAnalysis() : SCycleBase(),
     m_PileupReweightingTool_F( this ),
     m_BTaggingScaleTool( this ),
     m_ScaleFactorTool( this ),
-    m_RochesterTool(this),
+    //m_RochesterTool(this),
     m_RecoilCorrector( this ),
     m_JetCorrectionTool( this ),
     m_SVFitTool( this )
@@ -67,7 +67,7 @@ TauTauAnalysis::TauTauAnalysis() : SCycleBase(),
   DeclareProperty( "JTFshift",              m_JTFshift              = 0.0               );
   DeclareProperty( "doJTF",                 m_doJTF                 = false             );
   DeclareProperty( "RCset",                 m_RCset                 = 0                 );
-  DeclareProperty( "RCmember",              m_RCmember              = 0                 );
+  DeclareProperty( "RCerror",               m_RCerror               = 0                 );
   DeclareProperty( "doTight",               m_doTight               = false             ); // fill branches with less events
   DeclareProperty( "noTight",               m_noTight               = false             ); // override doTight
   
@@ -233,7 +233,7 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
   m_logger << INFO << "doJTF:               " << (m_doJTF        ? "TRUE" : "FALSE") << SLogger::endmsg;
   m_logger << INFO << "JTFshift:            " << m_JTFshift            << SLogger::endmsg;
   m_logger << INFO << "RCset:               " << m_RCset               << SLogger::endmsg;
-  m_logger << INFO << "RCmember:            " << m_RCmember            << SLogger::endmsg;
+  m_logger << INFO << "RCerror:             " << m_RCerror             << SLogger::endmsg;
   m_logger << INFO << "noTight:             " << (m_noTight      ? "TRUE" : "FALSE") << SLogger::endmsg;
   m_logger << INFO << "doTight:             " << (m_doTight      ? "TRUE" : "FALSE") << SLogger::endmsg;
   
@@ -323,6 +323,9 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
     DeclareVariable( b_iso_2_vvtight[ch],       "iso_2_vvtight",        treeName);
     
     DeclareVariable( b_gen_match_2[ch],         "gen_match_2",          treeName);
+    DeclareVariable( b_gen_ptvis_2[ch],         "gen_ptvis_2",          treeName);
+    DeclareVariable( b_gen_mvis_2[ch],          "gen_mvis_2",           treeName);
+    DeclareVariable( b_gen_decayMode_2[ch],     "gen_decayMode_2",      treeName);
     DeclareVariable( b_pol_2[ch],               "pol_2",                treeName);
     DeclareVariable( b_decayModeFindingOldDMs_2[ch],       "decayModeFindingOldDMs_2",          treeName);
     DeclareVariable( b_decayMode_2[ch],                    "decayMode_2",                       treeName);
@@ -496,17 +499,12 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
     }
     
     DeclareVariable( b_m_vis[ch],               "m_vis",                treeName);
-    DeclareVariable( b_pt_tt[ch],               "pt_tt",                treeName);
-    DeclareVariable( b_pt_tt_vis[ch],           "pt_tt_vis",            treeName);
-    DeclareVariable( b_R_pt_m_vis[ch],          "R_pt_m_vis",           treeName);
-    DeclareVariable( b_R_pt_m_vis2[ch],         "R_pt_m_vis2",          treeName);
+    DeclareVariable( b_pt_ll[ch],               "pt_tt",                treeName);
     
     DeclareVariable( b_m_sv[ch],                "m_sv",                 treeName);
     DeclareVariable( b_m_taub[ch],              "m_taub",               treeName);
     DeclareVariable( b_m_taumub[ch],            "m_taumub",             treeName);
     DeclareVariable( b_m_mub[ch],               "m_mub",                treeName);
-    DeclareVariable( b_pt_tt_sv[ch],            "pt_tt_sv",             treeName);
-    DeclareVariable( b_R_pt_m_sv[ch],           "R_pt_m_sv",            treeName);
     
     DeclareVariable( b_dR_ll[ch],               "dR_ll",                treeName);
     DeclareVariable( b_dphi_ll[ch],             "dphi_ll",              treeName);
@@ -540,11 +538,12 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
     TString tch = ch;
     Book( TH1F(hname, hname, 12, 0.5, 12.5 ), dirname);
   }
-  Book( TH1F("npu",             "npu",              110, -10, 100 ), "checks");
-  Book( TH1F("npu_float",       "npu",             1100, -10, 100 ), "checks");
-  Book( TH1F("npu_no0PU",       "npu_no0PU",        110, -10, 100 ), "checks");
-  Book( TH1F("puweight",        "puweight",         100,   0,  10 ), "checks");
-  Book( TH1F("muonSF",          "muon SF",          100,   0,   2 ), "checks");
+  Book( TH1F("npu",       "npu",               110, -10, 100 ), "checks");
+  Book( TH1F("npu_float", "npu",              1100, -10, 100 ), "checks");
+  Book( TH1F("npu_no0PU", "npu_no0PU",         110, -10, 100 ), "checks");
+  Book( TH1F("puweight",  "puweight",          100,   0,  10 ), "checks");
+  //Book( TH1F("muonSF",    "muon SF",          100,   0,   2 ), "checks");
+  //Book( TH1F("NUP",       "number of partons",  10,   0,  10 ), "checks");
   
   if (!m_isData){
     m_PileupReweightingTool.BeginInputData(      id, m_dataPUFileName               );
@@ -563,7 +562,7 @@ void TauTauAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
   m_BTaggingScaleTool.BeginInputData( id );
   m_BTaggingScaleTool.bookHistograms(); // to measure b tag efficiencies for our selections
   m_ScaleFactorTool.BeginInputData( id );
-  m_RochesterTool.BeginInputData( id );
+  //m_RochesterTool.BeginInputData( id );
   m_RecoilCorrector.BeginInputData( id );
   m_JetCorrectionTool.BeginInputData( id );
   m_SVFitTool.BeginInputData( id );
@@ -688,6 +687,7 @@ void TauTauAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
     Hist("npu_float", "checks")->Fill(m_eventInfo.PV_N);
     if(m_eventInfo.PV_N<=0) throw SError( SError::SkipEvent );
   }else{
+    //Hist("NUP", "checks")->Fill(m_eventInfo.lheNj);
     for (auto ch: channels_)
       fillCutflow("cutflow_" + ch, "histogram_" + ch, kJSON, 1);
     getEventWeight();
@@ -726,12 +726,11 @@ void TauTauAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
   for( int i = 0; i < m_muon.N; ++i ){
     UZH::Muon mymuon( &m_muon, i );
     
-    
     Float_t muonpt = mymuon.pt();
-    if(muonpt < m_muonPtCut*0.80) continue;
-    float sf = m_RochesterTool.correct(mymuon,m_genParticle,m_isData,m_RCset,m_RCmember); // Rochester correction to muon object
-    muonpt = mymuon.pt();
-    Hist("muonSF", "checks")->Fill(sf);
+    //if(muonpt < m_muonPtCut*0.80) continue;
+    //float sf = m_RochesterTool.correct(mymuon,m_genParticle,m_isData,m_RCset,0,m_RCerror); // Rochester correction to muon object
+    //muonpt = mymuon.pt();
+    //Hist("muonSF", "checks")->Fill(sf);
     if(m_doMES) muonpt *= (1.+m_MESshift);
     if(muonpt < m_muonPtCut) continue; // TODO: pT > 28 if IsoMu27 trigger only triggered
     
@@ -902,10 +901,13 @@ void TauTauAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
     fillCutflow("cutflow_mutau", "histogram_mutau", kLepTau, 1);
     sort(mutau_pair.begin(), mutau_pair.end());
     Int_t genmatch_2 = goodTausGen[mutau_pair[0].itau];
-    if(m_doTight) b_isolated_ = (mutau_pair[0].lep_iso<0.50 and (goodTaus[mutau_pair[0].itau].byVLooseIsolationMVArun2v1DBoldDMwLT()==1 or
-                                                                 goodTaus[mutau_pair[0].itau].byMediumIsolationMVArun2v1DBoldDMwLT()==1 or
-                                                                 goodTaus[mutau_pair[0].itau].byTightIsolationMVArun2v1DBoldDMwLT()==1));
-    else b_isolated_ = mutau_pair[0].lep_iso<0.50 and goodTaus[mutau_pair[0].itau].byLooseIsolationMVArun2v1DBoldDMwLT()==1;
+    b_isolated_      = mutau_pair[0].lep_iso<0.50;
+    if(m_doTight) b_isolated_ &= (goodTaus[mutau_pair[0].itau].byVLooseIsolationMVArun2v1DBoldDMwLT()==1 or
+                                  goodTaus[mutau_pair[0].itau].byVLooseIsolationMVArun2v2DBoldDMwLT()==1 or
+                                  goodTaus[mutau_pair[0].itau].byVLooseIsolationMVArun2v1DBnewDMwLT()==1 or
+                                  goodTaus[mutau_pair[0].itau].byLooseIsolationMVArun2v1DBoldDMwLT()==1 or
+                                  goodTaus[mutau_pair[0].itau].byLooseIsolationMVArun2v2DBoldDMwLT()==1 or
+                                  goodTaus[mutau_pair[0].itau].byLooseIsolationMVArun2v1DBnewDMwLT()==1);
     if(m_doTES and m_doMES) b_isolated_ &= (genmatch_2==5);
     
     // For Jets: cut and filter our selected muon and tau
@@ -921,7 +923,8 @@ void TauTauAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
     }
     
     fillCutflow("cutflow_mutau", "histogram_mutau", kTriggerMatched, 1);
-    if(!m_isData and !m_doTight and b_isolated_){
+    if(!m_isData and !m_doTight and (goodTaus[mutau_pair[0].itau].byTightIsolationMVArun2v2DBoldDMwLT()==1 or
+                                    goodTaus[mutau_pair[0].itau].byTightIsolationMVArun2v1DBnewDMwLT()==1)){
       //std::cout << ">>> ExecuteEvent - fillEfficiencies" << std::endl;
       m_BTaggingScaleTool.fillEfficiencies(goodJetsAK4); // to measure b tag efficiencies for our selections
       m_BTaggingScaleTool.fillEfficienciesDeepCSV(goodJetsAK4);
@@ -1149,7 +1152,11 @@ void TauTauAnalysis::FillBranches(const std::string& channel, const UZH::Tau& ta
   //std::cout << "\nFillBranches";// << std::endl;
   
   const char* ch = channel.c_str();
-  if(m_doRecoilCorr || m_doZpt) setGenBosonTLVs(); // only for HTT, DY and WJ
+  if(m_doRecoilCorr || m_doZpt){
+    setGenBosonTLVs(); // only for HTT and DY
+    b_m_genboson[ch]  = boson_tlv.M();
+    b_pt_genboson[ch] = boson_tlv.Pt();
+  }
   
   b_weight[ch]       = b_weight_;
   b_genweight[ch]    = b_genweight_;
@@ -1226,7 +1233,12 @@ void TauTauAnalysis::FillBranches(const std::string& channel, const UZH::Tau& ta
   b_byTightCombinedIsolationDeltaBetaCorr3Hits_2[ch]   = tau.byTightCombinedIsolationDeltaBetaCorr3Hits();
   b_byCombinedIsolationDeltaBetaCorrRaw3Hits_2[ch]     = tau.byCombinedIsolationDeltaBetaCorrRaw3Hits();
   
+  b_gen_decayMode_2[ch]                                = -1;
+  b_gen_ptvis_2[ch]                                    = -1;
+  b_gen_mvis_2[ch]                                     = -1;
   if(!m_doTight){
+    if(!m_isData and gen_match_2==5) b_gen_decayMode_2[ch] = genDecayMode(tau,b_gen_ptvis_2[ch],b_gen_mvis_2[ch]);
+    
     b_chargedPionPt_2[ch]                              = tau.chargedPionPt();
     b_neutralPionPt_2[ch]                              = tau.neutralPionPt();
     b_chargedIsoPtSum_2[ch]                            = tau.chargedIsoPtSum();
@@ -1256,6 +1268,32 @@ void TauTauAnalysis::FillBranches(const std::string& channel, const UZH::Tau& ta
     b_pol_2[ch]         = -9;
     if (tau.chargedPionPt() > 0 && tau.neutralPionPt() > 0)
       b_pol_2[ch]       = (tau.chargedPionPt() - tau.neutralPionPt()) / (tau.chargedPionPt() + tau.neutralPionPt());
+  }else{
+    b_chargedPionPt_2[ch]                              = -1;
+    b_neutralPionPt_2[ch]                              = -1;
+    b_chargedIsoPtSum_2[ch]                            = -1;
+    b_neutralIsoPtSum_2[ch]                            = -1;
+    b_chargedIsoPtSumdR03_2[ch]                        = -1;
+    b_neutralIsoPtSumdR03_2[ch]                        = -1;
+    b_puCorrPtSum_2[ch]                                = -1;
+    b_photonPtSumOutsideSignalCone_2[ch]               = -1;
+    b_photonPtSumOutsideSignalConedR03_2[ch]           = -1;
+    b_byPhotonPtSumOutsideSignalCone_2[ch]             = -1;
+    
+    b_nPhoton_2[ch]                                    = -1;
+    b_ptWeightedDetaStrip_2[ch]                        = -1;
+    b_ptWeightedDphiStrip_2[ch]                        = -1;
+    b_ptWeightedDrSignal_2[ch]                         = -1;
+    b_ptWeightedDrIsolation_2[ch]                      = -1;
+    b_leadingTrackChi2_2[ch]                           = -1;
+    b_leadingTrackPt_2[ch]                             = -1;
+    b_eRatio_2[ch]                                     = -1;
+    b_dxy_Sig_2[ch]                                    = -1;
+    b_ip3d_2[ch]                                       = -1;
+    b_ip3d_Sig_2[ch]                                   = -1;
+    b_hasSecondaryVertex_2[ch]                         = -1;
+    b_decayDistMag_2[ch]                               = -1;
+    b_flightLengthSig_2[ch]                            = -1;
   }
   
   extraLeptonVetos(channel, muon, electron); // sets global b_dilepton_veto_, b_extraelec_veto_, b_extramuon_veto_
@@ -1335,8 +1373,6 @@ void TauTauAnalysis::FillBranches(const std::string& channel, const UZH::Tau& ta
                                                                          m_jetAK4.N ); //m_eventInfo.lheNj
     met.et(met_tlv_corrected.E());
     met.phi(met_tlv_corrected.Phi());
-    b_m_genboson[ch]  = boson_tlv.M();
-    b_pt_genboson[ch] = boson_tlv.Pt();
   }
   
   // SHIFTS
@@ -1428,17 +1464,12 @@ void TauTauAnalysis::FillBranches(const std::string& channel, const UZH::Tau& ta
   b_puppimt_2[ch]   = TMath::Sqrt(2*tau_tlv.Pt()*fpuppimet*( 1-TMath::Cos(deltaPhi(tau_tlv.Phi(), fpuppimetphi ))));
   
   // discriminating variables
-  b_m_vis[ch]       = (lep_tlv + tau_tlv).M();
-  b_pt_tt[ch]       = (lep_tlv + tau_tlv + met.tlv()).Pt();
-  b_pt_tt_vis[ch]   = (lep_tlv + tau_tlv).Pt();
-  b_R_pt_m_vis[ch]  = -1;
-  if(b_m_vis[ch] > 0){
-    b_R_pt_m_vis[ch] = b_pt_tt[ch]/b_m_vis[ch];
-    b_R_pt_m_vis2[ch] = b_pt_tt_vis[ch]/b_m_vis[ch];
-  }
+  TLorentzVector ll_tlv = lep_tlv + tau_tlv;
+  b_m_vis[ch]       = ll_tlv.M();
+  b_pt_ll[ch]       = (ll_tlv + met.tlv()).Pt();
   b_dR_ll[ch]       = tau_tlv.DeltaR(lep_tlv);
-  b_dphi_ll[ch]     = tau_tlv.DeltaPhi(lep_tlv);
-  b_deta_ll[ch]     = abs(tau_tlv.Eta()-lep_tlv.Eta());
+  b_dphi_ll[ch]     = fabs(tau_tlv.DeltaPhi(lep_tlv));
+  b_deta_ll[ch]     = fabs(tau_tlv.Eta()-lep_tlv.Eta());
   b_mt_tot[ch]      = TMath::Sqrt(TMath::Power(b_pfmt_1[ch],2) + TMath::Power(b_pfmt_2[ch],2) + 2*lep_tlv.Pt()*b_pt_2[ch]*(1-TMath::Cos(deltaPhi(lep_tlv.Phi(), b_phi_2[ch]))));
   
   // zeta variables
@@ -1515,12 +1546,9 @@ void TauTauAnalysis::FillBranches(const std::string& channel, const UZH::Tau& ta
     //std::cout << ">>> SVFit...";
     m_SVFitTool.addMeasuredLeptonTau(channel,lep_tlv, tau_tlv, tau.decayMode());
     m_SVFitTool.getSVFitMassAndPT(m_sv,pt_tt_sv,met.px(),met.py(),met.cov00(),met.cov10(),met.cov11());
-    if(m_sv > 0) R_pt_m_sv = pt_tt_sv/m_sv;
     //std::cout << " done" << std::endl;
   }
   b_m_sv[ch]        = m_sv;
-  b_pt_tt_sv[ch]    = pt_tt_sv;
-  b_R_pt_m_sv[ch]   = R_pt_m_sv;
   
 }
 
@@ -1872,44 +1900,24 @@ void TauTauAnalysis::FillJetBranches_JEC( Float_t& jpt, Float_t& jeta, const TLo
 void TauTauAnalysis::setGenBosonTLVs(){
   //std::cout << "setGenBosonTLVs" << std::endl;
   // https://twiki.cern.ch/twiki/bin/viewauth/CMS/HiggsToTauTauWorking2016#Computation_of_generator_Z_W_Hig
-  // TODO: check case of more than one boson
-  
-  boson_tlv     = TLorentzVector();
-  boson_tlv_vis = TLorentzVector();
-  
-  for ( int p = 0; p < (m_genParticle.N); ++p ) {
-    UZH::GenParticle mygoodGenPart( &m_genParticle, p );
-    float pdg = fabs(mygoodGenPart.pdgId());
-    bool isNeutrino = (pdg == 12 || pdg == 14 || pdg == 16);
-    
-    if( (mygoodGenPart.fromHardProcessFinalState() && (pdg == 11 || pdg == 13 || isNeutrino)) ||
-        mygoodGenPart.isDirectHardProcessTauDecayProductFinalState() ){
-      boson_tlv += mygoodGenPart.tlv();
-      if(!isNeutrino)
-        boson_tlv_vis += mygoodGenPart.tlv();
+  int nLep = 0;
+  boson_tlv = TLorentzVector();
+  for( int p=0; p<(int)m_genParticle.pdgId->size(); ++p ){
+    UZH::GenParticle particle( &m_genParticle, p );
+    float PID = abs(particle.pdgId());
+    if(((PID==11 or PID==13) and particle.status()==1 and particle.fromHardProcessFinalState()) or
+        (PID==15 and particle.status()==2 and abs(particle.mother()[0])<30)){
+      nLep++;
+      boson_tlv += particle.tlv();
+      //if(nLep>2){
+      //   std::cout<<" nLep="<<nLep<<" "<<std::setw(10)<<PID
+      //            <<", M="<<std::setw(7)<<particle.mother()[0]<<", pt="<<std::setw(8)<<particle.pt()
+      //            <<", status "<<std::setw(2)<<particle.status()<<", HPFS="<<particle.fromHardProcessFinalState()<<std::endl;   
+      //}
+      //if(nLep==2) break;
     }
   }
 }
-
-
-
-
-
-double TauTauAnalysis::getGenBosonPt(){
-  //std::cout << "getGenBosonPt" << std::endl;
-  
-  double pt = -1;
-  for ( int p = 0; p < (m_genParticle.N); ++p ) {
-    UZH::GenParticle mygoodGenPart( &m_genParticle, p );
-    if( fabs(mygoodGenPart.pdgId()) == 23 and mygoodGenPart.pt() > 0 ){
-        return mygoodGenPart.pt();
-    }
-  }
-  
-  return pt;
-}
-
-
 
 
 
@@ -1926,8 +1934,8 @@ int TauTauAnalysis::genMatch(Float_t lep_eta, Float_t lep_phi) {
   Float_t min_dR = 1000;
   int id = 6;
   
-  // check for lepton matching, first
-  for ( int p = 0; p < (m_genParticle.N); ++p ) {
+  // MATCH leptons
+  for( int p=0; p<(int)m_genParticle.pdgId->size(); ++p ){
     UZH::GenParticle particle( &m_genParticle, p );
     
     Float_t pt      = particle.pt();
@@ -1950,10 +1958,11 @@ int TauTauAnalysis::genMatch(Float_t lep_eta, Float_t lep_phi) {
     }
   }
   
-  for ( int itau = 0; itau < (int)m_genParticle.tauvispt->size(); ++itau ) {
+  // MATCH hadronically decayed tau
+  for( int itau = 0; itau < (int)m_genParticle.tauvispt->size(); ++itau ) {
     //m_genParticle.taudecay
     Float_t dr = deltaR(lep_eta - m_genParticle.tauviseta->at(itau),
-			deltaPhi(lep_phi, m_genParticle.tauvisphi->at(itau)));
+		                deltaPhi(lep_phi,m_genParticle.tauvisphi->at(itau)));
     if(dr < min_dR){
       min_dR = dr;
       id = 5;
@@ -1965,6 +1974,140 @@ int TauTauAnalysis::genMatch(Float_t lep_eta, Float_t lep_phi) {
   return id;
 
 }
+
+
+int TauTauAnalysis::genDecayMode(const UZH::Tau tau, Float_t& genvispt, Float_t& genvism){
+  //std::cout << "genDecayMode" << std::endl;
+  
+  // Retrieve visible pT of the taus !
+  std::map<int, TLorentzVector> gennus;
+  std::map<int, TLorentzVector> gentaus;
+  std::map<int, int> decaymode;
+  Float_t min_dR = 0.3;
+  
+  for( int p = 0; p < (int)m_genParticle.pdgId->size(); ++p ){
+    UZH::GenParticle particle( &m_genParticle, p );
+    
+    Float_t pt     = particle.pt();
+    Float_t eta    = particle.eta();
+    Float_t phi    = particle.phi();
+    Float_t energy = particle.e();
+    Int_t pdgId    = particle.pdgId();
+    Int_t abspdgId = abs(particle.pdgId());
+    Int_t isPrompt = particle.isPrompt();
+    
+    Int_t mother = -999;
+    if(particle.nMoth() !=0){
+      mother = abs(particle.mother()[0]);
+    }
+    
+    // save gen tau neutrino
+    if(particle.status()==1 && abspdgId==16 && mother==15){
+      TLorentzVector genNeutrino;
+      genNeutrino.SetPtEtaPhiE(pt,eta,phi,energy);
+      gennus[pdgId] = genNeutrino;
+    }
+    
+    // skip if not tau
+    if(!(particle.status()==2 && abspdgId==15 && isPrompt > 0.5)) continue;
+    
+    bool isleptonic = false;
+    
+    int nNeutral = 0;
+    int nCharged = 0;
+
+    for(int idau=0; idau < (int)particle.nDau(); idau++){
+      Int_t daughter_PID = abs(particle.dau()[idau]);
+      if(daughter_PID==11 || daughter_PID==13 || daughter_PID==15) isleptonic = true;
+      if(daughter_PID==111 or daughter_PID==311){
+        nNeutral++;
+      }
+      else if(daughter_PID==211 or daughter_PID==321){
+        nCharged++;
+      }
+      else if(daughter_PID==223){ // 90% omega -> pi+pi-pi0
+        nCharged += 2;
+        nNeutral++;
+      }
+    }
+    
+    if(isleptonic==false){
+      TLorentzVector genPt;
+      genPt.SetPtEtaPhiE(pt,eta,phi,energy);
+      gentaus[pdgId] = genPt;
+      
+      
+      if(nCharged>0){
+        decaymode[pdgId] = 5*(nCharged-1)+std::min(nNeutral,9);
+      //if(nCharged==1){
+      //  if(nNeutral==0) decaymode[pdgId] = 0;
+      //  if(nNeutral==1) decaymode[pdgId] = 1;
+      //  if(nNeutral==2) decaymode[pdgId] = 2;
+      //  if(nNeutral==3) decaymode[pdgId] = 3;
+      //  if(nNeutral==4) decaymode[pdgId] = 4;
+      //  if(nNeutral>=5) decaymode[pdgId] = 5;
+      //}else if(nCharged==3){
+      //  decaymode[pdgId] = std::max(nNeutral,9);
+      //  if(nNeutral==0) decaymode[pdgId] = 10;
+      //  if(nNeutral==1) decaymode[pdgId] = 11;
+      //  if(nNeutral==2) decaymode[pdgId] = 12;
+      //  if(nNeutral==3) decaymode[pdgId] = 13;
+      //  if(nNeutral>=4) decaymode[pdgId] = 14;
+      //}else if(nCharged==5){
+      //  decaymode[pdgId] = 20;
+      }else{
+        std::cout << "genDecayMode: did not recognize tau decay: "<<std::endl;
+        for(int idau=0; idau < (int)particle.nDau(); idau++)
+          std::cout << abs(particle.dau()[idau]) << ", ";
+        std::cout << std::endl;
+        decaymode[pdgId] = -1;
+      }
+    }
+  }
+  
+  // if tau decays hadronically: loop over gentaus, gennus
+  // substract gennu pt from gentau pt
+  for(std::map<int, TLorentzVector>::iterator it = gentaus.begin(); it!=gentaus.end(); ++it){
+    Int_t pdg = (*it).first;
+    for(std::map<int, TLorentzVector>::iterator itn = gennus.begin(); itn!=gennus.end(); ++itn){
+      Int_t nu = (*itn).first;
+      if(pdg==15){
+        if(nu==16) (*it).second -= (*itn).second;
+      }else if(pdg==-15){
+        if(nu==-16) (*it).second -= (*itn).second;
+      }else{
+        std::cout << "Impossible !!!" << std::endl;
+      }
+    }
+  }
+  
+  Int_t dm = -1;
+
+//   if(gentaus.size()>0){
+//     std::cout << "Ntuplizer: ";
+//     for( int itau = 0; itau < (int)m_genParticle.tauvispt->size(); ++itau ){
+//       std::cout << " " << m_genParticle.tauvispt->at(itau);
+//     }
+//     std::cout << std::endl;
+//     std::cout << "genDM:     ";
+//   }
+  
+  for(std::map<int, TLorentzVector>::iterator it = gentaus.begin(); it!=gentaus.end(); ++it){
+    //std::cout << " " << (*it).second.Pt();
+    Float_t dr = tau.DeltaR((*it).second.Eta(),(*it).second.Phi());
+    if(dr < min_dR){
+      min_dR   = dr;
+      dm       = decaymode[(*it).first];
+      genvispt = (*it).second.Pt();
+      genvism  = (*it).second.M();
+    }
+  }
+  //if(gentaus.size()>0) std::cout << std::endl;
+  //if(dm==-1) std::cout << "Impossible decay mode = " << dm << std::endl;
+  return dm;
+  
+}
+
 
 
 

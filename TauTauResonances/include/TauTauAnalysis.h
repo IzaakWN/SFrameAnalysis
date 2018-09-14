@@ -28,7 +28,7 @@
 #include "../PileupReweightingTool/include/PileupReweightingTool.h"
 #include "../BTaggingTools/include/BTaggingScaleTool.h"
 #include "../LepEff2017/interface/ScaleFactorTool.h"
-#include "../RochesterTool/interface/RochesterTool.h"
+//#include "../RochesterTool/interface/RochesterTool.h"
 #include "../RecoilCorrections/interface/RecoilCorrector.h"
 #include "../SVFitTools/interface/SVFitTool.h"
 #include "../SVFitTools/interface/SVfitStandaloneAlgorithm.h"
@@ -157,10 +157,10 @@ class TauTauAnalysis : public SCycleBase {
     
     // set tlv of generator boson for recoil corrections
     virtual void setGenBosonTLVs();
-    virtual double getGenBosonPt();
     
     // match reco objects to taus
-    virtual int genMatch( Float_t lep_eta, Float_t lep_phi );
+    int genMatch( Float_t lep_eta, Float_t lep_phi );
+    int genDecayMode(const UZH::Tau tau, Float_t& genvispt, Float_t& genvism);
     
     // help function
     static Float_t deltaPhi( Float_t p1, Float_t p2 );
@@ -187,7 +187,6 @@ class TauTauAnalysis : public SCycleBase {
     //void cutflowCheck( const std::string& channel );
     //void visiblePTCheck();
     //void countBTaggedTaus();
-    int genDecayMode(Float_t lep_eta, Float_t lep_phi);
     static void printRow( const std::vector<std::string> svec = {}, const std::vector<int> ivec = {}, const std::vector<double> dvec = {}, const std::vector<float> fvec = {}, const int w=10 );
     
     
@@ -221,7 +220,7 @@ class TauTauAnalysis : public SCycleBase {
     PileupReweightingTool   m_PileupReweightingTool_F;
     BTaggingScaleTool       m_BTaggingScaleTool;
     ScaleFactorTool         m_ScaleFactorTool;
-    RochesterTool           m_RochesterTool;
+    //RochesterTool           m_RochesterTool;
     RecoilCorrectorTool     m_RecoilCorrector;
     JetCorrectionTool       m_JetCorrectionTool;
     SVFitTool               m_SVFitTool;
@@ -262,7 +261,7 @@ class TauTauAnalysis : public SCycleBase {
     bool    m_doMES;
     double  m_MESshift;
     int     m_RCset;
-    int     m_RCmember;
+    int     m_RCerror;
     bool    m_doEES;
     double  m_EESshift;
     double  m_EESshiftEndCap;
@@ -453,6 +452,9 @@ class TauTauAnalysis : public SCycleBase {
     std::map<std::string,Int_t>    b_iso_2_vvtight;
     std::map<std::string,Int_t>    b_gen_match_2;
     std::map<std::string,Float_t>  b_pol_2;
+    std::map<std::string,Float_t>  b_gen_ptvis_2;
+    std::map<std::string,Float_t>  b_gen_mvis_2;
+    std::map<std::string,Int_t>    b_gen_decayMode_2;
     
     std::map<std::string,Float_t>  b_byIsolationMVArun2v1DBoldDMwLTraw_2;
     std::map<std::string,Float_t>  b_byIsolationMVArun2v1DBnewDMwLTraw_2;
@@ -594,12 +596,7 @@ class TauTauAnalysis : public SCycleBase {
     
     std::map<std::string,Float_t>  b_m_vis;
     std::map<std::string,Float_t>  b_m_sv;
-    std::map<std::string,Float_t>  b_pt_tt;
-    std::map<std::string,Float_t>  b_pt_tt_vis;
-    std::map<std::string,Float_t>  b_pt_tt_sv;
-    std::map<std::string,Float_t>  b_R_pt_m_vis;
-    std::map<std::string,Float_t>  b_R_pt_m_vis2;
-    std::map<std::string,Float_t>  b_R_pt_m_sv;
+    std::map<std::string,Float_t>  b_pt_ll;
     
     std::map<std::string,Float_t>  b_m_taub;
     std::map<std::string,Float_t>  b_m_taumub;

@@ -47,6 +47,8 @@ DiMuonAnalysis::DiMuonAnalysis() : SCycleBase(),
   DeclareProperty( "doRecoilCorr",          m_doRecoilCorr          = false             );
   DeclareProperty( "doZpt",                 m_doZpt                 = false             );
   DeclareProperty( "doTTpt",                m_doTTpt                = false             );
+  DeclareProperty( "RCset",                 m_RCset                 = 0                 );
+  DeclareProperty( "RCerror",               m_RCerror               = 0                 );
   DeclareProperty( "TESshift",              m_TESshift              = 0.0               );
   DeclareProperty( "doTES",                 m_doTES                 = false             );
   DeclareProperty( "doTight",               m_doTight               = false             ); // fill branches with less events
@@ -58,8 +60,8 @@ DiMuonAnalysis::DiMuonAnalysis() : SCycleBase(),
   DeclareProperty( "CSVWorkingPoint",       m_CSVWorkingPoint       = 0.8838            );
   DeclareProperty( "deepCSVWorkingPoint",   m_deepCSVWorkingPoint   = 0.4941            );
   
-  DeclareProperty( "MuonPtCut",             m_muonPtCut             = 20.               );
-  DeclareProperty( "SecondMuonPtCut",       m_secondMuonPtCut       = 28.               );
+  DeclareProperty( "MuonPtCut",             m_muonPtCut             = 15.               );
+  DeclareProperty( "SecondMuonPtCut",       m_secondMuonPtCut       = 25.               );
   DeclareProperty( "MuonEtaCut",            m_muonEtaCut            = 2.4               );
   DeclareProperty( "MuonD0Cut",             m_muonD0Cut             = 0.045             );
   DeclareProperty( "MuonDzCut",             m_muonDzCut             = 0.2               );
@@ -114,7 +116,7 @@ void DiMuonAnalysis::BeginCycle() throw( SError ){
   
   // MARK: Triggers
   // 2017: run 294927 to 306126
-  //m_triggers.push_back( "HLT_IsoMu24_v"                                           );
+  m_triggers.push_back( "HLT_IsoMu24_v"                                           );
   m_triggers.push_back( "HLT_IsoMu27_v"                                           );
   //m_triggers.push_back( "HLT_IsoTkMu27_v"                                         );
   //m_triggers.push_back( "HLT_IsoMu27_eta2p1"                                      );
@@ -158,15 +160,17 @@ void DiMuonAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
   m_doTES   = m_TESshift != 0.0 and !m_isData;
   m_doTight = m_doTight or m_doTES; // need fail region for EES, JTF
   m_doTight = m_doTight and !m_noTight;        // noTight overrides doTight
-  m_logger << INFO << "IsData:              " << (m_isData   ?   "TRUE" : "FALSE") << SLogger::endmsg;
-  m_logger << INFO << "IsSignal:            " << (m_isSignal ?   "TRUE" : "FALSE") << SLogger::endmsg;
+  m_logger << INFO << "IsData:              " << (m_isData       ? "TRUE" : "FALSE") << SLogger::endmsg;
+  m_logger << INFO << "IsSignal:            " << (m_isSignal     ? "TRUE" : "FALSE") << SLogger::endmsg;
   m_logger << INFO << "doRecoilCorr:        " << (m_doRecoilCorr ? "TRUE" : "FALSE") << SLogger::endmsg;
-  m_logger << INFO << "doZpt:               " << (m_doZpt    ?   "TRUE" : "FALSE") << SLogger::endmsg;
-  m_logger << INFO << "doTTpt:              " << (m_doTTpt   ?   "TRUE" : "FALSE") << SLogger::endmsg;
-  m_logger << INFO << "doTES:               " << (m_doTES    ?   "TRUE" : "FALSE") << SLogger::endmsg;
+  m_logger << INFO << "doZpt:               " << (m_doZpt        ? "TRUE" : "FALSE") << SLogger::endmsg;
+  m_logger << INFO << "doTTpt:              " << (m_doTTpt       ? "TRUE" : "FALSE") << SLogger::endmsg;
+  m_logger << INFO << "RCset:               " << m_RCset               << SLogger::endmsg;
+  m_logger << INFO << "RCerror:             " << m_RCerror             << SLogger::endmsg;
+  m_logger << INFO << "doTES:               " << (m_doTES        ? "TRUE" : "FALSE") << SLogger::endmsg;
   m_logger << INFO << "TESshift:            " << m_TESshift            << SLogger::endmsg;
-  m_logger << INFO << "noTight:             " << (m_noTight  ?   "TRUE" : "FALSE") << SLogger::endmsg;
-  m_logger << INFO << "doTight:             " << (m_doTight  ?   "TRUE" : "FALSE") << SLogger::endmsg;
+  m_logger << INFO << "noTight:             " << (m_noTight      ? "TRUE" : "FALSE") << SLogger::endmsg;
+  m_logger << INFO << "doTight:             " << (m_doTight      ? "TRUE" : "FALSE") << SLogger::endmsg;
   
   m_logger << INFO << "MuonPtCut:           " << m_muonPtCut           << SLogger::endmsg;
   m_logger << INFO << "SecondMuonPtCut:     " << m_secondMuonPtCut     << SLogger::endmsg;
@@ -261,7 +265,7 @@ void DiMuonAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
     DeclareVariable( b_byVLooseIsolationMVArun2v1DBnewDMwLT_3[ch],         "byVLooseIsolationMVArun2v1DBnewDMwLT_3",         treeName);
     DeclareVariable( b_byLooseIsolationMVArun2v1DBnewDMwLT_3[ch],          "byLooseIsolationMVArun2v1DBnewDMwLT_3",          treeName);
     DeclareVariable( b_byMediumIsolationMVArun2v1DBnewDMwLT_3[ch],         "byMediumIsolationMVArun2v1DBnewDMwLT_3",         treeName);
-    DeclareVariable( b_byTightIsolationMVArun2v1DBnewDMwLT_3[ch],          "byTightIsolationMVArun2v1DBnewMwLT_3",           treeName);
+    DeclareVariable( b_byTightIsolationMVArun2v1DBnewDMwLT_3[ch],          "byTightIsolationMVArun2v1DBnewDMwLT_3",          treeName);
     DeclareVariable( b_byVTightIsolationMVArun2v1DBnewDMwLT_3[ch],         "byVTightIsolationMVArun2v1DBnewDMwLT_3",         treeName);
     DeclareVariable( b_byVVTightIsolationMVArun2v1DBnewDMwLT_3[ch],        "byVVTightIsolationMVArun2v1DBnewDMwLT_3",        treeName);
     
@@ -366,6 +370,8 @@ void DiMuonAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
     
     DeclareVariable( b_dR_ll[ch],               "dR_ll",                treeName);
     DeclareVariable( b_pt_ll[ch],               "pt_ll",                treeName);
+    DeclareVariable( b_deta_ll[ch],             "deta_ll",              treeName);
+    DeclareVariable( b_dphi_ll[ch],             "dphi_ll",              treeName);
     DeclareVariable( b_ht[ch],                  "ht",                   treeName);
     DeclareVariable( b_m_vis[ch],               "m_vis",                treeName);
     DeclareVariable( b_m_mutau_1[ch],           "m_mutau_1",            treeName);
@@ -393,7 +399,7 @@ void DiMuonAnalysis::BeginInputData( const SInputData& id ) throw( SError ) {
     Book( TH1F(hname, hname, 12, 0.5, 12.5 ), dirname);
   }
   
-  Book( TH1F("muonSF", "muon SF", 100, 0, 2 ), "checks");
+  //Book( TH1F("muonSF", "muon SF", 100, 0, 2 ), "checks");
   
   if (!m_isData){
     m_PileupReweightingTool.BeginInputData( id, m_dataPUFileName );
@@ -561,14 +567,14 @@ void DiMuonAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
   
   // MARK: Cut 3: muon 1
   //std::cout << ">>> ExecuteEvent - Cut 3: muon 1" << std::endl;
-  int muon28 = 0;
+  int secondMuon = 0;
   std::vector<UZH::Muon> goodMuons;
   for( int i = 0; i < m_muon.N; ++i ){
     UZH::Muon mymuon( &m_muon, i );
     
-    if(mymuon.pt() < m_muonPtCut*0.80) continue;
-    float sf = m_RochesterTool.correct(mymuon,m_genParticle,m_isData,0,0); // Rochester correction to muon object
-    Hist("muonSF", "checks")->Fill(sf);
+    //if(mymuon.pt() < m_muonPtCut*0.80) continue;
+    //float sf = m_RochesterTool.correct(mymuon,m_genParticle,m_isData,m_RCset,0,m_RCerror); // Rochester correction to muon object
+    //Hist("muonSF", "checks")->Fill(sf);
     if(mymuon.pt() < m_muonPtCut) continue;
     if(fabs(mymuon.eta()) > m_muonEtaCut) continue;
     if(fabs(mymuon.d0_allvertices()) > m_muonD0Cut) continue;
@@ -576,13 +582,13 @@ void DiMuonAnalysis::ExecuteEvent( const SInputData&, Double_t ) throw( SError )
     if(mymuon.isMediumMuonGH() < 0.5) continue;
     if(mymuon.SemileptonicPFIso()/mymuon.pt() > m_muonIsoCut) continue; // tight
     goodMuons.push_back(mymuon);
-    if(mymuon.pt()>m_secondMuonPtCut) muon28++;
+    if(mymuon.pt()>m_secondMuonPtCut) secondMuon++;
   }
   
   if(goodMuons.size()>0){
     fillCutflow("cutflow_mumu", "histogram_mumu", kMuon, 1);
     //std::cout << ">>> ExecuteEvent - Cut 4: muon 2" << std::endl;
-    if(goodMuons.size()>1 and muon28>0)
+    if(goodMuons.size()>1 and secondMuon>0)
       fillCutflow("cutflow_mumu", "histogram_mumu", kSecondMuon, 1);
     else throw SError( SError::SkipEvent );
   }
@@ -716,7 +722,11 @@ void DiMuonAnalysis::FillBranches(const std::string& channel, const UZH::Muon& m
   //std::cout << "\nFillBranches";// << std::endl;
   
   const char* ch = channel.c_str();
-  if(m_doRecoilCorr || m_doZpt) setGenBosonTLVs(); // only for HTT, DY and WJ
+  if(m_doRecoilCorr || m_doZpt){
+    setGenBosonTLVs(); // only for HTT, DY and WJ
+    b_m_genboson[ch]  = boson_tlv.M();
+    b_pt_genboson[ch] = boson_tlv.Pt();
+  }
   
   
   b_channel[ch]      = 4;
@@ -860,7 +870,7 @@ void DiMuonAnalysis::FillBranches(const std::string& channel, const UZH::Muon& m
     b_byLooseCombinedIsolationDeltaBetaCorr3Hits_3[ch]   = -9;
     b_byMediumCombinedIsolationDeltaBetaCorr3Hits_3[ch]  = -9;
     b_byTightCombinedIsolationDeltaBetaCorr3Hits_3[ch]   = -9;
-  }  
+  }
   
   // measure b tagging efficiency
   if(!m_isData and tau.pt()>20 and b_iso_1[ch]<0.15 && b_iso_2[ch]<0.15){
@@ -890,8 +900,6 @@ void DiMuonAnalysis::FillBranches(const std::string& channel, const UZH::Muon& m
   //                                                                      boson_tlv.Px(),     boson_tlv.Py(),
   //                                                                      boson_tlv_vis.Px(), boson_tlv_vis.Py(),
   //                                                                      m_jetAK4.N ); //m_eventInfo.lheNj
-  //  b_m_genboson[ch]  = boson_tlv.M();
-  //  b_pt_genboson[ch] = boson_tlv.Pt();
   //}else{
   //  met_tlv_corrected = met_tlv;
   //}
@@ -938,6 +946,8 @@ void DiMuonAnalysis::FillBranches(const std::string& channel, const UZH::Muon& m
   b_m_vis[ch]       = ll_tlv.M();
   b_dR_ll[ch]       = muon1.DeltaR(muon2);
   b_pt_ll[ch]       = ll_tlv.Pt();
+  b_dphi_ll[ch]     = fabs(muon1_tlv.DeltaPhi(muon2_tlv));
+  b_deta_ll[ch]     = fabs(muon1_tlv.Eta()-muon2_tlv.Eta());
   if(tau.pt()>20){
     b_m_mutau_1[ch] = muon1.M(tau);
     b_m_mutau_2[ch] = muon2.M(tau);
@@ -1172,49 +1182,32 @@ void DiMuonAnalysis::countJets(const TLorentzVector& jet, Int_t& ncjets, Int_t& 
 void DiMuonAnalysis::setGenBosonTLVs(){
   //std::cout << "setGenBosonTLVs" << std::endl;
   // https://twiki.cern.ch/twiki/bin/viewauth/CMS/HiggsToTauTauWorking2016#Computation_of_generator_Z_W_Hig
-  // TODO: check case of more than one boson
-  
-  boson_tlv     = TLorentzVector();
-  boson_tlv_vis = TLorentzVector();
-  
-  for ( int p = 0; p < (m_genParticle.N); ++p ) {
-    UZH::GenParticle mygoodGenPart( &m_genParticle, p );
-    float pdg = fabs(mygoodGenPart.pdgId());
-    bool isNeutrino = (pdg == 12 || pdg == 14 || pdg == 16);
-    
-    if( (mygoodGenPart.fromHardProcessFinalState() && (pdg == 11 || pdg == 13 || isNeutrino)) ||
-        mygoodGenPart.isDirectHardProcessTauDecayProductFinalState() ){
-      boson_tlv += mygoodGenPart.tlv();
-      if(!isNeutrino)
-        boson_tlv_vis += mygoodGenPart.tlv();
+  int nLep = 0;
+  boson_tlv = TLorentzVector();
+  for( int p=0; p<(int)m_genParticle.pdgId->size(); ++p ){
+    UZH::GenParticle particle( &m_genParticle, p );
+    float PID = abs(particle.pdgId());
+    if(((PID==13 or PID==11) and particle.status()==1 and particle.fromHardProcessFinalState()) or
+        (PID==15 and particle.status()==2 and abs(particle.mother()[0])<30)){
+      nLep++;
+      boson_tlv += particle.tlv();
+      //if(nLep>2){
+      //   std::cout<<" nLep="<<nLep<<" "<<std::setw(10)<<PID
+      //            <<", M="<<std::setw(7)<<particle.mother()[0]<<", pt="<<std::setw(8)<<particle.pt()
+      //            <<", status "<<std::setw(2)<<particle.status()<<", HPFS="<<particle.fromHardProcessFinalState()<<std::endl;   
+      //}
+      //if(nLep==2) break;
     }
   }
 }
 
-
-
-
-
-double DiMuonAnalysis::getGenBosonPt(){
-  //std::cout << "getGenBosonPt" << std::endl;
-  
-  double pt = -1;
-  for ( int p = 0; p < (m_genParticle.N); ++p ) {
-    UZH::GenParticle mygoodGenPart( &m_genParticle, p );
-    if( fabs(mygoodGenPart.pdgId()) == 23 and mygoodGenPart.pt() > 0 ){
-        return mygoodGenPart.pt();
-    }
-  }
-  
-  return pt;
-}
 
 
 
 
 
 int DiMuonAnalysis::genMatch(Float_t lep_eta, Float_t lep_phi) {
-  //std::cout << "cutflowCheck" << std::endl;
+  //std::cout << "genMatch" << std::endl;
   // https://twiki.cern.ch/twiki/bin/viewauth/CMS/HiggsToTauTauWorking2016#MC_Matching
   //  1: prompt electron
   //  2: prompt muon
@@ -1227,7 +1220,7 @@ int DiMuonAnalysis::genMatch(Float_t lep_eta, Float_t lep_phi) {
   int id = 6;
   
   // check for lepton matching, first
-  for ( int p = 0; p < (m_genParticle.N); ++p ) {
+  for( int p=0; p<(int)m_genParticle.pdgId->size(); ++p ){
     UZH::GenParticle particle( &m_genParticle, p );
     
     Float_t pt      = particle.pt();
@@ -1246,7 +1239,7 @@ int DiMuonAnalysis::genMatch(Float_t lep_eta, Float_t lep_phi) {
       if(pdgId==11 && isPrompt > 0.5) id = 1;
       if(pdgId==13 && isPrompt > 0.5) id = 2;
       if(pdgId==11 && isDirectPromptTauDecayProduct > 0.5) id = 3;
-      if(pdgId==13 && isDirectPromptTauDecayProduct > 0.5) id = 4;      
+      if(pdgId==13 && isDirectPromptTauDecayProduct > 0.5) id = 4;
     }
   }
   

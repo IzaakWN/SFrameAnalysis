@@ -140,7 +140,6 @@ class DiMuonAnalysis : public SCycleBase {
     
     // set tlv of generator boson for recoil corrections
     virtual void setGenBosonTLVs();
-    virtual double getGenBosonPt();
     
     // match reco objects to taus
     virtual int genMatch( Float_t lep_eta, Float_t lep_phi );
@@ -222,6 +221,9 @@ class DiMuonAnalysis : public SCycleBase {
     bool    m_doRecoilCorr;
     bool    m_doZpt;
     bool    m_doTTpt;
+    bool    m_doMES;
+    int     m_RCset;
+    int     m_RCerror;
     bool    m_doTES;
     double  m_TESshift;
     bool    m_doTight;
@@ -477,6 +479,8 @@ class DiMuonAnalysis : public SCycleBase {
     //std::map<std::string,Float_t>  b_pfmt_1_UncEnDown;
     
     std::map<std::string,Float_t>  b_dR_ll;
+    std::map<std::string,Float_t>  b_dphi_ll;
+    std::map<std::string,Float_t>  b_deta_ll;
     std::map<std::string,Float_t>  b_pt_ll;
     std::map<std::string,Float_t>  b_ht;
     

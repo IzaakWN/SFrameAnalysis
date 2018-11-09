@@ -4,10 +4,10 @@
 #### SETTINGS ############################################################################
 
 # LABELS & LUMI
-globalTag   = "_2017_V2_full_noEW" # extra label for opening file, saving plots to dir
-plottag     = "_full_RC_noEW" #_ZptWeights  # extra label for image file
-luminosity  = 41.4 #86
-era         = 2017
+globalTag   = "_2017_V2_full_noRC" # extra label for opening file, saving plots to dir
+plottag     = "_full_noRC" #_ZptWeights  # extra label for image file
+era         = "2017"
+luminosity  = 28.29 if "B-E" in era else 13.57 if "F" in era else 41.4 #86
 
 # VERBOSITY
 verbosity               = 1
@@ -22,8 +22,8 @@ drawShifts          = True #and False
 useCutTree          = True #and False
 loadMacros          = True #and False
 makePDF             = True and False
-onlyDY              = True #and False
-drawData            = True and False
+onlyDY              = True and False
+drawData            = True #and False
 
 # DATACARD OPTIONS
 doDatacard          = True and False
@@ -66,7 +66,7 @@ channels = [
 ]
 
 # CATEGORIES / SELECTIONS
-_weight            = "genweight*puweight*trigweight_1*idisoweight_1*idisoweight_2" #*zptweight" *getZpt_IWN(m_genboson,pt_genboson)
+_weight            = "genweight*puweight*trigweight_1*idisoweight_1*idisoweight_2" #*getZpt_2017(m_genboson,pt_genboson) #*zptweight" *getZpt_IWN(m_genboson,pt_genboson)
 isocuts_mumu       = "iso_1<0.15 && iso_2<0.15"
 vetos              = "lepton_vetos==0"
 vetos_mumu         = "extraelec_veto==0 && extramuon_veto==0"
@@ -76,6 +76,14 @@ baseline           = "%s && %s && q_1*q_2<0"%(isocuts_mumu,vetos_mumu)
 ZMMregion          = "70<m_vis && m_vis<110"
 tau_T              = "byTightIsolationMVArun2v1DBoldDMwLT_3==1"
 tau_VLnT           = "byTightIsolationMVArun2v1DBoldDMwLT_3!=1 && byVLooseIsolationMVArun2v1DBoldDMwLT_3==1"
+if "B-E" in era:
+  baseline        += " && (!isData || run<=304826)"
+  #_weight          = _weight.replace('puweight',"puweightBtoF")
+  plottag         += "_EraBtoE"
+if "F" in era:
+  baseline        += " && (!isData || run>=304911)"
+  #_weight = _weight.replace('puweight',"puweightF")
+  plottag         += "_EraF"
 
 selections  = [
 #     sel("no cuts",                                ""                                              ),
@@ -83,7 +91,8 @@ selections  = [
 #     sel("baseline, no tau ID, m_T<50GeV",         "%s && %s" %(baseline_noIso2,"pfmt_1<50")       ),
 #     sel("baseline, no tau ID, m_T>80GeV",         "%s && %s" %(baseline_noIso2,"pfmt_1>80")       ),
 #     sel("ZTT enriched, no tau ID",                "%s && %s" %(baseline, ZMMregion)               ),
-    sel("ZMM region",                             "%s && %s" %(baseline,ZMMregion), title="Z -> mumu region" ),
+#     sel("ZMM region",                             "%s && %s" %(baseline,ZMMregion), title="Z -> mumu region" ),
+    sel("dimuon",                                 "%s && %s" %(baseline,"m_vis>20"), title="Z -> mumu region" ),
 #     sel("ZMM region, tau tight",                  "%s && %s && %s" %(baseline,ZMMregion,tau_T)    ),
 #     sel("ZMM region, tau VL && !T",               "%s && %s && %s" %(baseline,ZMMregion,tau_VLnT) ),
 #     sel("baseline, tight, m_T<50GeV",             "%s && %s" %(baseline,"pfmt_1<50")              ),
@@ -102,7 +111,9 @@ variables = [
 #     var("met",                                  40,     0,  200 ),
 #     var("npu",                                  40,     0,   80 ),
 #     var("npv",                                  40,     0,   80 ),
-#     var("njets",                                 8,     0,    8 ),
+    var("njets",                                 8,     0,    8 ),
+    var("ncjets",                                8,     0,    8 ),
+    var("nfjets",                                8,     0,    8 ),
 #     var("nbtag",                                 7,     0,    7 ),
 #     var("pt_1",                                 50,     0,  200, title="leading muon pt"     ),
 #     var("eta_1",                                26,  -2.6,  2.6, title="leading muon eta"    ),
@@ -117,33 +128,55 @@ variables = [
 #     var("byIsolationMVArun2v1DBnewDMwLTraw_3",  50,  -1.0,  1.0, logy=True, position='centerleft' ),
 #     var("dzeta",                                50,  -150,  100 ), # filename="Dzeta"
 #     var("pzetavis",                             50,     0,  200 ),
-    var("(pt_ll-pt_genboson)/pt_genboson",     200,   -1.0, 1.0,  title="boson pt resolution",   filename="pt_boson_res",     units=""          ),
+#     var("(pt_ll-pt_genboson)/pt_genboson",     200,   -1.0, 1.0,  title="boson pt resolution",   filename="pt_boson_res",     units=""          ),
 #     var("(pt_ll-pt_genboson)/pt_genboson",     400,   -1.5,   6,  title="boson pt resolution",   filename="pt_boson_res_log", units="", logy=True, ymin=100 ),
-    var("(m_vis-m_genboson)/m_genboson",       200,   -0.5, 0.5,  title="boson mass resolution", filename="m_boson_res",      units=""          ),
+#     var("(m_vis-m_genboson)/m_genboson",       200,   -0.5, 0.5,  title="boson mass resolution", filename="m_boson_res",      units=""          ),
 #     var("(m_vis-m_genboson)/m_genboson",       400,   -1.5,   6,  title="boson mass resolution", filename="m_boson_res_log",  units="", logy=True, ymin=100 ),
 ]
 
 samplesB = [
-    ("WJ", "WJetsToLNu",                               "W + jets",             50380.0   ), # LO 50380.0; NLO 61526.7
-    ("WJ", "W1JetsToLNu",                              "W + 1J",                9644.5   ),
-    ("WJ", "W2JetsToLNu",                              "W + 2J",                3144.5   ),
-    ("WJ", "W3JetsToLNu",                              "W + 3J",                 954.8   ),
-    ("WJ", "W4JetsToLNu",                              "W + 4J",                 485.6   ),
+    
+#     ("WJ", "WJetsToLNu",                               "W + jets",             50380.0   ), # LO 50380.0; NLO 61526.7
+#     ("WJ", "W1JetsToLNu",                              "W + 1J",                9644.5   ),
+#     ("WJ", "W2JetsToLNu",                              "W + 2J",                3144.5   ),
+#     ("WJ", "W3JetsToLNu",                              "W + 3J",                 954.8   ),
+#     ("WJ", "W4JetsToLNu",                              "W + 4J",                 485.6   ),
+#     ("ST", "ST_t-channel_top_4f_inclusiveDecays",      "ST t-channel t",         136.02  ),
+#     ("ST", "ST_t-channel_antitop_4f_inclusiveDecays",  "ST t-channel at",         80.95  ),
+#     ("ST", "ST_tW_top_5f_inclusiveDecays",             "ST tW",                   35.60  ),
+#     ("ST", "ST_tW_antitop_5f_inclusiveDecays",         "ST atW",                  35.60  ),
+#     ("WW", "WW_TuneCP5",                               "WW",                      63.21  ),
+#     ("WZ", "WZ_TuneCP5",                               "WZ",                      22.82  ),
+#     ("ZZ", "ZZ_TuneCP5",                               "ZZ",                      10.32  ),
+#     ("TT", "TTTo2L2Nu",                                "ttbar 2l2#nu",            87.31  ),
+#     ("TT", "TTToHadronic",                             "ttbar hadronic",         380.1   ),
+#     ("TT", "TTToSemiLeptonic",                         "ttbar semileptonic",     364.4   ),
+#     ("DY", "DYJetsToLL_M-10to50_TuneCP5",              "Drell-Yan 10-50",      21658.0,  ),#{'extraweight':"getZpt_IWN(m_genboson,pt_genboson)"} ), # LO 18610.0; NLO 21658.0
+#     ("DY", "DYJetsToLL_M-50_TuneCP5",                  "Drell-Yan 50",          4954.0,  ),#{'extraweight':"getZpt_IWN(m_genboson,pt_genboson)"} ), # LO  4954.0; NLO  5765.4
+#     ("DY", "DY1JetsToLL_M-50_TuneCP5",                 "Drell-Yan 1J 50",       1012.5,  ),#{'extraweight':"getZpt_IWN(m_genboson,pt_genboson)"} ),
+#     ("DY", "DY2JetsToLL_M-50_TuneCP5",                 "Drell-Yan 2J 50",        332.8,  ),#{'extraweight':"getZpt_IWN(m_genboson,pt_genboson)"} ),
+#     ("DY", "DY3JetsToLL_M-50_TuneCP5",                 "Drell-Yan 3J 50",        101.8,  ),#{'extraweight':"getZpt_IWN(m_genboson,pt_genboson)"} ),
+    
+    ("WJ", "WJetsToLNu",                               "W + jets",             52940.0   ), # LO 50380.0; NLO 61526.7
+    ("WJ", "W1JetsToLNu",                              "W + 1J",                8104.0   ),
+    ("WJ", "W2JetsToLNu",                              "W + 2J",                2793.0   ),
+    ("WJ", "W3JetsToLNu",                              "W + 3J",                 992.5   ),
+    ("WJ", "W4JetsToLNu",                              "W + 4J",                 544.3   ),
     ("ST", "ST_t-channel_top_4f_inclusiveDecays",      "ST t-channel t",         136.02  ),
     ("ST", "ST_t-channel_antitop_4f_inclusiveDecays",  "ST t-channel at",         80.95  ),
-    ("ST", "ST_tW_top_5f_inclusiveDecays",             "ST tW",                   35.60  ),
-    ("ST", "ST_tW_antitop_5f_inclusiveDecays",         "ST atW",                  35.60  ),
-    ("WW", "WW_TuneCP5",                               "WW",                      63.21  ),
-    ("WZ", "WZ_TuneCP5",                               "WZ",                      22.82  ),
-    ("ZZ", "ZZ_TuneCP5",                               "ZZ",                      10.32  ),
+    ("ST", "ST_tW_top_5f_inclusiveDecays",             "ST tW",                   35.85  ),
+    ("ST", "ST_tW_antitop_5f_inclusiveDecays",         "ST atW",                  35.85  ),
+    ("WW", "WW_TuneCP5",                               "WW",                      75.88  ),
+    ("WZ", "WZ_TuneCP5",                               "WZ",                      27.6   ),
+    ("ZZ", "ZZ_TuneCP5",                               "ZZ",                      12.14  ),
     ("TT", "TTTo2L2Nu",                                "ttbar 2l2#nu",            87.31  ),
     ("TT", "TTToHadronic",                             "ttbar hadronic",         380.1   ),
     ("TT", "TTToSemiLeptonic",                         "ttbar semileptonic",     364.4   ),
-    ("DY", "DYJetsToLL_M-10to50_TuneCP5",              "Drell-Yan 10-50",      21658.0,  ),#{'extraweight':"getZpt_IWN(m_genboson,pt_genboson)"} ), # LO 18610.0; NLO 21658.0
-    ("DY", "DYJetsToLL_M-50_TuneCP5",                  "Drell-Yan 50",          4954.0,  ),#{'extraweight':"getZpt_IWN(m_genboson,pt_genboson)"} ), # LO  4954.0; NLO  5765.4
-    ("DY", "DY1JetsToLL_M-50_TuneCP5",                 "Drell-Yan 1J 50",       1012.5,  ),#{'extraweight':"getZpt_IWN(m_genboson,pt_genboson)"} ),
-    ("DY", "DY2JetsToLL_M-50_TuneCP5",                 "Drell-Yan 2J 50",        332.8,  ),#{'extraweight':"getZpt_IWN(m_genboson,pt_genboson)"} ),
-    ("DY", "DY3JetsToLL_M-50_TuneCP5",                 "Drell-Yan 3J 50",        101.8,  ),#{'extraweight':"getZpt_IWN(m_genboson,pt_genboson)"} ),
+    ("DY", "DYJetsToLL_M-10to50_TuneCP5",              "Drell-Yan 10-50",      18610.0,  ), #{'extraweight':"getZpt_2017(m_genboson,pt_genboson)"} ), # LO 18610.0; NLO 21658.0
+    ("DY", "DYJetsToLL_M-50_TuneCP5",                  "Drell-Yan 50",          5343.0,  ), #{'extraweight':"getZpt_2017(m_genboson,pt_genboson)"} ), # LO  4954.0; NLO  5765.4
+    ("DY", "DY1JetsToLL_M-50_TuneCP5",                 "Drell-Yan 1J 50",        877.8,  ), #{'extraweight':"getZpt_2017(m_genboson,pt_genboson)"} ),
+    ("DY", "DY2JetsToLL_M-50_TuneCP5",                 "Drell-Yan 2J 50",        304.4,  ), #{'extraweight':"getZpt_2017(m_genboson,pt_genboson)"} ),
+    ("DY", "DY3JetsToLL_M-50_TuneCP5",                 "Drell-Yan 3J 50",        111.5,  ), #{'extraweight':"getZpt_2017(m_genboson,pt_genboson)"} ),
 ]
 if onlyDY: samplesB = [s for s in samplesB if 'DY'==s[0]]
 

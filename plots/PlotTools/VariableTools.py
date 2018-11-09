@@ -167,7 +167,7 @@ def makeLatex(title,**kwargs):
         
         if "eta" in stringlow: #and "#eta" not in stringlow and "#zeta" not in stringlow and "deta" not in stringlow:
             string = string.replace("deta","#Deltaeta")
-            string = re.sub(r"(?<!\#z)(?<!\#B)eta",r"#eta",string)
+            string = re.sub(r"(?<!\#[Bbz])eta",r"#eta",string)
             string = re.sub(r"eta_([^{}()|<>=\ ]+)",r"eta_{\1}",string)
         
         if "abs(" in string and ")" in string:
@@ -222,9 +222,9 @@ def makeTitle(title,**kwargs):
 def makeHistName(*labels,**kwargs):
     """Use label and var to make an unique and valid histogram name."""
     hist_name = '_'.join(labels)
-    hist_name = hist_name.replace("+","-").replace(" - ","-").replace(".","p").replace(" ","_").replace(
-                                  "(","-").replace(")","-").replace("[","-").replace("]","-").replace(
-                                  "/","").replace("<","lt").replace(">","gt").replace("=","e").replace("*","x")
+    hist_name = hist_name.replace('+','-').replace(' - ','-').replace('.','p').replace(',','-').replace(' ','_').replace(
+                                  '(','-').replace(')','-').replace('[','-').replace(']','-').replace('||','OR').replace('&&','AND').replace(
+                                  '/','').replace('<','lt').replace('>','gt').replace('=','e').replace('*','x')
     return hist_name
     
 def makeFileName(string,**kwargs):
@@ -313,9 +313,11 @@ class Variable(object):
         #self.plot            = kwargs.get('plots',          True                        )
         self.only            = kwargs.get('only',           [ ]                         )
         self.veto            = kwargs.get('veto',           [ ]                         )
+        self.blind           = kwargs.get('blind',          ""                          )
         self.contexttitle    = getContextFromDict(kwargs, None, key='ctitle'                ) # context-dependent title
         self.contextbinning  = getContextFromDict(kwargs, args, key='cbinning',  regex=True ) # context-dependent binning
         self.contextposition = getContextFromDict(kwargs, self.position, key='cposition', regex=True ) # context-dependent position
+        self.contextblind    = getContextFromDict(kwargs, self.blind, key='cblind', regex=True ) # context-dependent blind limits
         if self.latex:
           self.title = makeLatex(self.title,units=self.units)
         if self.only:

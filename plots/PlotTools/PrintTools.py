@@ -13,35 +13,38 @@ text_color_dict = {
     'black'     : 30,   'red'       : 31,
     'green'     : 32,   'yellow'    : 33,   'orange' : 33,
     'blue'      : 34,   'purple'    : 35,
-    'magenta'   : 36,   'grey'      : 37,  }
+    'magenta'   : 36,   'grey'      : 37,
+}
 
 
 background_color_dict = {
     'black'     : 40,   'red'       : 41,
     'green'     : 42,   'yellow'    : 43,   'orange' : 43,
     'blue'      : 44,   'purple'    : 45,
-    'magenta'   : 46,   'grey'      : 47,  }
+    'magenta'   : 46,   'grey'      : 47,
+}
 
 
 
-def color(string,**kwargs):
+def color(string,color0='red',**kwargs):
     """Color"""
+    color0     = kwargs.get('color',color0)
     # http://stackoverflow.com/questions/287871/print-in-terminal-with-colors-using-python
     bold_code  = kwargs.get('bold',False)
-    color_code = "%d;%d;%d" % ( bold_code, text_color_dict[kwargs.get('color',"red")], background_color_dict[kwargs.get('background',"black")])
-    return kwargs.get('pre',"") + "\x1b[%sm%s\033[0m" % (color_code, string )
+    color_code = "%d;%d;%d"%( bold_code, text_color_dict[color0], background_color_dict[kwargs.get('background',"black")])
+    return kwargs.get('pre',"") + "\x1b[%sm%s\033[0m"%(color_code, string )
     
 
 
 def warning(string,*trigger,**kwargs):
     if len(trigger)==0 or trigger[0]:
-        return color(kwargs.get('exclamation',"Warning! ")+string, color="yellow", bold=True, prepend=">>> "+kwargs.get('pre',""))
+        return color(kwargs.get('exclamation',"Warning! ")+string, 'yellow', bold=True, pre=">>> "+kwargs.get('pre',""))
     
 
 
 def error(string,*trigger,**kwargs):
     if len(trigger)==0 or trigger[0]:
-        return color(kwargs.get('exclamation',"ERROR! ")+string, color="red", bold=True, prepend=">>> "+kwargs.get('pre',""))
+        return color(kwargs.get('exclamation',"ERROR! ")+string, 'red', bold=True, pre=">>> "+kwargs.get('pre',""))
     
 
 
@@ -301,7 +304,7 @@ class Logger(object):
     def warning(self,string,*args,**kwargs):
         """Warning"""
         if len(args)==0 or args[0]:
-          print color(kwargs.get('exclamation',"Warning! ")+string, color="yellow", bold=True, pre=self.pre+kwargs.get('pre',""))
+          print color(kwargs.get('exclamation',"Warning! ")+string,'yellow', bold=True, pre=self.pre+kwargs.get('pre',""))
         
     def title(self,*args,**kwargs):
         print header(*args,**kwargs)
@@ -312,7 +315,7 @@ class Logger(object):
     def error(self,string,*args,**kwargs):
         """Error"""
         if len(args)==0 or args[0]:
-          print color(kwargs.get('exclamation',"ERROR! ")+string, color="red", bold=True, pre=self.pre+kwargs.get('pre',""))
+          print color(kwargs.get('exclamation',"ERROR! ")+string,'red', bold=True, pre=self.pre+kwargs.get('pre',""))
         
     def fatal(self,*args,**kwargs):
         """Fatalerror"""

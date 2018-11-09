@@ -37,7 +37,7 @@ def combineCuts(*cuts,**kwargs):
     
     # TODO: take "or" into account with parentheses
     for cut in cuts:
-        if "||" in cuts: LOG.warning('combineCuts - Be careful with those "or" statements!')
+        if '||' in cuts: LOG.warning('combineCuts - Be careful with those "or" statements!')
         # [cut.strip() for i in cut.split('||')]
     
     if weight:
@@ -83,7 +83,9 @@ def stripWeights(cuts):
       LOG.warning('stripWeights: %d selection string matches in "%s"! Going with the first: "%s"'%(len(matches),cuts,matches[0]))
     return cuts
     
-
+doubleandpattern = re.compile(r"&& *&&")
+def cleanBooleans(string):
+  return doubleandpattern.sub(r"&&",string).rstrip(' ').rstrip('&').rstrip(' ').lstrip(' ').lstrip('&').lstrip(' ')
 
 def makeBlindCuts(var,a,b,N,xmin,xmax,**kwargs):
     """Helpfunction to make a selection string to blind a given variable within some window (a,b),
@@ -115,52 +117,52 @@ def makeBlindCuts(var,a,b,N,xmin,xmax,**kwargs):
 def invertCharge(cuts,**kwargs):
     """Helpfunction to find, invert and replace charge selections."""
     
-    verbosity   = max(kwargs.get('verbosity',0),verbositySelectionTools)
+    verbosity   = getVerbosity(kwargs,verbositySelectionTools)
     cuts0       = cuts
-    OS          = kwargs.get('OS',False)
+    to          = kwargs.get('to', 'SS')
+    
+    if cuts=="":
+      if   OS: cuts = "q_1*q_2<0"
+      elif SS: cuts = "q_1*q_2>0"
+      return cuts
     
     # MATCH PATTERNS https://regex101.com
-    matchOS = re.findall(r"q_[12]\ *\*\ *q_[12]\ *<\ *0",cuts)
-    matchSS = re.findall(r"q_[12]\ *\*\ *q_[12]\ *>\ *0",cuts)
-    LOG.verbose("invertCharge:\n>>>   matchOS = %s\n>>>   matchSS = %s" % (matchOS,matchSS),verbosity,level=2)
+    matchOS = re.findall(r"q_[12] *\* *q_[12] *< *0",cuts)
+    matchSS = re.findall(r"q_[12] *\* *q_[12] *> *0",cuts)
+    LOG.verbose('invertCharge:\n>>>   matchOS = %s\n>>>   matchSS = %s'%(matchOS,matchSS),verbosity,level=2)
     
     # CUTS: invert charge
     if (len(matchOS)+len(matchSS))>1:
-        LOG.warning("invertCharge: more than one charge match (%d OS, %d SS) in \"%s\""%(len(matchOS),len(matchSS),cuts))
-    if OS:
-        for match in matchSS: cuts = cuts.replace(match,"q_1*q_2<0") # invert to OS
+      LOG.warning('invertCharge: more than one charge match (%d OS, %d SS) in "%s"'%(len(matchOS),len(matchSS),cuts))
+    if to=='OS':
+      for match in matchSS: cuts = cuts.replace(match,"q_1*q_2<0") # invert to OS
+    elif to=='SS':
+      for match in matchOS: cuts = cuts.replace(match,"q_1*q_2>0") # invert to SS
     else:
-        for match in matchOS: cuts = cuts.replace(match,"q_1*q_2>0") # invert to SS
-    if not cuts:
-        if OS: cuts = "q_1*q_2<0"
-        else:  cuts = "q_1*q_2>0"
-    # if "q_1*q_2>0" in cuts.replace(' ',''): scale = 1.0
-    # if "q_1*q_2<0" in cuts.replace(' ',''):
-    #     cuts = cuts.replace("q_1 * q_2 < 0","q_1*q_2>0").replace("q_1*q_2 < 0","q_1*q_2>0").replace("q_1*q_2<0","q_1*q_2>0")        
-    # elif cuts: cuts = "q_1*q_2>0 && %s" % cuts
-    # else:      cuts = "q_1*q_2>0"
+      for match in matchOS: cuts = cuts.replace(match,"") # REMOVE
+      for match in matchSS: cuts = cuts.replace(match,"") # REMOVE
+    cuts = cleanBooleans(cuts)
     
-    LOG.verbose('  "%s"\n>>>   -> "%s" %s\n>>>'%(cuts0,cuts,"OS" if OS else "SS"),verbosity,level=2)
+    LOG.verbose('  "%s"\n>>>   -> "%s" %s\n>>>'%(cuts0,cuts,to),verbosity,level=2)
     return cuts
     
-
 
 def invertIsolation(cuts,**kwargs):
     """Helpfunction to find, invert and replace isolation selections."""
     
-    verbosity   = max(kwargs.get('verbosity',0),verbositySelectionTools)
-    channel     = kwargs.get('channel','emu')
-    iso_relaxed = kwargs.get('to','iso_1<0.5 && iso_2<0.5 && iso_1>0.20') # outdated (iso_1>0.20||iso_2>0.15) pzeta_disc>-35 && nbtag<1
+    verbosity   = getVerbosity(kwargs,verbositySelectionTools)
+    channel     = kwargs.get('channel','tautau' )
+    iso_relaxed = kwargs.get('to',     ''       )
     cuts0       = cuts 
     
     # MATCH PATTERNS https://regex101.com
-    match_iso_1 = re.findall(r"iso_1\ *[<>]=?\ *\d+\.\d+\ *[^\|]&*\ *",cuts)
-    match_iso_2 = re.findall(r"iso_2\ *!?[<=>]=?\ *\d+\.?\d*\ *[^\|]&*\ *",cuts)
-    LOG.verbose("invertIsolation:\n>>>   match_iso_1 = %s\n>>>   match_iso_2 = \"%s\"" % (match_iso_1,match_iso_2),verbosity,level=2)
+    match_iso_1 = re.findall(r"iso_1 *[<>]=? *\d+\.\d+ *[^|]&* *",cuts)
+    match_iso_2 = re.findall(r"iso_2 *!?[<=>]=? *\d+\.?\d* *[^|]&* *",cuts)
+    LOG.verbose('invertIsolation:\n>>>   match_iso_1 = %s\n>>>   match_iso_2 = "%s"'%(match_iso_1,match_iso_2),verbosity,level=2)
     
     # REPLACE
     if "iso_cuts==1" in cuts.replace(' ',''):
-        cuts = re.sub(r"iso_cuts\ *==\ *1",iso_relaxed,cuts)
+        cuts = re.sub(r"iso_cuts *== *1",iso_relaxed,cuts)
     elif len(match_iso_1) and len(match_iso_2):
         if len(match_iso_1)>1: LOG.warning("invertIsolation: More than one iso_1 match! cuts=%s"%cuts)
         if len(match_iso_2)>1: LOG.warning("invertIsolation: More than one iso_2 match! cuts=%s"%cuts)
@@ -169,7 +171,41 @@ def invertIsolation(cuts,**kwargs):
         cuts = "%s && %s" % (iso_relaxed,cuts)
     elif cuts:
         if len(match_iso_1) or len(match_iso_2): LOG.warning('invertIsolation: %d iso_1 and %d iso_2 matches! cuts="%s"'%(len(match_iso_1),len(match_iso_2),cuts))
-    cuts    = cuts.rstrip(' ').rstrip('&').rstrip(' ')
+    cuts = cleanBooleans(cuts)
+    
+    LOG.verbose('  "%s"\n>>>   -> "%s"\n>>>'%(cuts0,cuts),verbosity,level=2)
+    return cuts
+    
+
+
+isopattern1 = re.compile(r"(?:idMVA\w+|pfRelIso0._all)_1 *!?[<=>]=? *\d+ *[^|]&* *")
+isopattern2 = re.compile(r"idMVA\w+_2 *!?[<=>]=? *\d+ *[^|]&* *")
+def invertIsolationNanoAOD(cuts,**kwargs):
+    """Helpfunction to find, invert and replace isolation selections."""
+    
+    verbosity   = getVerbosity(kwargs,verbositySelectionTools)
+    channel     = kwargs.get('channel', 'emu' )
+    iso_relaxed = kwargs.get('to',      ''    )
+    remove1     = kwargs.get('remove1', True  )
+    cuts0       = cuts
+    
+    # MATCH isolations
+    match_iso_1 = isopattern1.findall(cuts)
+    match_iso_2 = isopattern2.findall(cuts)
+    LOG.verbose('invertIsolationNanoAOD:\n>>>   match_iso_1 = "%s"\n>>>   match_iso_2 = "%s"'%(match_iso_1,match_iso_2),verbosity,level=2)
+    
+    # REPLACE
+    if match_iso_1 and match_iso_2:
+      if len(match_iso_1)>1: LOG.warning("invertIsolationNanoAOD: More than one iso_1 match! cuts=%s"%cuts)
+      if len(match_iso_2)>1: LOG.warning("invertIsolationNanoAOD: More than one iso_2 match! cuts=%s"%cuts)
+      if remove1:
+        cuts = cuts.replace(match_iso_1[0],'')
+      cuts = cuts.replace(match_iso_2[0],'')
+      if iso_relaxed:
+        cuts = combineCuts(cuts,iso_relaxed)
+    elif cuts and match_iso_1 or match_iso_2:
+        LOG.warning('invertIsolationNanoAOD: %d iso_1 and %d iso_2 matches! cuts="%s"'%(len(match_iso_1),len(match_iso_2),cuts))
+    cuts = cleanBooleans(cuts)
     
     LOG.verbose('  "%s"\n>>>   -> "%s"\n>>>'%(cuts0,cuts),verbosity,level=2)
     return cuts
@@ -179,19 +215,20 @@ def invertIsolation(cuts,**kwargs):
 def relaxJetSelection(cuts,**kwargs):
     """Helpfunction to find, relax and replace jet selections:
          1) remove b tag requirements
-         2) relax central jet requirements."""
+         2) relax central jet requirements.
+    """
     
     ncjets_relaxed  = "ncjets>1" if "ncjets==2" in cuts.replace(' ','') else "ncjets>0"
-    verbosity       = max(kwargs.get('verbosity',0),verbositySelectionTools)
+    verbosity       = getVerbosity(kwargs,verbositySelectionTools)
     channel         = kwargs.get('channel', 'mutau'        )
     btags_relaxed   = kwargs.get('btags',   ""             )
     cjets_relaxed   = kwargs.get('ncjets',  ncjets_relaxed )
     cuts0           = cuts
     
     # MATCH PATTERNS
-    btags  = re.findall(r"&*\ *nc?btag(?:20)?\ *[<=>]=?\ *\d+\ *",cuts)
-    cjets  = re.findall(r"&*\ *ncjets(?:20)?\ *[<=>]=?\ *\d+\ *",cuts)
-    cjets += re.findall(r"&*\ *nc?btag(?:20)?\ *[<=>]=?\ *ncjets(?:20)?\ *",cuts)
+    btags  = re.findall(r"&* *nc?btag(?:20)? *[<=>]=? *\d+ *",cuts)
+    cjets  = re.findall(r"&* *ncjets(?:20)? *[<=>]=? *\d+ *",cuts)
+    cjets += re.findall(r"&* *nc?btag(?:20)? *[<=>]=? *ncjets(?:20)? *",cuts)
     LOG.verbose('relaxJetSelection:\n>>>   btags = %s\n>>>   cjets = "%s"' % (btags,cjets),verbosity,level=2)
     if len(btags)>1: LOG.warning('relaxJetSelection: More than one btags match! Only using first instance in cuts "%s"'%cuts)
     if len(cjets)>1: LOG.warning('relaxJetSelection: More than one cjets match! Only using first instance in cuts "%s"'%cuts)
@@ -216,47 +253,120 @@ def relaxJetSelection(cuts,**kwargs):
     return cuts
     
 
-tideqpattern = re.compile(r"(\*\ *\(\ *gen_match_2\ *==[^)]*\?[^)]*\))")
-tidineqpattern = re.compile(r"(gen_match_2\ *(!?[<=>]=?\ *\d))(?!\ *\?)")
-def vetoJetTauFakes(cuts,**kwargs):
-    """Helpfunction to ensure the jet to tau fakes (gen_match_2==6) are excluded in selection string.
-       Assume string contains gen_match_2 compared to any digits from 1 to 6.
-     """
-    
-    verbosity   = max(kwargs.get('verbosity',0),verbositySelectionTools)
-    removeTID   = kwargs.get('noTID', False )
-    cuts0       = cuts
-    
-    if removeTID:
-      cuts     = tideqpattern.sub("",cuts) #.replace('**','*')
-    match      = tidineqpattern.findall(cuts)
-    if len(match)==0:
-      print "cuts =",cuts
-      subcuts0 = stripWeights(cuts)
-      subcuts1 = combineCuts(subcuts0,"gen_match_2<6")
-      cuts     = cuts.replace(subcuts0,subcuts1)
-      print "subcuts1 =",subcuts1
-      print "cuts =",cuts
-      print "-------------"
+if isNanoAOD:
+  #tgmpatternTT = re.compile(r"genPartFlav_1 *== *5 *&& *genPartFlav_2 *== *5")
+  tgmpatternJJ = re.compile(r"\( *genPartFlav_1 *!= *5 *\|\| *genPartFlav_2 *!= *5 *\)")
+  tgmpatternLL = re.compile(r"\(genPartFlav_2 *> *0 *&& *genPartFlav_2 *(<|!=) *5\)")
+  tidpattern   = re.compile(r"(\* *\( *genPartFlav_[12] *==[^)]*\?[^)]*\))")
+  tgmpattern2   = re.compile(r"(genPartFlav_2 *(!?[<=>]=? *\d))(?! *\?)")
+  tgmpattern1  = re.compile(r"(genPartFlav_1 *(!?[<=>]=? *\d))(?! *\?)")
+  def vetoJetTauFakes(cuts,**kwargs):
+      """Helpfunction to ensure the jet to tau fakes (genPartFlav==0) are excluded in selection string.
+         Assume string contains gen_match_2 compared to any digits from 1 to 6.
+       """
+      
+      verbosity  = getVerbosity(kwargs,verbositySelectionTools)
+      removeTID  = kwargs.get('noTID',   False    )
+      channel    = kwargs.get('channel', "tautau" ) # TODO: generalize
+      cuts0      = cuts
+      
+      # TAU ID SF
+      if removeTID:
+        cuts     = tidpattern.sub("",cuts)
+      
+      # GENMATCH
+      if "tautau" in channel:
+        match1 = tgmpattern1.findall(cuts)
+        match2 = tgmpattern2.findall(cuts)
+        if len(match1)==0 and len(match2)==0:
+          subcuts0 = stripWeights(cuts)
+          subcuts1 = combineCuts(subcuts0,"genPartFlav_1>0 && genPartFlav_2>0")
+          cuts     = cuts.replace(subcuts0,subcuts1)
+          return cuts
+        matchJJ    = tgmpatternJJ.findall(cuts)
+        if matchJJ:
+           cuts = cuts.replace(matchJJ[0],"genPartFlav_1>0 && genPartFlav_2>0 && %s"%(matchJJ[0]))
+           return cuts
+        if len(match1)>0:
+          match, genmatch = match1[0]
+          if "!=" in genmatch:
+            if '5' in genmatch:
+              cuts = cuts.replace(match,"(genPartFlav_1!=5 && genPartFlav_1>0)")
+            elif '0' not in genmatch:
+              cuts = cuts.replace(match,"genPartFlav_1>0")
+        if len(match2)>0:
+          match, genmatch = match2[0]
+          if "!=" in genmatch:
+            if '5' in genmatch:
+              cuts = cuts.replace(match,"(genPartFlav_2!=5 && genPartFlav_2>0)")
+            elif '0' not in genmatch:
+              cuts = cuts.replace(match,"genPartFlav_2>0")
+      else:
+        match      = tgmpattern2.findall(cuts)
+        if len(match)==0:
+          subcuts0 = stripWeights(cuts)
+          subcuts1 = combineCuts(subcuts0,"genPartFlav_2>0")
+          cuts     = cuts.replace(subcuts0,subcuts1)
+          return cuts
+        elif len(match)>1:
+          LOG.warning('vetoJetTauFakes: more than one "genPartFlav" match (%d) in "%s"'%(len(match),cuts))
+        match, genmatch = match[0]
+        genmatch = genmatch.replace(' ','')
+      
+        if '!=' in genmatch:
+          if '5' in genmatch: # "genPartFlav_2!=5"
+            cuts = cuts.replace(match,"genPartFlav_2!=5 && genPartFlav_2>0")
+          elif not '0' in genmatch: # "genPartFlav_2!=*"
+            cuts = combineCuts(cuts,"genPartFlav_2>0")
+        elif "=0" in genmatch: # "genPartFlav_2*=6"
+            LOG.warning('vetoJetTauFakes: selection "%s" with "%s" set to "0"!'%(cuts,genmatch)) 
+            cuts = "0"
+        elif '>' in genmatch: # "genPartFlav_2>*"
+            cuts = combineCuts(cuts,"genPartFlav_2>0")
+      
+      #LOG.verbose('  "%s"\n>>>   -> "%s"\n>>>'%(cuts0,cuts),verbosity,level=2)
       return cuts
-    elif len(match)>1:
-      LOG.warning('vetoFakeRate: more than one "gen_match_2" match (%d) in "%s"'%(len(match),cuts))
-    match, genmatch = match[0]
-    genmatch = genmatch.replace(' ','')
+else:
+  tidpattern = re.compile(r"(\* *\( *gen_match_2 *==[^)]*\?[^)]*\))")
+  tgmpattern = re.compile(r"(gen_match_2 *(!?[<=>]=? *\d))(?! *\?)")
+  def vetoJetTauFakes(cuts,**kwargs):
+      """Helpfunction to ensure the jet to tau fakes (gen_match_2==6) are excluded in selection string.
+         Assume string contains gen_match_2 compared to any digits from 1 to 6.
+       """
     
-    if '!=' in genmatch:
-      if '5' in genmatch: # "gen_match_2!=5"
-        cuts = cuts.replace(match,"gen_match_2<5")
-      elif not '6' in genmatch: # "gen_match_2!=*"
-        cuts = combineCuts(cuts,"gen_match_2!=6")
-    elif "=6" in genmatch: # "gen_match_2*=6"
-        LOG.warning('vetoFakeRate: selection "%s" with "%s" set to "0"!'%(cuts,genmatch)) 
-        cuts = "0"
-    elif '>' in genmatch: # "gen_match_2>*"
-        cuts = combineCuts(cuts,"gen_match_2!=6")
+      verbosity   = getVerbosity(kwargs,verbositySelectionTools)
+      removeTID   = kwargs.get('noTID', False )
+      cuts0       = cuts
+      
+      # TAU ID SF
+      if removeTID:
+        cuts     = tidpattern.sub("",cuts) #.replace('**','*')
+      
+      # GENMATCH
+      match      = tgmpattern.findall(cuts)
+      if len(match)==0:
+        subcuts0 = stripWeights(cuts)
+        subcuts1 = combineCuts(subcuts0,"gen_match_2<6")
+        cuts     = cuts.replace(subcuts0,subcuts1)
+        return cuts
+      elif len(match)>1:
+        LOG.warning('vetoJetTauFakes: more than one "gen_match_2" match (%d) in "%s"'%(len(match),cuts))
+      match, genmatch = match[0]
+      genmatch = genmatch.replace(' ','')
     
-    #LOG.verbose('  "%s"\n>>>   -> "%s"\n>>>'%(cuts0,cuts),verbosity,level=2)
-    return cuts
+      if '!=' in genmatch:
+        if '5' in genmatch: # "gen_match_2!=5"
+          cuts = cuts.replace(match,"gen_match_2<5")
+        elif not '6' in genmatch: # "gen_match_2!=*"
+          cuts = combineCuts(cuts,"gen_match_2!=6")
+      elif "=6" in genmatch: # "gen_match_2*=6"
+          LOG.warning('vetoJetTauFakes: selection "%s" with "%s" set to "0"!'%(cuts,genmatch)) 
+          cuts = "0"
+      elif '>' in genmatch: # "gen_match_2>*"
+          cuts = combineCuts(cuts,"gen_match_2!=6")
+    
+      #LOG.verbose('  "%s"\n>>>   -> "%s"\n>>>'%(cuts0,cuts),verbosity,level=2)
+      return cuts
 
 
 
@@ -334,6 +444,13 @@ class Selection(object):
         else:
           result = Selection("%s (%s)"(self.name,weight.title),combineCuts(self.selection,weight=weight))
         return result
+    
+    def replace(self, old, new, **kwargs):
+        if kwargs.get('regex',False):
+          self.selection = self.selection.replace(old,new)
+        else:
+          self.selection = re.sub(old,new,self.selection)
+        return self.selection
     
     def changeContext(self,*args):
         """Change the contextual selections for a set of arguments, if it is available"""
@@ -444,9 +561,10 @@ def unwrapVariableSelection(*args,**kwargs):
       xvar, xbins, cuts = args
       nxbins, xmin, xmax = len(xbins)-1, xbins[0], xbins[-1]
     else:
-      LOG.error('unwrapVariableSelection - Could not unwrap arguments "%s", len(args)=%d. Returning None.'%(args,len(args)))
+      LOG.fatal('unwrapVariableSelection - Could not unwrap arguments "%s", len(args)=%d. Returning None.'%(args,len(args)))
     return xvar, nxbins, xmin, xmax, xbins, cuts
     
+
 def unwrapVariableSelection2D(*args,**kwargs):
     """Help function to unwrap 2D arguments that contain variable and selection."""
     if len(args)==1 and isList(args[0]):

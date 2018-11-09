@@ -5,7 +5,7 @@
 
 import os, re
 from PrintTools import *
-#import ROOT
+from ROOT import TFile
 
 # PATHS
 globalTag  = ""
@@ -27,7 +27,11 @@ verbosityPlotTools      = 1
 verbosityVariableTools  = 1
 verbositySelectionTools = 1
 verbosityWJ             = 1
+blind_dict              = { }
 doFakeRate              = False
+doFakeFactor            = False
+doQCD                   = False
+isNanoAOD               = False
 # ROOT.gROOT.SetBatch(ROOT.kTRUE)
 # gErrorIgnoreLevel = kInfo;
 
@@ -41,14 +45,34 @@ def isList(arg):
 def ensureList(arg):
   return arg if (isinstance(arg,list) or isinstance(arg,tuple)) else [arg]
   
+def ensureTFile(filename,option='READ',**kwargs):
+  pre  = kwargs.get('pre',  ""   )
+  stop = kwargs.get('exit', True )
+  if not os.path.isfile(filename):
+    LOG.fatal('File in path "%s" does not exist'%(filename),pre=pre)
+  file = TFile(filename,option)
+  if not file or file.IsZombie():
+    if stop:
+      LOG.fatal('Could not open file by name "%s"'%(filename),pre=pre)
+    else:
+      LOG.warning('Could not open file by name "%s"'%(filename),pre=pre)
+  return file
+  
 def ensureDirectory(dirname):
     """Make directory if it does not exist."""
     if not os.path.exists(dirname):
-        os.makedirs(dirname)
-        print ">>> made directory " + dirname
+      os.makedirs(dirname)
+      print '>>> made directory "%s"'%(dirname)
+      if not os.path.exists(dirname):
+        print '>>> failed to make directory "%s"'%(dirname)
     return dirname
 
-
+def getKey(kwargs,key,default=None):
+  """Get the key from a dictionary, return default if the value is None."""
+  value = kwarg.get(key,default)
+  if value==None:
+    return default
+  return value
 
 def setVerbose(*args,**kwargs):
     """Set verbosity level of each module."""
@@ -59,9 +83,7 @@ def setVerbose(*args,**kwargs):
         verbosityVariableTools  = 2
         verbositySelectionTools = 2
         verbosityWJ             = 2
-
-
-
+    
 def getVerbosity(*args):
     """Set verbosity level of each module."""
     verbosities = [ ]

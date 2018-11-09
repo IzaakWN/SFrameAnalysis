@@ -5,7 +5,7 @@
 
 # LABELS & LUMI
 globalTag   = "_2017_V2" # extra label for opening file, saving plots to dir
-plottag     = "" # extra label for image file
+plottag     = "_test" # extra label for image file
 era         = "2017" #B-E"
 luminosity  = 28.29 if "B-E" in era else 13.57 if "F" in era else 41.4 #86
 
@@ -47,15 +47,15 @@ mergeDY             = True #and False
 mergeTT             = True #and False
 mergeST             = True #and False
 mergeVV             = True #and False
-mergeTop            = True and False
+mergeTop            = True #and False
 splitDY             = True #and False
 splitDYByDM         = True and False
 splitTT             = True #and False
 splitST             = True and False
 normalizeWJ         = True #and False
-doQCD               = True and False
-doFakeRate          = True #and False
-OSSS_ratio          = 1.06
+doQCD               = True #and False
+doFakeRate          = True and False
+OSSS_ratio          = 1.10
 
 # SAMPLES
 SFRAME              = "SFrameAnalysis_ltau2017"
@@ -72,10 +72,12 @@ channels = [
 ]
 if not doShifts:
   doTES, doEES, doJTF, doJER, doJEC, doUncEn = False, False, False, False, False, False
+splitTT = splitTT and not mergeTop
+splitST = splitST and not mergeTop
 
 # CATEGORIES / SELECTIONS
 _weight            = "genweight*puweight*trigweight_1*idisoweight_1*idisoweight_2"
-if doTESscan: _weight += "*(gen_match_2==5 ? 0.883 : 1)"
+if doTESscan: _weight += "*(gen_match_2==5 ? 0.89 : 1)"
 #_weight           += "*ttptweight"; plottag+="_ttptweight"
 #_weight            = _weight.replace('puweight',"puweight80p0"); plottag+="_PU80p0"
 triggers           = "(triggers!=2 || pt_1>28)"
@@ -83,9 +85,12 @@ isocuts            = "iso_1<0.15 && iso_2==1" #iso_cuts==1"
 isocuts_newDM      = "iso_1<0.15 && byTightIsolationMVArun2v1DBnewDMwLT_2==1" #iso_cuts==1"
 vetos              = "lepton_vetos==0"
 baseline           = "channel>0 && (triggers!=2 || pt_1>28) && %s && %s && q_1*q_2<0 && decayMode_2<11"%(isocuts,vetos)
+baselinev2         = "channel>0 && (triggers!=2 || pt_1>28) && %s && %s && q_1*q_2<0 && decayMode_2<11"%("iso_1<0.15 && byTightIsolationMVArun2v2DBoldDMwLT_2==1",vetos)
+baseline           = baselinev2
 baseline_newDM     = "channel>0 && (triggers!=2 || pt_1>28) && %s && %s && q_1*q_2<0"%(isocuts_newDM,vetos)
 baseline_noIso2    = "channel>0 && (triggers!=2 || pt_1>28) && %s && %s && q_1*q_2<0 && decayMode_2<11"%("iso_1<0.15",vetos)
 baseline_JFR       = "channel>0 && (triggers!=2 || pt_1>28) && %s && %s && q_1*q_2<0 && decayMode_2<11"%("iso_1<0.15 && iso_2_vloose==1 && iso_2!=1",vetos)
+baseline_JFRv2     = "channel>0 && (triggers!=2 || pt_1>28) && %s && %s && q_1*q_2<0 && decayMode_2<11"%("iso_1<0.15 && byVLooseIsolationMVArun2v2DBoldDMwLT_2==1 && byTightIsolationMVArun2v2DBoldDMwLT_2!=1",vetos)
 baselineSS         = "channel>0 && (triggers!=2 || pt_1>28) && %s && %s && q_1*q_2>0 && decayMode_2<11"%(isocuts,vetos)
 baseline_antiIso   = "channel>0 && (triggers!=2 || pt_1>28) && %s && %s && q_1*q_2<0 && decayMode_2<11"%("iso_1>0.15 && iso_1<0.50 && iso_2==1",vetos)
 baselineSS_antiIso = "channel>0 && (triggers!=2 || pt_1>28) && %s && %s && q_1*q_2>0 && decayMode_2<11"%("iso_1>0.15 && iso_1<0.50 && iso_2==1",vetos)
@@ -101,6 +106,9 @@ if "F" in era:
   baseline_noIso2 += " && (!isData || run>=304911)"
   _weight = _weight.replace('puweight',"puweightF")
   plottag         += "_EraF"
+if doQCD and not doFakeRate:
+  plottag         += "_WJ-QCD"
+WJscale            = 1.136 if 'iso_2' in baseline else 1.086 if 'run2v2DBoldDM' in baseline else 1.082 if 'run2v1DBnewDM' in baseline else -1
 
 selections  = [
 #     sel("no cuts",                                ""                                                          ),
@@ -144,13 +152,23 @@ selections  = [
 #     sel("ZTT enriched, tight, 0 photons",         "%s && %s && nPhoton_2==0 " %(baseline, ZTTregion)          ),
 #     sel("ZTT enriched, tight, DM0, 0 photons",    "%s && %s && decayMode_2==0 && nPhoton_2==0" %(baseline, ZTTregion)  ),
 #     sel("ZTT enriched, tight, DM10, 0 photons",   "%s && %s && decayMode_2==10 && nPhoton_2==0" %(baseline, ZTTregion) ),
-#     sel("m_T<50GeV",                              "%s && %s" %(baseline,"pfmt_1<50")                          ),
+    sel("m_T<50GeV",                              "%s && %s" %(baseline,"pfmt_1<50")                          ),
+#     sel("m_T<50GeV, VL && !T",                    "%s && %s" %(baseline_JFR,"pfmt_1<50")                      ),
 #     sel("m_T<50GeV, DM0",                         "%s && %s" %(baseline,"pfmt_1<50 && decayMode_2==0")        ),
-    sel("m_T<50GeV, DM1",                         "%s && %s" %(baseline,"pfmt_1<50 && decayMode_2==1")        ),
-    sel("m_T<50GeV, DM10",                        "%s && %s" %(baseline,"pfmt_1<50 && decayMode_2==10")       ),
-    sel("newDM, m_T<50GeV, DM1",                  "%s && %s" %(baseline_newDM,"pfmt_1<50 && decayMode_2==1")  ),
-    sel("newDM, m_T<50GeV, DM10",                 "%s && %s" %(baseline_newDM,"pfmt_1<50 && decayMode_2==10") ),
-    sel("newDM, m_T<50GeV, DM11",                 "%s && %s" %(baseline_newDM,"pfmt_1<50 && decayMode_2==11") ),
+#     sel("m_T<50GeV, DM1",                         "%s && %s" %(baseline,"pfmt_1<50 && decayMode_2==1")        ),
+#     sel("m_T<50GeV, DM10",                        "%s && %s" %(baseline,"pfmt_1<50 && decayMode_2==10")       ),
+#     sel("newDM, m_T<50GeV, DM1",                  "%s && %s" %(baseline_newDM,"pfmt_1<50 && decayMode_2==1")  ),
+#     sel("newDM, m_T<50GeV, DM10",                 "%s && %s" %(baseline_newDM,"pfmt_1<50 && decayMode_2==10") ),
+#     sel("newDM, m_T<50GeV, DM11",                 "%s && %s" %(baseline_newDM,"pfmt_1<50 && decayMode_2==11") ),
+#     sel("oldDMv2",                                "%s" %(baselinev2)                                          ),
+#     sel("oldDMv2, m_T<50GeV",                     "%s && %s" %(baselinev2,"pfmt_1<50")                        ),
+#     sel("oldDMv2, m_T<50GeV, DM0",                "%s && %s" %(baselinev2,"pfmt_1<50 && decayMode_2==0")      ),
+#     sel("oldDMv2, m_T<50GeV, DM1",                "%s && %s" %(baselinev2,"pfmt_1<50 && decayMode_2==1")      ),
+#     sel("oldDMv2, m_T<50GeV, DM10",               "%s && %s" %(baselinev2,"pfmt_1<50 && decayMode_2==10")     ),
+#     sel("oldDMv2, m_T<50GeV, VL && !T",           "%s && %s" %(baseline_JFRv2,"pfmt_1<50")                    ),
+#     sel("oldDMv2, m_T<50GeV, VL && !T, DM0",      "%s && %s" %(baseline_JFRv2,"pfmt_1<50 && decayMode_2==0")  ),
+#     sel("oldDMv2, m_T<50GeV, VL && !T, DM1",      "%s && %s" %(baseline_JFRv2,"pfmt_1<50 && decayMode_2==1")  ),
+#     sel("oldDMv2, m_T<50GeV, VL && !T, DM10",     "%s && %s" %(baseline_JFRv2,"pfmt_1<50 && decayMode_2==10") ),
 #     sel("m_T<50GeV, DM1 restr",                   "%s && %s" %(baseline,"pfmt_1<50 && decayMode_2==1 && 0.35<m_2 && m_2<1.2") ), #1.15*sqrt(0.009*pt_2)
 #     sel("m_T<50GeV, DM10 restr",                  "%s && %s" %(baseline,"pfmt_1<50 && decayMode_2==10 && 0.90<m_2 && m_2<1.3") ),
 #     sel("m_T<50GeV, restr",                       "%s && %s" %(baseline,"pfmt_1<50 && (decayMode_2!=1 || 0.35<m_2 && m_2<1.2) && (decayMode_2!=10 || 0.90<m_2 && m_2<1.30)") ),
@@ -190,28 +208,24 @@ selections  = [
 
 # VARIABLES
 variables = [
-#     var("m_vis",                                40,     0,  200, cbinning={'iso_2.*nbtag':(20,0,200)} ),
+    var("m_vis",                                40,     0,  200, cbinning={'iso_2.*nbtag':(20,0,200)} ),
 #     ###var("m_sv",                                 40,     0,  200 ),
 #     var("m_2",                                  50,     0,    2, title="m_tau" ),
 #     var("m_2",                                  25,     0,    2, title="m_tau", filename="$NAME_0p08" ),
 #     var("m_2",                                  75,     0,    3, title="m_tau", logy=True, filename="$NAME_log", veto="decayMode_2" ),
-    var("m_2",                                  30,  0.15, 1.65, title="m_tau", filename="m_tau_zoom",  only='decayMode_2==1(?!0)' ),
-    var("m_2",                                  22,  0.70, 1.8,  title="m_tau", filename="m_tau_zoom",  only='decayMode_2==10', position='right' ),
-    var("m_2",                                  22,  0.70, 1.8,  title="m_tau", filename="m_tau_zoom",  only='decayMode_2==11', position='left'  ),
+#     var("m_2",                                  30,  0.15, 1.65, title="m_tau", filename="m_tau_zoom",  only='decayMode_2==1(?!0)' ),
+#     var("m_2",                                  22,  0.70, 1.8,  title="m_tau", filename="m_tau_zoom",  only='decayMode_2==10', position='right' ),
+#     var("m_2",                                  22,  0.70, 1.8,  title="m_tau", filename="m_tau_zoom",  only='decayMode_2==11', position='left'  ),
+#     var("m_2",                                    38,  0.20, 2.1,  title="tau mass", filename="m_tau", veto="decayMode_2==0", position='x=0.63', cposition={'decayMode_2==1(?![01])':'right','decayMode_2==11':'x=0.04'},
+#                                                                    cbinning={'decayMode_2==1(?![01])':(36,0.20,2.0), 'decayMode_2==1[01]':(23,0.70,1.85)} ),
 #     var("ht",                                   50,     0, 2500 ),
 #     var("dR_ll",                                30,     0,    6 ),
 #     var("deta_ll",                              45,     0,  4.5, title="deta_ll", filename="deta_ll",  position="right" ),
 #     var("dphi_ll",                              50,     0,  3.5, title="dphi_ll", filename="dphi_ll",  position="left"  ),
 #     var("pfmt_1",                               40,     0,  200, title="m_T(mu,MET)", ctitle={'etau':"m_T(e,MET)"}, cbinning={'iso_2.*nbtag':(20,0,200)} ),
-#     var("pfmt_1",                               40,     0,  200, title="m_T(mu,MET)", ctitle={'etau':"m_T(e,MET)"}, cbinning={'iso_2.*nbtag':(20,0,200)} ).shift('jerUp'),
-#     var("pfmt_1",                               40,     0,  200, title="m_T(mu,MET)", ctitle={'etau':"m_T(e,MET)"}, cbinning={'iso_2.*nbtag':(20,0,200)} ).shift('jerDown'),
-#     var("pfmt_1",                               40,     0,  200, title="m_T(mu,MET)", ctitle={'etau':"m_T(e,MET)"}, cbinning={'iso_2.*nbtag':(20,0,200)} ).shift('jesUp'),
-#     var("pfmt_1",                               40,     0,  200, title="m_T(mu,MET)", ctitle={'etau':"m_T(e,MET)"}, cbinning={'iso_2.*nbtag':(20,0,200)} ).shift('jesDown'),
 #     var("met",                                  40,     0,  200 ),
 #     var("met",                                  40,     0,  200 ).shift('jerUp'),
 #     var("met",                                  40,     0,  200 ).shift('jerDown'),
-#     var("met",                                  40,     0,  200 ).shift('jesUp'),
-#     var("met",                                  40,     0,  200 ).shift('jesDown'),
 #     var("metphi",                               35,  -3.5,  3.5 ),
 #     var("gen_match_2",                           9,    -1,    8, position='center', title="tau gen. match", ),
 #     ###var("puweight",                            100,     0,  200, logy=True ),
@@ -219,6 +233,8 @@ variables = [
 #     var("npv",                                  40,     0,   80 ),
 #     var("rho",                                  70,     0,   70 ),
 #     var("njets",                                 8,     0,    8 ),
+#     var("ncjets",                                8,     0,    8 ),
+#     var("nfjets",                                8,     0,    8 ),
 #     var("nbtag",                                 7,     0,    7 ),
 #     ###var("nbtag20",                               7,     0,    7 ),
 #     var("pt_1",                                 50,     0,  200, title="muon pt",  ctitle={'etau':"electron pt"}  ),
@@ -229,8 +245,8 @@ variables = [
 #     var("decayMode_2",                          14,     0,   14, position='center' ),
 #     var("byIsolationMVArun2v1DBoldDMwLTraw_2",  50,  -1.0,  1.0, logy=True, veto='iso_2.*decayMode_2==11', position='centerleft' ),
 #     var("byIsolationMVArun2v1DBoldDMwLTraw_2",  50,   0.8,  1.0, filename="$NAME_zoom0p8", veto='decayMode_2==11', position='centerleft', cbinning={'iso_2.*nbtag':(20,0.8,1.0)} ),
-#     var("byIsolationMVArun2v2DBoldDMwLTraw_2",  50,  -1.0,  1.0, logy=True, veto='iso_2.*decayMode_2==11', position='centerleft' ),
-#     var("byIsolationMVArun2v2DBoldDMwLTraw_2",  50,   0.8,  1.0, filename="$NAME_zoom0p8", veto='decayMode_2==11', position='centerleft', cbinning={'iso_2.*nbtag':(20,0.8,1.0)} ),
+#     var("byIsolationMVArun2v2DBoldDMwLTraw_2",  50,  -1.0,  1.0, logy=True, veto='iso_2.*decayMode_2==11', position='centerright', ymin=7000 ),
+#     var("byIsolationMVArun2v2DBoldDMwLTraw_2",  50,   0.8,  1.0, filename="$NAME_zoom0p8", veto='decayMode_2==11', position='y=0.96;leftleft', cbinning={'iso_2.*nbtag':(20,0.8,1.0)}, ymargin=1.27 ),
 #     var("byIsolationMVArun2v1DBnewDMwLTraw_2",  50,   0.8,  1.0, filename="$NAME_zoom0p8", position='centerleft' ),
 #     var("byIsolationMVArun2v1DBnewDMwLTraw_2",  50,  -1.0,  1.0, logy=True, position='centerleft' ),
 #     var("chargedPionPt_2",                      80,     0,  100 ),
@@ -269,26 +285,26 @@ variables = [
 
 samplesB = [
     #("TT", "TT_TuneCUETP8M2T4",                        "ttbar",                   831.76   ), # {'extraweight':_weight+"*ttptweight_runI/ttptweight"}
-    ("TT", "TTTo2L2Nu",                                "ttbar 2l2#nu",             87.31   ),
-    ("TT", "TTToHadronic",                             "ttbar hadronic",          380.1    ),
-    ("TT", "TTToSemiLeptonic",                         "ttbar semileptonic",      364.4    ),
+    ("TT", "TTTo2L2Nu",                                "ttbar 2l2#nu",              88.29  ),
+    ("TT", "TTToHadronic",                             "ttbar hadronic",           377.96  ),
+    ("TT", "TTToSemiLeptonic",                         "ttbar semileptonic",       365.35  ),
     ("ST", "ST_t-channel_top_4f_inclusiveDecays",      "ST t-channel t",           136.02  ),
     ("ST", "ST_t-channel_antitop_4f_inclusiveDecays",  "ST t-channel at",           80.95  ),
-    ("ST", "ST_tW_top_5f_inclusiveDecays",             "ST tW",                     35.60  ),
-    ("ST", "ST_tW_antitop_5f_inclusiveDecays",         "ST atW",                    35.60  ),
-    ("WW", "WW_TuneCP5",                               "WW",                        63.21  ), # 75.8
-    ("WZ", "WZ_TuneCP5",                               "WZ",                        22.82  ), # 27.6  #47.13
-    ("ZZ", "ZZ_TuneCP5",                               "ZZ",                        10.32  ), # 12.14 #16.523
-    ("WJ", "WJetsToLNu",                               "W + jets",               50380.0   ), # LO 50380.0; NLO 61526.7
-    ("WJ", "W1JetsToLNu",                              "W + 1J",                  9644.5   ),
-    ("WJ", "W2JetsToLNu",                              "W + 2J",                  3144.5   ),
-    ("WJ", "W3JetsToLNu",                              "W + 3J",                   954.8   ),
-    ("WJ", "W4JetsToLNu",                              "W + 4J",                   485.6   ),
-    ("DY", "DYJetsToLL_M-10to50_TuneCP5",              "Drell-Yan 10-50",        21658.0, {'extraweight': "zptweight"} ),
-    ("DY", "DYJetsToLL_M-50_TuneCP5",                  "Drell-Yan 50",            4954.0, {'extraweight': "zptweight"} ), # LO 4954.0; NLO 5765.4
-    ("DY", "DY1JetsToLL_M-50_TuneCP5",                 "Drell-Yan 1J 50",         1012.5, {'extraweight': "zptweight"} ),
-    ("DY", "DY2JetsToLL_M-50_TuneCP5",                 "Drell-Yan 2J 50",          332.8, {'extraweight': "zptweight"} ),
-    ("DY", "DY3JetsToLL_M-50_TuneCP5",                 "Drell-Yan 3J 50",          101.8, {'extraweight': "zptweight"} ),
+    ("ST", "ST_tW_top_5f_inclusiveDecays",             "ST tW",                     35.85  ),
+    ("ST", "ST_tW_antitop_5f_inclusiveDecays",         "ST atW",                    35.85  ),
+    ("WW", "WW_TuneCP5",                               "WW",                        75.88  ),
+    ("WZ", "WZ_TuneCP5",                               "WZ",                        27.6   ),
+    ("ZZ", "ZZ_TuneCP5",                               "ZZ",                        12.14  ),
+    ("WJ", "WJetsToLNu",                               "W + jets",               52940.0   ), # LO 52940.0; NLO 61526.7
+    ("WJ", "W1JetsToLNu",                              "W + 1J",                  8104.0   ),
+    ("WJ", "W2JetsToLNu",                              "W + 2J",                  2793.0   ),
+    ("WJ", "W3JetsToLNu",                              "W + 3J",                   992.5   ),
+    ("WJ", "W4JetsToLNu",                              "W + 4J",                   544.3   ),
+    ("DY", "DYJetsToLL_M-10to50_TuneCP5",              "Drell-Yan 10-50",        18610.0, {'extraweight': "getZpt_2017(m_genboson,pt_genboson)"} ),
+    ("DY", "DYJetsToLL_M-50_TuneCP5",                  "Drell-Yan 50",            5343.0, {'extraweight': "getZpt_2017(m_genboson,pt_genboson)"} ),
+    ("DY", "DY1JetsToLL_M-50_TuneCP5",                 "Drell-Yan 1J 50",          877.8, {'extraweight': "getZpt_2017(m_genboson,pt_genboson)"} ),
+    ("DY", "DY2JetsToLL_M-50_TuneCP5",                 "Drell-Yan 2J 50",          304.4, {'extraweight': "getZpt_2017(m_genboson,pt_genboson)"} ),
+    ("DY", "DY3JetsToLL_M-50_TuneCP5",                 "Drell-Yan 3J 50",          111.5, {'extraweight': "getZpt_2017(m_genboson,pt_genboson)"} ),
 ]
 
 samplesS = [
@@ -369,13 +385,13 @@ if (doShifts and doDatacard) or drawShifts:
         samples_TESscanMESUp[shiftkey]   = samples.shift(['DY'],filetagUp,  shifttagUp,  filter=True,share=True,close=True,title_veto="other")
         samples_TESscanMESDown[shiftkey] = samples.shift(['DY'],filetagDown,shifttagDown,filter=True,share=True,close=True,title_veto="other")
       if doZpt:
-        samples_TESscanZptUp[shiftkey]   = samples_TESscan[shiftkey].shiftWeight(['DY'], "(0.90*zptweight+0.10)", "-10% Z pt weight", filter=True, extra=True )
-        samples_TESscanZptDown[shiftkey] = samples_TESscan[shiftkey].shiftWeight(['DY'], "(1.10*zptweight-0.10)", "+10% Z pt weight", filter=True, extra=True )
+        samples_TESscanZptUp[shiftkey]   = samples_TESscan[shiftkey].shiftWeight(['DY'], "getZpt_2017Down(m_genboson,pt_genboson)", "-10% Z pt weight", filter=True, extra=True )
+        samples_TESscanZptDown[shiftkey] = samples_TESscan[shiftkey].shiftWeight(['DY'], "getZpt_2017Up(m_genboson,pt_genboson)",   "+10% Z pt weight", filter=True, extra=True )
     samples_TESscan['0.970'].printTable("TES -3%")
     samples_TESscan['0.970'].printSampleObjects("TES -3%")
   if doZpt:
-    samples_ZptUp   = samples.shiftWeight(['DY'], "(0.90*zptweight+0.10)", "-10% Z pt weight", filter=True, extra=True )
-    samples_ZptDown = samples.shiftWeight(['DY'], "(1.10*zptweight-0.10)", "+10% Z pt weight", filter=True, extra=True )
+    samples_ZptUp   = samples.shiftWeight(['DY'], "getZpt_2017Down(m_genboson,pt_genboson)", "-10% Z pt weight", filter=True, extra=True )
+    samples_ZptDown = samples.shiftWeight(['DY'], "getZpt_2017Up(m_genboson,pt_genboson)",   "+10% Z pt weight", filter=True, extra=True )
     samples_ZptUp.printTable("Zpt Up")
     samples_ZptDown.printTable("Zpt Down")
     if doTESscan:

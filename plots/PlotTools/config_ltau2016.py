@@ -190,7 +190,7 @@ selections  = [
 # VARIABLES
 variables = [
 #     var("m_sv",                              50,   0, 200, cbinning={'nc?btag':(44,0,220)} ),
-#     var("m_vis",                             40,   0, 160, cbinning={'nc?btag':(36,0,180)} ),
+    var("m_vis",                             40,   0, 160, cbinning={'nc?btag':(36,0,180)} ),
 #     var("m_2",                             30,   0,   3 ),
 #     var("met",                             40,   0, 200 ),
     var("pfmt_1",                          40,   0, 200, title="m_T(mu,MET)", ctitle={'etau':"m_T(e,MET)"} ),
@@ -247,49 +247,49 @@ variables = [
 #     variables.append(var( n,             2, 0,   2 ))
 
 samplesB = [                                                              # cross section [pb]
-    ("TT", "TT_TuneCUETP8M1",                      "ttbar",                    831.76, {'extraweight':"ttptweight_runI/ttptweight"} ), #{'extraweight':"1/ttptweight"} ), # "ttptweight_runI/ttptweight"
-    ("ST", "ST_tW_top_5f_inclusiveDecays",         "ST tW",                     35.60  ), #  38.09
-    ("ST", "ST_tW_antitop_5f_inclusiveDecays",     "ST atW",                    35.60  ), #  38.09
-    ("ST", "ST_t-channel_top_4f_inclusiveDecays",     "ST t",                  136.02  ), #  80.95 # 80.95
-    ("ST", "ST_t-channel_antitop_4f_inclusiveDecays", "ST at",                  80.95  ), # 136.02 # 136.02
-    ("WW", "WWTo1L1Nu2Q_13TeV_nlo",                "WWTo1L1Nu2Q",               49.997 ),
-    ("WZ", "WZTo1L1Nu2Q_13TeV_nlo",                "WZTo1L1Nu2Q",               10.71  ),
-    ("WZ", "WZTo2L2Q_13TeV_nlo",                   "WZTo2L2Q",                   5.595 ),
+    ('TT', "TT_TuneCUETP8M1",                      "ttbar",                    831.76, {'extraweight':"ttptweight_runI/ttptweight"} ), #{'extraweight':"1/ttptweight"} ), # "ttptweight_runI/ttptweight"
+    ('ST', "ST_tW_top_5f_inclusiveDecays",         "ST tW",                     35.60  ), #  38.09
+    ('ST', "ST_tW_antitop_5f_inclusiveDecays",     "ST atW",                    35.60  ), #  38.09
+    ('ST', "ST_t-channel_top_4f_inclusiveDecays",     "ST t",                  136.02  ), #  80.95 # 80.95
+    ('ST', "ST_t-channel_antitop_4f_inclusiveDecays", "ST at",                  80.95  ), # 136.02 # 136.02
+    ('WW', "WWTo1L1Nu2Q_13TeV_nlo",                "WWTo1L1Nu2Q",               49.997 ),
+    ('WZ', "WZTo1L1Nu2Q_13TeV_nlo",                "WZTo1L1Nu2Q",               10.71  ),
+    ('WZ', "WZTo2L2Q_13TeV_nlo",                   "WZTo2L2Q",                   5.595 ),
     #("WZ", "WZTo3LNu_TuneCUETP8M1_13TeV_nlo",      "WZTo3LNu",                   3.05  ),
-    ("WZ", "WZJToLLLNu_nlo",                       "WZJToLLLNu",                 4.708 ),
-    ("VV", "VVTo2L2Nu_13TeV_nlo",                  "VVTo2L2Nu",                 11.95  ),
-    ("ZZ", "ZZTo2L2Q_13TeV_nlo",                   "ZZTo2L2Q",                   3.22  ),
-    ("ZZ", "ZZTo4L_13TeV_nlo",                     "ZZTo4L",                     1.212 ),
-    ("WJ", "WJetsToLNu_TuneCUETP8M1",              "W + jets",               50380.0   ), # LO 50380.0; NLO 61526.7
-    ("WJ", "W1JetsToLNu_TuneCUETP8M1",             "W + 1J",                  9644.5   ),
-    ("WJ", "W2JetsToLNu_TuneCUETP8M1",             "W + 2J",                  3144.5   ),
-    ("WJ", "W3JetsToLNu_TuneCUETP8M1",             "W + 3J",                   954.8   ),
-    ("WJ", "W4JetsToLNu_TuneCUETP8M1",             "W + 4J",                   485.6   ),
-    ("DY", "DYJetsToLL_M-10to50_TuneCUETP8M1",     "Drell-Yan 10-50",        18610.0, {'extraweight':"getZpt_HTT(m_genboson,pt_genboson)/zptweight"}), #{'extraweight':"getZpt(pt_genboson)/zptweight"} # 18610
-    ("DY", "DY1JetsToLL_M-10to50_TuneCUETP8M1",    "Drell-Yan 1J 10-50",       421.5, {'extraweight':"getZpt_HTT(m_genboson,pt_genboson)/zptweight"}), #{'extraweight':"getZpt(pt_genboson)/zptweight"} # 421.5
-    ("DY", "DY2JetsToLL_M-10to50_TuneCUETP8M1",    "Drell-Yan 2J 10-50",       184.3, {'extraweight':"getZpt_HTT(m_genboson,pt_genboson)/zptweight"}), #{'extraweight':"getZpt(pt_genboson)/zptweight"} # 184.3
-    ("DY", "DY3JetsToLL_M-10to50_TuneCUETP8M1",    "Drell-Yan 3J 10-50",        95.0, {'extraweight':"getZpt_HTT(m_genboson,pt_genboson)/zptweight"}), #{'extraweight':"getZpt(pt_genboson)/zptweight"} # ???
-    ("DY", "DYJetsToLL_M-50_TuneCUETP8M1",         "Drell-Yan 50",            4954.0, {'extraweight':"getZpt_HTT(m_genboson,pt_genboson)/zptweight"}), #{'extraweight':"getZpt(pt_genboson)/zptweight"} # LO 4954.0; NLO 5765.4
-    ("DY", "DY1JetsToLL_M-50_TuneCUETP8M1",        "Drell-Yan 1J 50",         1012.5, {'extraweight':"getZpt_HTT(m_genboson,pt_genboson)/zptweight"}), #{'extraweight':"getZpt(pt_genboson)/zptweight"} 
-    ("DY", "DY2JetsToLL_M-50_TuneCUETP8M1",        "Drell-Yan 2J 50",          332.8, {'extraweight':"getZpt_HTT(m_genboson,pt_genboson)/zptweight"}), #{'extraweight':"getZpt(pt_genboson)/zptweight"} 
-    ("DY", "DY3JetsToLL_M-50_TuneCUETP8M1",        "Drell-Yan 3J 50",          101.8, {'extraweight':"getZpt_HTT(m_genboson,pt_genboson)/zptweight"}), #{'extraweight':"getZpt(pt_genboson)/zptweight"} 
-    ("DY", "DY4JetsToLL_M-50_TuneCUETP8M1",        "Drell-Yan 4J 50",           54.8, {'extraweight':"getZpt_HTT(m_genboson,pt_genboson)/zptweight"}), #{'extraweight':"getZpt(pt_genboson)/zptweight"} 
-    ###("WW", "WW_TuneCUETP8M1",                      "WW",                        63.21  ), # 63.21
-    ###("WZ", "WZ_TuneCUETP8M1",                      "WZ",                        22.82  ), # 10.71?
-    ###("ZZ", "ZZ_TuneCUETP8M1",                      "ZZ",                        10.32  ), #  3.22?
-    ###("WW", "WWTo1L1Nu2Q",                          "WW",                        1.212  ), # 1.212
-    ###("WW", "WWTo4Q_4f",                            "WW",                        45.31  ), # 45.31
-    ###("ST", "ST_tW_top_5f_NoFullyHadronicDecays",      'ST',                     38.09  ), # 
-    ###("ST", "ST_tW_antitop_5f_NoFullyHadronicDecays",  'ST',                      0.00  ), # 
-    ###("ST", "ST_s-channel_4f_leptonDecays",            'ST',                     10.11  ), # 10.11
-    ###("ST", "ST_t-channel_antitop_4f_inclusiveDecays", 'ST',                     80.95  ), # 80.95
-    ###("ST", "ST_t-channel_top_4f_inclusiveDecays",     'ST',                      0.00  ), # 
+    ('WZ', "WZJToLLLNu_nlo",                       "WZJToLLLNu",                 4.708 ),
+    ('VV', "VVTo2L2Nu_13TeV_nlo",                  "VVTo2L2Nu",                 11.95  ),
+    ('ZZ', "ZZTo2L2Q_13TeV_nlo",                   "ZZTo2L2Q",                   3.22  ),
+    ('ZZ', "ZZTo4L_13TeV_nlo",                     "ZZTo4L",                     1.212 ),
+    ('WJ', "WJetsToLNu_TuneCUETP8M1",              "W + jets",               50380.0   ), # LO 50380.0; NLO 61526.7
+    ('WJ', "W1JetsToLNu_TuneCUETP8M1",             "W + 1J",                  9644.5   ),
+    ('WJ', "W2JetsToLNu_TuneCUETP8M1",             "W + 2J",                  3144.5   ),
+    ('WJ', "W3JetsToLNu_TuneCUETP8M1",             "W + 3J",                   954.8   ),
+    ('WJ', "W4JetsToLNu_TuneCUETP8M1",             "W + 4J",                   485.6   ),
+    ('DY', "DYJetsToLL_M-10to50_TuneCUETP8M1",     "Drell-Yan 10-50",        18610.0, {'extraweight':"getZpt_HTT(m_genboson,pt_genboson)/zptweight"}), #{'extraweight':"getZpt(pt_genboson)/zptweight"} # 18610
+    ('DY', "DY1JetsToLL_M-10to50_TuneCUETP8M1",    "Drell-Yan 1J 10-50",       421.5, {'extraweight':"getZpt_HTT(m_genboson,pt_genboson)/zptweight"}), #{'extraweight':"getZpt(pt_genboson)/zptweight"} # 421.5
+    ('DY', "DY2JetsToLL_M-10to50_TuneCUETP8M1",    "Drell-Yan 2J 10-50",       184.3, {'extraweight':"getZpt_HTT(m_genboson,pt_genboson)/zptweight"}), #{'extraweight':"getZpt(pt_genboson)/zptweight"} # 184.3
+    ('DY', "DY3JetsToLL_M-10to50_TuneCUETP8M1",    "Drell-Yan 3J 10-50",        95.0, {'extraweight':"getZpt_HTT(m_genboson,pt_genboson)/zptweight"}), #{'extraweight':"getZpt(pt_genboson)/zptweight"} # ???
+    ('DY', "DYJetsToLL_M-50_TuneCUETP8M1",         "Drell-Yan 50",            4954.0, {'extraweight':"getZpt_HTT(m_genboson,pt_genboson)/zptweight"}), #{'extraweight':"getZpt(pt_genboson)/zptweight"} # LO 4954.0; NLO 5765.4
+    ('DY', "DY1JetsToLL_M-50_TuneCUETP8M1",        "Drell-Yan 1J 50",         1012.5, {'extraweight':"getZpt_HTT(m_genboson,pt_genboson)/zptweight"}), #{'extraweight':"getZpt(pt_genboson)/zptweight"} 
+    ('DY', "DY2JetsToLL_M-50_TuneCUETP8M1",        "Drell-Yan 2J 50",          332.8, {'extraweight':"getZpt_HTT(m_genboson,pt_genboson)/zptweight"}), #{'extraweight':"getZpt(pt_genboson)/zptweight"} 
+    ('DY', "DY3JetsToLL_M-50_TuneCUETP8M1",        "Drell-Yan 3J 50",          101.8, {'extraweight':"getZpt_HTT(m_genboson,pt_genboson)/zptweight"}), #{'extraweight':"getZpt(pt_genboson)/zptweight"} 
+    ('DY', "DY4JetsToLL_M-50_TuneCUETP8M1",        "Drell-Yan 4J 50",           54.8, {'extraweight':"getZpt_HTT(m_genboson,pt_genboson)/zptweight"}), #{'extraweight':"getZpt(pt_genboson)/zptweight"} 
+    ###('WW', "WW_TuneCUETP8M1",                      "WW",                        63.21  ), # 63.21
+    ###('WZ', "WZ_TuneCUETP8M1",                      "WZ",                        22.82  ), # 10.71?
+    ###('ZZ', "ZZ_TuneCUETP8M1",                      "ZZ",                        10.32  ), #  3.22?
+    ###('WW', "WWTo1L1Nu2Q",                          "WW",                        1.212  ), # 1.212
+    ###('WW', "WWTo4Q_4f",                            "WW",                        45.31  ), # 45.31
+    ###('ST', "ST_tW_top_5f_NoFullyHadronicDecays",      'ST',                     38.09  ), # 
+    ###('ST', "ST_tW_antitop_5f_NoFullyHadronicDecays",  'ST',                      0.00  ), # 
+    ###('ST', "ST_s-channel_4f_leptonDecays",            'ST',                     10.11  ), # 10.11
+    ###('ST', "ST_t-channel_antitop_4f_inclusiveDecays", 'ST',                     80.95  ), # 80.95
+    ###('ST', "ST_t-channel_top_4f_inclusiveDecays",     'ST',                      0.00  ), # 
 ]
 
 samplesD = {
-    "mutau": ( "SingleMuon",     "SingleMuon_Run2016",     "observed", {'blind':blind_dict} ),
-    "etau":  ( "SingleElectron", "SingleElectron_Run2016", "observed", {'blind':blind_dict} ),
-    "emu":   ( "SingleMuon",     "SingleMuon_Run2016",     "observed", {'blind':blind_dict} ),
+    'mutau': ( "SingleMuon",     "SingleMuon_Run2016",     "observed", {'blind':blind_dict} ),
+    'etau':  ( "SingleElectron", "SingleElectron_Run2016", "observed", {'blind':blind_dict} ),
+    'emu':   ( "SingleMuon",     "SingleMuon_Run2016",     "observed", {'blind':blind_dict} ),
 }
 
 samplesS   = [ ]
@@ -363,9 +363,7 @@ if doTTpt:
   samples_TTptDown = samples.shiftWeight(['TT'], "1/ttptweight", "no TT pt weight",   filter=False, extra=True ) # divide out from "weight"
   samples_TTptUp.printTable("TTpt Up")
 if doZpt:
-  samples_ZptUp   = samples.shiftWeight(['DY'], "(0.90*getZpt(pt_genboson)+0.10)/zptweight", "no Z pt weight",      filter=True, extra=True )
-  samples_ZptDown = samples.shiftWeight(['DY'], "(1.10*getZpt(pt_genboson)-0.10)/zptweight", "Z pt weighted twice", filter=True, extra=True )
+  samples_ZptUp   = samples.shiftWeight(['DY'], "(0.90*getZpt(pt_genboson)+0.10)/zptweight", "Z pt weight -10%",      filter=True, extra=True )
+  samples_ZptDown = samples.shiftWeight(['DY'], "(1.10*getZpt(pt_genboson)-0.10)/zptweight", "Z pt weight +10%", filter=True, extra=True )
   samples_ZptUp.printTable("Zpt Up")
   samples_ZptDown.printTable("Zpt Down")
-
-

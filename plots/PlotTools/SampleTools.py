@@ -7,43 +7,52 @@ from ctypes import c_double
 from math import sqrt, pow
 from copy import copy, deepcopy
 from collections import namedtuple as ntuple
-from ROOT import gROOT, TFile, TTree, TH1F, TH1D, TH2F, TH2D, gDirectory, TColor, \
+from ROOT import gROOT, gSystem, TFile, TTree, TH1F, TH1D, TH2F, TH2D, gDirectory, TColor, \
                  kAzure, kBlack, kBlue, kCyan, kGray, kGreen, kMagenta, kOrange, kPink, kRed, kSpring, kTeal, kWhite, kViolet, kYellow
 from SettingTools import *
 if loadMacros:
-  ###gROOT.Macro('PlotTools/QCDModelingEMu/QCDModelingEMu.C+')
   ###gROOT.Macro('PlotTools/weightJEta1.C+')
   if doFakeRate:
     gROOT.Macro('PlotTools/fakeRate/fakeRate.C+')
     #gROOT.ProcessLine('TString MVArerunv2 = "MVArerunv2"; TString MVArerunv1new = "MVArerunv1new";')
+  elif doQCD:
+    gROOT.Macro('PlotTools/QCD/QCD.C+') 
+  elif doFakeFactor:
+    #gROOT.ProcessLine(".include /shome/ineuteli/analysis/CMSSW_9_4_6/src/")
+    #gSystem.Load("/shome/ineuteli/analysis/CMSSW_9_4_6/lib/slc6_amd64_gcc630/libHTTutilitiesJet2TauFakes.so")
+    gROOT.Macro('PlotTools/fakeFactor/fakeFactor.C+')
   gROOT.Macro('PlotTools/leptonTauFake/leptonTauFake.C+')
+  gROOT.Macro('PlotTools/lepEff/lepEff.C+')
   gROOT.Macro('PlotTools/Zpt/zptweight.C+')
+  gROOT.Macro('PlotTools/pileup/pileup.C+')
   ###gROOT.Macro("prefire/prefireAnalysis.C+") # TODO: COMMENT OUT !!!
   
 
-colors_HTT_dict = { 'TT':   kBlue-8,                         'DY':          kOrange-4,
-                    'TTT':  kAzure-9,                        'ZL':          TColor.GetColor(100,182,232), #kAzure+5,
-                    'TTJ':  kBlue-8,                         'ZJ':          kGreen-6,
-                    'TTL':  kGreen-6,                        'ZTT':         kOrange-4,
-                    'ST':   TColor.GetColor(140,180,220),    'ZTT_DM0':     kOrange+5,
-                    'STJ':  kMagenta-8,                      'ZTT_DM1':     kOrange-4, #kOrange,
-                    'QCD':  kMagenta-10,                     'ZTT_DM10':    kYellow-9,
-                    'data': kBlack,                          'ZTT_DM11':    kOrange-6,
-                    'WJ':   50,                              'ZTT_DMother': kOrange-8,
-                    'VV':   TColor.GetColor(222,140,106),    'DY10':        TColor.GetColor(240,175,60), #TColor.GetColor(222,90,106)
-                    'sig':  kBlue
+colors_HTT_dict = {
+  'TT':   kBlue-8,                         'DY':          kOrange-4,
+  'TTT':  kAzure-9,                        'ZL':          TColor.GetColor(100,182,232), #kAzure+5,
+  'TTJ':  kBlue-8,                         'ZJ':          kGreen-6,
+  'TTL':  kGreen-6,                        'ZTT':         kOrange-4,
+  'ST':   TColor.GetColor(140,180,220),    'ZTT_DM0':     kOrange+5,
+  'STJ':  kMagenta-8,                      'ZTT_DM1':     kOrange-4, #kOrange,
+  'QCD':  kMagenta-10,                     'ZTT_DM10':    kYellow-9,
+  'data': kBlack,                          'ZTT_DM11':    kOrange-6,
+  'WJ':   50,                              'ZTT_DMother': kOrange-8,
+  'VV':   TColor.GetColor(222,140,106),    'DY10':        TColor.GetColor(240,175,60), #TColor.GetColor(222,90,106)
+  'sig':  kBlue
 }
-colors_IWN_dict = { 'TT':   kRed-2,        'DY':          kGreen-2,
-                    'TTT':  kRed-2,        'ZL':          kAzure+5,
-                    'TTJ':  kOrange+9,     'ZJ':          kSpring-7, #kGreen-7,
-                    'TTL':  kRed+1,        'DY10':        kAzure+5,
-                    'ST':   kMagenta-3,    'ZTT_DM0':     kOrange,
-                    'STJ':  kMagenta+3,    'ZTT_DM1':     kOrange+5,
-                    'QCD':  kRed-7,        'ZTT_DM10':    kYellow-9,
-                    'data': kBlack,        'ZTT_DM11':    kYellow-3, #kOrange+6
-                    'WJ':   kOrange-5,     'ZTT_DMother': kOrange-6, #kOrange+6
-                    'VV':   kYellow-7, #+771,
-                    'sig':  kAzure+4,
+colors_IWN_dict = {
+  'TT':   kRed-2,        'DY':          kGreen-2,
+  'TTT':  kRed-2,        'ZL':          kAzure+5,
+  'TTJ':  kOrange+9,     'ZJ':          kSpring-7, #kGreen-7,
+  'TTL':  kRed+1,        'DY10':        kAzure+5,
+  'ST':   kMagenta-3,    'ZTT_DM0':     kOrange,
+  'STJ':  kMagenta+3,    'ZTT_DM1':     kOrange+5,
+  'QCD':  kRed-7,        'ZTT_DM10':    kYellow-9,
+  'data': kBlack,        'ZTT_DM11':    kYellow-3, #kOrange+6
+  'WJ':   kOrange-5,     'ZTT_DMother': kOrange-6, #kOrange+6
+  'VV':   kYellow-7, #+771,
+  'sig':  kAzure+4,
 }
 colors_sample_dict = { }
 
@@ -51,32 +60,32 @@ colors_sample_dict = { }
 def setSampleColorDict(col_dict):
     global colors_sample_dict
     colors_sample_dict = {  
-        "TT":               col_dict['TT'],         'DY':          col_dict['DY'],
-        'TTT':              col_dict['TTT'],        'ZTT':         col_dict['DY'],
-        'TTL':              col_dict['TTL'],        'ZL':          col_dict['ZL'],
-        'TTJ':              col_dict['TTJ'],        'ZJ':          col_dict['ZJ'],
-        'ttbar':            col_dict['TT'],         'Drel*Yan':    col_dict['DY'],
-        'ttbar*real*tau':   col_dict['TTT'],        'Z*tau':       col_dict['DY'],
-        'ttbar*l':          col_dict['TTL'],        'Z*ll':        col_dict['ZL'],
-        'ttbar*j':          col_dict['TTJ'],        'Z*j*tau':     col_dict['ZJ'],
-        'ttbar*other':      col_dict['TTJ'],        'D*Y*l*tau':   col_dict['ZL'],
-        'ST':               col_dict['ST'],         'D*Y*other':   col_dict['ZJ'], #kSpring+3, kPink-2
-        'single top':       col_dict['ST'],         'D*Y*10*50':   col_dict['DY10'],
-        'STT':              col_dict['ST'],         'D*Y*50':      col_dict['DY'],
-        'STJ':              col_dict['STJ'],        'ZTT_DM0':     col_dict['ZTT_DM0'],     'Z*tau*DM0':   col_dict['ZTT_DM0'],
-        'single top*real':  col_dict['ST'],         'ZTT_DM1':     col_dict['ZTT_DM1'],     'Z*tau*DM1':   col_dict['ZTT_DM1'],
-        'single top*other': col_dict['STJ'],        'ZTT_DM10':    col_dict['ZTT_DM10'],    'Z*tau*DM10':  col_dict['ZTT_DM10'],
-        'QCD':              col_dict['QCD'],        'ZTT_DM11':    col_dict['ZTT_DM11'],    'Z*tau*DM11':  col_dict['ZTT_DM11'],
-        'JTF':              col_dict['QCD'],        'ZTT_DMother': col_dict['ZTT_DMother'], 'Z*tau*other': col_dict['DY10'],
-        'fake*rate':        col_dict['QCD'],        'W*jets':      col_dict['WJ'],
-        'j*tau*fake':       col_dict['QCD'],        'W*J':         col_dict['WJ'],
-        'signal':           col_dict['sig'],        'W':           col_dict['WJ'],
-        'VLQ':              col_dict['sig'],        'WW':          col_dict['VV'],
-        'bbA':              col_dict['sig'],        'WZ':          col_dict['VV'],
-        'data':             col_dict['data'],       'ZZ':          col_dict['VV'],
-        'single muon':      col_dict['data'],       'VV':          col_dict['VV'],
-        'single electron':  col_dict['data'],       'diboson':     col_dict['VV'],
-        'observed':         col_dict['data'],   
+      "TT":               col_dict['TT'],         'DY':          col_dict['DY'],
+      'TTT':              col_dict['TTT'],        'ZTT':         col_dict['DY'],
+      'TTL':              col_dict['TTL'],        'ZL':          col_dict['ZL'],
+      'TTJ':              col_dict['TTJ'],        'ZJ':          col_dict['ZJ'],
+      'ttbar':            col_dict['TT'],         'Drel*Yan':    col_dict['DY'],
+      'ttbar*real*tau':   col_dict['TTT'],        'Z*tau':       col_dict['DY'],
+      'ttbar*l':          col_dict['TTL'],        'Z*ll':        col_dict['ZL'],
+      'ttbar*j':          col_dict['TTJ'],        'Z*j*tau':     col_dict['ZJ'],
+      'ttbar*other':      col_dict['TTJ'],        'D*Y*l*tau':   col_dict['ZL'],
+      'ST':               col_dict['ST'],         'D*Y*other':   col_dict['ZJ'], #kSpring+3, kPink-2
+      'single top':       col_dict['ST'],         'D*Y*10*50':   col_dict['DY10'],
+      'STT':              col_dict['ST'],         'D*Y*50':      col_dict['DY'],
+      'STJ':              col_dict['STJ'],        'ZTT_DM0':     col_dict['ZTT_DM0'],     'Z*tau*DM0':   col_dict['ZTT_DM0'],
+      'single top*real':  col_dict['ST'],         'ZTT_DM1':     col_dict['ZTT_DM1'],     'Z*tau*DM1':   col_dict['ZTT_DM1'],
+      'single top*other': col_dict['STJ'],        'ZTT_DM10':    col_dict['ZTT_DM10'],    'Z*tau*DM10':  col_dict['ZTT_DM10'],
+      'QCD':              col_dict['QCD'],        'ZTT_DM11':    col_dict['ZTT_DM11'],    'Z*tau*DM11':  col_dict['ZTT_DM11'],
+      'JTF':              col_dict['QCD'],        'ZTT_DMother': col_dict['ZTT_DMother'], 'Z*tau*other': col_dict['DY10'],
+      'fake*rate':        col_dict['QCD'],        'W*jets':      col_dict['WJ'],
+      'j*tau*fake':       col_dict['QCD'],        'W*J':         col_dict['WJ'],
+      'signal':           col_dict['sig'],        'W':           col_dict['WJ'],
+      'VLQ':              col_dict['sig'],        'WW':          col_dict['VV'],
+      'bbA':              col_dict['sig'],        'WZ':          col_dict['VV'],
+      'data':             col_dict['data'],       'ZZ':          col_dict['VV'],
+      'single muon':      col_dict['data'],       'VV':          col_dict['VV'],
+      'single electron':  col_dict['data'],       'diboson':     col_dict['VV'],
+      'observed':         col_dict['data'],       'electroweak': col_dict['VV'],
     }
 setSampleColorDict(colors_IWN_dict if 'IWN' in colorset else colors_HTT_dict)
 
@@ -105,46 +114,70 @@ def makeSFrameSamples(samplesD,samplesB,samplesS,**kwargs):
     """
     outdir  = kwargs.get('dir',      SAMPLE_DIR  )
     weight  = kwargs.get('weight',   ""          )
-    kwargs['dir'] = outdir
+    kwargs.update({'SFrame': True, 'nanoAOD': False,    'dir': outdir,
+                   'data': False,  'background': False, 'signal': False})
     
     # DATA
     for channel, sample in samplesD.items():
         subdir, name, title = sample[:3]
         sdict = dict(kwargs,**sample[3]) if len(sample)>3 else kwargs.copy()
         sdict['weight'] = ""
-        samplesD[channel] = SFrameSampleD(subdir,name,title,**sdict)
+        sdict['data']   = True
+        samplesD[channel] = Sample(name,title,SFrameOutputPath(sdict['dir'],subdir,name,**sdict),**sdict)
     
     # BACKGROUND
     for i, sample in enumerate(samplesB):
         subdir, name, title, sigma = sample[:4]
         sdict = dict(kwargs,**sample[4]) if len(sample)>4 else kwargs.copy()
-        samplesB[i] = SFrameSampleB(subdir,name,title,sigma,**sdict)
+        sdict['background'] = True
+        samplesB[i] = Sample(name,title,sigma,SFrameOutputPath(sdict['dir'],subdir,name,**sdict),**sdict)
     
     # SIGNAL
     for i, sample in enumerate(samplesS):
         subdir, name, title, sigma = sample[:4]
         sdict = dict(kwargs,**sample[4]) if len(sample)>4 else kwargs.copy()
-        samplesS[i] = SFrameSampleS(subdir,name,title,sigma,**sdict)
+        sdict['signal'] = True
+        samplesS[i] = Sample(name,title,sigma,SFrameOutputPath(sdict['dir'],subdir,name,**sdict),**sdict)
     
-def SFrameSampleB(subdir,name,title,sigma,**kwargs):
-    """Help function to create a background Sample object with SFrame information."""
-    kwargs['SFrame']     = True
-    kwargs['background'] = True
-    return Sample(name,title,sigma,SFrameOutputPath(kwargs['dir'],subdir,name,**kwargs),**kwargs)
+def makeNanoAODSamples(channel,samplesD,samplesB,samplesS,**kwargs):
+    """
+    Make Sample objects from a list of nanoAOD samples given
+      channel, name, title and cross section for simulations,
+      channel, name and title for data.
+    The data should be a dictionary with channel as keys.
+    """
+    outdir  = kwargs.get('dir',      SAMPLE_DIR  )
+    weight  = kwargs.get('weight',   ""          )
+    kwargs.update({'SFrame':  False,   'nanoAOD':  True,   'dir': outdir,
+                   'channel': channel, 'treeName': 'tree',
+                   'data': False,   'background': False, 'signal': False})
     
-def SFrameSampleS(subdir,name,title,sigma,**kwargs):
-    """Help function to create a signal Sample object with SFrame information."""
-    kwargs['SFrame'] = True
-    kwargs['signal'] = True
-    return Sample(name,title,sigma,SFrameOutputPath(kwargs['dir'],subdir,name,**kwargs),**kwargs)
+    # DATA
+    for channel, sample in samplesD.items():
+        subdir, name, title = sample[:3]
+        sdict = dict(kwargs,**sample[3]) if len(sample)>3 else kwargs.copy()
+        sdict['weight'] = ""
+        sdict['data']   = True
+        if "Electron" in name: sdict['channel'] = 'etau'
+        elif "Muon" in name:   sdict['channel'] = 'mutau'
+        elif "Tau" in name:    sdict['channel'] = 'tautau'
+        samplesD[channel] = Sample(name,title,nanoAODOutputPath(sdict['dir'],subdir,name,**sdict),**sdict)
     
-def SFrameSampleD(subdir,name,title,**kwargs):
-    """Help function to create a data Sample object with SFrame information."""
-    kwargs['SFrame'] = True
-    kwargs['data']   = True
-    kwargs['weight'] = ""
-    return Sample(name,title,SFrameOutputPath(kwargs['dir'],subdir,name,**kwargs),**kwargs)
+    # BACKGROUND
+    for i, sample in enumerate(samplesB):
+        subdir, name, title, sigma = sample[:4]
+        sdict = dict(kwargs,**sample[4]) if len(sample)>4 else kwargs.copy()
+        sdict['background'] = True
+        samplesB[i] = Sample(name,title,sigma,nanoAODOutputPath(sdict['dir'],subdir,name,**sdict),**sdict)
     
+    # SIGNAL
+    for i, sample in enumerate(samplesS):
+        subdir, name, title, sigma = sample[:4]
+        sdict = dict(kwargs,**sample[4]) if len(sample)>4 else kwargs.copy()
+        sdict['signal']  = True
+        samplesS[i] = Sample(name,title,sigma,nanoAODOutputPath(sdict['dir'],subdir,name,**sdict),**sdict)
+    
+
 def SFrameOutputPath(outdir,subdir,samplename,*args,**kwargs):
     """Return a path to a root file from SFrame."""
     verbosity   = getVerbosity(kwargs,verbosityPlotTools,verbositySampleTools)
@@ -153,9 +186,21 @@ def SFrameOutputPath(outdir,subdir,samplename,*args,**kwargs):
     tag        += kwargs.get('extratag', ""              )
     if args and isinstance(args,str): tag = args[0]
     file        = "%s/%s/%s.%s%s.root" % (outdir,subdir,cycle,samplename,tag)
-    LOG.verbose('file = "%s"'%(file),     verbosity,level=3)
+    LOG.verbose('file = "%s"'%(file), verbosity,level=3)
     return file
     
+
+def nanoAODOutputPath(outdir,subdir,samplename,channel,*args,**kwargs):
+    """Return a path to a root file from the nanoAOD analysis."""
+    verbosity   = getVerbosity(kwargs,verbosityPlotTools,verbositySampleTools)
+    tag         = kwargs.get('tag',      globalTag       )
+    tag        += kwargs.get('extratag', ""              )
+    if args and isinstance(args,str): tag = args[0]
+    file        = "%s/%s/%s_%s%s.root" % (outdir,subdir,samplename,channel.replace('etau','eletau'),tag)
+    LOG.verbose('file = "%s"'%(file), verbosity,level=3)
+    return file
+    
+
 def shiftSample(samples0,searchterms,file_app,title_app,**kwargs):
     """Shift sample filename and title. Find the sample via a simple search term."""
     weight      = kwargs.get('weight',      ""          )
@@ -245,7 +290,7 @@ def getSumWeights(tree,cut0,weight):
       integral = hist.GetBinContent(2)
       gDirectory.Delete(hist.GetName())
       return integral
-      
+    
 def printComparingCutflow(efficiencies1,efficiencies2):
     print ">>> %13s:   %21s %8s   %15s   %16s   " % ("name","events".center(21,' '),"ratio".center(5,' '),"rel. eff.".center(15,' '),"abs. eff.".center(17,' '))
     for (name1,N1,releff1,abseff1), (name2,N2,releff2,abseff2) in zip(efficiencies1,efficiencies2):
@@ -253,8 +298,6 @@ def printComparingCutflow(efficiencies1,efficiencies2):
        if N1: ratio = N2/N1
        print (">>> %13s:   %9d - %9d %8.2f   %6.2f - %6.2f   %7.3f - %7.3f  " % (name1,N1,N2,ratio,releff1,releff2,abseff1,abseff2))
     
-
-
 def getColor(name):
     """Get color for some sample name."""
     if isinstance(name,Sample):
@@ -266,7 +309,6 @@ def getColor(name):
     LOG.warning('getColor - could not find color for "%s"!'%name)
     return 0
     
-
 def checkMemory():
     print "gDirectory %s"%(gDirectory.GetName())
     print gDirectory.ls()
@@ -334,7 +376,7 @@ class Sample(object):
         self.title          = title
         self.tags           = [ ]
         self.filename       = kwargs.get('filename',        filename            )
-        self.filenameshort  = "/".join(self.filename.split('/')[-2:])
+        self.filenameshort  = '/'.join(self.filename.split('/')[-2:])
         self.file           = TFile(self.filename) if self.filename else None
         self._tree          = kwargs.get('tree',            None                )
         self._treename      = kwargs.get('treeName',        "tree_mutau"        )
@@ -350,15 +392,18 @@ class Sample(object):
         self.weight         = kwargs.get('weight',          ""                  ) # weights
         self.extraweight    = kwargs.get('extraweight',     ""                  ) # extra weights
         self.cuts           = kwargs.get('cuts',            ""                  ) # extra cuts
+        self.channel        = kwargs.get('channel',         ""                  )      
         self.isData         = kwargs.get('data',            False               )
         self.isBackground   = kwargs.get('background',      False               )
         self.isSignal       = kwargs.get('signal',          False               )
-        self.blind_dict     = kwargs.get('blind',           { }                 ) # var vs. (xmin,xmax)
+        self.blind_dict     = kwargs.get('blind',           blind_dict          ) # var vs. (xmin,xmax)
         self.splitsamples   = [ ]
         self.color          = kwargs.get('color',           None                )
         self.linecolor      = kwargs.get('linecolor',       kBlack              )
         self.lumi           = kwargs.get('lumi',            luminosity          )
         self.isSFrame       = kwargs.get('SFrame',          True                )
+        self.isNanoAOD      = kwargs.get('nanoAOD',         not self.isSFrame   )
+        #self.contexttitle   = getContextFromDict(kwargs,    None, key='ctitle'  ) # context-dependent title
         
         if self.color==None:
           self.color = getColor(self)
@@ -368,44 +413,45 @@ class Sample(object):
             LOG.fatal('SampleSet::SampleSet: Could not open or find file for "%s" sample: "%s"'%(self.name,self.filename))
         
         # SFRAME
-        if self.sigma>=0 and self.isSFrame and not self.isData and not isinstance(self,MergedSample):
-            self.normalizeToLumiCrossSectionSFrame(self.lumi)
-        elif self.isData:
-            self.getNumberOfEventsSFrame("mutau",1,self.binN_weighted)
+        if self.isData:
+          self.getNumberOfEvents('mutau',1,self.binN_weighted)
+        elif self.sigma>=0 and not isinstance(self,MergedSample):
+          self.getNumberOfEvents('mutau',1,self.binN_weighted)
+          self.normalizeToLumiCrossSection(self.lumi)
         
         # CHECK NUMBER OF EVENTS
         if 0 < self.N < self.N_exp*0.97:
-            LOG.warning('SampleSet::SampleSet: Sample "%s" has significantly less events (%d) than expected (%d).'%(self.N,self.N_exp))
+            LOG.warning('SampleSet::SampleSet: Sample "%s" has significantly less events (%d) than expected (%d).'%(self.name,self.N,self.N_exp))
         
     
     def __str__(self):
         return self.name
-    
+        
     def __repr__(self):
-      """Returns string representation of Variable object."""
-      #return '<%s.%s("%s","%s") at %s>'%(self.__class__.__module__,self.__class__.__name__,self.name,self.title,hex(id(self)))
-      return '<%s("%s","%s") at %s>'%(self.__class__.__name__,self.name,self.title,hex(id(self)))
-      
+        """Returns string representation of Variable object."""
+        #return '<%s.%s("%s","%s") at %s>'%(self.__class__.__module__,self.__class__.__name__,self.name,self.title,hex(id(self)))
+        return '<%s("%s","%s") at %s>'%(self.__class__.__name__,self.name,self.title,hex(id(self)))
+        
     def __add__(self, sample):
         """Add samples into MergedSamples."""
         if isinstance(sample,Sample):
           mergedsample = MergedSample(self,sample)
           return self
         return None
-    
+        
     def __mul__(self, scale):
         """Multiply selection with some weight (that can be string or Selection object)."""
         if isNumber(scale):
           self.setScale(scale)
           return self
         return None
-    
+        
     def row(self,**kwargs):
         """Returns string that can be used as a row in a samples summary table"""
         pre    = kwargs.get('pre', "")
-        return ">>>  %s%-20s  %-40s  %12.2f  %10i  %11i  %10.3f  %s" %\
+        return ">>>  %s%-24s  %-40s  %12.2f  %10i  %11i  %10.3f  %s" %\
           (pre,self.title,self.name,self.sigma,self.N_unweighted,self.N,self.norm,self.extraweight) #+ ("  isData" if self.isData else "")
-    
+        
     def printRow(self):
         print self.row()
     
@@ -504,7 +550,7 @@ class Sample(object):
         result = cls.__new__(cls)
         result.__dict__.update(self.__dict__)
         return result
-
+        
     def __deepcopy__(self, memo):
         cls = self.__class__
         result = cls.__new__(cls)
@@ -512,7 +558,7 @@ class Sample(object):
         for key, val in self.__dict__.items():
             setattr(result, key, deepcopy(val, memo))
         return result
-    
+        
     def clone(self,*args,**kwargs):
         """Shallow copy."""
         samename                = kwargs.get('samename', False )
@@ -568,9 +614,31 @@ class Sample(object):
         for sample in self.splitsamples:
             sample.appendFileName(file_app,**kwargs)
         
+    def setFileName(self,filename):
+        """Set filename."""
+        self.filename = filename
+        self.filenameshort  = '/'.join(self.filename.split('/')[-2:])
+        
     def setTreeName(self,treename):
         """Set treename."""
         self.treename = treename
+        
+    def setChannel(self,channel):
+        """Set channel (mutau, etau, tautau, emu, ...)."""
+        LOG.verbose("setChannel: before: %s"%(channel),verbositySampleTools,2)
+        self.channel = channel
+        #if self.contexttitle:
+        #  title = self.contexttitle.getContext(*args)
+        #  if title!=None: self.title = title
+        LOG.verbose("            after:  %s"%(channel),verbositySampleTools,2)
+        if self.isNanoAOD:
+          self.setFileName(re.sub(r"_(e|ele|mu|tau)(mu|tau)","_"+channel.replace("etau","eletau"),self.filename))
+          self.reload()
+        for sample in self.splitsamples:
+            sample.setChannel(channel)
+        if isinstance(self,MergedSample):
+          for sample in self.samples:
+            sample.setChannel(channel)
         
     def setScale(self,scale):
         """Set treename, for split samples as well."""
@@ -710,44 +778,43 @@ class Sample(object):
         sigma    = kwargs.get('sigma',  self.sigma  )
         N_events = kwargs.get('N',      self.N      )
         if self.sigma<0:
-            LOG.warning("Sample::normalizeToLumiCrossSection: Cannot normalize sigma = %s < 0"%(sigma))
-            return -1
+          LOG.warning('Sample::normalizeToLumiCrossSection: Cannot normalize "%s": sigma = %s < 0'%(self.name,sigma))
+          return -1
         if self.isData:
-            LOG.warning('Sample::normalizeToLumiCrossSection: Ignoring data sample "%s"'%(self.name))
-            return norm
+          LOG.warning('Sample::normalizeToLumiCrossSection: Ignoring data sample "%s"'%(self.name))
+          return norm
         if N_events:
-            norm = lumi*sigma*1000/N_events
+          norm = lumi*sigma*1000/N_events
         else:
-            LOG.warning('Sample::normalizeToLumiCrossSection: Cannot normalize "%s" sample: N_events = %s!'%(self.name,N_events))
+          LOG.warning('Sample::normalizeToLumiCrossSection: Cannot normalize "%s" sample: N_events = %s!'%(self.name,N_events))
         if norm <= 0:
-            LOG.warning('Sample::normalizeToLumiCrossSection: Calculated normalization for "%s" sample is %.5g <= 0 (L=%.5g,sigma=%.5g,N=%.5g)!'%(self.name,norm,lumi,sigma,N_events))
+          LOG.warning('Sample::normalizeToLumiCrossSection: Calculated normalization for "%s" sample is %.5g <= 0 (L=%.5g,sigma=%.5g,N=%.5g)!'%(self.name,norm,lumi,sigma,N_events))
         
         self.norm = norm
         return norm
-        
     
-    def getNumberOfEventsSFrame(self,channel,binN,binN_weighted):
+    def getNumberOfEvents(self,channel,binN,binN_weighted):
         """Get number of events for a SFrame sample from the cutflow histogram."""
-        cutflowHist         = self.file.Get("histogram_%s/cutflow_%s"%(channel,channel))
-        if not cutflowHist:
+        if self.isSFrame:
+          cutflowHist         = self.file.Get("histogram_%s/cutflow_%s"%(channel,channel))
+          if not cutflowHist:
             cutflowHist     = self.file.Get("histogram_emu/cutflow_emu")
-        if not cutflowHist:
+          if not cutflowHist:
             cutflowHist     = self.file.Get("histogram_mumu/cutflow_mumu")
-        if not cutflowHist:
+          if not cutflowHist:
             cutflowHist     = self.file.Get("histogram_ditau/cutflow_ditau")
-        if not cutflowHist:
-            LOG.error("Could not find cutflow histogram!")
-        self.N              = cutflowHist.GetBinContent(binN_weighted)
-        self.N_unweighted   = cutflowHist.GetBinContent(binN)
-        
-    
-    def normalizeToLumiCrossSectionSFrame(self,lumi,**kwargs):
-        """Calculate and set the normalization for a SFrame sample."""
-        channel             = kwargs.get('cutflow',        "mutau"             )
-        binN                = kwargs.get('binN',           1                   )
-        binN_weighted       = kwargs.get('binN_weighted',  self.binN_weighted  )
-        self.getNumberOfEventsSFrame(channel,binN,binN_weighted)
-        return self.normalizeToLumiCrossSection(lumi,**kwargs)
+          if not cutflowHist:
+            LOG.error('Could not find cutflow histogram in %s!'%(self.filename))
+          self.N              = cutflowHist.GetBinContent(binN_weighted)
+          self.N_unweighted   = cutflowHist.GetBinContent(binN)
+        elif self.isNanoAOD:
+          cutflowHist         = self.file.Get("h_cutflow")
+          if not cutflowHist:
+            LOG.error('Could not find cutflow histogram in %s!'%(self.filename))
+          self.N              = cutflowHist.GetBinContent(binN_weighted)
+          self.N_unweighted   = cutflowHist.GetBinContent(binN)
+        else:
+          LOG.warning("getNumberOfEvents: Cannot set number of event, because it is not clear what histogram to use (SFrame or nanoAOD?)")
         
     
     def split(self,splitlist,**kwargs):
@@ -793,7 +860,7 @@ class Sample(object):
         replaceweight  = kwargs.get('replaceweight',     None                        )
         
         drawoption    = "E0" if self.isData else "HIST"
-        drawoption    = "gOff"+kwargs.get('option',   drawoption                  )
+        drawoption    = "gOff"+kwargs.get('option',   drawoption                     )
         
         # SIGNAL
         if scaleup and self.upscale!=1.:
@@ -807,8 +874,12 @@ class Sample(object):
         
         # BLIND
         blindcuts = ""
-        if blind and var in self.blind_dict:
-            a, b      = self.blind_dict[var]
+        if blind:
+          if isinstance(blind,tuple):
+            a, b    = blind
+            blindcuts = makeBlindCuts(var,a,b,nbins,xmin,xmax)
+          elif var in self.blind_dict:
+            a, b    = self.blind_dict[var]
             blindcuts = makeBlindCuts(var,a,b,nbins,xmin,xmax)
         
         # WEIGHTS
@@ -823,7 +894,7 @@ class Sample(object):
         # CUTS
         cuts     = combineCuts(cuts, extracuts, kwargs.get('extracuts',""), self.cuts, blindcuts, weight=weight)
         if noJTF:
-          cuts   = vetoJetTauFakes(cuts)
+          cuts   = vetoJetTauFakes(cuts,channel=self.channel)
         if self.isData and ('Up' in var or 'Down' in var or 'Up' in cuts or 'Down' in cuts):
           var    = undoShift(var)
           cuts   = undoShift(cuts)
@@ -902,7 +973,7 @@ class Sample(object):
         weight   = combineWeights(self.weight, self.extraweight, kwargs.get('weight', ""))
         cuts     = combineCuts(cuts, extracuts, kwargs.get('extracuts', ""), self.cuts, weight=weight)
         if noJTF:
-          cuts   = vetoJetTauFakes(cuts)
+          cuts   = vetoJetTauFakes(cuts,channel=self.channel)
         
         # TREE
         tree = self.getTree(treename)
@@ -913,14 +984,14 @@ class Sample(object):
         
         # HIST
         hist = TH2F(name, title, *hargs)
-        hist.SetDirectory(0)
         if self.isData: hist.SetBinErrorOption(TH2F.kPoisson)
         else:           hist.Sumw2()
         hist.SetOption("COLZ")
         
         # DRAW
-        out = tree.Draw("%s:%s >> %s" % (yvar,xvar,name), cuts, drawoption)
+        out = tree.Draw("%s:%s >> %s"%(yvar,xvar,name), cuts, drawoption)
         if out<0: LOG.error('Sample::hist - Drawing histogram for "%s" sample failed!'%(title))
+        hist.SetDirectory(0)
         
         # SCALE
         if scale!=1.0:  hist.Scale(scale)
@@ -953,11 +1024,14 @@ class Sample(object):
         found       = True
         regex       = kwargs.get('regex',       False   )
         exlcusive   = kwargs.get('exclusive',   True    )
+        start       = kwargs.get('start',       False   )
         labels      = [self.name,self.title]+self.tags
         for searchterm in searchterms:
           if not regex:
               searchterm = re.sub(r"(?<!\\)\+",r"\+",searchterm) # replace + with \+
               searchterm = re.sub(r"([^\.])\*",r"\1.*",searchterm) # replace * with .*
+          if start:
+            searchterm = '^'+searchterm
           if exlcusive:
               for samplelabel in labels:
                   matches = re.findall(searchterm,samplelabel)
@@ -1019,7 +1093,7 @@ class MergedSample(Sample):
     def row(self,**kwargs):
         """Returns string that can be used as a row in a samples summary table."""
         pre    = kwargs.get('pre', "")
-        string = ">>>  %s%-20s  %-40s  %12.2f  %10i  %11i  %10.3f  %s" %\
+        string = ">>>  %s%-24s  %-40s  %12.2f  %10i  %11i  %10.3f  %s" %\
           (pre,self.title,self.name,self.sigma,self.N_unweighted,self.N,self.norm,self.extraweight)
         for sample in self.samples:
           string += "\n" + sample.row(pre=pre+"  ")
@@ -1200,10 +1274,12 @@ class SampleSet(object):
         self.ignore             = kwargs.get('ignore',        [ ]         )
         self.sharedsamples      = kwargs.get('shared',        [ ]         )
         self.shiftQCD           = kwargs.get('shiftQCD',      0           )
+        self.isNanoAOD          = kwargs.get('nanoAOD',       False       )
         #self.weight             = kwargs.get('weight',        ""          )
         self.closed             = False
         
         self.TTscale            = { }
+        self.fracsFF            = { }
         self.nPlotsMade         = 0
         self.color_dict         = { }
         self.linecolor_dict     = { }
@@ -1219,7 +1295,7 @@ class SampleSet(object):
     def printTable(self,title=""):
       """Print table of all samples."""
       print ">>>\n>>> %s samples with integrated luminosity L = %s / fb at sqrt(s) = 13 TeV"%(title,luminosity)
-      print ">>>  %-20s  %-40s  %12s  %10s  %11s  %10s  %s" %\
+      print ">>>  %-24s  %-40s  %12s  %10s  %11s  %10s  %s" %\
             ("sample title","name","sigma [pb]","events","sum weights","norm.","extra weight")
       for sample in self.samples:
         sample.printRow()
@@ -1291,6 +1367,8 @@ class SampleSet(object):
     def setChannel(self,channel,treename=""):
         """Set channel."""
         self.channel = channel
+        for sample in self.samples:
+          sample.setChannel(channel)
         if treename:
           self.setTreeName(treename)
         if not self.closed:
@@ -1312,6 +1390,11 @@ class SampleSet(object):
               LOG.warning("SamplesSet::setColors - Color used twice!")
           else:
               usedColors.append(sample.color)
+        
+    def replaceWeight(self, oldweight, newweight):
+        """Replace weight."""
+        for sample in self.samples:
+          sample.replaceWeight(oldweight, newweight)
     
     def open(self,**kwargs):
         """Help function to close all files in samples list."""
@@ -1466,6 +1549,7 @@ class SampleSet(object):
         reset           = kwargs.get('reset',           False               )
         append          = kwargs.get('append',          ""                  )
         makeJTF         = kwargs.get('JFR',             False               )
+        #makeJTF         = kwargs.get('FF',              False               )
         noJTF           = kwargs.get('noJTF',           makeJTF             )
         makeQCD         = kwargs.get('QCD',             False               ) and not makeJTF
         ratio_WJ_QCD    = kwargs.get('ratio_WJ_QCD_SS', False               )
@@ -1486,7 +1570,7 @@ class SampleSet(object):
           for sample in self.samples:
             if not signal and sample.isSignal: continue
             if not data   and sample.isData:   continue
-            if noJTF and (sample.isPartOf("WJ","W*J","W*j") or "gen_match_2==6" in sample.cuts):
+            if noJTF and (sample.isPartOf("WJ","W*J","W*j") or "gen_match_2==6" in sample.cuts or "genPartFlav_2==6" in sample.cuts):
               continue
             if sample.splitsamples:
               samples += sample.splitsamples
@@ -1496,7 +1580,7 @@ class SampleSet(object):
           for sample in self.samples:
             if not signal and sample.isSignal: continue
             if not data   and sample.isData:   continue
-            if noJTF and (sample.isPartOf("WJ","W*J","W*j") or "gen_match_2==6" in sample.cuts):
+            if noJTF and (sample.isPartOf("WJ","W*J","W*j") or "gen_match_2==6" in sample.cuts or "genPartFlav_2==6" in sample.cuts):
               continue
             samples.append(sample)
             
@@ -1523,7 +1607,7 @@ class SampleSet(object):
             
             # ADD signal
             elif sample.isSignal and signal:
-              hist = sample.hist(*args,append=append,weight=weight,noJTF=noJTF,divideByBinSize=divideBinSize,verbosity=verbosity,scaleup=scaleup)
+              hist = sample.hist(*args,append=append,weight=weight,divideByBinSize=divideBinSize,verbosity=verbosity,scaleup=scaleup)
               histsS.append(hist)
             
             # ADD data
@@ -1535,7 +1619,7 @@ class SampleSet(object):
         
         # ADD QCD
         if makeJTF:
-            hist = self.jetFakeRate(*args,xbins=xbins,append=append,weight=weight,divideByBinSize=divideBinSize,verbosity=verbosity,saveToFile=file)
+            hist = self.jetTauFake(*args,xbins=xbins,append=append,weight=weight,divideByBinSize=divideBinSize,verbosity=verbosity,saveToFile=file)
             if hist:
               histsB.insert(0,hist)
         elif makeQCD:
@@ -1568,6 +1652,7 @@ class SampleSet(object):
         
         verbosity       = getVerbosity(kwargs,verbositySampleTools)
         data            = kwargs.get('data',            True                   )
+        signal          = kwargs.get('signal',          True                   )
         background      = kwargs.get('background',      True                   )
         weight          = kwargs.get('weight',          ""                     )
         weight_data     = kwargs.get('weight_data',     ""                     )
@@ -1607,6 +1692,11 @@ class SampleSet(object):
               hist = sample.hist2D(*args,append=append,weight=weight_data,verbosity=verbosity)
               histsD.append(hist)
             
+            # ADD signal
+            elif sample.isSignal and signal:
+              hist = sample.hist2D(*args,append=append,weight=weight,verbosity=verbosity)
+              histsS.append(hist)
+            
             if bar: bar.count("%s done"%sample.name)
         
         # ADD JTF
@@ -1618,6 +1708,136 @@ class SampleSet(object):
           LOG.warning("SampleSet::createHistograms: More than one data histogram!")
         
         return [ histsD, histsB, histsS ]
+    
+    
+    
+    def jetTauFake(self, *args, **kwargs):
+      if doFakeFactor:
+        return self.jetFakeFactor(*args, **kwargs)
+      else:
+        return self.jetFakeRate(*args, **kwargs)
+    
+    
+    
+    def jetFakeFactor(self, *args, **kwargs):
+        """Estimate tau fake rate background with the fake factor method.
+           - calculate fractions of jet to tau fake backgrounds (EW, TT, QCD)
+           - selection:
+               Anti-isolated region for tautau: one tau passes Medium (8), one tau passes Loose (4) but fails Tight (16)
+               Isolated region: MC events passing gen_match<6
+           - fake rate:
+               weight*( data - MC )
+           - NOTE: discard all MC events with gen_match==6
+        """
+        
+        verbosity       = getVerbosity(kwargs,verbositySampleTools)#+2
+        var, nbins, xmin, xmax, xbins, cuts0 = unwrapVariableSelection(*args)
+        if verbosity>1:
+            print header("estimating jet to tau fake for variable %s with fake factor method"%(var))
+        name            = kwargs.get('name',            makeHistName("JTF",var) )
+        append          = kwargs.get('append',          ""                      )+"_FF"
+        title           = kwargs.get('title',           "j -> tau fakes"        )
+        weight          = kwargs.get('weight',          ""                      )
+        weight_data     = kwargs.get('weight',          ""                      )
+        shift           = kwargs.get('shift',           None                    )
+        anisolated      = False
+        name           += append
+        fracsFF         = self.fracsFF
+        
+        # SELECTIONS
+        cuts          = cuts0
+        gROOT.ProcessLine('loadFakeFactor("%s")'%(self.channel.replace('mu','m').replace('ele','e').replace('tau','t')))
+        if 'tautau' in self.channel:
+          weightFF    = 'getFakeFactor(pt_1,idDecayMode_1,idMVAoldDM2017v2_1,pt_2,idDecayMode_2,idMVAoldDM2017v2_2,njets,m_vis)'
+          cuts_aniso  = "((idMVAoldDM2017v2_1>=16 && idMVAoldDM2017v2_2<16 && idMVAoldDM2017v2_2>=2) || (idMVAoldDM2017v2_2>=16 && idMVAoldDM2017v2_1<16 && idMVAoldDM2017v2_1>=2))"
+          cuts_aniso1 = "idMVAoldDM2017v2_2>=16 && idMVAoldDM2017v2_1<16 && idMVAoldDM2017v2_1>=2"
+          cuts_aniso2 = "idMVAoldDM2017v2_1>=16 && idMVAoldDM2017v2_2<16 && idMVAoldDM2017v2_2>=2"
+          cuts_aniso  = invertIsolationNanoAOD(cuts0,to=cuts_aniso,verbosity=verbosity)
+          cuts_aniso1 = invertIsolationNanoAOD(cuts0,to=cuts_aniso1,verbosity=verbosity)
+          cuts_aniso2 = invertIsolationNanoAOD(cuts0,to=cuts_aniso2,verbosity=verbosity)
+          yvarfs      = [ ("genPartFlav_1==0",cuts_aniso1), ("genPartFlav_2==0",cuts_aniso2) ]
+        else:
+          if "mutau" in self.channel:
+            weightFF  = 'getFakeFactor(pt_2,idDecayMode_2,idMVAoldDM2017v2_2,pfRelIso04_all_1,njets,m_vis,pfmt_1)'
+          else:
+            weightFF  = 'getFakeFactor(pt_2,idDecayMode_2,idMVAoldDM2017v2_2,pfRelIso03_all_1,njets,m_vis,pfmt_1)'
+          cuts_aniso  = "idMVAoldDM2017v2_2<16 && idMVAoldDM2017v2_2>=2"
+          cuts_aniso  = invertIsolationNanoAOD(cuts0,to=cuts_aniso,remove1=False,verbosity=verbosity)
+          yvarfs      = [ ("genPartFlav_2==0",cuts_aniso), ]
+        if verbosity>1:
+          print '>>> SampleSet::jetFakeFactor:\n>>>   cuts0="%s"\n>>>   cuts_aniso="%s"\n>>>   weightFF="%s"'%(cuts0,cuts_aniso,weightFF)
+        
+        # FRACTIONS = MC / DATA
+        # TODO: save fractions per var / selection
+        for yvarf, cuts_anisof in yvarfs:
+          xvarf = 'm_vis'
+          nxbinsf, xminf, xmaxf = 40, 0, 200
+          nybinsf, yminf, ymaxf = 2, 0, 2
+          if verbosity>1:
+            print '>>> SampleSet::jetFakeFactor: calculating fractions for ("%s",%d,%s,%s) vs. ("%s",%d,%s,%s)\n>>>   cuts_anisof="%s"'%(yvarf,nybinsf,yminf,ymaxf,xvarf,nxbinsf,xminf,xmaxf,cuts_anisof)
+          histsD_JTF, histsB_JTF, _ = self.createHistograms2D(xvarf,nxbinsf,xminf,xmaxf,yvarf,nybinsf,yminf,ymaxf,cuts_anisof,weight=weight,append=append,
+                                                              signal=False,QCD=False,JFR=False,blind=False,split=False,task="calculating fractions")
+          if not histsD_JTF:
+            LOG.warning("SampleSet::jetFakeFactor: No data to make DATA driven JFR!")
+            return None
+          histD_JTF = histsD_JTF[0]
+          for i in xrange(0,nxbinsf+2):
+            zval1 = histD_JTF.GetBinContent(i,1)
+            zval2 = histD_JTF.GetBinContent(i,2)
+            histD_JTF.SetBinContent(i,1,zval2)
+            if zval1!=0:
+              LOG.warning('SampleSet::jetFakeFactor: Data has non-zero contributions to "%s" in bin %d of "%s"!'%(yvarf,i,xvarf))
+          #step      = float(xmaxf-xminf)/nxbinsf
+          #xbinsf    = [xmin+i*step for i in xrange(0,nxbinsf+1)]
+          fracsFF['real'] = [ 0.0 ]*nxbinsf
+           #TH1F(xvarf+"_real",xvarf+"_real",nxbinsf,xminf,xmaxf)
+          fracsFF['EWJ']  = [ 0.0 ]*nxbinsf #TH1F(xvarf+"_EWJ", xvarf+"_EWJ", nxbinsf,xminf,xmaxf)
+          fracsFF['TTJ']  = [ 0.0 ]*nxbinsf #TH1F(xvarf+"_TTJ", xvarf+"_TTJ", nxbinsf,xminf,xmaxf)
+          fracsFF['QCD']  = [ 0.0 ]*nxbinsf #TH1F(xvarf+"_QCD", xvarf+"_QCD", nxbinsf,xminf,xmaxf)
+          for hist in histsB_JTF:
+            hist.Divide(histD_JTF)
+            if 'TT' in hist.GetName() or 'ttbar' in hist.GetName() or 'top' in hist.GetName():
+              for i in xrange(1,nxbinsf+1):
+                fracsFF['real'][i-1] += hist.GetBinContent(i,1)
+                fracsFF['TTJ'][i-1]  += hist.GetBinContent(i,2)
+            else:
+              for i in xrange(1,nxbinsf+1):
+                fracsFF['real'][i-1] += hist.GetBinContent(i,1)
+                fracsFF['EWJ'][i-1]  += hist.GetBinContent(i,2)
+          for i in xrange(0,nxbinsf):
+            sumMC = fracsFF['real'][i]+fracsFF['EWJ'][i]+fracsFF['TTJ'][i]
+            fracsFF['QCD'][i] = max(0,1.-sumMC)
+            if sumMC>1:
+              LOG.warning("SampleSet::jetFakeFactor: Sum of fractions MC/data is %.2f > 1 in bin %d of %s! Rescaling..."%(sumMC,i,xvarf))
+              fracsFF['real'][i] *= 1./sumMC
+              fracsFF['EWJ'][i]  *= 1./sumMC
+              fracsFF['TTJ'][i]  *= 1./sumMC
+          for proc, frac in fracsFF.iteritems():
+            if 'tautau' in self.channel:
+              proc += '_1' if '_1' in yvarf else '_2' #if '_2' in yvarf else ''
+            line = 'setFraction("%s","%s",%s,%s,%s,{%s})'%(proc,xvarf,nxbinsf,xminf,xmaxf,','.join("%.4f"%x for x in frac))
+            if verbosity>2: print '\n'+line
+            gROOT.ProcessLine(line)
+        
+        
+        
+        # HISTOGRAMS
+        args_aniso = list(args[:-1])+[cuts_aniso]
+        histsD_aniso, _, _ = self.createHistograms(*args_aniso,weight_data=weightFF,append=append,verbosity=verbosity,
+                                                   background=False,signal=False,QCD=False,task="calculating FF",split=False,blind=False,noJTF=True)
+        
+        # CHECK histograms
+        if not histsD_aniso:
+          LOG.warning("SampleSet::jetFakeFactor: No data to make DATA driven JFR!")
+          return None
+        histJTF = histsD_aniso[0].Clone(name)
+        histJTF.SetTitle(title)
+        histJTF.SetFillColor(getColor('JTF'))
+        histJTF.SetOption('HIST')
+        
+        close(histsD_aniso)
+        gROOT.ProcessLine("closeFakeFactor()")
+        return histJTF
     
     
     
@@ -1648,30 +1868,29 @@ class SampleSet(object):
         
         # WEIGHT
         gROOT.ProcessLine('setID("MVArerun")')
-        weightFR        = 'getFakeRate(pt_2,m_2,decayMode_2)' # pt-, mass- dependent
-        #weightFR        = "getFakeRate(pt_2,decayMode_2)" # pt-dependent only
+        weightFR        = 'getFakeRate(pt_2,m_2,eta_2,decayMode_2)' # pt-, eta-/mass-dependent
+        #weightFR        = 'getFakeRate(pt_2,m_2,decayMode_2)' # pt-, mass-dependent
+        ###weightFR        = "getFakeRate(pt_2,decayMode_2)" # pt-dependent only
         if shift:
           if 'down' in shift.lower(): weightFR = weightFR.replace('getFakeRate','getFakeRateDown')
           elif 'up' in shift.lower(): weightFR = weightFR.replace('getFakeRate','getFakeRateUp')
           else: LOG.warning('SampleSet::jetFakeRate: Did not recognize shift "%s"!'%(shift))
         
         # CUTS
-        print "cuts0 =",cuts0
-        cuts          = vetoJetTauFakes(cuts0)
-        print "cuts =",cuts
+        cuts          = vetoJetTauFakes(cuts0,channel=self.channel)
         cuts_aniso    = "iso_2_vloose==1 && iso_2!=1"
         isomatch      = re.findall(r"iso_2\ *==\ *1",cuts)
         anisomatch    = re.findall(r"iso_2_vloose\ *==\ *1 && iso_2\ *!=\ *1",cuts)
         if len(isomatch)==0 and len(anisomatch)==0:
-          gROOT.ProcessLine('setID("MVArerunv1new")')
           cuts_aniso  = "byVLooseIsolationMVArun2v1DBnewDMwLT_2==1 && byTightIsolationMVArun2v1DBnewDMwLT_2!=1"
           isomatch    = re.findall(r"byTightIsolationMVArun2v1DBnewDMwLT_2\ *==\ *1",cuts)
           anisomatch  = re.findall(r"byVLooseIsolationMVArun2v1DBnewDMwLT_2\ *==\ *1 && byTightIsolationMVArun2v1DBnewDMwLT_2\ *!=\ *1",cuts)
+          if len(isomatch)>0: gROOT.ProcessLine('setID("MVArerunv1new")')
         if len(isomatch)==0 and len(anisomatch)==0:
-          gROOT.ProcessLine('setID("MVArerunv2")')
           cuts_aniso  = "byVLooseIsolationMVArun2v2DBoldDMwLT_2==1 && byTightIsolationMVArun2v2DBoldDMwLT_2!=1"
           isomatch    = re.findall(r"byTightIsolationMVArun2v2DBoldDMwLT_2\ *==\ *1",cuts)
           anisomatch  = re.findall(r"byVLooseIsolationMVArun2v2DBoldDMwLT_2\ *==\ *1 && byTightIsolationMVArun2v2DBoldDMwLT_2\ *!=\ *1",cuts)
+          if len(isomatch)>0: gROOT.ProcessLine('setID("MVArerunv2")')
         if len(isomatch)==0 and len(anisomatch)==1:
           LOG.warning('SampleSet::jetFakeRate: Using anti-isolated selection "%s" for fake rate!'%(cuts))
           isomatch    = anisomatch
@@ -1689,8 +1908,8 @@ class SampleSet(object):
           print '>>> SampleSet::jetFakeRate:\n>>>   cuts0="%s"\n>>>   cuts="%s"\n>>>   cuts_aniso="%s"\n>>>   weightFR="%s"'%(cuts0,cuts,cuts_aniso,weightFR)
         
         ## HISTOGRAMS
-        #histsD_JFR, histsB_JFR, histsS_JFR = self.createHistograms(var,N,a,b,cuts,weight=weight,weight_data=weight_data,append=append,
-        #                                                          signal=False,background=False,QCD=False,task="calculating JFR",split=False,blind=False,noJTF=True)
+        #histsD_JFR, histsB_JFR, _ = self.createHistograms(var,N,a,b,cuts,weight=weight,weight_data=weight_data,append=append,
+        #                                                  signal=False,background=False,QCD=False,task="calculating JFR",split=False,blind=False,noJTF=True)
         #histJTF = histsD_JFR[0].Clone(name)
         #histJTF.SetTitle(title)
         #histJTF.SetFillColor(getColor('JTF'))
@@ -1698,8 +1917,9 @@ class SampleSet(object):
         #histMC_JFR.Reset()
         
         # HISTOGRAMS
-        histsD_JFR, histsB_JFR, histsS_JFR = self.createHistograms(var,nbins,xmin,xmax,cuts,weight=weight,weight_data=weight_data,append=append,
-                                                                   signal=False,QCD=False,task="calculating JFR",split=False,blind=False,noJTF=True)
+        #args_aniso = list(args[:-1])+[cuts_aniso]
+        histsD_JFR, histsB_JFR, _ = self.createHistograms(var,nbins,xmin,xmax,cuts,weight=weight,weight_data=weight_data,append=append,
+                                                          signal=False,QCD=False,task="calculating JFR",split=False,blind=False,noJTF=True)
         
         # CHECK histograms
         if not histsD_JFR:
@@ -1726,7 +1946,7 @@ class SampleSet(object):
           canvas, pave = canvasWithText(cuts)
           pave.AddText("weight: "+weight)
           canvas.Write("selections")
-          for hist in histsS_JFR+histsB_JFR+histsD_JFR+[histMC_JFR]:
+          for hist in histsB_JFR+histsD_JFR+[histMC_JFR]:
             hist.GetXaxis().SetTitle(var)
             hist.Write(hist.GetName())
             #dir.Write(hist.GetName())
@@ -1739,7 +1959,7 @@ class SampleSet(object):
           JFR      = histJTF.Integral()
           print ">>> SampleSet::jetFakeRate: - data = %.1f, MC = %.1f, JFR = %.1f"%(data_JFR,MC_JFR,JFR)
         
-        close(histsS_JFR+histsB_JFR+histsD_JFR+[histMC_JFR])
+        close(histsB_JFR+histsD_JFR+[histMC_JFR])
         return histJTF
         
     
@@ -1763,8 +1983,8 @@ class SampleSet(object):
         name           += append
         
         # WEIGHT & CUTS
-        weightFR        = "getFakeRate(pt_2,m_2,decayMode_2)" # pt-, mass- dependent 
-        cuts        = vetoJetTauFakes(cuts0)
+        weightFR    = "getFakeRate(pt_2,m_2,decayMode_2)" # pt-, mass- dependent 
+        cuts        = vetoJetTauFakes(cuts0,channel=self.channel)
         isomatch    = re.findall(r"iso_2\ *==\ *1",cuts)
         anisomatch  = re.findall(r"iso_2_vloose\ *==\ *1 && iso_2\ *!=\ *1",cuts)
         if len(isomatch)==0 and len(anisomatch)==1:
@@ -1780,8 +2000,8 @@ class SampleSet(object):
         weight_data = weightFR
         
         # HISTOGRAMS
-        histsD_JFR, histsB_JFR, histsS_JFR = self.createHistograms2D(xvar,nxbins,xmin,xmax,yvar,nybins,ymin,ymax,cuts,xbins=xbins,ybins=ybins,weight=weight,weight_data=weight_data,append=append,
-                                                                     signal=False,QCD=False,task="calculating JFR",split=False,noJTF=True)
+        histsD_JFR, histsB_JFR, _ = self.createHistograms2D(xvar,nxbins,xmin,xmax,yvar,nybins,ymin,ymax,cuts,xbins=xbins,ybins=ybins,weight=weight,weight_data=weight_data,append=append,
+                                                            signal=False,QCD=False,task="calculating JFR",split=False,noJTF=True)
         
         # CHECK histograms
         if not histsD_JFR:
@@ -1807,17 +2027,27 @@ class SampleSet(object):
           JFR      = histJTF.Integral()
           print ">>> SampleSet::jetFakeRate: - data = %.1f, MC = %.1f, JFR = %.1f"%(data_JFR,MC_JFR,JFR)
         
-        close(histsS_JFR+histsB_JFR+histsD_JFR+[histMC_JFR])
+        close(histsB_JFR+histsD_JFR+[histMC_JFR])
         return histJTF
-        
-        
     
+        
     def QCD(self,*args,**kwargs):
+        if self.isNanoAOD:
+          if self.channel=="tautau":
+            return self.QCD_ABCD(*args,**kwargs)
+          else:
+            kwargs['relax']   = False
+            kwargs['scaleup'] = 1.0
+            return self.QCD_OSSS(*args,**kwargs)
+        else:
+          return self.QCD_OSSS(*args,**kwargs)
+    
+    def QCD_OSSS(self,*args,**kwargs):
         """Substract MC from data with same sign (SS) selection of a lepton - tau pair
            and return a histogram of the difference."""
         
         verbosity       = getVerbosity(kwargs,verbositySampleTools)
-        var, N, a, b, xbins, cuts0 = unwrapVariableSelection(*args)
+        var, nbins, xmin, xmax, xbins, cuts0 = unwrapVariableSelection(*args)
         isJetCategory   = re.search(r"(nc?btag|n[cf]?jets)",cuts0)
         relax           = 'emu' in self.channel or isJetCategory
         if verbosity > 1:
@@ -1843,10 +2073,10 @@ class SampleSet(object):
         
         scaleup         = 1.0 if "q_1*q_2>0" else 2.0 if "emu" in self.channel else OSSS_ratio
         scaleup         = kwargs.get('scaleup',         scaleup                 )
-        LOG.verbose("   QCD: scaleup = %s, shift = %s, self.shiftQCD = %s" % (scaleup,shift,self.shiftQCD),verbosity,level=2)
+        LOG.verbose("   QCD: scaleup = %s, shift = %s, self.shiftQCD = %s"%(scaleup,shift,self.shiftQCD),verbosity,level=2)
         
         # CUTS: invert charge
-        cuts            = invertCharge(cuts0)
+        cuts            = invertCharge(cuts0,to='SS')
         
         # CUTS: relax cuts for QCD_SS_SB
         # https://indico.cern.ch/event/566854/contributions/2367198/attachments/1368758/2074844/QCDStudy_20161109_HTTMeeting.pdf
@@ -1891,14 +2121,15 @@ class SampleSet(object):
             #      cuts+=" && bpt_2>30"
             #      LOG.warning("QCD: %s - added 30 GeV cut on b jets in \"%s\""%(var,cuts))
         
-        LOG.verbose("   QCD - cuts = %s %s" % (cuts,"(relaxed)" if relax else ""),verbosity,level=2)
+        LOG.verbose("   QCD - cuts = %s %s"%(cuts,"(relaxed)" if relax else ""),verbosity,level=2)
         
         # HISTOGRAMS
         gROOT.cd()
         histD  = None
         histWJ = None
-        histsD_SS, histsB_SS, histsS_SS = self.createHistograms(var,N,a,b,cuts,weight=weight,weight_data=weight_data,append=append,
-                                                                signal=False,QCD=False,task="calculating QCD",split=False,blind=False,verbosity=verbosity-1)
+        args_SS = list(args[:-1])+[cuts]
+        histsD_SS, histsB_SS, _ = self.createHistograms(*args_SS,weight=weight,weight_data=weight_data,append=append,
+                                                        signal=False,QCD=False,task="calculating QCD",split=False,blind=False,verbosity=verbosity-1)
         
         # GET WJ
         if doRatio_WJ_QCD:
@@ -1930,7 +2161,7 @@ class SampleSet(object):
           canvas, pave = canvasWithText(cuts)
           pave.AddText("weight: "+weight)
           canvas.Write("selections")
-          for hist in histsS_SS+histsB_SS+histsD_SS+[histMC_SS]:
+          for hist in histsB_SS+histsD_SS+[histMC_SS]:
             hist.GetXaxis().SetTitle(var)
             hist.Write(hist.GetName())
           gROOT.cd()
@@ -1940,13 +2171,13 @@ class SampleSet(object):
             QCD_SS = histQCD.Integral(1,N)
             if QCD_SS:
               scaleup = QCD_OS_SR/QCD_SS # normalizing to OS_SR
-              LOG.verbose("   QCD - scaleup = QCD_OS_SR/QCD_SS_SB = %.1f/%.1f = %.3f" % (QCD_OS_SR,QCD_SS,scaleup),verbosity,level=2)
+              LOG.verbose("   QCD - scaleup = QCD_OS_SR/QCD_SS_SB = %.1f/%.1f = %.3f"%(QCD_OS_SR,QCD_SS,scaleup),verbosity,level=2)
             else:
               LOG.warning("SampleSet::QCD: QCD_SS_SB.Integral() == 0!")
         scale   = scaleup*(1.0+shift) # scale up QCD 6% in OS region by default
         histQCD.Scale(scale)
         histQCD.SetFillColor(getColor('QCD'))
-        histQCD.SetOption("HIST")
+        histQCD.SetOption('HIST')
         MC_SS   = histMC_SS.Integral()
         data_SS = histD_SS.Integral()
         QCD_SS  = histQCD.Integral()
@@ -1960,15 +2191,151 @@ class SampleSet(object):
         else:
             LOG.verbose("   QCD - data_SS = %.1f, MC_SS = %.1f, QCD_SS = %.1f, scale=%.3f"%(data_SS,MC_SS,QCD_SS,scale),verbosity,level=2)
         
-        close(histsS_SS+histsB_SS+histsD_SS+[histMC_SS])
+        close(histsB_SS+histsD_SS+[histMC_SS])
         return histQCD
         
     
+    
+    def QCD_ABCD(self,*args,**kwargs):
+        """Estimate the QCD in a data-driven way with the ABCD method:
+        Substract MC from data in three different regions:
+                           OS          SS
+          isolated         A=SR        B
+          anti-isolated    C=shape     D
+        Get the shape from region C, get the yield as B*C/D, where C/D = OS/SS ratio.
+        Anti-isolated region for tautau: one tau passes Medium (8), one tau passes Loose (4) but fails Tight (16)
+        """
+        
+        verbosity       = getVerbosity(kwargs,verbositySampleTools)
+        var, nbins, xmin, xmax, xbins, cuts0 = unwrapVariableSelection(*args)
+        if verbosity > 1:
+          print header("estimating QCD (ABCD) for variable %s" % (var))
+          #LOG.verbose("\n>>> estimating QCD for variable %s" % (self.var),verbosity,level=2)
+        
+        samples         = self.samples
+        name            = kwargs.get('name',            makeHistName("QCD",var) )
+        title           = kwargs.get('title',           "QCD multijet"          )
+        append          = kwargs.get('append',          ""                      )+"_SS"
+        weight          = kwargs.get('weight',          ""                      )
+        weight_data     = kwargs.get('weight',          ""                      )
+        shift           = kwargs.get('shift',           0.0                     ) + self.shiftQCD # for systematics
+        ratio_WJ_QCD    = kwargs.get('ratio_WJ_QCD_SS', False                   )
+        doRatio_WJ_QCD  = isinstance(ratio_WJ_QCD,      c_double                )
+        
+        # SELECTIONS
+        if 'tautau' in self.channel:
+          yvar       = "isoRegion(idMVAoldDM2017v2_1,idMVAoldDM2017v2_2)"
+          cuts_aniso = "((idMVAoldDM2017v2_1>=8 && idMVAoldDM2017v2_2<16 && idMVAoldDM2017v2_2>=4) || (idMVAoldDM2017v2_2>=8 && idMVAoldDM2017v2_1<16 && idMVAoldDM2017v2_1>=4))"
+        else:
+          yvar       = "isoRegion(idMVAoldDM2017v2_1,idMVAoldDM2017v2_2)"
+          cuts_aniso  = invertIsolationNanoAOD(cuts0,to=cuts_aniso,remove1=False,verbosity=verbosity)
+          LOG.warning('QCD_ABCD not implemented for %s channel!'%(self.channel))
+          return None
+        cuts_aniso = invertIsolationNanoAOD(cuts0,to=cuts_aniso,verbosity=verbosity)
+        cuts_naked = invertIsolationNanoAOD(cuts0,to='',verbosity=verbosity)
+        cuts_naked = invertCharge(cuts_naked,to='',verbosity=verbosity)
+        
+        # YIELDS
+        xvar = "q_1*q_2" #"signRegion(q_1,q_2)"
+        histsD_ABCD, histsB_ABCD, _ = self.createHistograms2D(xvar,2,-10,10,yvar,2,1,3,cuts_naked,weight=weight,weight_data=weight_data,append=append,
+                                                              signal=False,QCD=False,JFR=False,blind=False,split=False,task="calculating QCD's ABCD yields")
+        if not histsD_ABCD:
+          LOG.warning("SampleSet::QCD_ABCD: No data to make DATA driven QCD!")
+          return None
+        histD_ABCD = histsD_ABCD[0]
+        histQCD_ABCD = histsB_ABCD[0].Clone(name+"_ABCD")
+        histQCD_ABCD.Reset()
+        histQCD_ABCD.Add(histD_ABCD)
+        for histB in histsB_ABCD:
+          histQCD_ABCD.Add(histB,-1)
+        N_OS_iso   = histQCD_ABCD.GetBinContent(1,2) # A
+        N_SS_iso   = histQCD_ABCD.GetBinContent(2,2) # B
+        N_OS_aniso = histQCD_ABCD.GetBinContent(1,1) # C
+        N_SS_aniso = histQCD_ABCD.GetBinContent(2,1) # D
+        if verbosity>1:
+          print ">>>   total data = %.1f"%(histD_ABCD.Integral())
+          print ">>>   ABCD yields:                %10s %10s"%('OS','SS')
+          print ">>>                isolated       %10.1f %10.1f"%(N_OS_iso,  N_SS_iso  )
+          print ">>>                anti-isolated  %10.1f %10.1f"%(N_OS_aniso,N_SS_aniso)
+        scale  = N_SS_iso*N_OS_aniso/N_SS_aniso*(1.0+shift)
+        close([histQCD_ABCD]+histsD_ABCD+histsB_ABCD)
+        
+        # HISTOGRAMS
+        args_aniso = list(args[:-1])+[cuts_aniso]
+        histsD_OS_aniso, histsB_OS_aniso, _ = self.createHistograms(*args_aniso,weight=weight,weight_data=weight_data,append=append,
+                                                                    signal=False,QCD=False,JFR=False,split=False,blind=False,task="calculating QCD ABCD shape",verbosity=verbosity-1)
+        if not histsD_OS_aniso:
+          LOG.warning("SampleSet::QCD_ABCD: No data to make DATA driven QCD!")
+          return None
+        histD_OS_aniso = histsD_OS_aniso[0]
+
+        
+        # GET WJ
+        histWJ = None
+        if doRatio_WJ_QCD:
+          for hist in histsB_OS_aniso:
+            if ('WJ' in hist.GetName() or re.findall(r"w.*jets",hist.GetName(),re.IGNORECASE)):
+              if histWJ_OS_aniso:
+                LOG.warning("SampleSet::QCD_ABCD: more than one W+jets sample in SS region, going with first instance!", pre="  ")
+                break
+              else: histWJ_OS_aniso = hist
+          if not histWJ_OS_aniso:
+            LOG.warning("SampleSet::QCD_ABCD: Did not find W+jets sample!", pre="  ")
+        
+        histMC_OS_aniso = histsB_OS_aniso[0].Clone(name+"_MC_OS_aniso")
+        histMC_OS_aniso.Reset()
+        for histB in histsB_OS_aniso:
+          histMC_OS_aniso.Add(histB)
+        histQCD = histsB_OS_aniso[0].Clone(name)
+        histQCD.SetTitle(title)
+        histQCD.Reset()
+        histQCD.Add(histD_OS_aniso)
+        histQCD.Add(histMC_OS_aniso,-1)
+        histQCD.SetFillColor(getColor('QCD'))
+        histQCD.SetOption("HIST")
+        
+        MC_OS_aniso   = histMC_OS_aniso.Integral()
+        data_OS_aniso = histD_OS_aniso.Integral()
+        QCD_OS_aniso  = histQCD.Integral()
+        
+        # CHECK yield
+        if verbosity>2:
+          under, over = histQCD.GetBinContent(0), histQCD.GetBinContent(histQCD.GetXaxis().GetNbins()+1)
+          print ">>> check: QCD_OS_aniso + under-/overflow = %.1f + %.1f + %.1f = %.1f  <->  %.1f"%(QCD_OS_aniso,under,over,QCD_OS_aniso+under+over,N_OS_aniso)
+        
+        # CHECK negative bins
+        nNegBins = 0
+        for i, bin in enumerate(histQCD):
+          if bin<0:
+            histQCD.SetBinContent(i,0)
+            histQCD.SetBinError(i,1)
+            nNegBins += 1
+        if nNegBins>0:
+          LOG.warning("SampleSet::QCD_ABCD: %d/%d negative bins! Set to 0 +- 1"%(nNegBins,nbins), pre="  ")
+        
+        # CHECK integral
+        if QCD_OS_aniso==0:
+          LOG.warning("SampleSet::QCD_ABCD: QCD integral is 0!", pre="  ")
+          return histQCD
+        histQCD.Scale(scale/QCD_OS_aniso)
+        
+        if doRatio_WJ_QCD and histWJ_OS_aniso:
+          WJ_OS_aniso        = histWJ_OS_aniso.Integral()
+          ratio_WJ_QCD.value = WJ_OS_aniso/QCD_OS_aniso
+          LOG.verbose("  QCD OS+aniso region: data = %.1f, MC = %.1f, QCD = %.1f, scale=%.3f, WJ = %.1f, ratio_WJ_QCD = %.3f"%(data_OS_aniso,MC_OS_aniso,QCD_OS_aniso,scale,WJ_OS_aniso,ratio_WJ_QCD.value),verbosity,level=2)
+        else:
+          LOG.verbose("  QCD OS+aniso region: data = %.1f, MC = %.1f, QCD = %.1f, scale=%.3f"%(data_OS_aniso,MC_OS_aniso,QCD_OS_aniso,scale),verbosity,level=2)
+        
+        close([histMC_OS_aniso]+histsD_OS_aniso+histsB_OS_aniso)
+        return histQCD
+    
+    
+       
     def renormalizeWJ(self,cuts,**kwargs):
         """Renormalize WJ by requireing that MC and data has the same number of events in
-           the mt_1 > 80 GeV sideband.
-           This method assume that the variable of this Plot object is a transverse mass and is plotted
-           from 80 GeV to at least 100 GeV."""
+        the mt_1 > 80 GeV sideband.
+        This method assume that the variable of this Plot object is a transverse mass and is plotted
+        from 80 GeV to at least 100 GeV."""
         
         var, nbins, xmin, xmax = "pfmt_1", 200, 80, 200
         if isinstance(cuts,Selection): cuts = cuts.selection
@@ -2089,7 +2456,7 @@ class SampleSet(object):
     
     def renormalizeTT(self,cuts,**kwargs):
         """Renormalize TT by requireing that MC and data has the same number of events in some control region.
-           ..."""
+        ..."""
         
         var, nbins, xmin, xmax = 'pfmt_1', 100, 0, 400
         if isinstance(cuts,Selection): cuts = cuts.selection
@@ -2224,8 +2591,7 @@ class SampleSet(object):
         return scale, err_scale
     
     def measurePurityInSignalWindow(self, var, nbins, xmin0, xmax0, cuts, **kwargs):
-        """Measure purity of processes in region.
-        """
+        """Measure purity of processes in region."""
         print ">>> measurePurityInSignalWindow"
         
         filter     = kwargs.get('filter',  [ ]  )
@@ -2241,8 +2607,7 @@ class SampleSet(object):
           #print ">>> "
     
     def measurePurity(self, *args, **kwargs):
-        """Measure purity of processes in region.
-        """
+        """Measure purity of processes in region."""
         
         verbosity = getVerbosity(kwargs,verbositySampleTools)
         var, nbins, xmin, xmax, xbins, cuts0 = unwrapVariableSelection(*args)
@@ -2284,7 +2649,7 @@ class SampleSet(object):
     
     def measureOSSSratio(self,*args,**kwargs):
         """Measure OS/SS ratio by substract non-QCD MC from data with opposite sign (OS) and same sign (SS)
-           requirements of a lepton pair."""
+        requirements of a lepton pair."""
         
         verbosity = getVerbosity(kwargs,verbositySampleTools)
         var, nbins, xmin, xmax, xbins, cuts = unwrapVariableSelection(*args)
@@ -2542,8 +2907,9 @@ class SampleSet(object):
         title_tag       = kwargs.get('title_tag',   False       )
         title_veto      = kwargs.get('title_veto',  False       )
         close           = kwargs.get('close',       False       )
-        kwargs.setdefault('name', file_app.lstrip('_'))
-        kwargs.setdefault('label', file_app)
+        kwargs.setdefault('name',      file_app.lstrip('_')     )
+        kwargs.setdefault('label',     file_app                 )
+        kwargs.setdefault('isNanoAOD', self.isNanoAOD           )
         
         searchterms     = ensureList(searchterms)
         all             = searchterms==['*']
@@ -2585,6 +2951,7 @@ class SampleSet(object):
         filter          = kwargs.get('filter',      False       ) # filter other samples
         share           = kwargs.get('share',       False       ) # share other samples (as opposed to cloning them)
         extra           = kwargs.get('extra',       True        ) # replace extra weight
+        kwargs.setdefault('isNanoAOD', self.isNanoAOD           )
         
         if not isList(searchterms): searchterms = [ searchterms ]
         samplesD        = { }
@@ -2795,6 +3162,8 @@ def stitch(sampleList,*searchterms,**kwargs):
     # SET weight of inclusive sample
     sample_incl.norm = 1.0 # apply lumi-cross section normalization via weights
     stitchweights    = '*'.join(weights)
+    if sample_incl.isNanoAOD:
+      stitchweights  = stitchweights.replace('NUP','LHE_Njets')
     LOG.verbose("   stitch weights = %s"%(stitchweights),verbosity,4)
     sample_incl.addWeight(stitchweights)
     if not title0: title0 = sample_incl.title
@@ -2818,7 +3187,7 @@ def crossSectionsNLO(*searchterms,**kwargs):
     isWJ          = False
     
     sigmasNLO     = { 'DY': { 'M-50':      5765.4,
-                              'M-10to50': 21658.0 },
+                              'M-10to50': 21658.0 }, # WRONG !!! 18610.0 is already NLO
                       'WJ':               61526.7 }
     
     for searchterm in searchterms:
@@ -2832,9 +3201,10 @@ def crossSectionsNLO(*searchterms,**kwargs):
         if "WJ" in searchterm:
             isWJ = True
     
-    if isDY_M50 and "2017" in globalTag:
-      LOG.warning("crossSectionsNLO: changing NNLO cross section for DY M>50")
-      sigmasNLO['DY']['M-50'] = 3*2004.76
+    if isDY_M50 and ("2017" in globalTag or "2017" in era):
+      LOG.warning("crossSectionsNLO: changing NNLO cross section for DY")
+      sigmasNLO['DY']['M-50'] = 3*2077.85
+      sigmasNLO['DY']['M-10to50'] = 18610.0 #(3*2065.75/5343.0)*25296
     
     if isDY and isWJ:
         LOG.error("crossSections - Detected both isDY and isWJ!")
